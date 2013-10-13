@@ -1,0 +1,36 @@
+README - 0.4.0
+==============
+
+Description:
+------------
+TUI is an abrevihation for Textual User Interface
+It enables you to write scripts simulation a TUI
+in Emergency, Multiuser and Graphical stages.
+Furthermore, the TUI will work in bash, csh and 
+zsh too as its written in sh.
+
+This package provides multiple commands (tui*)
+available in the shell.
+Those commands are thought to be used in your scripts, 
+'replacing' other/some calls of 'echo' and/or 'printf'.
+They will give you the opportunity to place strings left,
+center or right aligned.
+
+
+
+Purpose:
+------------
+In todays world, everything is about presenting.
+There are many tasks that can be faster accomplished 
+using a script rather than writing an application for
+it as others require to use it.
+
+This said, it is known many end-users dont like the terminal screen.
+That is usualy because the commands in terminals have their 
+output not very well structured, usualy just text-by-text-by-newline-by-text.
+
+This is if you need/want/have to provide scripts for users to use,
+and make it (a little) easier for them to 'read' the terminal,
+without to have to write 'presentation' handlers.
+
+

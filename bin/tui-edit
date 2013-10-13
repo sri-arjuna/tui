@@ -1,0 +1,34 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.4
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
+		\rOpens provided FILE/s in EDITOR_[CLI,GUI]
+		\r"
+	ARGS=($@)
+	ARGS_COUNT=$#
+#
+#	Check for the environment to load
+#
+	type printx &>/dev/zero || source tui
+#
+#	Variable handling
+#
+	[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	esac
+#
+#	Display
+#
+	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
+	then	export EDITOR=$(which $EDITOR_GUI)
+	else	export EDITOR=$(which $EDITOR_CLI)
+	fi
+	$EDITOR ${ARGS[@]}

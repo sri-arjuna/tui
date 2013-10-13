@@ -1,0 +1,39 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.4
+	ME="$(basename $0)"
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME SOURCE TARGET
+		\rWrites SOURCE to TARGET
+		\rRequires root rights.
+		\r"
+	source tui
+	SOURCE="$1"
+	TARGET="$2"
+	echo "" > $TUI_TEMP_FILE
+	
+#
+#	Variable handling
+#
+	if [[ "$1" = "-h" ]] || [[ -z $2 ]];then
+	echo -e "$help_text" && exit $RET_HELP;fi
+	[[ 0 -eq $UID ]] || tui-status 1 "Requires root" || exit 1
+#
+#	Display
+#
+	RET_DD=1
+	(dd if=$SOURCE of=$TARGET 2> $TUI_TEMP_FILE && \
+		export RET_DD=0 || export RET_DD=1 )   &
+	PID=$(ps|grep -v tui|grep dd|awk '{print $1}')
+	while [[ ! "" = "$(ps|grep -v tui|grep dd|awk '{print $1}')" ]]
+	do 	kill -USR1 $PID 2>&1
+		SIZE=($(grep "," $TUI_TEMP_FILE|awk '{print $3$4}'))
+		[[ ${#SIZE[@]} -lt 1 ]] && max=0 || max=$[ ${#SIZE[@]} - 1 ]
+		tui-printf "Writing $SOURCE to $TARGET..." "${SIZE[$max]}" "[  $(tui-indi)   ]"
+		sleep 0.7
+        done
+	tui-status $RET_DD "Written $(basename $SOURCE) to $TARGET"

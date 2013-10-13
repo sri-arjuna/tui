@@ -1,0 +1,154 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	COLUMNS=$(tput cols)
+	if [[ ! 0 -eq $[ $COLUMNS % 2 ] ]]
+	then	# not equal amount of cols
+		let COLUMNS--
+	fi
+	TUI_VERSION=0.4.0
+#
+#	Load defaults
+#
+	for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
+#
+#	Load user config if available
+#
+	[[ ! 0 -eq $UID ]] && \
+		[[ -f $TUI_USER_CONF ]] && \
+		source "$TUI_USER_CONF" && \
+		[[ $doAlias ]] && source $(dirname $TUI_USER_CONF)/alias.conf
+	
+	[[ 0 -eq $UID ]] && [[ $doAlias ]] && \
+		source /etc/tui/alias.conf
+#
+#	BUILTIN's
+#
+	DATE() { echo $(date +'%Y.%m.%d') ; }
+	TIME() { echo $(date +'%H:%M:%S') ; }
+	if [[ xterm = "$TERM" ]]
+	then	type $EDITOR_GUI 2&> /dev/zero && \
+			EDITOR=$EDITOR_GUI || EDITOR=$EDITOR_CLI
+		type $BROWSER_GUI 2&> /dev/zero && \
+			BROWSER=$BROWSER_GUI || BROWSER=$BROWSER_CLI
+	else	EDITOR=$EDITOR_CLI
+		BROWSER=$BROWSER_CLI
+	fi
+#
+#	'Internals'
+#
+	getspace() { # NUM
+	# Returns string of NUM space chars
+	#
+		C=0 ; out=""
+		while [[ $C -lt $1 ]];do out+=" ";let C++;done
+		printf "$out"
+	}
+	printx() { # "String 1" "String 2" "String 3" 
+	# Prints strings: left, center and reight-aligned
+	# If 2 strings supplied, prints left and right
+	#
+	#	Variable handling
+	#
+		ARG_NUM=$#
+		COLUMNS=$(tput cols)	# Say its 99
+		LEN_BORDERS=$[ ${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2 ] # 3 + 3 + 2 = 8 (2 beeing the space between BORDERs and text
+		LEN_SPACE_TOTAL=$[ $COLUMNS - $LEN_BORDERS + $ARG_NUM ] # 
+		# Set Arguments length to at least 3
+		[[ ! -z $1 ]] && TXT_LEFT="$1"   || TXT_LEFT=" "
+		[[ ! -z $2 ]] && TXT_MIDDLE="$2" || TXT_MIDDLE=" "
+		[[ ! -z $3 ]] && TXT_RIGHT="$3"  || TXT_RIGHT=" "
+		LEN_ARGS=$[ ${#TXT_LEFT} + ${#TXT_MIDDLE} + ${#TXT_RIGHT} + 4 ]
+		LEN_SPACE_AVAIL=$[ $LEN_SPACE_TOTAL - $LEN_ARGS ]
+		if [[ 1 -eq $[ $LEN_ARGS % 2 ] ]]
+		then	let LEN_SPACE_AVAIL--
+			FILLER=" "
+		else 	FILLER=""
+		fi
+		half=$[ $LEN_SPACE_AVAIL / 2 ]
+	#
+	#	Evenize / Align output
+	#
+		if [[ $COLUMNS -le $[ $LEN_ARGS + $LEN_BORDERS + $LEN_SPACE_TOTAL ] ]] # 
+		then	# Text matches on 1 line
+		#
+		#	Prepare the text arangements
+		#
+			case $ARG_NUM in
+			0)	CLI_OUTPUT="$(getspace $LEN_SPACE_AVAIL)$FILLER"					;;
+			1)	CLI_OUTPUT="$TXT_LEFT$(getspace $LEN_SPACE_AVAIL)$FILLER"					;;
+			2)	CLI_OUTPUT="$TXT_LEFT$(getspace $LEN_SPACE_AVAIL)$FILLER$TXT_MIDDLE"				;;
+			3)	CLI_OUTPUT="$TXT_LEFT$(getspace $half)$TXT_MIDDLE $(getspace $half)$FILLER$TXT_RIGHT"		;;
+			*)	echo tui-status 1 "$(basename $0): Cant handle more than 3 arguments" ; return $?	;;
+			esac
+			printf " $CLI_OUTPUT "
+		else	# Text matches NOT on 1 line
+		#
+		#	Prepare the text arangements
+		#
+			case $ARG_NUM in
+			1)	tui-echo "${TXT_LEFT:0:(${#TXT_LEFT}/2)}"
+				tui-printf " " "${TXT_LEFT:(${#TXT_LEFT}/2)}"
+				;;
+			2)	[[ ! "" = "$(echo $TXT_LEFT)" ]] && \
+					tui-echo "$TXT_LEFT"
+				if [[ $LEN_SPACE_TOTAL -lt ${#TXT_MIDDLE} ]]
+				then	tui-echo "${TXT_MIDDLE:0:(${#TXT_MIDDLE}/2)}"
+					tui-printf " " "${TXT_MIDDLE:(${#TXT_MIDDLE}/2)}"
+				else	tui-printf "$TXT_MIDDLE"
+				fi
+				;;
+			3)	tui-echo "$1" "$2"
+				tui-printf  "$3"
+				;;
+			esac
+			return $?
+		fi
+	}
+#
+#	Display
+#
+	if [[ "$(basename $0)" = tui ]]
+	then	# Its not sourced, thus show config menu
+		script_version=0.8
+		ME="$(basename $0)"
+		help_tui="$ME ($script_version)
+			\rUsage: source $ME | $ME
+			\rWhere options are:
+			\r\t-h\tThis screen
+			\r"
+		if [[ "-h" = "$1" ]]
+		then	echo -e "$help_tui" 
+			exit $RET_HELP
+		fi
+		TITLE="Configuration"	# Must be here to not overwrite script titles upon sourcing!
+		tui-header "TUI ($TUI_VERSION) by sea" "$(DATE) $(TIME)"
+		tui-title "$TITLE ($script_version)"
+		tui-echo "Calling $ME like this gives you an impression how it may look like."
+		tui-echo "As well as it lets you configure it."
+		tui-echo
+		
+		tui-echo "If you are looking for the commands of TUI, try this:" "tui-<hit-the-tab>"
+		tui-echo "Also you could read:" "the man pages or /usr/share/tui/README"
+		tui-echo "Also there is a sample script:" "/usr/share/tui/sample"
+		tui-echo "To create a new script in ~/bin, type:" "tui-newscript SCRIPTNAME"
+		
+		tui-echo
+		if [[ 0 -eq $UID ]] 
+		then 	thisconf=/etc/tui/
+		else	thisconf="$HOME/.config/tui/"
+		fi
+		if tui-bol-yesno "Edit $thisconf now?" 
+		then	if [[ ! -f $thisconf ]] && [[ ! 0 -eq $UID ]]
+			then	tui-bol-dir "$thisconf"
+				cp /etc/tui/alias.conf $thisconf
+				cp /usr/share/tui/user.conf $thisconf
+			fi
+			tui-edit $thisconf/*
+			tui-status $? "Edited $USER's configuration"
+			source $thisconf/*
+		fi
+	fi

@@ -1,0 +1,42 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.6
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME [options] [str1] [str2] [str3]
+		\rPrints str1 on the left
+		\rPrints str2 in the middle
+		\rPrints str3 on the right
+		\rIf 2 strings are passed, they're printed left and right.
+		\r"
+	ARGS_COUNT=$#
+	TITLE="TITLE"
+#
+#	Check for the environment to load
+#
+	type printx &>/dev/zero || source tui
+#
+#	Variable handling
+#
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	esac
+	[[ ! -z $1 ]] && TXT_LEFT="$1"   || TXT_LEFT=" "
+	[[ ! -z $2 ]] && TXT_MIDDLE="$2" || TXT_MIDDLE=" "
+	[[ ! -z $3 ]] && TXT_RIGHT="$3"  || TXT_RIGHT=" "
+	case $ARGS_COUNT in
+	2)	TXT_RIGHT="$TXT_MIDDLE"
+		TXT_MIDDLE=" "
+		;;
+	esac
+#
+#	Display
+#
+	printf "\r$BORDER_LEFT"
+	printx "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
+	printf "$BORDER_RIGHT"

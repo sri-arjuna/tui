@@ -1,0 +1,76 @@
+.TH "tui" "1" "2013 09 24"  "Simon A. Erat (sea)" "TUI 0.4.0"
+
+.SH "NAME"
+tui \- Textual User Interface
+
+.SH "SYNOPSIS"
+source \fBtui\fP | \fBtui\fP
+.br
+
+.SH "DESCRIPTION"
+.PP 
+\fBtui\fP is providing a way to present your scripts easy with color(-name)s,
+with the use of just some few new commands, starting with: tui-<tab>
+.br
+For the use with scripts, you will have high benefit of sourcing 'tui',
+.br
+just like: source \fBtui\fP
+.br
+That will provide several set-able variables, such as DEFAULT_[EMAIL,USER,HOMEPAGE] and DEFAULT_LICENSE[_URL].
+.br
+These variables are used while creating new scripts and the according manual using tui-newscript for example.
+.br
+But their usage is not limited to such simple task, you might use the DEFAULT_[EMAIL,USER] to be used for new GIT projects, 
+or whatever you can think of...
+.PP
+While the main commands (tui-[echo,header,printf,status,title]) are just for presentation,
+there are also commands which aim to ease scripting, such as: tui-
+.br
+* bol-dir
+.br
+* bol-yesno
+.br
+* edit
+.br
+* indi
+.br
+* press
+.br
+And more to come, please see each one's manual for more information.
+
+
+.SH BUILTINS
+.PP 
+.IP "\fBDATE\fP"
+.br
+Prints current date in format: YYYY.MM.DD
+.IP "\fBTIME\fP"
+.br
+Prints current time in format: HH:MM:DD
+.IP "\fBgetspace\fP"
+getspace NUM
+.br
+Prints a string of NUM spaces.
+
+.SH CONFIGURATION
+* /etc/tui/tui.conf
+.br
+* /usr/share/tui/user.conf
+.PP
+How it appears for you may be configured in /etc/tui/tui.conf systemwide (not recomended)
+.br
+or per user if you copy /usr/share/tui/user.conf to $HOME/.config/tui/user.conf
+
+.SH LICENSE
+GNU Lesser General Public License (LGPL)
+.br
+http://www.gnu.org/licenses/lgpl.html
+
+.br
+The CLI package is a logical consequence of my previous project: Script-Tools.
+.br
+This offers all the nice CLI handling i've been using there, so i can reuse it and offer others to have the same benefits and joy writing their scripts.
+
+
+.SH CONTACT
+erat.simon@gmail.com

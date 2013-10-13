@@ -1,0 +1,26 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.1
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME
+		\rRequires the user to press enter to continue
+		\r"
+	MESSAGE="Press [ENTER] to continue"
+#
+#	Variable handling
+#
+	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	esac
+#
+#	Display
+#
+	cli-printf "$MESSAGE" "$MESSAGE"
+	read buffer

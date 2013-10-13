@@ -1,0 +1,23 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.2
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME /path/to/check
+		\rReturns 0 if '/path/to/check' was found or could be created
+		\r"
+#
+#	Display
+#
+	if [[ -z $1 ]] || [[ "-h" = "$1" ]]
+	then	echo -e "$help_text"
+		exit 99
+	elif [[ -d "$1" ]]
+	then	tui-status 0 "Found: $1"
+	else	mkdir -p "$1"
+		tui-status $? "Created: $1"
+	fi

@@ -1,0 +1,45 @@
+.TH "cli-status" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+
+.SH NAME
+cli-status
+
+.SH SYNOPSIS
+\fBcli-status\fP $? ["MESSAGE"]
+
+.SH DESCRIPTION
+.PP
+Returns the error level a passed as first (numeric) argument and prints MESSAGE if supplied.
+.br
+RET_DONE=0
+.br
+RET_FAIL=1
+.br
+RET_WORK=2
+.br
+RET_TODO=3
+.br
+RET_SKIP=4
+.br
+RET_NEXT=5
+.br
+RET_BACK=6
+.br
+RET_CANC=7
+.br
+RET_ENAB=10
+.br
+RET_DIAB=11
+.br
+RET_HELP=99
+.br
+RET_INFO=111
+
+.SH LICENSE
+GNU Lesser General Public License (LGPL)
+.br
+http://www.gnu.org/licenses/lgpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+sea@fedoraproject.org

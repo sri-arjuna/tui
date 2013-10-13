@@ -1,0 +1,52 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+#	STABLE: 2013.10.13	--- DONT CHANGE IT ---
+#				unless everything is STABLE & BACKED UP !!
+	script_version=0.4
+	ME="$(basename $0)"
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME [options] URL [URL2] ..
+		\rWhere options are:
+		\r\t-h\tThis screen
+		\r"
+	source tui
+	ARGS=(${@})
+	FILE_TEMP="$TUI_TEMP_DIR/tui-download.status"
+	FILE_CMD="$TUI_TEMP_DIR/bgjob"
+	umask 022 $FILE_CMD $FILE_TEMP
+	DEST=""
+	tui-bol-dir "$TUI_TEMP_DIR" > /dev/zero
+	#tui-echo "Downloading to:"  "$(pwd)"
+#
+#	Variable handling
+#
+	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	"")	unset ARGS[@]
+		ARGS[0]=$(tui-read "Enter url to download:")
+	esac
+#
+#	Display
+#
+	for URL in "${ARGS[@]}"
+	do 	THIS="$(basename $URL)"
+		tui-printf "Initializing new download..." "$WORK"
+		echo "wget -qc $URL" > $FILE_CMD
+		chmod +x $FILE_CMD
+		$FILE_CMD &
+		sleep 1.5
+		K=1024
+	
+		while [[ ! "" = "$(ps|grep wget)" ]] #|| [[ ! "" = "$(ps $!)" ]]
+		do	tmp_size="$(ls -hl |grep $THIS |awk '{print $5}')"
+			tui-printf "Downloading..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
+			sleep 1
+		done
+		tui-status $? "Downloaded: $(pwd)/$THIS"
+	done 

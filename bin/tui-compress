@@ -1,0 +1,17 @@
+#!/bin/sh
+echo "ALPHA $0 ALPHA -- requires UNIX"
+# i dont know how compress 'works' with dirs...
+[[ -z $1 ]] && echo "Use: $0 FILE [/some/path?] ..." && exit
+for ENTRY in ${@}
+do
+	THIS=$(basename $ENTRY)
+	printf "\nInitializing..."
+	compress $ENTRY &
+	while [[ ! "" = "$(ps $!)" ]]
+	do
+		size=$(ls -hl|grep $THIS|awk '{print $5}')
+		printf "\rCompressing: $THIS ($size)"
+		sleep 1
+	done
+	printf "\rCompressed $THIS - $?\n"
+done

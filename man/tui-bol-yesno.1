@@ -1,0 +1,35 @@
+.TH "tui-bol-yesno" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+
+.SH NAME
+tui-bol-yesno
+
+.SH SYNOPSIS
+\fBtui-bol-yesno\fP "Question"
+
+.br
+Example: 
+.br
+if \fBtui-bol-yesno\fP "Are you male?"
+.br
+then echo "do male stuff"
+.br
+else echo "do female stuff"
+.br
+fi
+
+.SH DESCRIPTION
+.PP
+Asks the user supplied question and returns 0 for y,j,o,s
+.br
+which are the starting letters for yes in english, spanish, italian, german and french
+.br
+or 1 for anything else.
+
+.SH LICENSE
+GNU Lesser General Public License (LGPL)
+.br
+http://www.gnu.org/licenses/lgpl.html
+
+
+.SH CONTACT
+erat.simon@gmail.com

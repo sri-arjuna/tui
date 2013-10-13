@@ -1,0 +1,122 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.8
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME [path/to/]FILENAME
+		\rCreates a new script and a manpage template for FILENAME
+		\r"
+	DEST=""
+	TITLE="sea's New script script"
+#
+#	Variable handling
+#
+	[ "$1" = "-h" ] && echo -e "$help_text" && exit $RET_HELP
+	tui-title "$TITLE ($script_version)"
+	source tui
+#
+#	Display
+#
+	if [[ -z $1 ]]
+	then	read -p "Enter the filename: " DEST
+		if [[ "$DEST" = "$(basename $DEST)" ]]
+		then	if [[ -f "$HOME/.local/bin" ]]
+			then	DEST="$HOME/.local/bin/$DEST"
+			else	DEST="$HOME/bin/$DEST"
+				tui-bol-dir "$(dirname $DEST)" > /dev/zero
+			fi
+		fi
+	else	if [[ "$1" = "$(basename $1)" ]]
+		then	if [[ -f "$HOME/.local/bin" ]]
+			then	DEST="$HOME/.local/bin/$1"
+			else	DEST="$HOME/bin/$1"
+				tui-bol-dir "$(dirname $DEST)" > /dev/zero
+			fi
+		else	DEST="$1"
+		fi
+	fi
+	if [[ -f "$DEST" ]]
+	then	tui-bol-yesno "File $DEST exists... Overwrite?"
+		tui-status $? "Overwrite file: $DEST" || exit 1
+	fi
+	cat > "$DEST" << EOF
+#!/bin/sh
+#	Author: 	$USER_NAME
+#	Contact:	$USER_EMAIL
+#
+#	Variable defaults
+#
+	script_version=0.1
+	ME="\$(basename \$0)"
+	help_text="\r\$ME (\$script_version)
+		\rUsage: \$ME [options] [arguments]
+		\rWhere options are:
+		\r\t-h\tThis screen
+		\r"
+	TITLE="SetAtitle"
+	ARGS=(\${@})
+	ARGS_COUNT=\$#
+#
+#	Load own/users TUI configuration?
+#
+	source tui
+#
+#	Variable handling
+#
+	#[[ -z \$1 ]] && echo -e "\$help_text" && exit \$RET_HELP
+	case "\$1" in
+	"-h")	echo -e "\$help_text" ; exit \$RET_HELP 	;;
+	esac
+#
+#	Display
+#
+	tui-title "\$TITLE (\$script_version)"
+	tui-echo 
+EOF
+	if tui-status $? "Saved: $(echo $DEST)"
+	then	chmod +x "$DEST"
+		[[ ! xterm = "$TERM" ]] && \
+			sh $DEST -h && \
+			sleep 1
+		tui-edit "$DEST"
+	fi
+	doMan=false
+	tui-bol-yesno "Create a manpage too?" && \
+		doMan=true && \
+		cat > "$DEST.1" << EOF
+.TH "$1" "1" "$(DATE|sed s/'\.'/' '/g)" "$USER_NAME"
+
+.SH NAME
+$1 (0.1)
+
+.SH SYNOPSIS
+\fB$1\fP [options] [arguments]
+.br
+Example: $1 
+.br
+Where options are:
+.IP "\fB-XY\fP"
+does this
+.IP "\fB-YX\fP"
+does that
+
+.SH DESCRIPTION
+.PP
+Some descriptional text
+
+.SH LICENSE
+$DEFAULT_LICENSE
+.br
+$DEFAULT_LICENSE_URL
+
+.SH CONTACT
+$USER_EMAIL
+.br
+$USER_HOMEPAGE
+EOF
+	$doMan && tui-edit "$DEST.1"
+	$doMan && man "$DEST.1"

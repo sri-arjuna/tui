@@ -1,0 +1,58 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.2
+	ME="$(basename $0)"
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME [options]
+		\rSelect usb device if more than one is found
+		\rWhere options are:
+		\r\t-h\tThis screen
+		\r"
+	ARGS=(${@})
+	ARGS_COUNT=$#
+	targetusb=""
+	devDisk=/dev/disk/by-id
+	tDev=""
+#
+#	Load own/users TUI configuration?
+#
+	source tui
+#
+#	Variable handling
+#
+	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	esac
+#
+#	Display
+#
+	if [ "" = "$targetusb" ] ; then
+		#tui-title "Please choose the removable media: "
+		list="$(ls $devDisk|grep usb|grep -v part)"
+		while [ "" = "$list" ] ; do
+			left="$BORDER_LEFT Please connect an USB device..."
+			right="[  $(tui-indi) ] $BORDER_RIGHT"
+			devDisk=/dev/disk/by-id
+			printf "\r"
+			read -t 1 -p "$left$(getspace $[ $COLUMNS - ${#left} - ${#right} ] )$right"  buffer
+			list="$(ls $devDisk|grep usb|grep -v part[0-9])"
+		done
+		if [ ! "$list" = "$(echo $list)" ]
+		then	select targetUsb in $list ; do
+				tDev=$(readlink -f $devDisk/$targetUsb)
+				break
+			done
+		else	targetUsb=$list
+			tDev=$(readlink -f $devDisk/$targetUsb)
+		fi
+	else	# Yet to re-impliment
+		targetUsb="$(  ls /dev/disk/by-id/ -l | grep $(basename $targetusb)|grep -v part|awk '{print $9}' )"	
+		tDev="$targetusb"
+	fi
+	echo $tDev

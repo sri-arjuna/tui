@@ -1,0 +1,37 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.5
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME
+		\rEach call it prints the next symbol of this order:
+		\r - \\ | /
+		\r
+		\rExample: 
+		\rwhile [ true ]
+		\rdo\t$ME
+		\rdone
+		\r"
+	[[ -z $TUI_TEMP_DIR ]] && \
+		source /etc/tui/tui.conf && \
+		export TUI_TEMP_DIR tmpfile="$TUI_TEMP_DIR/tui-indi.num"
+	indicator=( "-" "\\" "|" "/" )
+#
+#	Prepare
+#
+	umask 022 $tmpfile
+	if [ -f $tmpfile ]
+	then	val=$(cat $tmpfile)
+	else	val=0
+	fi
+#
+#	Display
+#
+	printf "${indicator[$val]}"
+	let val++
+	[ $val -gt 3 ] && val=0
+	echo $val > $tmpfile

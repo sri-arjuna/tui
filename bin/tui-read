@@ -1,0 +1,27 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.2
+	ME="$(basename $0)"
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME [options] \"Question/Path/something for the user to type\"
+		\rReturns typed answer
+		\r"
+	source tui
+#
+#	Variable handling
+#
+	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	esac
+#
+#	Display
+#
+	txt="$1"
+	read -p "$BORDER_LEFT $txt " INPUT #$(getspace $[ $COLUMNS - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - ${#txt} - 2 ] ) $BORDER_RIGHT" 
+	echo "$INPUT"

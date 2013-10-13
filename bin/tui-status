@@ -1,0 +1,55 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.3
+	ME="$(basename $0)"
+	help_text="$ME ($script_version)
+		\rUsage: $ME ERRORLEVEL \"Message to user\"
+		\rWhere ERRORLEVEL must be numeric
+		\r"
+#
+#	Variables to display
+#	Diffrent for GUI or CLI
+#
+	script_version=0.5
+	[[ -z $DONE ]] && source /etc/tui/status.conf
+#
+#	Fill array for easy access
+#
+	retvalue[0]="$DONE" ;	retvalue[1]="$FAIL"	# "$FAILURE"
+	retvalue[2]="$WORK" ;	retvalue[3]="$TODO"
+	
+	retvalue[4]="$SKIP" ;	retvalue[5]="$NEXT"
+	retvalue[6]="$BACK" ;	retvalue[7]="$CANC"
+	
+	retvalue[10]="$ENAB";	retvalue[11]="$DIAB"
+	
+	retvalue[99]="$HELP";	retvalue[111]="$INFO"
+	
+	[ -z "$1" ] && $ME 1 "Usage: $ME ERRORLEVEL [ \"Message to user\" ]" && return 1
+	if [ "$1" = "-h" ]
+	then	echo "$ME ($script_version)
+		\rUsage: $ME \$? [ \"Message to user\" ]
+		\rInterpreted numbers:"
+		for num in $(seq 0 1 120)
+		do	str="$(echo "${retvalue[$num]}")"
+			[ ! "" = "$(echo $str)" ] && \
+				echo -e "\t$str : $num"
+		done
+		echo
+		return 99
+	else	tmp="$2"
+		len="${#tmp}"
+		if [ ! "" = "${retvalue[$1]}" ]
+		then	case $# in
+			1)	tui-echo " "  "${retvalue[$1]}"	;;
+			2)	tui-echo  "$2" "${retvalue[$1]}"	;;
+			3)	tui-echo  "$2" "$3" "${retvalue[$1]}"	;;
+			esac
+		else	tui-echo  "$2" "ErrNr: $1"
+		fi
+	fi
+	exit $1

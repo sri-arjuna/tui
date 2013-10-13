@@ -1,0 +1,52 @@
+#!/bin/sh
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.4
+	ME="$(basename $0)"
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME [options] [[/path/to/]tar]
+		\rWhere options are:
+		\r\t-h\tThis screen
+		\r"
+	source tui
+	ARGS=(${@})
+	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
+	FILE_CMD="$TUI_TEMP_DIR/bgjob"
+	umask 022 $FILE_CMD $FILE_TEMP
+	DEST=""
+#
+#	Variable handling
+#
+	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	case "$1" in
+	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		;;
+	"")	unset ARGS[@]
+		ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
+	esac
+#
+#	Display
+#
+	for FOLDER in "${ARGS[@]}"
+	do 	tui-printf "Initializing $FOLDER..." "$WORK"
+		printf "\r"
+		THIS="$(basename $FOLDER)"
+		DEST="$(pwd)/$THIS.$TAR_EXT"
+		PWD_ORG="$(pwd)"
+		echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero" > $FILE_CMD
+		cd "$(dirname $FOLDER)"
+		chmod +x $FILE_CMD
+		$FILE_CMD &
+		sleep 1
+		while [[ ! "" = "$(ps|grep -v tui|grep tar)" ]]
+		do	tmp_size="$(ls -hl $DEST |awk '{print $5}')"
+			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi)"
+			sleep 1
+		done
+		cd "$PWD_ORG"
+		tui-status $? "Compressed: $DEST"
+		
+	done 
