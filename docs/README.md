@@ -36,7 +36,7 @@ This is if you need/want/have to provide scripts for users to use,
 and make it (a little) easier for them to 'read' the terminal,
 without to have to write 'presentation' handlers.
 
-So, for myself i wanted somethign to align the text shown.
+So, for myself i wanted something to align the text shown.
 Thus, the commands have alignmends to the: left, center and the right.
 So each command that is supposed to just display strings,
 may be passed up to 3 strings at a time, or empty.
