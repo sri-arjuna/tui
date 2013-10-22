@@ -22,8 +22,10 @@ a touch of user interface, even at init 1 /emergency mode.
 All the commands try to be as native langue OR self explaining as possible.
 
 !!
+
    During the currently running ALPHA and BETA stages,
    i'm open to any name change suggestions!
+
 !!
 
 
