@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+#	Author: 	Simon A. Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#
+#	Variable defaults
+#
+	script_version=0.2
+	ME="$(basename $0)"
+	[[ -z $HELP ]] && source tui
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
+		\rNOTE:\t'Progress String' may contain shell escaped commands.
+		\r
+		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
+		\rPrints 'Exit String' when done, regardless of exit code (0,1,?).
+		\rWAIT is optinal wait time between updates, default is 0.7 (seconds).
+		\r"
+#
+#	Variable handling
+#
+	if [[ "$1" = "-h" ]] || [[ -z $3 ]];then
+	echo -e "$help_text" && exit $RET_HELP;fi
+	BG_RET="-1"
+	JOB="$1"
+	TXT_PROGRESS="$2"
+	TXT_EXIT="$3"
+	[[ -z $4 ]] && WAIT=0.7 || WAIT=$4
+#
+#	Send job to bg and get pid
+#
+	(sh "$JOB" && echo 0 > /dev/stdout > $TUI_TEMP_FILE || \
+			echo 1 > /dev/stdout > $TUI_TEMP_FILE
+	)   & PID=$!
+#
+#	While the job is running...
+#
+	while [[ ! "" = "$(ps |grep $PID)" ]]
+	do
+		tui-printf \
+			"$(eval echo $TXT_PROGRESS)" \
+			"[  $(tui-indi)   ]"
+		sleep $WAIT
+	done
+#
+#	Report Return Code of ended bg-job
+#
+	BG_RET=$(cat $TUI_TEMP_FILE)
+	if [[ "$BG_RET" = "-1" ]]
+	then	tui-echo "$TXT_EXIT" "Could not retrieve returnvalue" "$INFO"
+		exit $RET_INFO
+	else	tui-status $BG_RET "$TXT_EXIT"
+		exit $?
+	fi

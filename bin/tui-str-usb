@@ -41,6 +41,7 @@
 			devDisk=/dev/disk/by-id
 			printf "\r"
 			read -t 1 -p "$left$(getspace $[ $COLUMNS - ${#left} - ${#right} ] )$right"  buffer
+			printf "\lf"
 			list="$(ls $devDisk|grep usb|grep -v part[0-9])"
 		done
 		if [ ! "$list" = "$(echo $list)" ]
