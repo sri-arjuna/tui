@@ -142,10 +142,10 @@
 		else	thisconf="$HOME/.config/tui/"
 		fi
 		if tui-bol-yesno "Edit $thisconf now?" 
-		then	if [[ ! -f $thisconf ]] && [[ ! 0 -eq $UID ]]
+		then	if [[ ! -d $thisconf ]] && [[ ! 0 -eq $UID ]]
 			then	tui-bol-dir "$thisconf"
-				cp /etc/tui/alias.conf $thisconf
-				cp /usr/share/tui/user.conf $thisconf
+				#cp /etc/tui/alias.conf $thisconf
+				cp /usr/share/tui/*.conf $thisconf
 			fi
 			tui-edit $thisconf/*
 			tui-status $? "Edited $USER's configuration"
