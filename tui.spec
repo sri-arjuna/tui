@@ -1,15 +1,16 @@
 Name:        tui
 Version:     0.4.0
-Release:     6%{?dist}
+Release:     7%{?dist}
 Summary:     Text User Interface for scripts
 
 License:     LGPL
-#URL:         http://sea.fedorapeople.org/Review/%{name}
-Source0:     %{name}-%{version}.tar.gz
+URL:         https://github.com/sri-arjuna/tui
+#Source0:     https://github.com/sri-arjuna/tui/archive/master.zip
+Source0:     http://sea.fedorapeople.org/Review/%{name}/%{name}-%{version}.tar.gz
 
 BuildArch:   noarch
 
-Requires:    leafpad
+Requires:    gedit
 Requires:    nano
 Requires:    w3m #Not really needed
 Requires:    wget

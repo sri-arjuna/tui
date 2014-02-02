@@ -69,24 +69,26 @@
 	ARGS=(\${@})
 	ARGS_COUNT=\$#
 #
-#	Arguments
+#	Catching Arguments
 #
 	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_HELP
 	for thisARG in "${@}";do
 		case "\$thisARG" in
-		"-h")	printf "\$help_text" ; exit \$RET_HELP 	;;
+		"-h")	printf "\$help_text"
+			exit \$RET_HELP
+			;;
 		esac
 	done
 #
 #	Functions
 #
 	func() { # Argument examples
-	# Descriptional
+	# Descriptional, ...
 	# Text here
 		echo \$1
 	}
 #
-#	Display
+#	Display & Action
 #
 	tui-title "\$TITLE (\$script_version)"
 	tui-echo 
@@ -99,18 +101,19 @@ EOF
 		tui-edit "$DEST"
 	fi
 	doMan=false
+	
 	tui-bol-yesno "Create a manpage too?" && \
 		doMan=true && \
 		cat > "$DEST.1" << EOF
-.TH "$1" "1" "$(DATE|sed s/'\.'/' '/g)" "$USER_NAME"
+.TH "$(basename $DEST)" "1" "$(DATE|sed s/'\.'/' '/g)" "$USER_NAME"
 
 .SH NAME
-$1 (0.1)
+$(basename $DEST) (0.1)
 
 .SH SYNOPSIS
-\fB$1\fP [options] [arguments]
+\fB$(basename $DEST)\fP [options] [arguments]
 .br
-Example: $1 
+Example: $(basename $DEST)
 .br
 Where options are:
 .IP "\fB-XY\fP"

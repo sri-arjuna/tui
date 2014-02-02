@@ -4,7 +4,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.1
+	script_version=0.2
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
@@ -22,5 +22,5 @@
 #
 #	Display
 #
-	cli-printf "$MESSAGE" "$MESSAGE"
+	tui-printf "$MESSAGE" "$MESSAGE"
 	read buffer
