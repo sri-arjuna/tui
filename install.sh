@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+# 2014.01.28 by sea
 #
 #	Variables
 #
@@ -17,8 +17,15 @@
 #
 	read -p "Press enter to install $app OR press 'CTRL+c' to abort"
 	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 #$DIR_MAN8
+	mv README.md $DIR_APP
 	mv bin/* $DIR_BIN/
 	mv conf/* $DIR_CFG/
 	mv docs/[A-Z]* $DIR_DOC
 	mv docs/* $DIR_APP
 	mv man/*1 $DIR_MAN1
+	
+	source tui
+	MSG="Exiting & removing tempfiles"
+	tui-echo "$MSG" "$WAIT"
+	cd .. && rm -fr $(dirname $0)
+	tui-status $? "$MSG"

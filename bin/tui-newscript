@@ -47,30 +47,40 @@
 #!/bin/sh
 #	Author: 	$USER_NAME
 #	Contact:	$USER_EMAIL
+#	Created:	$(date +'%Y.%M.%d')
 #
 #	Variable defaults
 #
+	source tui
 	script_version=0.1
 	ME="\$(basename \$0)"
+	TITLE="SetAtitle"
 	help_text="\r\$ME (\$script_version)
+		\r\$TITLE
 		\rUsage: \$ME [options] [arguments]
 		\rWhere options are:
 		\r\t-h\tThis screen
+		\r\t-o\tOther stuff
 		\r"
-	TITLE="SetAtitle"
 	ARGS=(\${@})
 	ARGS_COUNT=\$#
-#
-#	Load own/users TUI configuration?
-#
-	source tui
 #
 #	Variable handling
 #
 	#[[ -z \$1 ]] && echo -e "\$help_text" && exit \$RET_HELP
-	case "\$1" in
-	"-h")	echo -e "\$help_text" ; exit \$RET_HELP 	;;
-	esac
+	for thisARG in "${@}";do
+		case "\$thisARG" in
+		"-h")	echo -e "\$help_text" ; exit \$RET_HELP 	;;
+		esac
+	done
+#
+#	Functions
+#
+	func() { # Argument examples
+	# Descriptional
+	# Text here
+		echo \$1
+	}
 #
 #	Display
 #
