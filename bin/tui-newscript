@@ -45,11 +45,15 @@
 	fi
 	cat > "$DEST" << EOF
 #!/bin/sh
+#
 #	Author: 	$USER_NAME
 #	Contact:	$USER_EMAIL
-#	Created:	$(date +'%Y.%M.%d')
+#	License:	$DEFAULT_LICENSE
+#	Created:	$(date +'%Y.%m.%d')
+#	Changed:	$(date +'%Y.%m.%d')
+#	Description:	
 #
-#	Variable defaults
+#	Variables
 #
 	source tui
 	script_version=0.1
@@ -65,12 +69,12 @@
 	ARGS=(\${@})
 	ARGS_COUNT=\$#
 #
-#	Variable handling
+#	Arguments
 #
-	#[[ -z \$1 ]] && echo -e "\$help_text" && exit \$RET_HELP
+	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_HELP
 	for thisARG in "${@}";do
 		case "\$thisARG" in
-		"-h")	echo -e "\$help_text" ; exit \$RET_HELP 	;;
+		"-h")	printf "\$help_text" ; exit \$RET_HELP 	;;
 		esac
 	done
 #
