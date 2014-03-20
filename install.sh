@@ -24,6 +24,7 @@
 	mv docs/[A-Z]* $DIR_DOC
 	mv docs/* $DIR_APP
 	mv man/*1 $DIR_MAN1
+	mv uninstall.sh $DIR_APP
 	
 	source tui
 	MSG="Installed $app"
