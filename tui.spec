@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.4.0
-Release:     7%{?dist}
+Version:     0.4.1
+Release:     0%{?dist}
 Summary:     Text User Interface for scripts
 
 License:     LGPL
@@ -55,7 +55,7 @@ and easy accessible by executing 'tui':
 
 %install
 rm -rf       %{buildroot}
-rm %{name}/install.sh %{name}/README.md %{name}/tui.spec
+rm %{name}/install.sh %{name}/uninstall.sh %{name}/README.md %{name}/tui.spec
 mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
                      %{buildroot}%{_sysconfdir}/%{name}/ \
@@ -85,7 +85,10 @@ rm -rf %{buildroot}
 %{_bindir}/%{name}-*
 
 %changelog
-* Sun Feb 02 2014 - Simon A. Erat - erat.simon@gmail.com - 0.4.1-0
+* Thu Mar 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.4.1-0
+- Introducing $USER_SHELL, used for tui-newscript as shell definition
+
+* Sun Feb 02 2014 - Simon A. Erat - erat.simon@gmail.com - 0.4.0-7
 - Added:     tui.spec to package location
 - Changed:   install.sh
 - Changed:   tui-newscript.sh
