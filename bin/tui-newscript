@@ -31,7 +31,7 @@
 			fi
 		fi
 	else	if [[ "$1" = "$(basename $1)" ]]
-		then	if [[ -f "$HOME/.local/bin" ]]
+		then	if [[ -d "$HOME/.local/bin" ]]
 			then	DEST="$HOME/.local/bin/$1"
 			else	DEST="$HOME/bin/$1"
 				tui-bol-dir "$(dirname $DEST)" > /dev/zero
@@ -44,21 +44,21 @@
 		tui-status $? "Overwrite file: $DEST" || exit 1
 	fi
 	cat > "$DEST" << EOF
-#!/bin/sh
+#!$(which $USER_SHELL)
 #
 #	Author: 	$USER_NAME
 #	Contact:	$USER_EMAIL
 #	License:	$DEFAULT_LICENSE
 #	Created:	$(date +'%Y.%m.%d')
 #	Changed:	$(date +'%Y.%m.%d')
-#	Description:	
+	script_version=0.1
+#	Description:	Descriptional text goes here
 #
 #	Variables
 #
 	source tui
-	script_version=0.1
 	ME="\$(basename \$0)"
-	TITLE="SetAtitle"
+	TITLE=" SetAtitle "
 	help_text="\r\$ME (\$script_version)
 		\r\$TITLE
 		\rUsage: \$ME [options] [arguments]
@@ -72,11 +72,15 @@
 #	Catching Arguments
 #
 	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_HELP
-	for thisARG in "${@}";do
-		case "\$thisARG" in
-		"-h")	printf "\$help_text"
-			exit \$RET_HELP
-			;;
+	while getopts "e:(example)h:(help)": name
+	do 	case \$name in
+		e|example)
+			optE_argument="\$OPTARG"
+			optE_bool=true ;;
+		h|help)
+			printf "\$help_text"
+			exit \$RET_HELP	;;
+		# *)	printf "\$help_text";exit \$RET_HELP	;;
 		esac
 	done
 #
@@ -96,7 +100,7 @@ EOF
 	if tui-status $? "Saved: $(echo $DEST)"
 	then	chmod +x "$DEST"
 		[[ ! xterm = "$TERM" ]] && \
-			sh $DEST -h && \
+			$USER_SHELL $DEST -h && \
 			sleep 1
 		tui-edit "$DEST"
 	fi

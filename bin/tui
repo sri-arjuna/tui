@@ -135,8 +135,8 @@
 		tui-echo "Also you could read:" "the man pages or /usr/share/tui/README"
 		tui-echo "Also there is a sample script:" "/usr/share/tui/sample"
 		tui-echo "To create a new script in ~/bin, type:" "tui-newscript SCRIPTNAME"
-		
 		tui-echo
+		
 		if [[ 0 -eq $UID ]] 
 		then 	thisconf=/etc/tui/
 		else	thisconf="$HOME/.config/tui/"
