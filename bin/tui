@@ -9,7 +9,7 @@
 	then	# not equal amount of cols
 		let COLUMNS--
 	fi
-	TUI_VERSION=0.4.0
+	TUI_VERSION=0.4.1
 #
 #	Load defaults
 #
