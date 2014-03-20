@@ -64,10 +64,8 @@
 		\rUsage: \$ME [options] [arguments]
 		\rWhere options are:
 		\r\t-h\tThis screen
-		\r\t-o\tOther stuff
+		\r\t-e ARG\tExample with argument
 		\r"
-	ARGS=(\${@})
-	ARGS_COUNT=\$#
 #
 #	Catching Arguments
 #
@@ -83,6 +81,9 @@
 		# *)	printf "\$help_text";exit \$RET_HELP	;;
 		esac
 	done
+	shift \$((\$OPTIND - 1))
+	ARGS=(\${*})
+	ARGS_COUNT=\${#ARGS[@]}
 #
 #	Functions
 #
