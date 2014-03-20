@@ -27,6 +27,5 @@
 	
 	source tui
 	MSG="Installed $app"
-	tui-echo "$MSG" "$WAIT"
-	cd .. && rm -fr $(dirname $0)
+	tui-printf "$MSG" "$WORK"
 	tui-status $? "$MSG"
