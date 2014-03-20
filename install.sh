@@ -26,7 +26,7 @@
 	mv man/*1 $DIR_MAN1
 	
 	source tui
-	MSG="Exiting & removing tempfiles"
+	MSG="Installed $app"
 	tui-echo "$MSG" "$WAIT"
 	cd .. && rm -fr $(dirname $0)
 	tui-status $? "$MSG"
