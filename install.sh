@@ -12,6 +12,7 @@
 	DIR_CFG=/etc/$app
 	DIR_DOC=/usr/share/doc/$app
 	DIR_MAN1=/usr/share/man/man1
+	for tDir in $DIR_APP $DIR_CFG $DIR_DOC $DIR_MAN1; [ ! -d $tDir ] && mkdir -p $tDir;done
 #
 #	Initall to Environment
 #
