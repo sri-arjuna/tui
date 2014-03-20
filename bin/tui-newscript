@@ -40,7 +40,7 @@
 		fi
 	fi
 	if [[ -f "$DEST" ]]
-	then	tui-bol-yesno "File $DEST exists... Overwrite?"
+	then	tui-yesno "File $DEST exists... Overwrite?"
 		tui-status $? "Overwrite file: $DEST" || exit 1
 	fi
 	cat > "$DEST" << EOF
@@ -107,7 +107,7 @@ EOF
 	fi
 	doMan=false
 	
-	tui-bol-yesno "Create a manpage too?" && \
+	tui-yesno "Create a manpage too?" && \
 		doMan=true && \
 		cat > "$DEST.1" << EOF
 .TH "$(basename $DEST)" "1" "$(DATE|sed s/'\.'/' '/g)" "$USER_NAME"

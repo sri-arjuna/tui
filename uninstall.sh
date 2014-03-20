@@ -17,7 +17,7 @@
 #
 	tui-echo "Press enter to uninstall $app OR press 'CTRL+c' to abort"
 	tui-press
-	if tui-bol-yesno "Remove custom configurations of all local users?"
+	if tui-yesno "Remove custom configurations of all local users?"
 	then 	for usr in $(ls /home --hide=lost+found)
 		do 	tui-printf "Removing configuration of $usr"
 			rm -fr "/home/${usr}/.config/$app"

@@ -31,7 +31,7 @@
 	clear
 	tui-header "Could be used as Status or Informationbar"
 	tui-title "$TITLE ($script_version)"
-	if tui-bol-yesno "Load additional configuration?"
+	if tui-yesno "Load additional configuration?"
 	then	source tui
 	fi
 	tui-echo "Welcome:" \
@@ -45,12 +45,12 @@
 	tui-echo "You entred:" "$VARIABLE"
 	
 	tui-title "Asking for yes or no"
-	tui-bol-yesno "Do you wear a blue hat?"
+	tui-yesno "Do you wear a blue hat?"
 	if tui-status $? "$DEFAULT_USER wears a blue hat"
 	then	tui-echo "You're a fedora user!"
 	else	tui-echo "You're not using fedora..."
 	fi
-	if tui-bol-yesno "Does that matter"
+	if tui-yesno "Does that matter"
 	then	tui-echo yup
 	else	tui-echo nope
 	fi

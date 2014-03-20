@@ -141,7 +141,7 @@
 		then 	thisconf=/etc/tui/
 		else	thisconf="$HOME/.config/tui/"
 		fi
-		if tui-bol-yesno "Edit $thisconf now?" 
+		if tui-yesno "Edit $thisconf now?" 
 		then	if [[ ! -d $thisconf ]] && [[ ! 0 -eq $UID ]]
 			then	tui-bol-dir "$thisconf"
 				#cp /etc/tui/alias.conf $thisconf

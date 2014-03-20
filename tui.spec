@@ -133,7 +133,7 @@ rm -rf %{buildroot}
 - Fixed:     Several files
 
 * Sat Sep 21 2013 - Simon A. Erat - erat.simon@gmail.com - 0.3.7-2
-- Added:     tui-status, tui-edit, tui-bol-yesno, tui-press
+- Added:     tui-status, tui-edit, tui-yesno, tui-press
 
 * Sat Sep 21 2013 - Simon A. Erat - erat.simon@gmail.com - 0.3.7-1
 - Fixed:     Display issues
