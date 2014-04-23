@@ -4,7 +4,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.8
+	script_version=0.9
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [path/to/]FILENAME
@@ -41,63 +41,10 @@
 	fi
 	if [[ -f "$DEST" ]]
 	then	tui-yesno "File $DEST exists... Overwrite?"
-		tui-status $? "Overwrite file: $DEST" || exit 1
+		tui-status $? "Overwrite file: $DEST" || mv "$DEST" "$DEST-$(date +'%F.%s').bak"
 	fi
-	cat > "$DEST" << EOF
-#!$(which $USER_SHELL)
-#
-#	Author: 	$USER_NAME
-#	Contact:	$USER_EMAIL
-#	License:	$DEFAULT_LICENSE
-#	Created:	$(date +'%Y.%m.%d')
-#	Changed:	$(date +'%Y.%m.%d')
-	script_version=0.1
-#	Description:	Descriptional text goes here
-#
-#	Variables
-#
-	source tui
-	ME="\$(basename \$0)"
-	TITLE=" SetAtitle "
-	help_text="\r\$ME (\$script_version)
-		\r\$TITLE
-		\rUsage: \$ME [options] [arguments]
-		\rWhere options are:
-		\r\t-h\tThis screen
-		\r\t-e ARG\tExample with argument
-		\r"
-#
-#	Catching Arguments
-#
-	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_HELP
-	while getopts "e:(example)h:(help)": name
-	do 	case \$name in
-		e|example)
-			optE_argument="\$OPTARG"
-			optE_bool=true ;;
-		h|help)
-			printf "\$help_text"
-			exit \$RET_HELP	;;
-		# *)	printf "\$help_text";exit \$RET_HELP	;;
-		esac
-	done
-	shift \$((\$OPTIND - 1))
-	ARGS=(\${*})
-	ARGS_COUNT=\${#ARGS[@]}
-#
-#	Functions
-#
-	func() { # Argument examples
-	# Descriptional, ...
-	# Text here
-		echo \$1
-	}
-#
-#	Display & Action
-#
-	tui-title "\$TITLE (\$script_version)"
-	tui-echo 
-EOF
+	APP_DIR=/usr/share/tui
+	source $APP_DIR/docs/templates/bash
 	if tui-status $? "Saved: $(echo $DEST)"
 	then	chmod +x "$DEST"
 		[[ ! xterm = "$TERM" ]] && \

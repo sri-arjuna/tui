@@ -1,0 +1,87 @@
+cat > "$DEST" << EOF
+#!$(which $USER_SHELL)
+#
+#	Author: 	$USER_NAME
+#	Contact:	$USER_EMAIL
+#	License:	$DEFAULT_LICENSE
+#	Created:	$(date +'%Y.%m.%d')
+#	Changed:	$(date +'%Y.%m.%d')
+	script_version=0.1
+#	Description:	Descriptional text goes here
+#
+#	Variables
+#
+	source tui
+	TITLE="${1^}"
+	ME="\${0##*/}"
+	ME_DIR="\${0/\${0##/*/}}"
+	help_text="
+\$ME (\$script_version)
+\$TITLE
+Usage: 	\$ME [options] [arguments]
+Where options are:
+	-h|--help		This screen
+	-e|--example	ARG	Example with mandatory argument
+	-a|--another	[ARG]	Example with optinal argument
+
+"
+	optE_bool=false 	# For a working template
+	ARG_TOGGLE_ANOTHER=none # For a working template
+#
+#	Functions
+#
+	func() { # Argument examples
+	# Descriptional, ...
+	# Text here
+		echo \$1
+	}
+#
+#	Catching Arguments
+#
+	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_HELP
+	while getopts "a(another)e:(example):h(help)": name
+	do 	case \$name in
+		a|another)
+			ARG_TOGGLE_ANOTHER=set
+			;;
+		e|example)
+			optE_argument="\$OPTARG"
+			optE_bool=true
+			;;
+		h|help)
+			printf "\$help_text"
+			exit \$RET_HELP
+			;;
+		# *)	printf "\$help_text" ; exit \$RET_HELP	;;
+		esac
+	done
+	shift \$((\$OPTIND - 1))
+	ARGS=(\${*})			# Remaining arguments
+	ARGS_COUNT=\${#ARGS[@]}		# Amount of remaining
+
+#
+#	Display & Action
+#
+	tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
+	tui-title "\$TITLE"
+	
+	# The following is just a demo
+	tui-echo "Hello \$USER, welcome to \$TITLE" "Its running in \$ME_DIR"
+	
+	if [[ \$ARG_TOGGLE_ANOTHER = set ]]
+	then	VAL=0
+	else	VAL=1
+	fi
+	
+	tui-status \$VAL "Argument '-a' was passed." && \\
+		tui-echo "Yeah great!" || \\
+		tui-echo "You lazy... ;)"
+	
+	if tui-yesno "Did you call the 'e' option?"
+	then	[[ -z \$optE_argument ]] && \\
+			tui-echo "No you didnt..." || \\
+			tui-echo "Option 'e' was called" "and $optE_argument was supplied"
+	else	tui-echo "OK"
+	fi
+	
+EOF
