@@ -44,7 +44,7 @@
 		tui-status $? "Overwrite file: $DEST" || mv "$DEST" "$DEST-$(date +'%F.%s').bak"
 	fi
 	APP_DIR=/usr/share/tui
-	source $APP_DIR/templates/bash
+	source $APP_DIR/templates/$USER_SHELL
 	if tui-status $? "Saved: $(echo $DEST)"
 	then	chmod +x "$DEST"
 		[[ ! xterm = "$TERM" ]] && \

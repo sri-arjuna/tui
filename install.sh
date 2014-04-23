@@ -18,7 +18,7 @@
 #	Initall to Environment
 #
 	read -p "Press enter to install $app OR press 'CTRL+c' to abort"
-	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 $DIR_TPL #$DIR_MAN8
+	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 #$DIR_TPL #$DIR_MAN8
 	mv README.md $DIR_APP
 	mv bin/* $DIR_BIN
 	mv conf/* $DIR_CFG
@@ -26,7 +26,7 @@
 	mv docs/* $DIR_APP
 	mv man/*1 $DIR_MAN1
 	mv uninstall.sh $DIR_APP
-	mv templates/ $DIR_TPL
+	mv templates $DIR_TPL
 	
 	source tui
 	MSG="Installed $app"
