@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU Lesser General Public License (LGPL)
+#	Created:	2014.04.26
+#	Changed:	2014.04.26
+	script_version=0.1
+#	Description:	Simply displays a rotating line on the left side
+#			The line rotates upon each call
+#
+#	Variables
+#
+	source tui
+	TITLE="Progress indicator"
+	ME="${0##*/}"
+	ME_DIR="${0/${0##/*/}}"
+	help_text="
+$ME ($script_version)
+$TITLE
+Usage: 	$ME [options] [arguments]
+Where options are:
+	-h|--help		This screen
+	-i|--ident	VAL	VAL to let tui-progress use seperate tempfiles for diffrent output
+
+"
+	ID_CUR=$$
+	ID=""
+	INDI=( '\' '|' '/' '-' )
+	TOTAL=$[ ${#INDI[@]} -1 ]
+	
+#
+#	Catching Arguments
+#
+	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
+	#set -x
+	while getopts "i:(ident):h(help)": name
+	do 	case $name in
+		i|ident)
+			ID="$OPTARG"
+			;;
+		h|help)
+			printf "$help_text"
+			exit $RET_HELP
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS=(${*})			# Remaining arguments
+	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
+	C=0
+	for a in "${ARGS[@]}";do
+		case $C in
+		0)	LEFT="$a"	;;
+		1)	MIDDLE="$a"	;;
+		esac
+		((C++))
+	done
+	C=0
+#
+#	Display & Action
+#
+	# Create initial tempfile if none exists
+	[ -z $ID ] && ID=default
+	TMPFILE="$TUI_TEMP_DIR/tui-progress.$ID"
+	[ ! -f "$TMPFILE" ] && \
+		touch "$TMPFILE" && \
+		printf 0 > "$TMPFILE"
+	
+	# Read tempfile value
+	VAL=$(cat "$TMPFILE")
+	PROGRESS="[  ${INDI[$VAL]}   ]"
+	
+	# Update value for next access
+	[ ! $VAL -ge $TOTAL ] && \
+		( ((VAL++)) ; printf $VAL > "$TMPFILE" ) || \
+		printf 0 > "$TMPFILE"
+	
+	# Display
+	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"

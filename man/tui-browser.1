@@ -1,0 +1,74 @@
+.TH "tui-browser" "1" "2014 04 26" "Simon Arjuna Erat (sea)"
+
+.SH NAME
+tui-browser (0.1)
+
+.SH SYNOPSIS
+\fBtui-browser\fP [options] [location]
+.br
+Example:	tui-browser
+.br
+		tui-browser "$HOME/path with spaces"
+.br
+		tui-browser 	-t "My script manager" \\
+.br
+					-u "Contains $(ls|wc -l) entries" \\
+.br
+					-d "Sections" \\
+.br
+					-f "Actions" \\
+.br
+					"/path/to/scripts"
+.br
+.br
+Where options are:
+.IP "\fB-d\fP"
+Folders will be labled as ARG
+.IP "\fB-f\fP"
+Files will be labled as ARG
+.IP "\fB-t\fP"
+Title-label (upper-left) is set to ARG
+.IP "\fB-u\fP"
+User-label (upper-right) is set to ARG
+
+.SH DESCRIPTION
+.PP
+Basicly its a demonstration application script for TUI.
+.br
+tui-browser is designed to handle passed location (or current pwd if nothing is passed) as basedirectory.
+.br
+From there it simply browses current path and displays folders and files seperatly,
+and lets the user type in commands.
+.br
+Those commands support some simply tasks, such as execute a script or change to a folder by simply type the name
+of the file or the folder. However, you can also directly edit files, or move/rename files and folders - but just inside the basedirectory.
+
+.SH INTERNAL SYNTAX
+.PP
+\fB:\fP <mode/action> <item/file/folder> <dest/newname>
+.br
+\fBMODE\fP:
+.br
+	Where the letters in brackets are the short form, they can be one of:
+.br
+	(a)bout (c)reate (d)elete (e)dit e(x)ecute (i)nfo (h)elp rena(m)e (q)uit
+.br
+	
+.br
+\fBITEM\fP:
+.br
+	Usualy either a file or a folder.
+.br
+\fBDEST\fP:
+.br
+	Optional, but working with 'create' and 'rename'..
+.br
+.SH LICENSE
+GNU Lesser General Public License (LGPL)
+.br
+http://www.gnu.org/licenses/lgpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://sea.fedorapeople.org

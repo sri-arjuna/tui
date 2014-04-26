@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU Lesser General Public License (LGPL)
+#	Created:	2014.04.24
+#	Changed:	2014.04.24
+	script_version=0.1
+#	Description:	Set a value in an 'conf/ini' file
+#
+#	Variables
+#
+	#set -x
+	source tui
+	TITLE="Save values to conf files"
+	ME="${0##*/}"
+	ME_DIR="${0/${0##/*/}}"
+	help_text="
+$ME ($script_version - BETA)
+$TITLE
+Usage: 		$ME [options] FILE VALUENAME VALUE
+Examples:	$ME -l  /etc/default/grub
+		$ME     /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as passed (VALUENAME)
+		$ME -ic /etc/default/grub grub_timeout 15	| Saves valuename as VALUENAME
+		$ME -i  /etc/default/grub grub_timeout 15	| Saves valuename as passed (valuename)
+		$ME -is /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as valuename
+		
+Where options are:
+	-h|--help		This screen
+	-i|--irrelevant		Is no longer case sensitive
+	-l|--list		Lists values vailabel in the file
+	-c|--caps		Writes the VALUE, and stores VALUENAME in capitals
+	-s|--small		Writes the VALUE, and stores VALUENAME in lower chars
+"
+	OPT=""
+	VALUE=""
+	CONFFILE=""
+	VARNAME=""
+	CAPS=false
+	SMALL=false
+#
+#	Catching Arguments
+#
+	[[ -z $2 ]] && printf "$help_text" && exit $RET_HELP
+	while getopts "i(irrelevant)c(caps)s(small)l(list)h(help)": name
+	do 	case $name in
+		c|caps)
+			CAPS=true
+			SMALL=false
+			;;
+		s|small)
+			SMALL=true
+			CAPS=false
+			;;
+		i|irrelevant)
+			OPT="-i"
+			;;
+		l|list)
+			grep -v ^# "$2"|grep "="|sed s,"="," ",g|awk '{print $1}'
+			exit 0
+			;;
+		h|help)
+			printf "$help_text"
+			exit $RET_HELP
+			;;
+		esac
+	done
+	if [ -z $OPT ] 
+	then 	CONFFILE="$1"
+		VARNAME="$2"
+		VALUE="$3"
+	else 	CONFFILE="$2"
+		VARNAME="$3"
+		VALUE="$4"
+	fi
+	
+#
+#	Display & Action
+#
+	SEARCH=$(grep $OPT "$VARNAME" "$CONFFILE"|grep -v ^#)
+	$SMALL && VARNAME="${VARNAME,,}"
+	$CAPS  && VARNAME="${VARNAME^^}"
+	REPLACE="$VARNAME=\"$VALUE\""
+	
+	# Set proper SED 'divider'
+	SD=","
+	printf "$REPLACE"|grep "," && SD="/"
+	printf "$REPLACE"|grep '\\' && SD="/"
+	printf "$REPLACE"|grep "/" && SD="\\"
+	
+	[ -z "$SEARCH" ] && \
+		printf "${REPLACE}\n" >> "$CONFFILE" || \
+		sed s${SD}"$SEARCH"${SD}"${REPLACE}"${SD}g -i "$CONFFILE"
+		#sed s\\"$SEARCH"\\"${REPLACE}"\\g -i "$CONFFILE"

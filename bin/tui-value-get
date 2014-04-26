@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU Lesser General Public License (LGPL)
+#	Created:	2014.04.24
+#	Changed:	2014.04.24
+	script_version=0.1
+#	Description:	Get a value from an 'conf/ini' file
+#
+#	Variables
+#
+	#set -x
+	source tui
+	TITLE="Get values from conf files"
+	ME="${0##*/}"
+	ME_DIR="${0/${0##/*/}}"
+	help_text="
+$ME ($script_version - BETA)
+$TITLE
+Usage: 		$ME [options] FILE [VALUENAME]
+Example:	$ME -l /etc/default/grub
+		$ME /etc/default/grub GRUB_CMDLINE_LINUX
+		$ME -i /etc/default/grub grub_cmdline_linux
+		
+Where options are:
+	-h|--help		This screen
+	-i|--irrelevant		Is no longer case sensitive
+	-l|--list		Lists values vailabel in the file
+
+"
+	OPT=""
+	VALUE=""
+	CONFFILE=""
+	VARNAME=""
+#
+#	Catching Arguments
+#
+	[[ -z $2 ]] && printf "$help_text" && exit $RET_HELP
+	while getopts "i(irrelevant)l(list)h(help)": name
+	do 	case $name in
+		i|irrelevant)
+			OPT="-i"
+			;;
+		l|list)
+			grep -v ^# "$2"|grep "="|sed s,"="," ",g|awk '{print $1}'
+			exit 0
+			;;
+		h|help)
+			printf "$help_text"
+			exit $RET_HELP
+			;;
+		esac
+	done
+	if [ -z $OPT ] 
+	then 	CONFFILE="$1"
+		VARNAME="$2"
+	else 	CONFFILE="$2"
+		VARNAME="$3"
+	fi
+	
+#
+#	Display & Action
+#
+	VALUE=$(grep $OPT "$VARNAME" "$CONFFILE"|grep -v ^#|sed s,'"','',g|sed s,'=',' ',g) > /dev/zero
+	VALUE="${VALUE:${#VARNAME}+1}"
+	echo "$VALUE"
