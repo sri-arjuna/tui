@@ -1,0 +1,411 @@
+#!/bin/bash
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU Lesser General Public License (LGPL)
+#	Created:	2014.04.26
+#	Changed:	2014.05.01
+	script_version=0.3
+#	Description:	A script to browse a folder recursivly,
+#			using its start dir as 'BASE' which it wont leave ".."
+#			Highly customable.
+#
+#	Variables
+#
+	source tui
+	TITLE="Advanced File Browser for the cli, based on TUI"
+	ME="${0##*/}"
+	ME_DIR="${0/${0##/*/}}"
+	help_text="
+$ME ($script_version)
+$TITLE
+Usage: 	$ME [options] [arguments]
+Where options are:
+	-h(elp)		This screen
+	-b(lacklist)	ARG	TODO
+	-d(ir)  	ARG	Folders will be labled as ARG
+	-f(ile) 	ARG	Files will be labled as ARG
+	-l(ocation)  	ARG	Location will be labled as ARG
+	-m(ode) 	ARG	Can be 'text' (nice n' slow, default)
+				or 'num' (functional n' fast)
+	-n(oclear)		Dont clear screen after menu actions
+	-t(itle)	ARG	Title-label (upper-left) is set to ARG
+	-u(ser) 	ARG	User-label (upper-right) is set to ARG
+	
+"
+	# Default Interface:
+	lbl_title="$ME ($script_version) - $TITLE"
+	lbl_user="$USER @ $(date +'%F %T')"
+	lbl_dir="Folders"
+	lbl_file="Files"
+	menu=show
+	default_actions="delete edit execute help info new rename quit"
+	PWD_OLD="$(pwd)"
+	BLACKLIST="su sudo"
+	SOURCE=""
+	MENU_MODE=text
+	doClear=true
+	BASE=""
+#
+#	Pre-funccction
+#
+	MakeCurStr() { # PATH
+	# Parses PATH and 'make it look nice'
+	# Returns the 'nice looking string'
+		[ -z $1 ] && printf "Missing argument" %s && return 1
+		str="$1"
+		out=""
+		# If PATH is just $BASE it shows a simple /, otherwise removing leading .
+		[ "." = "$str" ] && \
+			out="/" || \
+			out="${str:1}"
+		# Replace the slashes with something else
+		printf " $out"|sed s\\"/"\\" / "\\g
+	}
+#
+#	Catching Arguments
+#
+	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
+	while getopts "m:d:f:t:b:p:s:u:n(noclear)h(help)": name
+	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
+		case $name in
+		t|title)	lbl_title="$OPTARG"	;;
+		u|user) 	lbl_user="$OPTARG"	;;
+		d|dir) 		lbl_dir="$OPTARG"	;;
+		f|file) 	lbl_file="$OPTARG"	;;
+		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
+		s|source) 	SOURCE="$OPTARG"	;;
+		p|path) 	BASE="$OPTARG"		;;
+		m|mode)		MENU_MODE="$OPTARG"	;;
+		n|noclear)	doClear=false		;;
+		h|help)		printf "$help_text"
+				exit $RET_HELP		;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	
+	# Remaining argument should be BASE
+	ARGS=(${*})			# Remaining arguments
+	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
+	#for a in "${ARGS[@]}";do BASE="$a";done
+	tui-title "$ARGS_COUNT"
+	
+	# Verify required variables
+	[ -z $BASE ] && BASE="$(pwd)" || cd "$BASE"
+	CURRENT="$BASE"	# Relative path after base
+	CUR_STR=$(MakeCurStr "$CURRENT")
+	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
+#
+#	Functions
+#
+	mnu_Folder() { # ACTION NAME [NEWVAL]
+	# Shows the menu for $default_actions
+	# Folder-sepecific
+		[ -z $2 ] && printf %s "Usage: mnu_Folder ACTION NAME" && exit 1
+		action="$1" ; item="$2" ; newval="$3"
+		case $action in
+		n|new)	mkdir "$item" 		;;
+		d|delete)	tui-yesno "Delete $item and all of its subfolders" && \
+				rm -fr "$item"		;;
+		m|rename)
+				[ -z $newval ] && newval=$(tui-read "What is the new name: ")
+				mv "$item" "$newval"	;;
+		x|execute)	cd "$item"		;;
+		esac
+	}
+	mnu_File() { # ACTION NAME [NEWVAL]
+	# Shows the menu for $default_actions
+	# Folder-sepecific
+		[ -z $2 ] && printf %s "Usage: mnu_File ACTION NAME [NEW_VAL]" && exit 1
+		action="$1" ; item="$2" ; newval="$3"
+		case $action in
+		n|new)	touch "$item"
+				tui-edit "$item"	;;
+		d|delete)	tui-yesno "Delete $item" && \
+					rm -f "$item"	;;
+		e|edit) 	tui-edit "$item"	;;
+		i|info)		stat "$item"		;;
+		m|rename)	[ -z $newval ] && \
+					newval=$(tui-read "What is the new name: ")
+				mv "$item" "$newval"	;;
+		x|execute)	OpenMime "$item"	;;
+		esac
+	}
+	ShowContent() { # ABSOLUTEPATH
+	# Displays the content of a path
+	# 
+		[ -z $1 ] && printf %s "Missing argument" && return 1
+		if [ "" = "$(ls)" ]
+		then 	tui-status 1 "Location is empty"
+			tui-echo
+		else	unset folders[@] files[@] ARRAY[@]
+			L=M=R=""
+			CD=0 ; CF=0	# Counters : dir + files
+			# Fill specific arrays
+			ARRAY=( * )
+			for e in "${ARRAY[@]}";do
+				if [ -d "$e" ]
+				then	folders[$CD]="$e"
+					((CD++))
+				else	files[$CF]="$e"
+					((CF++))
+				fi
+			done
+			for task in folder files;do
+				unset array
+				# Counters C D E
+				C=0 ; D=1 ; E=2
+				# Show task and create specific array
+				case $task in
+				folder)	[ -z $lbl_dir ] && \
+						content_title="$lbl_dir_default" || \
+						content_title="$lbl_dir"
+					array=( "${folders[@]}" )
+					;;
+				files)	[ -z $lbl_file ] && \
+						content_title="$lbl_file_default" || \
+						content_title="$lbl_file"
+					array=( "${files[@]}" )
+					;;
+				esac
+				# Dont show title if no entries available
+				[ ! "x" = "$(printf x${array[@]})" ] && \
+					tui-title "${content_title}:"
+				# Display array
+				while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
+					L="${array[$C]}"
+					M="${array[$D]}"
+					R="${array[$E]}"
+					C=$[ $C + 3 ]
+					D=$[ $D + 3 ]
+					E=$[ $E + 3 ]
+					# Only show lines with content
+					[ ! "" = "$(echo $L$M$R)" ] && \
+						tui-echo "$L" "$M" "$R"
+				done
+			done
+			
+		fi
+	}
+	has_shebang() { # FILE
+	# Returns successfully if file begins with '#/bin' or '#!/bin'
+	# Fails otherwise
+		head "$1" -n1 | grep ^"#[!]/bin" && \
+			return 0 || return 1
+	}
+	is_less_kb() { # FILE NUM
+	# Returns successfully if FILE-size is lower than NUM
+	# Fails otherwise
+		size=$(ls -l "$1" | awk '{print $5}')
+		[ $size -lt $2 ] && \
+			return 0 || return 1
+	}
+	OpenMime() { # /path/to/file
+	# Attemps to open passed file with proper mime-application
+	# Returns successfully if app was found, fails if not
+		if [ $TERM = xterm ]
+		then	xdg-open "$1"
+			return $?
+		else	PDF=$(which mupdf) 		# Temporary fix TODO
+			PIC_VIEW=$(which gpicview)	# Temporary fix TODO
+			FN="$1" 					# Filename
+			has_shebang "$FN" && ./"$FN" && return 0
+			TYPE=$(mimetype "$FN"|awk '{print $2}')	# Type of it:
+			TYP=${TYPE##/*}
+			SUB=${TYPE##*/}
+			echo "DEBUG:: $TYP -- $SUB"
+			# 'Supportet' file types
+			case "${TYPE:0:4}" in
+			"appl")	case "$SUB" in
+				# "")		; return $?	;;
+				# "")	echo	; return $?	;;
+				"pdf")	$PDF "$FN"	;;
+				"x-compressed-tar")	tui-yesno "Uncompress $FN now?" || return 1
+				   			tui-yesno "Here ($CURRENT)?" && \
+				   				exTO="$CURRENT" || \
+				   				exTO=$(tui-read "Where do you want to extract the files to: ")
+					   		[ -d "$exTO" ] || mkdir -p "$exTO"
+					   		tar -axf "$FN" -C "$exTO"	;;
+				"x-shellscript")	./"$FN" 	; return $?	;;
+				*)	tui-status 1 "$TYPE not supported on console #$VTNR"	; return $?	;;
+				esac
+				;;
+			"inod")	case "$SUB" in
+				"diectory")	cd "$FN" 	; return $?	;;
+				# "")	echo TODO		; return $?	;;
+				*)	tui-status 1 "$TYPE not handled yet"	; return $?	;;
+				esac
+				;;
+			"imag")	$PIC_VIEW "$FN"	; return $?
+				;;
+			"text")	case "$SUB" in
+				"plain") tui-edit "$FN"		; return $?	;;
+				"html")	"$BROWSER" "$FN"	; return $?	;;
+				# "")	echo		; return $?	;;
+				# "")	echo		; return $?	;;
+				# "")	echo		; return $?	;;
+				# *)	#more "$FN" ; return $?	;;
+				esac
+				;;
+			# if everything else fails...
+			*)		tui-status 1 "Mimetype: '$TYPE' for file '$FN' is not supportet yet!"
+					return $?			;;
+			esac
+		fi
+		tui-status 1 "Failed to open $FN ($TYPE)"
+		return $?
+	}
+	func() { # Argument examples
+	# Returns successfully if 
+	# Text here
+		echo $1
+	}
+#
+#	Load BLACKLIST & SOURCE
+#
+	[ -z "$BLACKLIST" ] && \
+		checkBlacklist=false || \
+		checkBlacklist=true
+	if [ ! -z $SOURCE ]
+	then 	if [ -d "$SOURCE" ] 
+		then 	cd "$SOURCE"
+			for f in *;do [ -f "$f" ] && source "$f";printf ".";done
+			cd "$OLDPWD"
+		elif [ -f "$SOURCE"]
+		then 	source "$SOURCE"
+		else	tui-status 1 "Error occoured with -s $SOURCE"
+			exit $?
+		fi
+	fi
+#
+#	Display & Action
+#
+	cd "$CURRENT"
+	while [ ! $menu = "quit-browser" ];do
+	#
+	#	Set vars that must be re-read/set upon reload of current dir
+	#
+		CURRENT="$(pwd)"
+		len="${#BASE}"
+		[ "$BASE" = "$CURRENT" ] && \
+			CUR_STR="" || \
+			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
+	#
+	#	Display	- TOP MENU
+	#
+		$doClear && clear
+		tui-header "$lbl_title" "$lbl_user"
+		tui-title "Location:" "" "/$CUR_STR"
+	#
+	#	MENU :: TEXT
+	#
+		if [ $MENU_MODE = text ] ; then
+		#
+		#	DISPLAY - Show content
+		#
+		ShowContent "$CURRENT"
+		#
+		#	Fetch input
+		#
+			tui-echo
+			read -p "$BORDER_LEFT What is your choice: " mode item newval spare
+		#
+		#	Deside action
+		#	
+			if [ ! -z $mode ]; then
+			# Expect $mode to be either an item of $default_actions
+			# or a file / folder
+				case $mode in
+				n|new)  	[ -z $item ] && \
+							item=(tui-read "What is the name:")
+						tui-yesno "Will $item be a folder?" && \
+							mnu_Folder c "$item" || \
+							mnu_File c "$item"
+						;;
+				[bB]|[bB]ack)	# Exit if 'leaving' base directory
+						[ "$CURRENT" = "$BASE" ] && \
+							menu="quit-browser" || \
+							menu="back"
+						;;
+				d|delete)	[ -z $item ] && \
+							tui-echo "Please select what you want to delete:" && \
+							select item in "${ARRAY[@]}";do break;done
+						[ -d "$item" ] && \
+							mnu_Folder d "$item" || \
+							mnu_File d "$item"
+						;;
+				e|edit) 	skip=true
+						[ -z $item ] && \
+							tui-echo "Please select a file to edit:" && \
+							select item in "${files[@]}";do break;done
+						[ -d "$item" ] && \
+								ERROR_MSG="Cant edit a folder!" && \
+								skip=true || \
+								( [ -f "$item" ] && skip=false )
+						[ $skip = false ] && \
+							mnu_File  edit "$item"	
+						;;
+				x|execute)	if [ -z $item ]
+						then	ERROR_MSG="Nothing provided to execute!"
+						else	[ -d "$item" ] && \
+								mnu_Folder x "$item" || \
+								( mnu_File   x "$item" ; tui-press)
+						fi					;;
+				i|info) 	if [ -z $item ]
+						then	ERROR_MSG="Nothing provided to execute!"
+						else	stat "$item"
+							tui-press
+						fi					;;
+				r|rename)	if [ -z $item ]
+						then	ERROR_MSG="Nothing provided to execute!"
+						else	stat "$item"
+							tui-press
+						fi					;;
+				[qQ]|[qQ]uit)	menu="quit-browser"			;;
+				*)		# Its not a $default_action
+						if [ -z $item ]
+						then	# No 2nd argument passed
+							if [ -d "$mode" ]
+							then	cd "$mode"
+							elif [ -f "$mode" ]
+							then	mnu_File "execute" "$mode"
+								tui-press
+							fi
+						else	tui-echo "BETA shell include?:"
+							$mode $item
+							tui-press
+						fi					;;
+				esac
+			fi
+		elif [ $MENU_MODE = num ] ; then
+		#
+		# MENU :: NUM
+		#
+			select e in * Back Quit;do 
+				case "$e" in
+				Back)	menu="back"
+					break	;;
+				Quit)	menu="quit-browser"
+					exit 0	;;
+				*)	[ -d "$e" ] && \
+						cd "$e" && \
+						CURRENT="$e" && \
+						break
+					[ -f "$e" ] && \
+						( ./"$e" ; break )
+					;;
+				esac
+			done
+			#mnuNum "$CURRENT"
+			
+		else	tui-status 1 "Error, MENU_MODE = $MENU_MODE"
+		fi
+	# Check for BACK
+	# Exit if 'leaving' base directory
+		if [ $menu = back ]
+		then	[ "$CURRENT" = "$BASE" ] && \
+				menu="quit-browser" || \
+				cd ..
+		fi
+	done
+	cd "$PWD_OLD"

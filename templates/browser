@@ -1,0 +1,53 @@
+#!/bin/bash
+MORE_OPTS=""
+[ -z $APP_USER_LABEL ]	|| MORE_OPTS+=" -u '$APP_USER_LABEL'"
+[ -z $APP_FILES ] 	|| MORE_OPTS+=" -d '$APP_FILES'"
+[ -z $APP_FOLDERS ]	|| MORE_OPTS+=" -f '$APP_FOLDERS'"
+[ -z $APP_SCRIPTS ] 	|| MORE_OPTS+=" -s '$APP_SCRIPTS'"
+cat << EOF
+#!/bin/bash
+#	Description:	
+#	
+#	Author: 	$USER_NAME < $USER_EMAIL >
+#	Date:		$(date +'%F')
+#
+#	This script requires TUI - Text User Interface & tui-browser  by (sea)
+#	
+#
+	if [ ! -d /usr/share/tui ]
+	then 	# Install GIT & TUI
+		echo
+		echo "	Installing TUI..."
+		echo 
+		! type git > /dev/zero && \
+			echo "Installing GIT, a source code manager...." && \\
+			yum install -y git 2>&1
+		git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
+		sh /tmp/tui.inst/install.sh #| echo 
+		rm -fr /tmp/tui.inst
+	fi
+	if [ ! -d /usr/share/tui-browser ]
+	then 	# Install GIT & TUI
+		echo
+		echo "	Installing tui-browser..."
+		echo 
+		! type git > /dev/zero && \
+			echo "Installing GIT, a source code manager...." && \\
+			yum install -y git 2>&1
+		git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
+		sh /tmp/tui.inst/install.sh #| echo 
+		rm -fr /tmp/tui.inst
+	fi
+#
+#	Variables
+#
+	ME="\${0##*/}"
+	ME_DIR="\${0/${0##/*/}}"
+	ME_BASE="\$ME_DIR/$APP_LIB"
+	TITLE="\$APP_TITLE"
+#
+#	Display to user
+#
+	cd "\$ME_BASE"
+	tui-browser	-t "\$TITLE" $MORE_OPTS
+EOF
