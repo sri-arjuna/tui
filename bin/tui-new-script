@@ -4,7 +4,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=0.9.1
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [path/to/]FILENAME
@@ -12,12 +12,26 @@
 		\r"
 	DEST=""
 	TITLE="sea's New script script"
+	SHELL_MIN=""
 #
 #	Variable handling
 #
-	[ "$1" = "-h" ] && echo -e "$help_text" && exit $RET_HELP
 	tui-title "$TITLE ($script_version)"
 	source tui
+	while getopts "mh": name
+	do 	case $name in
+		m)	SHELL_MIN="_min"	;;
+		h|help)
+			printf "$help_text"
+			exit $RET_HELP
+			;;
+		# *)	printf "$help_text" ; exit $RET_HELP	;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS=(${*})			# Remaining arguments
+	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
+
 #
 #	Display
 #
@@ -44,7 +58,8 @@
 		tui-status $? "Overwrite file: $DEST" || mv "$DEST" "$DEST-$(date +'%F.%s').bak"
 	fi
 	APP_DIR=/usr/share/tui
-	source $APP_DIR/templates/$USER_SHELL
+	source $APP_DIR/templates/scripts/$USER_SHELL$SHELL_MIN || \
+		( tui-status 1 "$USER_SHELL$SHELL_MIN is not available in templates..." ; exit 1)
 	if tui-status $? "Saved: $(echo $DEST)"
 	then	chmod +x "$DEST"
 		[[ ! xterm = "$TERM" ]] && \

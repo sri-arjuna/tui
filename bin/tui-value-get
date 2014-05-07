@@ -4,14 +4,15 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2014.04.24
-#	Changed:	2014.04.24
-	script_version=0.1
+#	Changed:	2014.05.06
+	script_version=0.2
 #	Description:	Get a value from an 'conf/ini' file
 #
 #	Variables
 #
 	#set -x
-	source tui
+	#source tui
+	RET_HELP=99
 	TITLE="Get values from conf files"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
@@ -62,6 +63,6 @@ Where options are:
 #
 #	Display & Action
 #
-	VALUE=$(grep $OPT "$VARNAME" "$CONFFILE"|grep -v ^#|sed s,'"','',g|sed s,'=',' ',g) > /dev/zero
+	VALUE=$(grep $OPT ^"$VARNAME"= "$CONFFILE"|grep -v ^#|sed s,'"','',g|sed s,'=',' ',g) > /dev/zero
 	VALUE="${VALUE:${#VARNAME}+1}"
-	echo "$VALUE"
+	printf "$VALUE"
