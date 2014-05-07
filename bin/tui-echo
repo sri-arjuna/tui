@@ -4,7 +4,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.5
+	script_version=0.6
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
@@ -14,11 +14,6 @@
 		\rIf 2 strings are passed, they're printed left and right.
 		\r"
 	ARGS_COUNT=$#
-	TITLE="TITLE"
-#
-#	Check for the environment to load
-#
-	type printx &>/dev/zero || source tui
 #
 #	Variable handling
 #
@@ -37,6 +32,5 @@
 #
 #	Display
 #
-	printf "\r$BORDER_LEFT"
-	printx "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
-	printf "$BORDER_RIGHT\n"
+	tui-printf -E "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
+	
