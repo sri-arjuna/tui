@@ -12,7 +12,7 @@ BuildArch:   noarch
 
 Requires:    gedit
 Requires:    nano
-Requires:    w3m #Not really needed
+Requires:    w3m
 Requires:    wget
 Requires:    xterm
 
