@@ -22,13 +22,15 @@
 	cp README.md $DIR_APP
 	cp bin/* $DIR_BIN
 	cp conf/* $DIR_CFG
-	cp docs/[A-Z]* $DIR_DOC
 	cp docs/* $DIR_APP
 	cp man/*1 $DIR_MAN1
 	cp uninstall.sh $DIR_APP
-	cp templates/* $DIR_TPL
+	cp -R templates/* $DIR_TPL
+	cp profile.d/* /etc/profile.d
 	
-	source tui
+	source /etc/profile.d/tui.sh
 	MSG="Installed $app"
 	tui-printf "$MSG" "$WORK"
 	tui-status $? "$MSG"
+	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && \
+		rm ./*
