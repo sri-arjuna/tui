@@ -89,7 +89,7 @@ rm -rf %{buildroot}
 %{_bindir}/%{name}-*
 
 %changelog
-* Thu May 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-1
+* Thu May 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-0
 - Rewrote for performance: tui is shown ~1 sec faster (0.6s now)
 - Added tui-browser, tui-new-browser ; Filebrowser/Script Manager
 
