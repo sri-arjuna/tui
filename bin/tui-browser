@@ -12,7 +12,6 @@
 #
 #	Variables
 #
-	source tui
 	TITLE="Advanced File Browser for the cli, based on TUI"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
@@ -47,6 +46,16 @@ Where options are:
 	doClear=true
 	BASE=""
 #
+# 	Are these really needed ?
+#
+	###########source tui
+	#for D in /etc/tui/ $HOME/.config/tui
+	#do	for F in apps colors status tui
+	#	do	T=$D/$F.conf
+	#		[ -f $T ] && source $T
+	#	done
+	#done
+#
 #	Pre-funccction
 #
 	MakeCurStr() { # PATH
@@ -59,7 +68,7 @@ Where options are:
 		[ "." = "$str" ] && \
 			out="/" || \
 			out="${str:1}"
-		# Replace the slashes with something else
+		# Replace the slashes with something else  (space-slash-space)
 		printf " $out"|sed s\\"/"\\" / "\\g
 	}
 #
@@ -69,31 +78,23 @@ Where options are:
 	while getopts "m:d:f:t:b:p:s:u:n(noclear)h(help)": name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
-		t|title)	lbl_title="$OPTARG"	;;
-		u|user) 	lbl_user="$OPTARG"	;;
+		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
 		d|dir) 		lbl_dir="$OPTARG"	;;
 		f|file) 	lbl_file="$OPTARG"	;;
-		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
-		s|source) 	SOURCE="$OPTARG"	;;
-		p|path) 	BASE="$OPTARG"		;;
-		m|mode)		MENU_MODE="$OPTARG"	;;
-		n|noclear)	doClear=false		;;
 		h|help)		printf "$help_text"
 				exit $RET_HELP		;;
+		m|mode)		MENU_MODE="$OPTARG"	;;
+		n|noclear)	doClear=false		;;
+		p|path) 	BASE="$OPTARG"		;;
+		s|source) 	SOURCE="$OPTARG"	;;
+		t|title)	lbl_title="$OPTARG"	;;
+		u|user) 	lbl_user="$OPTARG"	;;
+		
 		esac
 	done
-	shift $(($OPTIND - 1))
-	
-	# Remaining argument should be BASE
-	ARGS=(${*})			# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
-	#for a in "${ARGS[@]}";do BASE="$a";done
-	tui-title "$ARGS_COUNT"
-	
+	#shift $(($OPTIND - 1))
 	# Verify required variables
 	[ -z $BASE ] && BASE="$(pwd)" || cd "$BASE"
-	CURRENT="$BASE"	# Relative path after base
-	CUR_STR=$(MakeCurStr "$CURRENT")
 	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
 #
 #	Functions
@@ -169,7 +170,7 @@ Where options are:
 					;;
 				esac
 				# Dont show title if no entries available
-				[ ! "x" = "$(printf x${array[@]})" ] && \
+				[ ! "" = "$(printf ${array[@]})" ] && \
 					tui-title "${content_title}:"
 				# Display array
 				while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
@@ -280,7 +281,7 @@ Where options are:
 #
 #	Display & Action
 #
-	cd "$CURRENT"
+	cd "$BASE"
 	while [ ! $menu = "quit-browser" ];do
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
@@ -295,7 +296,7 @@ Where options are:
 	#
 		$doClear && clear
 		tui-header "$lbl_title" "$lbl_user"
-		tui-title "Location:" "" "/$CUR_STR"
+		tui-title "Location:"  "/$CUR_STR"
 	#
 	#	MENU :: TEXT
 	#
@@ -316,7 +317,8 @@ Where options are:
 			# Expect $mode to be either an item of $default_actions
 			# or a file / folder
 				case $mode in
-				n|new)  	[ -z $item ] && \
+				n|new)  	menu=new
+						[ -z $item ] && \
 							item=(tui-read "What is the name:")
 						tui-yesno "Will $item be a folder?" && \
 							mnu_Folder c "$item" || \
@@ -327,14 +329,16 @@ Where options are:
 							menu="quit-browser" || \
 							menu="back"
 						;;
-				d|delete)	[ -z $item ] && \
+				d|delete)	menu=del
+						[ -z $item ] && \
 							tui-echo "Please select what you want to delete:" && \
 							select item in "${ARRAY[@]}";do break;done
 						[ -d "$item" ] && \
 							mnu_Folder d "$item" || \
 							mnu_File d "$item"
 						;;
-				e|edit) 	skip=true
+				e|edit) 	menu=edit
+						skip=true
 						[ -z $item ] && \
 							tui-echo "Please select a file to edit:" && \
 							select item in "${files[@]}";do break;done
@@ -345,24 +349,28 @@ Where options are:
 						[ $skip = false ] && \
 							mnu_File  edit "$item"	
 						;;
-				x|execute)	if [ -z $item ]
+				x|execute)	menu=exe
+						if [ -z $item ]
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	[ -d "$item" ] && \
 								mnu_Folder x "$item" || \
 								( mnu_File   x "$item" ; tui-press)
 						fi					;;
-				i|info) 	if [ -z $item ]
+				i|info) 	menu=info
+						if [ -z $item ]
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	stat "$item"
 							tui-press
 						fi					;;
-				r|rename)	if [ -z $item ]
+				r|rename)	menu=rename
+						if [ -z $item ]
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	stat "$item"
 							tui-press
 						fi					;;
 				[qQ]|[qQ]uit)	menu="quit-browser"			;;
 				*)		# Its not a $default_action
+						menu=diffrent
 						if [ -z $item ]
 						then	# No 2nd argument passed
 							if [ -d "$mode" ]
@@ -371,7 +379,7 @@ Where options are:
 							then	mnu_File "execute" "$mode"
 								tui-press
 							fi
-						else	tui-echo "BETA shell include?:"
+						else	tui-echo "BETA shell execute?:" "'$mode $item'"
 							$mode $item
 							tui-press
 						fi					;;

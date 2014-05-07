@@ -103,7 +103,7 @@ Options are:
 		then 	SECOND="$FIRST"
 			num_o="${#SECOND}"
 			num=$[ $num_o / 2 * 2  ]
-			[ $num_o -gt $num ] && adder=" "||adder=""
+			[ $num_o -gt $num ] && adder=" "||adder="  "
 			EMPTY="${EMPTY:${num}+2}"	# The +2 is a temp bugfix
 			half=$[ ${#EMPTY} / 2  ]
 			FIRST="${EMPTY:$half}"
