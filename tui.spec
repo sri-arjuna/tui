@@ -63,11 +63,11 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
                      %{buildroot}%{_sysconfdir}/%{name}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
-                     %{buildroot}%{_datarootdir}/%{name} \
+                     %{buildroot}%{_datarootdir}/%{name}/templates \
                      %{buildroot}%{_docdir}/%{name}
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
 mv %{name}/conf/*    %{buildroot}%{_sysconfdir}/%{name}/
-mv %{name}/templates %{buildroot}%{_datarootdir}/%{name}/
+mv %{name}/templates/* %{buildroot}%{_datarootdir}/%{name}/templates/
 mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
 
