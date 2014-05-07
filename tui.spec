@@ -55,7 +55,10 @@ and easy accessible by executing 'tui':
 
 %install
 rm -rf       %{buildroot}
-rm %{name}/install.sh %{name}/uninstall.sh %{name}/README.md %{name}/tui.spec
+rm %{name}/install.sh \
+	%{name}/uninstall.sh \
+	%{name}/README.md \
+	#%{name}/tui.spec
 mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
                      %{buildroot}%{_sysconfdir}/%{name}/ \
@@ -70,6 +73,7 @@ mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
 
 #rm -fr %{name}/profile.d/
 mv %{name}/profile.d/* %{buildroot}%{_sysconfdir}/profile.d/
+
 
 %clean
 rm -rf %{buildroot}
