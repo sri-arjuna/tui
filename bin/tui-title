@@ -38,4 +38,5 @@
 #
 #	Display
 #
-	tui-printf -T "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
+	#tui-printf -T "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
+	tui-printf -T "$1" "$2" "$3"
