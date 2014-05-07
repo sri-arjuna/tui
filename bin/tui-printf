@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2013.05.03
-#	Changed:	2014.05.07
-	script_version=0.7
+#	Changed:	2014.05.08
+	script_version=0.8
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -74,24 +74,24 @@ Options are:
 #	Prepare Colors & Strings
 #
 	if [ $doEcho = true ]
-	then	COLOR_LINE_START="${reset}"
+	then	COLOR_LINE_START="\r${reset}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="\n"
 	elif [ $doHeader = true ]
 	then	# Full line
-		COLOR_LINE_START="${HEAD_BG}${HEAD_FG}"
+		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="${reset}\n"
 	elif [ $doTitle = true ]
 	then	# 'Inlay'
-		COLOR_LINE_START=""
+		COLOR_LINE_START="\r"
 		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
 		COLOR_LINE_CLOSE="${reset}"
 		COLOR_LINE_END="\n"
 	else	# The default
-		COLOR_LINE_START="${reset}"
+		COLOR_LINE_START="\r${reset}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END=""
