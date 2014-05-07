@@ -63,6 +63,6 @@ Where options are:
 #
 #	Display & Action
 #
-	VALUE=$(grep $OPT ^"$VARNAME"= "$CONFFILE"|grep -v ^#|sed s,'"','',g|sed s,'=',' ',g) > /dev/zero
+	VALUE=$(grep $OPT "$VARNAME"= "$CONFFILE"|grep -v ^#|sed s,'"','',g|sed s,'=',' ',g) > /dev/zero
 	VALUE="${VALUE:${#VARNAME}+1}"
 	printf "$VALUE"

@@ -32,5 +32,5 @@
 #
 #	Display
 #
-	tui-printf -E "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
-	
+	#tui-printf -E "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
+	tui-printf -E "$1" "$2" "$3"
