@@ -1,5 +1,5 @@
 Name:        tui
-Version:     0.4.1
+Version:     0.5.0
 Release:     0%{?dist}
 Summary:     Text User Interface for scripts
 
@@ -63,8 +63,8 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_datarootdir}/%{name} \
                      %{buildroot}%{_docdir}/%{name}
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
-mv %{name}/conf/*    %{buildroot}%{_sysconfdir}/%{name}
-mv %{name}/docs/*conf %{buildroot}%{_datarootdir}/%{name}
+mv %{name}/conf/*    %{buildroot}%{_sysconfdir}/%{name}/
+mv %{name}/templates %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
 
@@ -85,6 +85,10 @@ rm -rf %{buildroot}
 %{_bindir}/%{name}-*
 
 %changelog
+* Thu May 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-1
+- Rewrote for performance: tui is shown ~1 sec faster (0.6s now)
+- Added tui-browser, tui-new-browser ; Filebrowser/Script Manager
+
 * Thu Mar 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.4.1-0
 - Introducing $USER_SHELL, used for tui-newscript as shell definition
 
