@@ -5,7 +5,7 @@
 #
 #	Load default interface
 #
-	source /etc/tui/{colors,tui}.conf
+	source /etc/tui/{colors,status,tui}.conf
 #
 #	Load user interface config
 #
@@ -18,3 +18,7 @@
 	export HEAD_BG HEAD_FG
 	export TITLE_BG TITLE_FG 
 	export BORDER_LEFT BORDER_RIGHT
+	# tui-status
+	export TODO WORK DONE FAIL
+	export SKIP NEXT BACK CANC
+	export ENAB DIAB INFO HELP

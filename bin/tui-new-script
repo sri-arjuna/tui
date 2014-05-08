@@ -7,9 +7,11 @@
 	script_version=0.9.1
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
-		\rUsage: $ME [path/to/]FILENAME
-		\rCreates a new script and a manpage template for FILENAME
-		\r"
+Usage: $ME [path/to/]FILENAME
+Creates a new script and a manpage template for FILENAME
+	-m		Create a minimal script-header
+
+"
 	DEST=""
 	TITLE="sea's New script script"
 	SHELL_MIN=""
@@ -17,8 +19,8 @@
 #	Variable handling
 #
 	tui-title "$TITLE ($script_version)"
-	source tui
-	while getopts "mh": name
+	source $HOME/.config/tui/user.conf
+	while getopts "mh" name
 	do 	case $name in
 		m)	SHELL_MIN="_min"	;;
 		h|help)
