@@ -30,7 +30,6 @@
 	
 	source /etc/profile.d/tui.sh
 	MSG="Installed $app"
-	tui-printf "$MSG" "$WORK"
-	tui-status $? "$MSG"
-	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && \
-		rm ./*
+	echo "$WORK $MSG" 
+	echo "$? $MSG"
+#	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && rm ./*
