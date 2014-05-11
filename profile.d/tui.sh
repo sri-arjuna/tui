@@ -5,7 +5,9 @@
 #
 #	Load default interface
 #
-	source /etc/tui/{colors,status,tui}.conf
+	for cfg in colors status tui;do
+		source /etc/tui/$cfg.conf
+	done
 #
 #	Load user interface config
 #
