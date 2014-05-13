@@ -1,3 +1,4 @@
+cat > "$DEST" << EOF
 #/bin/bash
 #	$USER_NAME, $USER_EMAIL @ $(date +'%F %b')
 #	Descriptional text here...
@@ -8,5 +9,7 @@
 #
 	
 #
-#	Display
+#	Action
 #
+	
+EOF

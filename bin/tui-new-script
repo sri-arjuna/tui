@@ -1,49 +1,55 @@
-#!/bin/sh
+#!/bin/bash
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #
 #	Variable defaults
 #
-	script_version=0.9.1
-	ME="$(basename $0)"
-	help_text="$ME ($script_version)
-Usage: $ME [path/to/]FILENAME
-Creates a new script and a manpage template for FILENAME
-	-m		Create a minimal script-header
+	script_version=0.9.3
+	ME="${0##*/}"
+	help_text="
+$ME ($script_version)
+Creates a new script in $HOME/bin, if $HOME/.local/bin doesnt exists.
+Also asks to create a basic manpage template in the same location.
+
+Usage:  	$ME [options] [path/to/]FILENAME
+Examples:	$ME fileA.sh			# Creates a script in $HOME/bin
+		$ME -p /opt/bin/fileB.sh	# Creates a full application script in /opt/bin
+Where options are:
+	-h		This screen
+	-p		Create a full application script template
+	-m		Create a header less than -p, but more than no option
 
 "
 	DEST=""
 	TITLE="sea's New script script"
-	SHELL_MIN=""
+	SHELL_EXT=""
 #
 #	Variable handling
 #
 	tui-title "$TITLE ($script_version)"
 	source $HOME/.config/tui/user.conf
-	while getopts "mh" name
+	while getopts "hmp" name
 	do 	case $name in
-		m)	SHELL_MIN="_min"	;;
-		h|help)
-			printf "$help_text"
-			exit $RET_HELP
-			;;
+		m)	SHELL_EXT="_min"	;;
+		p)	SHELL_EXT="_app"	;;
+		h)	printf "$help_text"
+			exit $RET_HELP	;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
 	ARGS=(${*})			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
-
 #
 #	Display
 #
 	if [[ -z $1 ]]
 	then	read -p "Enter the filename: " DEST
-		if [[ "$DEST" = "$(basename $DEST)" ]]
-		then	if [[ -f "$HOME/.local/bin" ]]
+		if [[ "$DEST" = "${DEST##*/}" ]]
+		then	if [[ -d "$HOME/.local/bin" ]]
 			then	DEST="$HOME/.local/bin/$DEST"
 			else	DEST="$HOME/bin/$DEST"
-				tui-bol-dir "$(dirname $DEST)" > /dev/zero
+				tui-bol-dir "$(dirname $DEST)" # > /dev/zero
 			fi
 		fi
 	else	if [[ "$1" = "$(basename $1)" ]]
@@ -56,18 +62,19 @@ Creates a new script and a manpage template for FILENAME
 		fi
 	fi
 	if [[ -f "$DEST" ]]
-	then	tui-yesno "File $DEST exists... Overwrite?"
-		tui-status $? "Overwrite file: $DEST" || mv "$DEST" "$DEST-$(date +'%F.%s').bak"
+	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F.%s').bak"
+		tui-status $? "Overwrite file: $DEST"
 	fi
 	APP_DIR=/usr/share/tui
-	source $APP_DIR/templates/scripts/$USER_SHELL$SHELL_MIN || \
-		( tui-status 1 "$USER_SHELL$SHELL_MIN is not available in templates..." ; exit 1)
+	source $APP_DIR/templates/scripts/$USER_SHELL$SHELL_EXT || \
+		( tui-status 1 "$USER_SHELL$SHELL_EXT is not available in templates..." ; exit 1)
 	if tui-status $? "Saved: $(echo $DEST)"
 	then	chmod +x "$DEST"
 		[[ ! xterm = "$TERM" ]] && \
 			$USER_SHELL $DEST -h && \
 			sleep 1
 		tui-edit "$DEST"
+		#$EDITOR "$DEST"
 	fi
 	doMan=false
 	
