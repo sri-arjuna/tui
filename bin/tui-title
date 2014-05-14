@@ -4,7 +4,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
@@ -16,27 +16,18 @@
 		\r"
 	ARGS_COUNT=$#
 #
-#	Check for the environment to load
-#
-	type printx &>/dev/zero || source tui
-#
 #	Variable handling
 #
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
 	esac
-	[[ ! -z $1 ]] && TXT_LEFT="$1"   || TXT_LEFT=" "
-	[[ ! -z $2 ]] && TXT_MIDDLE="$2" || TXT_MIDDLE=" "
-	[[ ! -z $3 ]] && TXT_RIGHT="$3"  || TXT_RIGHT=" "
-	
-	case $ARGS_COUNT in
-	1)	TXT_MIDDLE="$1"
-		TXT_LEFT=" "
-		;;
-	esac
 #
 #	Display
 #
-	#tui-printf -T "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
-	tui-printf -T "$1" "$2" "$3"
+	case $ARGS_COUNT in
+	0)	tui-printf -T 			;;
+	1)	tui-printf -T "$1"		;;
+	2)	tui-printf -T "$1" "$2" 	;;
+	3)	tui-printf -T "$1" "$2" "$3"	;;
+	esac

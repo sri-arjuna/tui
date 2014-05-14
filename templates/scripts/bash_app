@@ -2,14 +2,14 @@ cat > "$DEST" << EOF
 #!$(which $USER_SHELL)
 source /etc/profile.d/tui.sh
 #
-#	File:		${DEST##*/}
+#	File:		$DEST
 #	Author: 	$USER_NAME
 #	Contact:	$USER_EMAIL
 #	License:	$DEFAULT_LICENSE
 #	Created:	$(date +'%Y.%m.%d')
 #	Changed:	$(date +'%Y.%m.%d')
 	script_version=0.1
-	TITLE="${1^}"
+	TITLE="${DEST##*/}"
 #	Description:	Text
 #			...
 #			...
@@ -21,13 +21,13 @@ source /etc/profile.d/tui.sh
 	ME="\${ME/.sh/}"			# Cut off .sh extension
 	ME_DIR="\${0/\${0##/*/}}"		# Dirname of \$0
 	CONFIG="\$HOME/.config/\$ME.conf"	# Configuration file
-	LOG="\$HOME/\$ME.log" 	#-\$(date +'%T')	# If a daily log is prefered
+	LOG="\$HOME/\$ME.log"		#-\$(date +'%T')	# If a daily log is prefered
 #
 #	Help text
 #
 	help_text="
 \$ME (\$script_version)
-\$TITLE
+\${TITLE^}
 Usage: 		\$ME [options] [arguments]
 Examples:	\$ME -a
 		\$ME -e optVAL

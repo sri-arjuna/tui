@@ -4,7 +4,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
@@ -21,16 +21,12 @@
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
 	esac
-	[[ ! -z $1 ]] && TXT_LEFT="$1"   || TXT_LEFT=" "
-	[[ ! -z $2 ]] && TXT_MIDDLE="$2" || TXT_MIDDLE=" "
-	[[ ! -z $3 ]] && TXT_RIGHT="$3"  || TXT_RIGHT=" "
-	case $ARGS_COUNT in
-	2)	TXT_RIGHT="$TXT_MIDDLE"
-		TXT_MIDDLE=" "
-		;;
-	esac
 #
 #	Display
 #
-	#tui-printf -E "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
-	tui-printf -E "$1" "$2" "$3"
+	case $ARGS_COUNT in
+	0)	tui-printf -E 			;;
+	1)	tui-printf -E "$1"		;;
+	2)	tui-printf -E "$1" "$2" 	;;
+	3)	tui-printf -E "$1" "$2" "$3"	;;
+	esac
