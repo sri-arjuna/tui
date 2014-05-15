@@ -17,6 +17,8 @@
 #
 #	Export so it remains available for TUI
 #
+	TUI_RESET=$RESET
+	export TUI_RESET RESET
 	export HEAD_BG HEAD_FG
 	export TITLE_BG TITLE_FG 
 	export BORDER_LEFT BORDER_RIGHT
