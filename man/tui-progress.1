@@ -1,22 +1,28 @@
-.TH "tui-progress" "1" "2014 04 26" "Simon Arjuna Erat (sea)"
+.TH "tui-progress" "1" "2014 04 26" "Simon Arjuna Erat (sea)" "TUI 0.5.0"
 
 .SH NAME
-tui-progress (0.1)
+tui-progress (0.3)
 
 .SH SYNOPSIS
 \fBtui-progress\fP [options] [arguments]
 .br
-Example: tui-progress
+Example:	tui-progress "Message to user"
+.br
+		tui-progress -m 104 "Count up to 104"
 .br
 Where options are:
-.IP "\fB-XY\fP"
-does this
-.IP "\fB-YX\fP"
-does that
+.IP "\fB-i\fP" VAL
+Uses VAL as to keep diffrent instances apart
+.IP "\fB-r\fP"
+Resets an instances index to 0 (1 if -m is set)
+.IP "\fB-m\fP" VAL
+Set Max value to VAL, this changes the outout to:	counted num / max value
+.br
+As in: "4 / VAL"
 
 .SH DESCRIPTION
 .PP
-Some descriptional text
+Is used to indicate progress, while keeping the output to a single line.
 
 .SH LICENSE
 GNU Lesser General Public License (LGPL)

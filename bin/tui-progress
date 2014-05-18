@@ -5,13 +5,13 @@
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2014.04.26
 #	Changed:	2014.04.26
-	script_version=0.1
+	script_version=0.3
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
 #	Variables
 #
-	source tui
+	source /etc/profile.d/tui.sh
 	TITLE="Progress indicator"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
@@ -19,62 +19,78 @@
 $ME ($script_version)
 $TITLE
 Usage: 	$ME [options] [arguments]
-Where options are:
-	-h|--help		This screen
-	-i|--ident	VAL	VAL to let tui-progress use seperate tempfiles for diffrent output
+Displays either / - \\ | within [     ] as progress string on the right side.
 
+Where options are:
+	-h(elp) 		This screen
+	-m(ax)		VAL	If provided, changes progressstring output to 'calculated-num / VAL '
+	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
+				Should be provided if used with -m
+	-r(eset)		Resets the tempfile, should be used first
 "
 	ID_CUR=$$
-	ID=""
+	ID=default
 	INDI=( '\' '|' '/' '-' )
 	TOTAL=$[ ${#INDI[@]} -1 ]
-	
+	TYPE=dash
+	MAX=1
+	doReset=false
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	#set -x
-	while getopts "i:(ident):h(help)": name
+	while getopts "i:m:rh" name
 	do 	case $name in
-		i|ident)
-			ID="$OPTARG"
-			;;
-		h|help)
-			printf "$help_text"
-			exit $RET_HELP
-			;;
+		i)	ID="$OPTARG"		;;
+		m)	MAX="$OPTARG"
+			TYPE=num		;;
+		h)	printf "$help_text"
+			exit $RET_HELP		;;
+		r)	doReset=true		;;
 		esac
 	done
 	shift $(($OPTIND - 1))
 	ARGS=(${*})			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 	C=0
-	for a in "${ARGS[@]}";do
-		case $C in
-		0)	LEFT="$a"	;;
-		1)	MIDDLE="$a"	;;
-		esac
-		((C++))
-	done
+	LEFT="$1"
+	MIDDLE="$2"
 	C=0
 #
-#	Display & Action
+#	 Create initial tempfile if none exists
 #
-	# Create initial tempfile if none exists
-	[ -z $ID ] && ID=default
 	TMPFILE="$TUI_TEMP_DIR/tui-progress.$ID"
 	[ ! -f "$TMPFILE" ] && \
 		touch "$TMPFILE" && \
 		printf 0 > "$TMPFILE"
-	
-	# Read tempfile value
+#
+#	Read initial value from tmpfile
+#
 	VAL=$(cat "$TMPFILE")
-	PROGRESS="[  ${INDI[$VAL]}   ]"
-	
-	# Update value for next access
-	[ ! $VAL -ge $TOTAL ] && \
-		( ((VAL++)) ; printf $VAL > "$TMPFILE" ) || \
-		printf 0 > "$TMPFILE"
-	
-	# Display
-	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
+	PROGRESS=""
+	case "$TYPE" in
+		dash)	[[ $VAL -gt 3 ]] && VAL=2
+			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
+		num)	PROGRESS="$VAL / $MAX"		;;
+		*)	tui-status 1 "Error, type is $TYPE"	;;
+	esac
+	[[ -z $PROGRESS ]] && exit 1
+#
+#	Update value for next access
+#
+	case "$TYPE" in
+	dash) 	[[ ! $VAL -ge $TOTAL ]] && \
+			( ((VAL++)) ; printf $VAL > "$TMPFILE" ) || \
+			printf 0 > "$TMPFILE"		;;
+	num)	((VAL++)) ; num=$VAL
+		printf $num > "$TMPFILE"		;;
+	esac
+#
+#	Display & Action
+#
+	[[ -z $LEFT ]] && LEFT=" " 
+	[[ -z $MIDDLE ]] && MIDDLE=" "
+	if [[ true = $doReset ]]
+	then 	tui-printf "$LEFT" "$MIDDLE" "$INFO"
+		printf 1 > "$TMPFILE"
+	else 	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
+	fi

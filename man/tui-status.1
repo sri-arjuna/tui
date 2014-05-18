@@ -1,14 +1,16 @@
-.TH "tui-status" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-status" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.5.0"
 
 .SH NAME
 tui-status
 
 .SH SYNOPSIS
-\fBtui-status\fP $? ["MESSAGE"]
+\fBtui-status\fP $? ["MESSAGE" ["Centred message"] ]
 
 .SH DESCRIPTION
 .PP
-Returns the error level a passed as first (numeric) argument and prints MESSAGE if supplied.
+tui-status always exists with the numeric argument that must be passed.
+.br
+Returns the error level passed as first (numeric) argument and prints the MESSAGE's if supplied.
 .br
 RET_DONE=0
 .br
@@ -33,6 +35,10 @@ RET_DIAB=11
 RET_HELP=99
 .br
 RET_INFO=111
+.br
+Just use the strinparg after _, $INFO, will display what you see on the right side upon:
+tui-status $RET_INFO "Info message"
+.br
 
 .SH SEE ALSO
 printf(1), sh(1), tput(1)
