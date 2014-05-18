@@ -66,14 +66,26 @@ Where options are:
 			mnu_funcA() { # args?
 			# Description
 			# Returns what - format?
-				tui-echo "Do A : \$@"
-				printf "\$1=\$2" >> "\$CONFIG"
-				return \$?
+				NAME=func_value_name
+				CURRENT=\$(tui-value-get "\$CONFIG" "\$NAME")
+				tui-echo "\${NAME^} is currently set to:" "\$CURRENT"
+				if tui-yesno "Change this?"
+				then 	select newval in \$TODO_LIST;do break;done
+					tui-value-set "\$CONFIG" "\$NAME" "\$newval"
+					doLog "\$CONFIG" "Changed '$NAME' from '\$CURRENT' to '\$newvalue'"
+				fi
 			}
 			mnu_funcB() { # args?
 			# Description
 			# Returns what - format?
-				tui-echo "Do B : \$@"
+				NAME=func_value_name
+				CURRENT=\$(tui-value-get "\$CONFIG" "\$NAME")
+				tui-echo "\${NAME^} is currently set to:" "\$CURRENT"
+				if tui-yesno "Change this?"
+				then 	newval=$(tui-read "What is \$NAME's new value:")
+					tui-value-set "\$CONFIG" "\$NAME" "\$newval"
+					doLog "\$CONFIG" "Changed '\$NAME' from '\$CURRENT' to '\$newvalue'"
+				fi
 			}
 			mnu_funcC() { # args?
 			# Description
@@ -119,13 +131,13 @@ Where options are:
 #
 #	Environment checks
 #
-	[ ! -e "\$LOG" ] && \\
+	[[ ! -e "\$LOG" ]] && \\
 		touch \$LOG && \\
 		doLog "------------------------------------------" && \\
 		doLog "Created logfile of \$ME (\$script_version)" && \\
 		doLog "------------------------------------------"
 	# This is optimized for a one-time setup
-	[ ! -e "\$CONFIG" ] && \\
+	[[ ! -e "\$CONFIG" ]] && \\
 		doLog "Setup : First config" && \\
 		tui-echo "Entering first time setup." "\$SKIP" && \\
 		sleep 1 && \\

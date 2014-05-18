@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash -x
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
@@ -13,11 +13,7 @@
 		\rPrints str3 on the right
 		\rIf 2 strings are passed, they're printed left and right.
 		\r"
-	ARGS_COUNT=$#
-#
-#	Check for the environment to load
-#
-	type printx &>/dev/zero || source tui
+	ARGS_COUNT=${#@}
 #
 #	Variable handling
 #
@@ -25,15 +21,12 @@
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
 	esac
-	[[ ! -z $1 ]] && TXT_LEFT="$1" && ARG_NUM=1 || TXT_LEFT=" "
-	[[ ! -z $2 ]] && TXT_MIDDLE="$2" && ARG_NUM=2 || TXT_MIDDLE=" "
-	[[ ! -z $3 ]] && TXT_RIGHT="$3" && ARG_NUM=3 || TXT_RIGHT=" "
-	case $ARGS_COUNT in
-	2)	TXT_RIGHT="$TXT_MIDDLE"
-		TXT_MIDDLE=" "
-		;;
-	esac
 #
 #	Display
 #
-	tui-printf -H "$TXT_LEFT" "$TXT_MIDDLE" "$TXT_RIGHT"
+	case $ARGS_COUNT in
+	0)	tui-printf -H " "		;;
+	1)	tui-printf -H "$1"		;;
+	2)	tui-printf -H "$1" "$2" 	;;
+	3)	tui-printf -H "$1" "$2" "$3"	;;
+	esac
