@@ -2,7 +2,7 @@ cat > "$DEST" << EOF
 #!$(which $USER_SHELL)
 source /etc/profile.d/tui.sh
 #
-#	File:		$DEST
+#	File:		${DEST##*/}
 #	Author: 	$USER_NAME
 #	Contact:	$USER_EMAIL
 #	License:	$DEFAULT_LICENSE
@@ -34,6 +34,7 @@ Examples:	\$ME -a
 		\$ME ARG
 Where options are:
 	-h(elp) 		This screen
+	-C(onf			Show the config/setup dialog
 	-L(OG)			Show the log file (\$LOG)
 	-e(xample)	ARG	Example with mandatory argument
 	-a(nother)	[ARG]	Example with optinal argument
@@ -42,6 +43,8 @@ Where options are:
 #
 #	Variables
 #
+	REQUIRES="pack ages as string"
+	REQUIRED=""
 	todo=by_you
 #
 #	Functions
@@ -72,8 +75,10 @@ Where options are:
 				if tui-yesno "Change this?"
 				then 	select newval in \$TODO_LIST;do break;done
 					tui-value-set "\$CONFIG" "\$NAME" "\$newval"
-					doLog "\$CONFIG" "Changed '$NAME' from '\$CURRENT' to '\$newvalue'"
+					return \$?
+				else	return \$RET_BACK
 				fi
+				return 1
 			}
 			mnu_funcB() { # args?
 			# Description
@@ -82,15 +87,18 @@ Where options are:
 				CURRENT=\$(tui-value-get "\$CONFIG" "\$NAME")
 				tui-echo "\${NAME^} is currently set to:" "\$CURRENT"
 				if tui-yesno "Change this?"
-				then 	newval=$(tui-read "What is \$NAME's new value:")
+				then 	newval=\$(tui-read "What is \$NAME's new value:")
 					tui-value-set "\$CONFIG" "\$NAME" "\$newval"
-					doLog "\$CONFIG" "Changed '\$NAME' from '\$CURRENT' to '\$newvalue'"
+					return \$?
+				else	return \$RET_BACK
 				fi
+				return 1
 			}
 			mnu_funcC() { # args?
 			# Description
 			# Returns what - format?
 				tui-echo "Do C : \$@"
+				
 			}
 		#
 		#	Menu / Action
@@ -122,8 +130,9 @@ Where options are:
 					#doLog "Setup : \$action : \$cmd : \$args"
 					\$cmd \$args
 					RET=\$?
-					doLog "Setup : \$action : \$cmd : \$args : ret \$RET"
-					tui-status \$RET "Setup \$action" || tui-press
+					doLog "Setup : \$action - \$cmd - \$NAME from '\$CURRENT' to '\$newval' - Ret : \$RET"
+					tui-status \$RET "Setup \$action - \$NAME (\$newval)" 
+					[[ \$RET -eq 1 ]] && tui-press
 					break
 				done
 			done
@@ -142,13 +151,14 @@ Where options are:
 		tui-echo "Entering first time setup." "\$SKIP" && \\
 		sleep 1 && \\
 		MenuSetup
-	source "\$CONFIG" || ( doLog "Failed to load: \$CONFIG" ; tui-status 1 "Failed to load: \$CONFIG" )
+	source "\$CONFIG" || \\
+		( doLog "Failed to load: \$CONFIG" ; tui-status 1 "Failed to load: \$CONFIG" )
 #
 #	Catching Arguments
 #
 	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_FAIL
 	# A ':' after a char indicates that this option requires an argument
-	while getopts "ae:hL" opt
+	while getopts "ae:hCL" opt
 	do 	case \$opt in
 		a)	# This is only demo
 			ARG_TOGGLE_ANOTHER=set
@@ -162,6 +172,8 @@ Where options are:
 			;;
 		L)	less "\$LOG"	
 			exit \$RET_DONE
+		C)	MenuSetup
+			exit \$RET_DONE
 			;;
 		# *)	printf "\$help_text" ; exit \$RET_FAIL	;;
 		esac
@@ -169,7 +181,23 @@ Where options are:
 	shift \$((\$OPTIND - 1))
 	ARGS=(\${*})			# Remaining arguments
 	ARGS_COUNT=\${#ARGS[@]}		# Amount of remaining
-
+#
+#	Install missing packages
+#
+	tui-progress -ri \$\$" "
+	[[ ! true = "\$req_inst" ]] && \
+		for R in \$REQUIRES;do
+			tui-progress -i \$\$ -m \${#REQUIRES} "Check requirement: $R"
+			rpm -qa \$F > /dev/zero || REQUIRED+=" \$R"
+		done
+	if [[ ! "" = "\$(printf "\$REQUIRED")" ]]
+	then 	tui-title "Installing missing packages"
+		doLog "Installing missing packages: \$REQUIRED"
+		sudo yum install -y \$REQUIRED && \\
+			printf "req_inst=true\n" >> "\$CONFIG"
+	else 	[[ ! true = "\$req_inst" ]] && \\
+			printf "req_inst=true\n" >> "\$CONFIG"
+	fi
 #
 #	Display & Action
 #
