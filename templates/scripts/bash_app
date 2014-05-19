@@ -185,18 +185,21 @@ Where options are:
 #	Install missing packages
 #
 	tui-progress -ri \$\$" "
-	[[ ! true = "\$req_inst" ]] && \
+	if [[ ! true = "\$req_inst" ]]
+	then 	doLog "Req : Checking for installed packages"
 		for R in \$REQUIRES;do
 			tui-progress -i \$\$ -m \${#REQUIRES} "Check requirement: $R"
-			rpm -qa \$F > /dev/zero || REQUIRED+=" \$R"
+			rpm -qa \$F > /dev/zero || ( REQUIRED+=" \$R" ; doLog "Req : Missing \$R" )
 		done
+	fi
 	if [[ ! "" = "\$(printf "\$REQUIRED")" ]]
 	then 	tui-title "Installing missing packages"
 		doLog "Installing missing packages: \$REQUIRED"
 		sudo yum install -y \$REQUIRED && \\
-			printf "req_inst=true\n" >> "\$CONFIG"
+			printf "req_inst=true\\n" >> "\$CONFIG"
 	else 	[[ ! true = "\$req_inst" ]] && \\
-			printf "req_inst=true\n" >> "\$CONFIG"
+			printf "req_inst=true\\n" >> "\$CONFIG" && \\
+			doLog "All required packages already installed
 	fi
 #
 #	Display & Action
