@@ -5,9 +5,9 @@
 #
 #	Variable defaults
 #
-	script_version=0.2
+	script_version=0.3
 	ME="$(basename $0)"
-	[[ -z $HELP ]] && source tui
+	[[ -z $TUI_TEMP_FILE ]] && source /etc/profile.d/tui.sh
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
@@ -16,12 +16,24 @@
 		\rPrints 'Exit String' when done, regardless of exit code (0,1,?).
 		\rWAIT is optinal wait time between updates, default is 0.7 (seconds).
 		\r"
+	CHECKFILE=false
 #
 #	Variable handling
 #
-	if [[ "$1" = "-h" ]] || [[ -z $3 ]];then
-	echo -e "$help_text" && exit $RET_HELP;fi
+	[[ -z $3 ]] && printf "$help_text" && exit $RET_HELP
 	BG_RET="-1"
+	while getopts "hf:" opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		f)	FILECHECK="$OPTARG"
+			CHECKFILE=true
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	
 	JOB="$1"
 	TXT_PROGRESS="$2"
 	TXT_EXIT="$3"
@@ -29,17 +41,21 @@
 #
 #	Send job to bg and get pid
 #
-	(sh "$JOB" && echo 0 > /dev/stdout > $TUI_TEMP_FILE || \
-			echo 1 > /dev/stdout > $TUI_TEMP_FILE
+	(sh "$JOB" && printf 0 > /dev/stdout > $TUI_TEMP_FILE || \
+			printf 1 > /dev/stdout > $TUI_TEMP_FILE
 	)   & PID=$!
 #
 #	While the job is running...
 #
+	tui-printf "Starting job..." "$WORK"
+	sleep 2
 	while [[ ! "" = "$(ps |grep $PID)" ]]
 	do
-		tui-printf \
-			"$(eval echo $TXT_PROGRESS)" \
-			"[  $(tui-indi)   ]"
+		if [[ true = $CHECKFILE ]]
+		then 	FS=$(ls -lh "$FILECHECK"|awk '{print $5}')
+			tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
+		else	tui-printf "$(eval printf $TXT_PROGRESS)" "[  $(tui-indi)   ]" 2>&1
+		fi
 		sleep $WAIT
 	done
 #

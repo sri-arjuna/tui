@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash +x
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -27,6 +27,7 @@ Where options are:
 	-l(ocation)  	ARG	Location will be labled as ARG
 	-m(ode) 	ARG	Can be 'text' (nice n' slow, default)
 				or 'num' (functional n' fast)
+	-p(ath)		ARG	Will use ARG as basedir
 	-n(oclear)		Dont clear screen after menu actions
 	-t(itle)	ARG	Title-label (upper-left) is set to ARG
 	-u(ser) 	ARG	User-label (upper-right) is set to ARG
