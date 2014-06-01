@@ -1,19 +1,16 @@
-README - 0.4.0
+README - 0.5.0
 ==============
 
 Description:
 ------------
-TUI is an abrevihation for Textual User Interface
-It enables you to write scripts simulation a TUI
-in any terminal window or tty console.
+TUI is an abrevihation for "Text User Interface".
+It enables you to write scripts simulation a TUI in any terminal window or tty console.
+Due to the 'limitation's of a TTY/Terminal, it is a line-based-interface.
 
-It is ment for scripts that are 'selective' with their
-output to the user, and also want to present it
-a little bit more attractive.
+It is ment for scripts that are 'selective' with their output to the user, 
+and also want to present themself a little bit more attractive.
 
-With TUI you can give your scripts (csh, bash, ksh,
-shell, zsh, anything that actualy uses commands of /[s]bin or /usr/[s]bin)
-a touch of user interface, even at init 1 /emergency mode.
+With TUI you can give your scripts a touch of user interface, even at init 1 /emergency mode.
 
 All the commands try to be as native langue OR self explaining as possible.
 !!

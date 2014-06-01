@@ -1,0 +1,79 @@
+#!/bin/bash
+#	Simon Arjuna Erat (sea), erat.simon@gmail.com @ 2014-05-20
+#	Simply writes a log file
+#
+#
+#	Variables
+#
+	#source /etc/profile.d/tui.sh
+	ME="${0##*/}"			# Basename of $0
+	script_version=0.4
+	TITLE=""
+	PRE=""
+	leave_empty=false
+	D="$(date +%F)"
+	T="$(date +%T)"
+	daily_date_str="#### $(date +'%F') ####"	# Only used if log dont uses the date otherwise
+	SEP="\t"
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+The order of the options defince the string order.
+Usage: 		$ME [options] \"LOGFILE\" \"Message\"
+Examples:	$ME \"/var/log/appname.log\" \"Message\"
+		$ME -dtp \"LOGFILE\" \"Server started\"
+		$ME -pu \"LOGFILE\" \"Changed background\"
+		
+Where options are:
+	-h(elp) 		This screen
+	-e(mpty)		Prints just the message or nothing
+	-d(ate)			Adds the DATE ($D) in front
+	-t(ime)			Adds the TIME ($T) in front
+	-p(id)			Adds the PID  ($$) in front
+	-u(ser)			Adds the USER ($USER) in front
+	-s(eperator)	ARG	Changes the the seperator ($SEP) to ARG
+
+"
+#
+#	Catching arguments
+#
+	[[ -z $2 ]] && printf "$help_text" && exit $RET_FAIL
+	while getopts "hedtpus:" opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP		;;
+		e)	leave_empty=true	;;
+		d)	PRE+=" $D"		;;
+		t)	PRE+=" $T"		;;
+		p)	PRE+=" $$"		;;
+		u)	PRE+=" $USER"		;;
+		s)	SEP="$OPTARG"		;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	LOG="$1"
+	MSG="$2"
+	if [[ $leave_empty = false ]]
+	then 	[[ -z "$PRE" ]] && \
+			PRE="$(date +'%F %T') $SEP " || \
+			PRE="$PRE $SEP "
+	fi
+#
+#	Action
+#
+	if [[ ! -f "$LOG" ]]
+	then 	# Create log file, exit with message on error
+		# Prints basic log header
+		touch "$LOG" || (tui-status 1 "Failed to create $LOG as $USER" ; exit 1)
+		printf "$daily_date_str\n" > "$LOG"
+	else 	# LOG exists
+		#D=$(date +'%F')
+		# If PRE doesnt not contain today's date, see if the log contains,
+		# if its missing there too, add today's date first
+		printf "${PRE}${MSG}" | grep -q "$D" || \
+			( grep -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
+	fi
+	[[ " " = "${PRE:0:1}" ]] && PRE="${PRE:1}"
+	printf "${PRE}${MSG}\n" >> "$LOG"

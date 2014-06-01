@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2014.04.24
-#	Changed:	2014.05.06
-	script_version=0.2
+#	Changed:	2014.05.29
+	script_version=0.3
 #	Description:	Get a value from an 'conf/ini' file
 #
 #	Variables
@@ -38,7 +38,7 @@ Where options are:
 #	Catching Arguments
 #
 	[[ -z $2 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "i(irrelevant)l(list)h(help)": name
+	while getopts "i(irrelevant)l(list)h(help)" name
 	do 	case $name in
 		i|irrelevant)
 			OPT="-i"
@@ -53,13 +53,10 @@ Where options are:
 			;;
 		esac
 	done
-	if [ -z $OPT ] 
-	then 	CONFFILE="$1"
-		VARNAME="$2"
-	else 	CONFFILE="$2"
-		VARNAME="$3"
-	fi
-	
+	shift $(($OPTIND - 1))
+	CONFFILE="$1"
+	VARNAME="$2"
+	#[[ -f "$CONFFILE" ]] ;tui-status $? "$CONFFILE dont exist?"
 #
 #	Display & Action
 #

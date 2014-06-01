@@ -1,0 +1,46 @@
+#!/bin/bash
+# tui-wait by Simon Arjuna Erat (sea) (erat.simon@gmail.com) on 2014-06-01
+#wait() { # TIME [ MSG ]
+# Provide TIME in seconds, optionaly followed (without space) by either: s,m,h ; for 5min 30 secs, you still need to provide seconds only
+# Optionaly you may provide a custom message
+	#set -x
+	TIME="${1/[a-zA-Z]/}"
+	UNIT="${1/[0-9]/}"
+	[[ -z $UNIT ]] && UNIT=s
+	
+	[[ -z "$2" ]] && \
+		MSG="Time left:" || \
+		MSG="$2"
+	hours=0
+	minutes=0
+	seconds=0
+	case ${UNIT,,} in
+	s)	seconds="$TIME"	;;
+	m)	minutes="$TIME"	;;
+	h)	hours="$TIME"	;;
+	esac
+
+	while [[ $seconds -ge 0 ]]
+	do 	# seconds is 0 or higher
+		# So subtract, its a countdown
+		[[ "$hours$minutes$seconds" = "000" ]] && \
+			tui-echo "$MSG" "$NEXT" && \
+			exit 0
+		((seconds--))
+		#seconds=$[ $seconds - 1 ]
+		if [[ $seconds -lt 0 ]]
+		then 	# We have sub zero seconds, fix that
+			seconds=59
+			((minutes--)) 
+			# While minutes changes, check for further minute & hour changes
+			[[ $minutes -lt 0 ]] && minutes=59 && ((hours--))
+			[[ $hours -lt 0 ]] && hours=0
+		fi
+		# Generate string & output to user
+		time_string="$hours:$minutes:$seconds"
+		#[[ "$hours$minutes$seconds" = "000" ]] && return 0
+		tui-printf  "$MSG" "$time_string" ## -- $seconds ($(date +%S))"
+		sleep 1
+		
+	done
+	exit 1
