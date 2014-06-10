@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2013.05.03
-#	Changed:	2014.05.08
-	script_version=0.8
+#	Changed:	2014.06.10
+	script_version=0.9
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -42,6 +42,7 @@ Options are:
 	doEcho=false
 	doHeader=false
 	doTitle=false
+	optStyle=""
 #
 #	Catching Arguments
 #
@@ -70,6 +71,38 @@ Options are:
 	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
 	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
 	[ ! -z "$4" ] && doMore=true || doMore=false
+#
+#	Verify all fit on 1 line
+#
+	len=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
+	if [[ $len -gt $WIDTH ]]
+	then 	len2=$[ ${#FIRST} + ${#SECOND} ]
+		#echo $len $len2 $WIDTH
+		if [[ $len2 -le $WIDTH ]]
+		then 	# first & second match on one line
+			tui-printf -E "$FIRST" "$SECOND"
+			tui-printf $optStyle "$THIRD"
+		else	# it needs further spliting:
+			if [[ ${#FIRST} -le $WIDTH ]]
+			then 	tui-printf -E "$FIRST"
+				tui-printf $optStyle "$SECOND" "$THIRD"
+			else	half=$[ ${#FIRST} / 2 ]
+				part1="${FIRST:0:$half}"
+				part2="${FIRST:$half}"
+				tui-printf -E "$part1"
+				[[ -z $SECOND ]] && \
+					tui-printf -E "$part2" || \
+					tui-printf -E "$part2" "$SECOND"
+				[[ -z $THIRD ]] || \
+					tui-printf $optStyle "$THIRD"
+			fi
+		fi
+		# Since this is special handling, 
+		# calling itself with reduced string lengths
+		# so we can exit after this is done
+		exit
+	# else # just continue with the script below
+	fi
 #
 #	Prepare Colors & Strings
 #
