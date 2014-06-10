@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2014.04.24
-#	Changed:	2014.05.06
-	script_version=0.2
+#	Changed:	2014.06.09
+	script_version=0.3
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -17,21 +17,21 @@
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	help_text="
-$ME ($script_version - BETA)
+$ME ($script_version)
 $TITLE
-Usage: 		$ME [options] FILE VALUENAME VALUE
-Examples:	$ME -l  /etc/default/grub
+Usage: 		$ME [options] FILE VALUENAME [VALUE]
+Examples:	$ME -l  /etc/default/grub 			| Prints a list of found variable-names
 		$ME     /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as passed (VALUENAME)
 		$ME -ic /etc/default/grub grub_timeout 15	| Saves valuename as VALUENAME
 		$ME -i  /etc/default/grub grub_timeout 15	| Saves valuename as passed (valuename)
 		$ME -is /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as valuename
 		
 Where options are:
-	-h|--help		This screen
-	-i|--irrelevant		Is no longer case sensitive
-	-l|--list		Lists values vailabel in the file
-	-c|--caps		Writes the VALUE, and stores VALUENAME in capitals
-	-s|--small		Writes the VALUE, and stores VALUENAME in lower chars
+	-h		This screen
+	-i		Internal search pattern is no longer case sensitive
+	-l		Lists values vailabel in the file
+	-c		Writes the VALUE, and stores VALUENAME in capital chars
+	-s		Writes the VALUE, and stores VALUENAME in lower chars
 "
 	OPT=""
 	VALUE=""
@@ -42,54 +42,82 @@ Where options are:
 #
 #	Catching Arguments
 #
-	[[ -z $2 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "i(irrelevant)c(caps)s(small)l(list)h(help)": name
+	while getopts "icslh": name
 	do 	case $name in
-		c|caps)
+		c)
 			CAPS=true
 			SMALL=false
 			;;
-		s|small)
+		s)
 			SMALL=true
 			CAPS=false
 			;;
-		i|irrelevant)
+		i)
 			OPT="-i"
 			;;
-		l|list)
+		l)
 			grep -v ^# "$2"|grep "="|sed s,"="," ",g|awk '{print $1}'
 			exit 0
 			;;
-		h|help)
+		h)
 			printf "$help_text"
 			exit $RET_HELP
 			;;
 		esac
 	done
-	if [ -z $OPT ] 
-	then 	CONFFILE="$1"
-		VARNAME="$2"
-		VALUE="$3"
-	else 	CONFFILE="$2"
-		VARNAME="$3"
-		VALUE="$4"
-	fi
+	[[ -z $2 ]] && printf "$help_text" && exit 1
 	
+	shift $(($OPTIND - 1))
+	CONFFILE="$1"
+	VARNAME="$2"
+	VALUE="$3"
+	hadDollar=false
+#
+#	Functions
+#
+	isQuoted() { # STRING
+	# Returns 0 if STRING contains "
+	#
+		printf "$1"|grep -q "\"" && \
+			return 0 || \
+			return 1
+	}
+	isFound() { # FILE STRING
+	# Returns 0 if STRING is found
+	#
+		grep -q "$2" "$1" && \
+			return 0 || \
+			return 1
+	}
 #
 #	Display & Action
 #
-	SEARCH=$(grep $OPT ^"$VARNAME"= "$CONFFILE"|grep -v ^#)
+	SEARCH="$(grep $OPT "$VARNAME=" "$CONFFILE"|grep -v ^#|tr -d [:space:])"
 	$SMALL && VARNAME="${VARNAME,,}"
 	$CAPS  && VARNAME="${VARNAME^^}"
-	REPLACE="$VARNAME=\"$VALUE\""
+	printf  "$SEARCH"|grep -q "\"" && \
+		REPLACE="$VARNAME=\"$VALUE\"" || \
+		REPLACE="$VARNAME=$VALUE"
 	
 	# Set proper SED 'divider'
 	SD=","
-	printf "$REPLACE"|grep "," && SD="/"
-	printf "$REPLACE"|grep '\\' && SD="/"
-	printf "$REPLACE"|grep "/" && SD="\\"
+	if printf "$REPLACE"|grep -q "$SD"
+	then 	# Coma was found
+		SD="/"
+		printf "$REPLACE"|grep ","|grep "$SD"|grep -q '\\' && SD="\\"
+		# Forward slash was found
+		printf "$REPLACE"|grep ","|grep "$SD"|grep -q "/" && SD="|"	# This line is 'beta'
+		# backslash was found
+	fi
+	# Troubles with VARIABLES due to leading '$'
+	printf "$SEARCH"|grep -q "\$" && \
+		SEARCH="$(printf "$SEARCH"|sed s,'\$','\\\$',g)" && \
+		hadDollar=true
 	
-	[ -z "$SEARCH" ] && \
+	# Generate the command
+	cmd="sed s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i \"$CONFFILE\""
+
+	# Save changes
+	! grep -q "$VARNAME" "$CONFFILE" && \
 		printf "${REPLACE}\n" >> "$CONFFILE" || \
-		sed s${SD}"$SEARCH"${SD}"${REPLACE}"${SD}g -i "$CONFFILE"
-		#sed s\\"$SEARCH"\\"${REPLACE}"\\g -i "$CONFFILE"
+		( [[ true = $hadDollar ]] && $(eval $cmd) || $cmd )
