@@ -1,6 +1,25 @@
-cat > "$DEST" << EOF
-#!$(which $USER_SHELL)
 source /etc/profile.d/tui.sh
+
+cat > "$DEST" << EOF
+#!/bin/bash
+#
+# Copyright (c) $(date +'%Y') $USER_NAME  <$USER_EMAIL>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
 #
 #	File:		${DEST##*/}
 #	Author: 	$USER_NAME
@@ -8,7 +27,7 @@ source /etc/profile.d/tui.sh
 #	License:	$DEFAULT_LICENSE
 #	Created:	$(date +'%Y.%m.%d')
 #	Changed:	$(date +'%Y.%m.%d')
-	script_version=0.1
+	script_version=0.0.1
 	TITLE="${DEST##*/}"
 #	Description:	Text
 #			...
@@ -20,8 +39,11 @@ source /etc/profile.d/tui.sh
 	ME="\${0##*/}"			# Basename of \$0
 	ME="\${ME/.sh/}"			# Cut off .sh extension
 	ME_DIR="\${0/\${0##/*/}}"		# Dirname of \$0
-	CONFIG="\$HOME/.config/\$ME.conf"	# Configuration file
-	LOG="\$HOME/\$ME.log"		#-\$(date +'%T')	# If a daily log is prefered
+	CFG_DIR="\$HOME/.config/\$ME"	# Configuration directory
+	CONFIG="\$CFG_DIR/\$ME.conf"	# Configuration file
+	LOG="\$CFG_DIR/\$ME.log"		# Logfile
+	tempfile="\$CFG_DIR/\$ME.tmp"	# Tempfile
+	REQUIRES="pack ages as string"
 #
 #	Help text
 #
@@ -39,118 +61,151 @@ Where options are:
 	-e(xample)	ARG	Example with mandatory argument
 	-a(nother)	[ARG]	Example with optinal argument
 
+Files:
+--------------------------------------
+Script:		\$ME
+Config: 	\$CONFIG
+Log:		\$LOG
+tempfile:	\$tempfile
 "
+#
+#	Configuration file template
+#
+	config_template="#!/bin/bash
+# Configuration file for \$ME (\$script_version)
+#
+#	Booleans
+#
+	issetCopy=false
+	issetVerbose=false
 #
 #	Variables
 #
-	REQUIRES="pack ages as string"
-	REQUIRED=""
-	todo=by_you
+	lang=eng
+	varOne=\"\"
+	varTwo=\"\"
+#
+#	Arrays
+#
+	MSG_DEMO[eng]=\"Greetings\"
+	MSG_DEMO[ger]=\"Grüsse\"
+"
 #
 #	Functions
 #
 	doLog() { # "MESSAGE STRING"
-	# Prints: date time pid username --
-	# followed by the supplied "message string"
-		printf "\$(date +'%F %T') \$\$ \$USER -- \$1\\n" >> \$LOG
+	# Prints: Time & "Message STRING"
+	# See 'tui-log -h' for more info
+		tui-log -t "\$LOG" "\$1"
+	}
+	checkReqs() { # LIST
+	# Installs missing packages
+	# Requires a config file
+	#
+	#	vars
+	#
+		req_str="req_inst"
+		req_inst=\$(tui-value-get "\$CONFIG" "\$req_str" )
+		req_total=\$(printf \${REQUIRES}|wc|awk '{print \$2}'
+	
+	
+	#
+	#	Display
+	#
+		[[ \$req_inst = true ]] && return 0
+		tui-progress -ri \$ME-reqs -m \$req_total) " "
+		doLog "Req : Checking for installed packages"
+		
+		# Create a list of packages to install
+		for R in \$REQUIRES;do
+			tui-progress \\
+				-i \$ME-reqs \
+				-m \$(printf \${REQUIRES}|wc|awk '{print \$2}') \\
+				"Check for required: \$R"
+			rpm -qa \$F > /dev/zero && \\
+				doLog "Req : Found \$R" || \\
+				( REQUIRED+=" \$R" ; doLog "Req : Missing \$R" )
+		done
+		
+		# Install the missing packages
+		if [[ ! " " = "\$(printf "\${REQUIRED} ")" ]]
+		then 	[[ ! 0 -eq \$UID ]] && \\
+				tui-echo "YUM requires root access!" && \\
+				return 1
+			tui-title "Installing missing packages"
+			doLog "Req : Installing missing packages: \$REQUIRED"
+			yum install -y \$REQUIRED && \\
+				printf "req_inst=true\n" >> "\$CONFIG"
+			tui-status \$? "Installed: \$REQUIRED"
+			[[ 0 -eq \$? ]] && \\
+				ret_info="succeeded" || \\
+				ret_info="failed"
+			doLog "Req: Installation of \$REQUIRED \$ret_info"
+		else 	[[ ! true = "\$req_inst" ]] && \\
+				printf "req_inst=true\n" >> "\$CONFIG" && \\
+				doLog "Req : All required packages are already installed"
+		fi
 	}
 	MenuSetup() { # 
 	# Configures the variables/files used by the script
-	# The 'MNU_SETUP_A' variables, are used as menu and for the case statement, same for the functions
-		#
-		#	Variables
-		#
-			MNU_SETUP_A="Demo setup"
-			MNU_SETUP_B="Demo entry"
-			MNU_SETUP_C="Demo value"
-		#
-		#	Functions
-		#
-			mnu_funcA() { # args?
-			# Description
-			# Returns what - format?
-				NAME=func_value_name
-				CURRENT=\$(tui-value-get "\$CONFIG" "\$NAME")
-				tui-echo "\${NAME^} is currently set to:" "\$CURRENT"
-				if tui-yesno "Change this?"
-				then 	select newval in \$TODO_LIST;do break;done
-					tui-value-set "\$CONFIG" "\$NAME" "\$newval"
-					return \$?
-				else	return \$RET_BACK
-				fi
-				return 1
-			}
-			mnu_funcB() { # args?
-			# Description
-			# Returns what - format?
-				NAME=func_value_name
-				CURRENT=\$(tui-value-get "\$CONFIG" "\$NAME")
-				tui-echo "\${NAME^} is currently set to:" "\$CURRENT"
-				if tui-yesno "Change this?"
-				then 	newval=\$(tui-read "What is \$NAME's new value:")
-					tui-value-set "\$CONFIG" "\$NAME" "\$newval"
-					return \$?
-				else	return \$RET_BACK
-				fi
-				return 1
-			}
-			mnu_funcC() { # args?
-			# Description
-			# Returns what - format?
-				tui-echo "Do C : \$@"
-				
-			}
-		#
-		#	Menu / Action
-		#
-			setup_toggle=true
-			while \$setup_toggle ; do
-				clear 
-				tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
-				tui-title "Setup : \$ME"
-				select action in Back "\$MNU_SETUP_A" "\$MNU_SETUP_B" "\$MNU_SETUP_C"
-				do 	case "\$action" in
-					Back)	setup_toggle=false
-						break
-					;;
-					"\$MNU_SETUP_A")
-						cmd=mnu_funcA
-						args="argA argB"
-					;;
-					"\$MNU_SETUP_B")
-						cmd=mnu_funcB
-						args=""
-					;;
-					"\$MNU_SETUP_C")
-						cmd=mnu_funcC
-						args=""
-					;;
-					esac
-					tui-title "Changing \$action"
-					#doLog "Setup : \$action : \$cmd : \$args"
-					\$cmd \$args
-					RET=\$?
-					doLog "Setup : \$action - \$cmd - \$NAME from '\$CURRENT' to '\$newval' - Ret : \$RET"
-					tui-status \$RET "Setup \$action - \$NAME (\$newval)" 
-					[[ \$RET -eq 1 ]] && tui-press
-					break
-				done
+	#
+	#	Menu entries
+	#
+		opwd=\$(pwd)
+		cd "\$CFG_DIR"
+		MNU_ENTRY=( \$(ls) )
+	#
+	#	Menu / Action
+	#
+		setup_toggle=true
+		while \$setup_toggle ; do
+			clear 
+			tui-header "\$ME (\$script_version)" "\$TITLE" "\$(date +'%F %T')"
+			tui-title "Setup : \$ME"
+			tui-echo "Please select a file to open:"
+			select FILE in Quit "\${MNU_ENTRY[\*]}"
+			do 	VARS=\$(tui-value-get -l "\$FILE"|grep -v ^"#")
+				case "\$action" in
+				Quit)	setup_toggle=false	;;
+				*)	tui-title "Configuration File: \$FILE"
+					tui-echo "Which variable to change?"
+					select var in Back \$VARS
+					do	val=\$(tui-value-get "\$CONFIG" "\$var")
+						tui-echo "\${var^} is set to:" "\$val"
+						case \$var in
+						\*)	tui-yesno "Change this value?" && \\
+								newval=\$(tui-read "Please type new value:")
+							;;
+						esac
+						msg="Changed \"$var\" from \"$val\" to \"$newval\""
+						# Save the new value to variable in config 
+						tui-value-set "\$CONFIG" "\$var" "\$newval"
+						tui-status \$? "\$msg" && \\
+							doLog "Setup: \$msg" || \\
+							doLog "Setup: Failed to c\$(printf \${msg:1}|sed s,ged,ge,g)"
+					fi
+				esac
 			done
+		done
+		cd "\$pwd"
 	}
 #
 #	Environment checks
 #
-	[[ ! -e "\$LOG" ]] && \\
-		touch \$LOG && \\
-		doLog "------------------------------------------" && \\
-		doLog "Created logfile of \$ME (\$script_version)" && \\
-		doLog "------------------------------------------"
 	# This is optimized for a one-time setup
-	[[ ! -e "\$CONFIG" ]] && \\
-		doLog "Setup : First config" && \\
-		tui-echo "Entering first time setup." "\$SKIP" && \\
-		sleep 1 && \\
+	if [[ ! -e "\$CONFIG" ]]
+	then	[[ -d "\$CFG_DIR" ]] || \
+			( mkdir -p "\$CFG_DIR" ; tui-echo "Entering first time setup." "\$SKIP" )
+		[[ ! -e "\$LOG" ]] && \\
+			touch \$LOG && \\
+			doLog "------------------------------------------" && \\
+			doLog "Created logfile of \$ME (\$script_version)" && \\
+			doLog "------------------------------------------" && \\
+			doLog "Setup : First config"
+		sleep 0.5
 		MenuSetup
+	fi
+	# Load default values before argument handling
 	source "\$CONFIG" || \\
 		( doLog "Failed to load: \$CONFIG" ; tui-status 1 "Failed to load: \$CONFIG" )
 #
@@ -175,7 +230,7 @@ Where options are:
 		C)	MenuSetup
 			exit \$RET_DONE
 			;;
-		# *)	printf "\$help_text" ; exit \$RET_FAIL	;;
+		# *)	printf "\$help_text" ; exit \$?	;;
 		esac
 	done
 	shift \$((\$OPTIND - 1))
@@ -184,7 +239,7 @@ Where options are:
 #
 #	Install missing packages
 #
-	tui-progress -ri \$\$" "
+	tui-progress -ri "\$\$ME"
 	if [[ ! true = "\$req_inst" ]]
 	then 	doLog "Req : Checking for installed packages"
 		for R in \$REQUIRES;do
@@ -209,5 +264,5 @@ Where options are:
 	tui-echo "Script resides in:" 	"\$ME_DIR"
 	tui-echo "Logfile:" 		"\$LOG"
 	tui-echo "Configuration:" 	"\$CONFIG"
-	
+	tui-echo "Temp file:"		"\$tempfile"
 EOF

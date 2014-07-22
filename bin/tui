@@ -4,7 +4,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU Lesser General Public License (LGPL)
 #	Created:	2014.05.06
-#	Changed:	2014.06.09
+#	Changed:	2014.07.18
 	script_version=1.0
 #	Description:	Tool to configure TUI
 #
@@ -13,10 +13,13 @@
 	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
 	for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
-	TUI_VERSION=0.5.0
+	TUI_VERSION=0.5.1
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
+	[[ 0 -eq $UID ]] && \
+		LOG="/var/log/$ME.log" || \
+		LOG="$HOME/.config/$ME/$ME.log"
 	help_text="
 $ME ($script_version)
 $TITLE
@@ -29,50 +32,76 @@ Where options are:
 #
 #	Functions
 #
+	doLog() { # "MESSAGE STRING"
+	# Prints: Time & "Message STRING"
+	# See 'tui-log -h' for more info
+		tui-log -t "$LOG" "$1"
+	}
 	ConfigTUI() { #
 	#
 	#
+		MSG_MENU_title=""
+		MSG_MENU_out=""
+		MSG_MENU_next=""
+		
 		# Get the proper path
 		if [[ 0 -eq $UID ]] 
-		then 	thisconf=/etc/tui/
-			MSG="TUI config - System Wide"
+		then 	thisconf=/etc/$ME/
+			MSG_MENU_title="TUI config - System Wide"
 		else	thisconf="$HOME/.config/tui/"
-			MSG="TUI config - $USER personal"
+			MSG_MENU_title="TUI config - $USER personal"
 		fi
 		cd "$thisconf"
 		
 		# Show & Edit files
-		tui-printf -T "$MSG"
+		tui-printf -T "$MSG_MENU_title"
 		select ConfigSection in Quit Edit_All * ;do
 			if [ ! "" = "$(printf $ConfigSection)" ];then
 				[ Quit = $ConfigSection ] && exit 0
-				tui-printf -T "Change section: $ConfigSection"
 				[ Edit_All = $ConfigSection ] && tui-edit "$thisconf"/* && exit 0
-			
+				
+				tui-printf -T "Change section: $ConfigSection (overview)"
+				# Single file edit below
 				CONFIGS=$(tui-value-get -l "$ConfigSection")
-				# Show content
+				
+				# Show content of the file
 				for VAR in $CONFIGS;do
 					cur=$(tui-value-get "$ConfigSection" "$VAR")
 					tui-printf -E "Setting '$VAR'"  "$cur"
 				done
+				
 				# Change?
-				MSG2="Which variable to change in $ConfigSection?"
+				MSG_next="Which variable to change in $ConfigSection?"
 				select var2chg in Back $CONFIGS;do 
 					[ Back = "$var2chg" ] && break
 					cur=$(eval printf $(tui-value-get "$ConfigSection" "$var2chg"))
 					newval=$(tui-read "What is the new value of $var2chg ($cur):")
+					MSG_out="$ConfigSection: Changed $var2chg to $newval"
 					tui-value-set "$ConfigSection" "$var2chg" "$newval"
-					tui-status $? "Changed $var2chg to $newval"
-					tui-printf -T "$MSG2"
+					tui-status $? "$MSG_out" && \
+						doLog "$MSG_out"
+					tui-printf -T "$MSG_next"
 				done
 			fi
 			tui-printf -T "$MSG"
 		done
 	}
+	FirstUse() { #
+	# Checks if the user configuration is present
+	# Effectless as root user
+		tmp="$HOME/.config/tui/"
+		num=$(ls $tmp|wc -l)
+		[[ ! -d "$T" ]] && \
+			[[ $num -ge 2 ]] && \
+			mkdir -p "$T" && \
+			cp -R /usr/share/tui/conf/*  "$T"
+	}
+	[[ 0 -eq $UID ]] || \
+		( [[ -d "$HOME/.config/tui/" ]] || FirstUse )
 #
 #	Catching Arguments
 #
-	while getopts "h": name
+	while getopts "h" name
 	do 	case $name in
 		h|help)
 			printf "$help_text"
@@ -87,7 +116,7 @@ Where options are:
 	then 	ConfigTUI
 		exit $?
 	fi
-	shift $(($OPTIND - 1))
+	#shift $(($OPTIND - 1))
 #
 #	Display & Action
 #
@@ -102,13 +131,6 @@ Where options are:
 		tui-printf -E "Also there is a sample script:" "/usr/share/tui/sample"
 		tui-printf -E "To create a new script in ~/bin or ~/.local/bin, type:" "tui-new-script SCRIPTNAME"
 		tui-printf -E
-		tui-printf -E "Configure it now?"
-		
-		# Required for ConfigTUI-function
-		if [[ 0 -eq $UID ]]
-		then 	thisconf=/etc/tui/
-		else	thisconf="$HOME/.config/tui/"
-		fi
-		
+		#tui-yesno "Configure it now?" || exit 0
 		ConfigTUI	
 	fi
