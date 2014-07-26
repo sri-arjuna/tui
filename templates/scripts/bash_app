@@ -1,3 +1,4 @@
+#!/bin/bash
 source /etc/profile.d/tui.sh
 
 cat > "$DEST" << EOF
@@ -38,9 +39,12 @@ cat > "$DEST" << EOF
 #
 	ME="\${0##*/}"			# Basename of \$0
 	ME="\${ME/.sh/}"			# Cut off .sh extension
-	ME_DIR="$(dirname \$0)"		# Dirname of \$0
+	[[ ! "." = "\$(dirname \$0)" ]] && \\
+		ME_DIR="\$(dirname \$0)" || \\
+		ME_DIR="\$(pwd)"		# Dirname of \$0
 	CFG_DIR="\$HOME/.config/\$ME"	# Configuration directory
 	CONFIG="\$CFG_DIR/\$ME.conf"	# Configuration file
+	CONFIG_FILE_ARRAY=("\$CONFIG")	# An array of all configuration scripts used by ${DEST##*/}
 	LOG="\$CFG_DIR/\$ME.log"		# Logfile
 	tempfile="\$CFG_DIR/\$ME.tmp"	# Tempfile
 	REQUIRES="pack ages as string"
@@ -64,15 +68,17 @@ Where options are:
 Files:
 --------------------------------------
 Script:		\$ME
+Script-Dir:	\$ME_DIR
 Config: 	\$CONFIG
+Config_Dir:	\$CFG_DIR
 Log:		\$LOG
-tempfile:	\$tempfile
+Tempfile:	\$tempfile
 "
 #
 #	Configuration file template
 #
 	config_template="#!/bin/bash
-# Configuration file for \$ME (\$script_version)
+# Configuration file for \$ME (\$script_version) by $USER_NAME
 #
 #	Booleans
 #
@@ -119,7 +125,7 @@ tempfile:	\$tempfile
 		# Create a list of packages to install
 		for R in \$REQUIRES;do
 			tui-progress \\
-				-i \$ME-reqs \
+				-i \$ME-reqs \\
 				-m \$(printf \${REQUIRES}|wc|awk '{print \$2}') \\
 				"Check for required: \$R"
 			rpm -qa \$F > /dev/zero && \\
@@ -149,44 +155,90 @@ tempfile:	\$tempfile
 	MenuSetup() { # 
 	# Configures the variables/files used by the script
 	#
+	#	Check for config file
+	#
+		[[ -f "\$CONFIG" ]] || \\
+			( printf "\$config_template" > "\$CONFIG" ; doLog "Config: Default configurationfile created" )
+	#
 	#	Menu entries
 	#
 		opwd=\$(pwd)
 		cd "\$CFG_DIR"
-		MNU_ENTRY=( \$(ls) )
-		MNU_ENTRY=( \$(tui-value-get -l "\$CONFIG") )
 	#
 	#	Menu / Action
 	#
 		setup_toggle=true
 		while \$setup_toggle ; do
+			# While there are more files, printf 'header'
 			clear 
 			tui-header "\$ME (\$script_version)" "\$TITLE" "\$(date +'%F %T')"
 			tui-title "Setup : \$ME"
-			tui-echo "Please select a file to open:"
-			select FILE in Quit "\${MNU_ENTRY[\*]}"
-			do 	VARS=\$(tui-value-get -l "\$FILE"|grep -v ^"#")
-				case "\$action" in
-				Quit)	setup_toggle=false	;;
-				*)	tui-title "Configuration File: \$FILE"
-					tui-echo "Which variable to change?"
-					select var in Back \$VARS
-					do	val=\$(tui-value-get "\$CONFIG" "\$var")
-						tui-echo "\${var^} is set to:" "\$val"
-						case \$var in
-						\*)	tui-yesno "Change this value?" && \\
-								newval=\$(tui-read "Please type new value:")
-							;;
-						esac
-						msg="Changed \"$var\" from \"$val\" to \"$newval\""
-						# Save the new value to variable in config 
-						tui-value-set "\$CONFIG" "\$var" "\$newval"
-						tui-status \$? "\$msg" && \\
-							doLog "Setup: \$msg" || \\
-							doLog "Setup: Failed to c\$(printf \${msg:1}|sed s,ged,ge,g)"
-					fi
+			
+			# Select among files
+			if [[ 1 -eq \${#CONFIG_FILE_ARRAY[@]} ]]
+			then	# Its only 1 file, preview
+				for VAR in \$(tui-value-get -l "\$CONFIG");do val="\$(tui-value-get \$CONFIG \$VAR)";tui-echo "\$VAR" "\$val";done
+				#grep -v ^"#" "\$CONFIG" > "\$tempfile"
+				#oifs="\$IFS" ; IFS="="
+				#while read var val;do
+				#[[ \$# -gt 0 ]] && tui-echo "\$var" "\$val"
+				#done<"\$tempfile"
+				#IFS="\$oifs"
+				tui-echo "Please select wich value to change:"
+				select VAR in Back Edit \$(tui-value-get -l "\$CONFIG");do
+				case \$VAR in
+				Back) 	setup_toggle=false
+					break
+					;;
+				Edit)	tui-edit "\$CONFIG"
+					;;
+				*)	VAL=$(tui-value-get "\$CONFIG" "\$VAR")
+					tui-echo "Currently '\$VAR' is set to '\$VAL'."
+					tui-yesno "Do you really want to change this?" || break
+					newval=\$(tui-read "Please type new value:")
+					msg="Changed \"$var\" from \"$val\" to \"$newval\""
+					tui-value-set "\$CONFIG" "\$var" "\$newval"
+					tui-status \$? "\$msg" && \\
+						doLog "Setup: \$msg" || \\
+						doLog "Setup: Failed to c\$(printf \${msg:1}|sed s,ged,ge,g)"
+					;;
 				esac
-			done
+				done
+				
+			else	# There are more to choose from
+				MNU_ENTRY=( \$(ls) )
+				#MNU_ENTRY=( \$(tui-value-get -l "\$CONFIG") )
+				tui-echo "Please select a file to open:"
+				select FILE in Back "\${CONFIG_FILE_ARRAY[*]}"
+				do 	VARS=\$(tui-value-get -l "\$FILE"|grep -v ^"#")
+					case "\$FILE" in
+					Back)	setup_toggle=false
+						break
+						;;
+					*)	tui-title "Configuration File: \$FILE"
+						tui-echo "Which variable to change?"
+						select var in Back \$VARS
+						do	val=\$(tui-value-get "\$CONFIG" "\$var")
+							tui-echo "\${var^} is set to:" "\$val"
+							case \$var in
+							Back)	break	;;
+							\*)	if tui-yesno "Change this value?"
+								then 	newval=\$(tui-read "Please type new value:")
+									msg="Changed \"$var\" from \"$val\" to \"$newval\""
+									# Save the new value to variable in config 
+									tui-value-set "\$CONFIG" "\$var" "\$newval"
+									tui-status \$? "\$msg" && \\
+										doLog "Setup: \$msg" || \\
+										doLog "Setup: Failed to c\$(printf \${msg:1}|sed s,ged,ge,g)"
+								fi
+								;;
+							esac
+						
+						done
+						;;
+					esac
+				done
+			fi
 		done
 		cd "\$pwd"
 	}
@@ -228,6 +280,7 @@ tempfile:	\$tempfile
 			;;
 		L)	less "\$LOG"	
 			exit \$RET_DONE
+			;;
 		C)	MenuSetup
 			exit \$RET_DONE
 			;;
@@ -255,13 +308,16 @@ tempfile:	\$tempfile
 			printf "req_inst=true\\n" >> "\$CONFIG"
 	else 	[[ ! true = "\$req_inst" ]] && \\
 			printf "req_inst=true\\n" >> "\$CONFIG" && \\
-			doLog "All required packages already installed
+			doLog "All required packages already installed"
 	fi
 #
 #	Display & Action
 #
 	tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
 	tui-title "\$TITLE"
+	tui-echo "This is some sample test" \\
+		"with a centre" \\
+		"and right alignment"
 	tui-echo "Script resides in:" 	"\$ME_DIR"
 	tui-echo "Logfile:" 		"\$LOG"
 	tui-echo "Configuration:" 	"\$CONFIG"
