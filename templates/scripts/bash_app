@@ -177,7 +177,10 @@ Tempfile:	\$tempfile
 			# Select among files
 			if [[ 1 -eq \${#CONFIG_FILE_ARRAY[@]} ]]
 			then	# Its only 1 file, preview
-				for VAR in \$(tui-value-get -l "\$CONFIG");do val="\$(tui-value-get \$CONFIG \$VAR)";tui-echo "\$VAR" "\$val";done
+				for VAR in \$(tui-value-get -l "\$CONFIG");do 
+					val="\$(tui-value-get \$CONFIG \$VAR)"
+					tui-echo "\$VAR" "\$val"
+				done
 				#grep -v ^"#" "\$CONFIG" > "\$tempfile"
 				#oifs="\$IFS" ; IFS="="
 				#while read var val;do

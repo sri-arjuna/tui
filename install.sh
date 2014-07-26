@@ -4,7 +4,7 @@
 #	Variables
 #
 	app=tui
-	[[ ! -f install.sh ]] && cd $(dirname $0)
+	[[ ! -f install.sh ]] && cd "$(dirname '$0')"
 	[[ -d /usr/bin ]] && \
 		DIR_BIN=/usr/bin || \
 		DIR_BIN=/bin
@@ -17,9 +17,10 @@
 			$DIR_CFG \
 			$DIR_DOC \
 			$DIR_MAN1 \
-			$DIR_TPL
+			$DIR_TPL \
+			$DIR_APP/conf
 	do	[[ ! -d $tDir ]] && \
-			mkdir -p $tDir
+			mkdir -p $tDir && printf "*\tCreated missing dir: $tDir\n"
 	done
 #
 #	Initall to Environment
@@ -29,7 +30,7 @@
 	cp README.md $DIR_APP
 	cp bin/* $DIR_BIN
 	cp conf.etc/* $DIR_CFG
-	cp conf.home $DIR_APP/conf
+	cp conf.home/* $DIR_APP/conf
 	cp docs/[A-Z]* $DIR_DOC
 	cp -R docs/* $DIR_APP
 	cp man/*1 $DIR_MAN1
