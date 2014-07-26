@@ -35,7 +35,7 @@
 	cp -R docs/* $DIR_APP
 	cp man/*1 $DIR_MAN1
 	cp uninstall.sh $DIR_APP
-	cp -R templates/* $DIR_TPL
+	cp -R "templates/"* $DIR_TPL
 	cp profile.d/* /etc/profile.d
 	
 	source /etc/profile.d/tui.sh
