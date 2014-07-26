@@ -38,7 +38,7 @@ cat > "$DEST" << EOF
 #
 	ME="\${0##*/}"			# Basename of \$0
 	ME="\${ME/.sh/}"			# Cut off .sh extension
-	ME_DIR="\${0/\${0##/*/}}"		# Dirname of \$0
+	ME_DIR="$(dirname \$0)"		# Dirname of \$0
 	CFG_DIR="\$HOME/.config/\$ME"	# Configuration directory
 	CONFIG="\$CFG_DIR/\$ME.conf"	# Configuration file
 	LOG="\$CFG_DIR/\$ME.log"		# Logfile
@@ -154,6 +154,7 @@ tempfile:	\$tempfile
 		opwd=\$(pwd)
 		cd "\$CFG_DIR"
 		MNU_ENTRY=( \$(ls) )
+		MNU_ENTRY=( \$(tui-value-get -l "\$CONFIG") )
 	#
 	#	Menu / Action
 	#
@@ -234,7 +235,7 @@ tempfile:	\$tempfile
 		esac
 	done
 	shift \$((\$OPTIND - 1))
-	ARGS=(\${*})			# Remaining arguments
+	ARGS=(\"\${*}\")			# Remaining arguments
 	ARGS_COUNT=\${#ARGS[@]}		# Amount of remaining
 #
 #	Install missing packages

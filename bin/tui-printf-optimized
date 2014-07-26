@@ -34,26 +34,26 @@ Options are:
 	FIRST=""
 	SECOND=""
 	THIRD=""
-	WIDTH=$( [ -z $COLUMNS ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
-	#TOTAL="$WIDTH"
-	WIDTH=$[ $WIDTH - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - 2 ]	# Subtract default 'borders'
+	#WIDTH=$( [ -z $COLUMNS ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
+	WIDTH=${COLUMNS:−$(tput cols)} 
+	#WIDTH=$[ $WIDTH - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - 2 ]	# Subtract default 'borders'
+	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 
 	WIDTH=$[ $WIDTH / 2 * 2 ]					# Make it even 
 	EMPTY="$(printf '%*s' $WIDTH)"					# Get 'width' spaces
-	doEcho=false
-	doHeader=false
-	doTitle=false
+	doEcho=1
+	doHeader=1
+	doTitle=1
 	optStyle=""
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
 	while getopts "EHTh?" name
 	do 	case $name in
-		E|echo) 	doEcho=true
+		E|echo) 	doEcho=0
 				optStyle="-E"	;;
-		H|header)	doHeader=true
+		H|header)	doHeader=0
 				optStyle="-H"	;;
-		T|title)	doTitle=true
+		T|title)	doTitle=0
 				optStyle="-T"	;;
 		h|"?"|*)	printf "$help_text"
 				exit $RET_HELP
@@ -61,16 +61,11 @@ Options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=("${*}")			# Remaining arguments	| These two fail on spaced-strings
-	ARGS_COUNT_org=${#ARGS[@]}	# Amount of remaining
-	#FIRST="${ARGS[0]}"
-	#SECOND="${ARGS[1]}"
-	#THIRD="${ARGS[2]}"
 	ARGS_COUNT=0
 	[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
 	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
 	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
-	[ ! -z "$4" ] && doMore=true || doMore=false
+	[ ! -z "$4" ] && doMore=0 || doMore=1
 #
 #	Verify all fit on 1 line
 #
@@ -106,18 +101,18 @@ Options are:
 #
 #	Prepare Colors & Strings
 #
-	if [ $doEcho = true ]
+	if [ $doEcho ]
 	then	COLOR_LINE_START="\r${TUI_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="\n"
-	elif [ $doHeader = true ]
+	elif [ $doHeader ]
 	then	# Full line
 		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="${TUI_RESET}\n"
-	elif [ $doTitle = true ]
+	elif [ $doTitle ]
 	then	# 'Inlay'
 		COLOR_LINE_START="\r"
 		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
@@ -132,11 +127,10 @@ Options are:
 	case $ARGS_COUNT in
 	0)	FIRST="$EMPTY"
 		;;
-	1)	if [ $doTitle = true ]
+	1)	if [ $doTitle ]
 		then 	SECOND="$FIRST"
-			num_o="${#SECOND}"
-			num=$[ $num_o / 2 * 2  ]
-			[ $num_o -gt $num ] && adder=" "||adder="  "
+			num=$(($#SECOND / 2 * 2))
+			[ $num -ne "${#SECOND}" ] && adder=' ' || adder=''
 			EMPTY="${EMPTY:${num}+2}"	# The +2 is a temp bugfix
 			half=$[ ${#EMPTY} / 2  ]
 			FIRST="${EMPTY:$half}"
@@ -154,10 +148,7 @@ Options are:
 		half=$[ ${#EMPTY} / 2 ]
 		
 		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
-		len_compare=$[ $len_strings / 2 * 2  ]
-		[ $len_compare -lt $len_strings ] && \
-			adder=1 || \
-			adder=0
+		adder=$((len_strings % 2))
 		
 		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
 		;;
@@ -165,12 +156,13 @@ Options are:
 #
 #	Display & Action
 #
-	printf "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"
+	#printf "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"
+	printf "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} %s ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}" "${FIRST}${SECOND}${THIRD}"
 #
 #	BETA "if more"
 #
 	#unset ARGS[0] ARGS[1] ARGS[2]
-	if [ $doMore = true ]
+	if [ $doMore ]
 	then	# there are remains..
 		C=0
 		for A in "${ARGS[*]}";do 
