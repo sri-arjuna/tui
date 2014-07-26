@@ -31,11 +31,11 @@
 	cp bin/* $DIR_BIN
 	cp conf.etc/* $DIR_CFG
 	cp conf.home/* $DIR_APP/conf
-	cp docs/[A-Z]* $DIR_DOC
+	cp -R docs/[A-Z]* $DIR_DOC
 	cp -R docs/* $DIR_APP
 	cp man/*1 $DIR_MAN1
 	cp uninstall.sh $DIR_APP
-	cp -R "templates/"* $DIR_TPL
+	cp -R templates/* $DIR_TPL
 	cp profile.d/* /etc/profile.d
 	
 	source /etc/profile.d/tui.sh
