@@ -37,9 +37,9 @@
 	cp uninstall.sh $DIR_APP
 	cp -R templates/* $DIR_TPL
 	cp profile.d/* /etc/profile.d
-	
+	RET=$?
 	source /etc/profile.d/tui.sh
 	MSG="Installed $app"
 	echo "$WORK $MSG" 
-	echo "$? $MSG"
+	tui-status "$? $MSG"
 #	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && rm ./*
