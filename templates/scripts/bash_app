@@ -291,7 +291,7 @@ Tempfile:	\$tempfile
 		esac
 	done
 	shift \$((\$OPTIND - 1))
-	ARGS=(\"\${*}\")			# Remaining arguments
+	ARGS=("\${*}")			# Remaining arguments
 	ARGS_COUNT=\${#ARGS[@]}		# Amount of remaining
 #
 #	Install missing packages
