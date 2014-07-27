@@ -40,6 +40,6 @@
 	RET=$?
 	source /etc/profile.d/tui.sh
 	MSG="Installed $app"
-	echo "$WORK $MSG" 
+	#echo "$WORK $MSG" 
 	tui-status $? "$MSG"
 #	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && rm ./*
