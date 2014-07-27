@@ -25,6 +25,7 @@
 #
 #	Initall to Environment
 #
+	printf "\n\n\t"
 	read -p "Press enter to install $app OR press 'CTRL+c' to abort"
 	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 $DIR_TPL #$DIR_MAN8
 	cp README.md $DIR_APP
@@ -40,6 +41,5 @@
 	RET=$?
 	source /etc/profile.d/tui.sh
 	MSG="Installed $app"
-	#echo "$WORK $MSG" 
 	tui-status $? "$MSG"
 #	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && rm ./*
