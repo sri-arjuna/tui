@@ -1,9 +1,40 @@
 #!/bin/bash
+#
+# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
 # tui-wait by Simon Arjuna Erat (sea) (erat.simon@gmail.com) on 2014-06-01
-#wait() { # TIME [ MSG ]
-# Provide TIME in seconds, optionaly followed (without space) by either: s,m,h ; for 5min 30 secs, you still need to provide seconds only
-# Optionaly you may provide a custom message
-	#set -x
+#
+#	Help text
+#
+	ME=tui-wait
+	script_version=0.3
+	help_text="
+$ME ($script_version)
+Usage: 		$ME TIME [MSG]
+Examples:	$ME 2m
+		$ME 1h \"Until somewhat happens\"
+
+"
+	if [[ "-h" = "$1" ]] || [[ -z $1 ]] 
+	then	printf "$help_text"
+		exit 1
+	fi
 	TIME="${1/[a-zA-Z]/}"
 	UNIT="${1/[0-9]/}"
 	[[ -z $UNIT ]] && UNIT=s
@@ -22,12 +53,11 @@
 
 	while [[ $seconds -ge 0 ]]
 	do 	# seconds is 0 or higher
-		# So subtract, its a countdown
 		[[ "$hours$minutes$seconds" = "000" ]] && \
 			tui-echo "$MSG" "$NEXT" && \
 			exit 0
+		# So subtract, its a countdown
 		((seconds--))
-		#seconds=$[ $seconds - 1 ]
 		if [[ $seconds -lt 0 ]]
 		then 	# We have sub zero seconds, fix that
 			seconds=59
@@ -38,8 +68,7 @@
 		fi
 		# Generate string & output to user
 		time_string="$hours:$minutes:$seconds"
-		#[[ "$hours$minutes$seconds" = "000" ]] && return 0
-		tui-printf  "$MSG" "$time_string" ## -- $seconds ($(date +%S))"
+		tui-printf  "$MSG" "$time_string"
 		sleep 1
 		
 	done

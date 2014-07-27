@@ -1,27 +1,59 @@
-#!/bin/sh
+#!/bin/bash
+#
+# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #
 #	Variable defaults
 #
-	script_version=0.2
+	script_version=0.3
 	ME="$(basename $0)"
-	help_text="\r$ME ($script_version)
-		\rUsage: $ME [options] \"Question/Path/something for the user to type\"
-		\rReturns typed answer
-		\r"
-	source tui
+	help_text="
+$ME ($script_version)
+Usage: 		$ME [options] MSG
+Examples:	$ME \"What is your favorite color?\"
+		$ME -p \"Enter your password:\" ; printf '\\\n'
+
+"
+	doPassword=""
 #
 #	Variable handling
 #
-	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
-	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
+	txt="$1"
+	while getopts "hp" opt;do
+	case "$opt" in
+	"h")	printf "$help_text" ; exit $RET_HELP
+		;;
+	"p")	doPassword="-se"
+		txt="$1"	
 		;;
 	esac
+	done
+	shift $(($OPTIND - 1))
 #
 #	Display
 #
-	txt="$1"
-	read -p "$BORDER_LEFT $txt " INPUT #$(getspace $[ $COLUMNS - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - ${#txt} - 2 ] ) $BORDER_RIGHT" 
-	echo "$INPUT"
+	[[ -z $1 ]] && \
+		txt="Type your input:" || \
+		txt="$1"
+	read ${doPassword} -p "$BORDER_LEFT $txt " INPUT
+	printf "$INPUT"
+	
