@@ -3,8 +3,9 @@ source /etc/profile.d/tui.sh
 
 cat > "$DEST" << EOF
 #!/bin/bash
+# ------------------------------------------------------------------------
 #
-# Copyright (c) $(date +'%Y') $USER_NAME  <$USER_EMAIL>
+# Copyright (c) $(date +'%Y') by $USER_NAME  <$USER_EMAIL>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -30,38 +31,43 @@ cat > "$DEST" << EOF
 #	Changed:	$(date +'%Y.%m.%d')
 	script_version=0.0.1
 	TITLE="${DEST##*/}"
-#	Description:	Text
-#			...
-#			...
+#	Description:	Text TODO
+#			...  TODO
 #
 #
 #	Script Environment
 #
-	ME="\${0##*/}"			# Basename of \$0
-	ME="\${ME/.sh/}"			# Cut off .sh extension
+	ME="\${0##*/}"				# Basename of ${DEST##*/}
+	ME="\${ME/.sh/}"				# Cut off .sh extension
 	[[ ! "." = "\$(dirname \$0)" ]] && \\
 		ME_DIR="\$(dirname \$0)" || \\
-		ME_DIR="\$(pwd)"		# Dirname of \$0
-	CFG_DIR="\$HOME/.config/\$ME"	# Configuration directory
-	CONFIG="\$CFG_DIR/\$ME.conf"	# Configuration file
-	CONFIG_FILE_ARRAY=("\$CONFIG")	# An array of all configuration scripts used by ${DEST##*/}
-	LOG="\$CFG_DIR/\$ME.log"		# Logfile
-	tempfile="\$CFG_DIR/\$ME.tmp"	# Tempfile
+		ME_DIR="\$(pwd)"			# Dirname of ${DEST##*/}
+	CONFIG_DIR="\$HOME/.config/\$ME"		# Configuration directory
+	CONFIG="\$CONFIG_DIR/\$ME.conf"		# Configuration file
+## TODO
+## If you need more configuration files, simply add them, within quotes, to the array below
+	CONFIG_FILE_ARRAY=("\$CONFIG")		# An array of all configuration scripts used by ${DEST##*/}
+	LOG="\$CONFIG_DIR/\$ME.log"		# Logfile
+	tempfile="\$CONFIG_DIR/\$ME.tmp"		# Tempfile
 	REQUIRES="pack ages as string"
 #
 #	Help text
+#
+#	TODO
+#	Add your own options, be sure to add them to "getopts" handling too
 #
 	help_text="
 \$ME (\$script_version)
 \${TITLE^}
 Usage: 		\$ME [options] [arguments]
-Examples:	\$ME -a
+Examples:	\$ME 
+		\$ME -a
 		\$ME -e optVAL
-		\$ME ARG
 Where options are:
 	-h(elp) 		This screen
-	-C(onf			Show the config/setup dialog
-	-L(OG)			Show the log file (\$LOG)
+	-C(onf			Show the config menu
+	-L(og)			Show the log file (\$LOG)
+	-------------------------------------------------------
 	-e(xample)	ARG	Example with mandatory argument
 	-a(nother)	[ARG]	Example with optinal argument
 
@@ -70,31 +76,53 @@ Files:
 Script:		\$ME
 Script-Dir:	\$ME_DIR
 Config: 	\$CONFIG
-Config_Dir:	\$CFG_DIR
+Config_Dir:	\$CONFIG_DIR
 Log:		\$LOG
 Tempfile:	\$tempfile
 "
 #
+# This script requires TUI - Text User Interface
+# See:		https://github.com/sri-arjuna/tui
+#
+#	Check if TUI is installed...
+#
+	S=/etc/profile.d/tui.sh
+	if [[ ! -f \$S ]]
+	then 	[[ ! 0 -eq \$UID ]] && \\
+			printf "\\n#\\n#\\tPlease restart the script as root to install TUI (Text User Interface).\\n#\\n#\\n" && \\
+			exit 1
+		if ! git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
+		then 	mkdir -p /tmp/tui.inst ; cd /tmp/tui.inst/
+			curl --progress-bar https://github.com/sri-arjuna/tui/archive/master.zip -o master.zip
+			unzip master.zip && rm master.zip
+		fi
+    		sh /tmp/tui.inst/install.sh || \\
+    			(printf "\\n#\\n#\\tPlease report this issue of TUI installation fail.\\n#\\n#\\n";exit 1)
+    	fi
+    	source \$S ; S=""
+#
 #	Configuration file template
+#
+#	TODO
+#	Apply your applications default configuration values
+#
 #
 	config_template="#!/bin/bash
 # Configuration file for \$ME (\$script_version) by $USER_NAME
 #
 #	Booleans
 #
-	issetCopy=false
-	issetVerbose=false
+	issetAnother=false
+	issetExample=false
 #
 #	Variables
 #
+	# \$LANG contains the keyboard layout, thus in small letters
 	lang=eng
-	varOne=\"\"
-	varTwo=\"\"
-#
-#	Arrays
-#
-	MSG_DEMO[eng]=\"Greetings\"
-	MSG_DEMO[ger]=\"Grüsse\"
+	DIR_DATA_HOME=\"/opt/\$ME/\"
+	DIR_DATA_LANG=\"\$DIR_DATA_HOME/langs\"
+	EXAMPLE=\"sample\"
+	ANOTHER=\"something else\"
 "
 #
 #	Functions
@@ -112,26 +140,26 @@ Tempfile:	\$tempfile
 	#
 		req_str="req_inst"
 		req_inst=\$(tui-value-get "\$CONFIG" "\$req_str" )
-		req_total=\$(printf \${REQUIRES}|wc|awk '{print \$2}'
-	
-	
 	#
 	#	Display
 	#
 		[[ \$req_inst = true ]] && return 0
-		tui-progress -ri \$ME-reqs -m \$req_total) " "
+#		tui-progress -ri \$ME-reqs -m \$req_total) " "
 		doLog "Req : Checking for installed packages"
 		
+		tui-install \$@
+		return \$?
+		
 		# Create a list of packages to install
-		for R in \$REQUIRES;do
-			tui-progress \\
-				-i \$ME-reqs \\
-				-m \$(printf \${REQUIRES}|wc|awk '{print \$2}') \\
-				"Check for required: \$R"
-			rpm -qa \$F > /dev/zero && \\
-				doLog "Req : Found \$R" || \\
-				( REQUIRED+=" \$R" ; doLog "Req : Missing \$R" )
-		done
+#		for R in \$REQUIRES;do
+#			tui-progress \\
+#				-i \$ME-reqs \\
+#				-m \$(printf \${REQUIRES}|wc|awk '{print \$2}') \\
+#				"Check for required: \$R"
+#			rpm -qa \$F > /dev/zero && \\
+#				doLog "Req : Found \$R" || \\
+#				( REQUIRED+=" \$R" ; doLog "Req : Missing \$R" )
+#		done
 		
 		# Install the missing packages
 		if [[ ! " " = "\$(printf "\${REQUIRED} ")" ]]
@@ -152,7 +180,7 @@ Tempfile:	\$tempfile
 				doLog "Req : All required packages are already installed"
 		fi
 	}
-	MenuSetup() { # 
+	ConfigMenu() { # 
 	# Configures the variables/files used by the script
 	#
 	#	Check for config file
@@ -163,7 +191,7 @@ Tempfile:	\$tempfile
 	#	Menu entries
 	#
 		opwd=\$(pwd)
-		cd "\$CFG_DIR"
+		cd "\$CONFIG_DIR"
 	#
 	#	Menu / Action
 	#
@@ -195,7 +223,7 @@ Tempfile:	\$tempfile
 					;;
 				Edit)	tui-edit "\$CONFIG"
 					;;
-				*)	VAL=$(tui-value-get "\$CONFIG" "\$VAR")
+				*)	VAL=\$(tui-value-get "\$CONFIG" "\$VAR")
 					tui-echo "Currently '\$VAR' is set to '\$VAL'."
 					tui-yesno "Do you really want to change this?" || break
 					newval=\$(tui-read "Please type new value:")
@@ -208,15 +236,14 @@ Tempfile:	\$tempfile
 				esac
 				done
 				
-			else	# There are more to choose from
-				MNU_ENTRY=( \$(ls) )
-				#MNU_ENTRY=( \$(tui-value-get -l "\$CONFIG") )
+			else	# There are more than one CONFIG to choose from
 				tui-echo "Please select a file to open:"
 				select FILE in Back "\${CONFIG_FILE_ARRAY[*]}"
-				do 	VARS=\$(tui-value-get -l "\$FILE"|grep -v ^"#")
+				do 	# VARS is a list of all found VARIABLES of FILE
+					VARS=\$(tui-value-get -l "\$FILE"|grep -v ^"#")
 					case "\$FILE" in
-					Back)	setup_toggle=false
-						break
+					Back)	setup_toggle=false	# To exit the while loop
+						break			# To exit the current select loop
 						;;
 					*)	tui-title "Configuration File: \$FILE"
 						tui-echo "Which variable to change?"
@@ -224,8 +251,24 @@ Tempfile:	\$tempfile
 						do	val=\$(tui-value-get "\$CONFIG" "\$var")
 							tui-echo "\${var^} is set to:" "\$val"
 							case \$var in
-							Back)	break	;;
-							\*)	if tui-yesno "Change this value?"
+							Back)	break	;;	# Just exit the select loop, and return back to FILE selection
+#
+#		TODO
+#	Custom case states, in case you want to let the user 
+#	select values from specific lists/arrays or even diffrent
+#			-->		-->		"SomeValue")
+#								LIST_A="A B C D
+#								tui-echo "Please select from this list:"
+#								select newval in \$LIST_A;do break;done
+#								tui-echo "Selected:" "\$newval"
+#								msg="Changed \"$var\" from \"$val\" to \"$newval\""
+#								# Save the new value to variable in config 
+#			-->		-->			tui-value-set "\$CONFIG" "\$var" "\$newval"
+#								tui-status \$? "\$msg" && \\
+#									doLog "Setup: \$msg" || \\
+#									doLog "Setup: Failed to c\$(printf \${msg:1}|sed s,ged,ge,g)"
+#			-->		-->			;;
+							*)	if tui-yesno "Change this value?"
 								then 	newval=\$(tui-read "Please type new value:")
 									msg="Changed \"$var\" from \"$val\" to \"$newval\""
 									# Save the new value to variable in config 
@@ -245,47 +288,51 @@ Tempfile:	\$tempfile
 		done
 		cd "\$pwd"
 	}
+## TODO
+## Got more functions to add?
+##
 #
 #	Environment checks
 #
 	# This is optimized for a one-time setup
 	if [[ ! -e "\$CONFIG" ]]
-	then	[[ -d "\$CFG_DIR" ]] || \
-			( mkdir -p "\$CFG_DIR" ; tui-echo "Entering first time setup." "\$SKIP" )
+	then	[[ -d "\$CONFIG_DIR" ]] || \\
+			( mkdir -p "\$CONFIG_DIR" ; tui-echo "Entering first time setup." "\$SKIP" )
 		[[ ! -e "\$LOG" ]] && \\
 			touch \$LOG && \\
 			doLog "------------------------------------------" && \\
 			doLog "Created logfile of \$ME (\$script_version)" && \\
 			doLog "------------------------------------------" && \\
 			doLog "Setup : First config"
-		sleep 0.5
-		MenuSetup
+		ConfigMenu
 	fi
 	# Load default values before argument handling
-	source "\$CONFIG" || \\
-		( doLog "Failed to load: \$CONFIG" ; tui-status 1 "Failed to load: \$CONFIG" )
+## TODO : Remove these line if you want to read the defaults from CONFIG manualy
+	source "\$CONFIG" || ( doLog "Failed to load: \$CONFIG" ; tui-status 1 "Failed to load: \$CONFIG" )
 #
 #	Catching Arguments
 #
-	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_FAIL
+	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_FAIL	## Uncomment to exit with help if nothing is passed
 	# A ':' after a char indicates that this option requires an argument
 	while getopts "ae:hCL" opt
 	do 	case \$opt in
-		a)	# This is only demo
-			ARG_TOGGLE_ANOTHER=set
-			;;
-		e)	# This is only demo
-			optE_argument="\$OPTARG"
-			optE_bool=true
-			;;
 		h)	printf "\$help_text"
 			exit \$RET_HELP
 			;;
 		L)	less "\$LOG"	
 			exit \$RET_DONE
 			;;
-		C)	MenuSetup
+		C)	ConfigMenu
 			exit \$RET_DONE
+			;;
+## TODO
+## Apply your chages below
+		a)	# This is only demo
+			ARG_TOGGLE_ANOTHER=set
+			;;
+		e)	# This is only demo
+			optE_argument="\$OPTARG"
+			optE_bool=true
 			;;
 		# *)	printf "\$help_text" ; exit \$?	;;
 		esac
@@ -296,11 +343,11 @@ Tempfile:	\$tempfile
 #
 #	Install missing packages
 #
-	tui-progress -ri "\$\$ME"
+	tui-progress -ri "\$ME"
 	if [[ ! true = "\$req_inst" ]]
 	then 	doLog "Req : Checking for installed packages"
 		for R in \$REQUIRES;do
-			tui-progress -i \$\$ -m \${#REQUIRES} "Check requirement: $R"
+			tui-progress -i \$ME -m \${#REQUIRES} "Check requirement: $R"
 			rpm -qa \$F > /dev/zero || ( REQUIRED+=" \$R" ; doLog "Req : Missing \$R" )
 		done
 	fi
@@ -318,6 +365,9 @@ Tempfile:	\$tempfile
 #
 	tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
 	tui-title "\$TITLE"
+#
+## TODO : Your own stuff :)
+#
 	tui-echo "This is some sample test" \\
 		"with a centre" \\
 		"and right alignment"
