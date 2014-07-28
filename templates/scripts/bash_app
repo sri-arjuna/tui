@@ -93,8 +93,9 @@ Tempfile:	\$tempfile
 			exit 1
 		if ! git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
 		then 	mkdir -p /tmp/tui.inst ; cd /tmp/tui.inst/
-			curl --progress-bar https://github.com/sri-arjuna/tui/archive/master.zip -o master.zip
-			unzip master.zip && rm master.zip
+			curl --progress-bar -L https://github.com/sri-arjuna/tui/archive/master.zip -o master.zip
+			unzip master.zip && rm -f master.zip
+			mv tui-master/* . ; rmdir tui-master
 		fi
     		sh /tmp/tui.inst/install.sh || \\
     			(printf "\\n#\\n#\\tPlease report this issue of TUI installation fail.\\n#\\n#\\n";exit 1)
