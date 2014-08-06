@@ -31,14 +31,20 @@ Examples:	$ME 2m
 		$ME 1h \"Until somewhat happens\"
 
 "
+#
+#	Argument handling
+#
 	if [[ "-h" = "$1" ]] || [[ -z $1 ]] 
 	then	printf "$help_text"
 		exit 1
 	fi
+#
+#	Variables
+#
 	TIME="${1/[a-zA-Z]/}"
-	UNIT="${1/[0-9]/}"
+	UNIT="${1/[0-9][0-9]/}"
+	[[ -z $TIME ]] && printf "$help_text" && exit 1
 	[[ -z $UNIT ]] && UNIT=s
-	
 	[[ -z "$2" ]] && \
 		MSG="Time left:" || \
 		MSG="$2"
@@ -49,27 +55,34 @@ Examples:	$ME 2m
 	s)	seconds="$TIME"	;;
 	m)	minutes="$TIME"	;;
 	h)	hours="$TIME"	;;
+	*)	tui-status 1 "Please use either (s)econds, (m)inutes, or (h)ours"
 	esac
-
+#
+#	Action - loop
+#
 	while [[ $seconds -ge 0 ]]
-	do 	# seconds is 0 or higher
+	do 	# First display current / passed time
+		# Generate string & output to user
+		time_string="$hours:$minutes:$seconds"
+		tui-printf  "$MSG" "$time_string"
+		
+		# Already reached 0
 		[[ "$hours$minutes$seconds" = "000" ]] && \
 			tui-echo "$MSG" "$NEXT" && \
 			exit 0
+		
 		# So subtract, its a countdown
 		((seconds--))
 		if [[ $seconds -lt 0 ]]
 		then 	# We have sub zero seconds, fix that
 			seconds=59
 			((minutes--)) 
-			# While minutes changes, check for further minute & hour changes
+			# While minutes changes, check for hour changes
 			[[ $minutes -lt 0 ]] && minutes=59 && ((hours--))
 			[[ $hours -lt 0 ]] && hours=0
 		fi
-		# Generate string & output to user
-		time_string="$hours:$minutes:$seconds"
-		tui-printf  "$MSG" "$time_string"
-		sleep 1
 		
+		# Actualy wait a second
+		sleep 1
 	done
-	exit 1
+	exit 0
