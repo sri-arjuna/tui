@@ -148,7 +148,7 @@ Tempfile:	\$tempfile
 #		tui-progress -ri \$ME-reqs -m \$req_total) " "
 		doLog "Req : Checking for installed packages"
 		
-		tui-install \$@
+		tui-install -v \$@
 		return \$?
 		
 		# Create a list of packages to install
