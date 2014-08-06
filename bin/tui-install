@@ -1,0 +1,195 @@
+#!/bin/bash 
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2014 by Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	File:		tui-install
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU Lesser General Public License (LGPL)
+#	Created:	2014.07.28
+#	Changed:	2014.07.28
+	script_version=0.2
+	TITLE="tui-install"
+#	Description:	Install provided packages, using the 'default' package manager
+#			that is to be expected on this based distro.
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-install
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+${TITLE^}
+Usage: 		$ME [options] PACKAGES
+Examples:	$ME PACKAGE
+		$ME -v some packages
+		$ME -vl /path/to/logfile.log LIST OF PACKAGES
+Where options are:
+	-h(elp) 		This screen
+	-------------------------------------------------------
+	-b(ased)		Prints on what the distro is based on and exit
+	-d(istro)		Prints the distro name and exit
+	-l(og)		ARG	Writes and entry to ARG wheter installation was sucessfull or not
+	-v(erbose)		Use a line for each package
+
+"
+#
+#	Variables
+#
+	source /etc/profile.d/tui.sh
+	doLog=1
+	verbose=1
+	LOG=""
+#
+#	Functions
+#
+	distro() { #
+	# Should print the name of the distro
+	#
+        	e=/etc
+		SF="release version"    # Search For
+        
+        	results=$(for a in $SF;do ls $e|grep $a;done)
+		resultsFiles=$(for each in $results;do [[ -f "$e/$each" ]] && printf "$each ";done)
+        
+		for each in $resultsFiles
+		do      tmp=$(cat "$e/$each")
+			if [[ ! "cpe" = "${tmp:0:3}" ]]
+			then    strcat=$(cat "$e/$each")
+			    	[[ ! "" = "$strcat" ]] && output="$strcat"
+			fi
+		done
+		printf "$(printf $strcat|awk {'printf $1'})"
+	}
+	based() { #
+	# Returns arch, debian, redhat or unkown
+	#
+    		if [[ -f /etc/redhat-release ]] 
+		then	printf redhat
+		elif [[ -f /etc/arch-release ]]
+		then	printf arch
+		elif [[ -f /etc/debian_version ]]
+		then	printf debian
+		else	printf unknown
+		fi
+	}
+#
+#	Catching Arguments
+#
+	#[[ -z $1 ]] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
+	# A ':' after a char indicates that this option requires an argument
+	while getopts "bdhl:v" opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		#------------------------
+		b)	# Print distro name and exit
+			based
+			exit 0
+			;;
+		d)	# Print distro name and exit
+			distro
+			exit 0
+			;;
+		l)	dolog=0
+			LOG="$OPTARG" 	;;
+		v)	verbose=0	;;
+		*)	printf "$help_text" ; exit $?	;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS=("${*}")			# Remaining arguments
+	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
+	pkgs=${ARGS[*]}
+#
+#	Display & Action
+#
+	[[ 0 -ne $UID ]] && \
+		tui-echo "$ME requires root access!" "$FAIL" && \
+		exit 1
+
+	# Get the right installer
+	case $(based) in
+	arch)		APP=pacman	;;
+	debian)		APP=apt-get	;;
+	redhat)		APP=yum		;;
+	esac
+	
+	# Generate commands for the installer
+	cmd=""
+	make_cache=""
+	case $APP in
+	yum)		[[ $verbose -eq 0 ]] && cmd="-C"
+			cmd+=" -q -y install"
+			make_cache="$APP -q makecache"
+			;;	
+	apt-get)	cmd="-q -y install"
+			make_cache=""
+			;;
+	pacman)		cmd="-qIY"	# OR: -IY ?? // -Ssyu
+			make_cache=""
+			;;
+	esac
+	
+	# Install depending upon verbosity	
+	if [[ $verbose -eq 0 ]]
+	then	# Is on, install each package on its own line...
+		count_good=0
+		good_ones=""
+		count_total=1
+		# To reduce time, we create a new cache, and tell the PKMGR later to use cache only
+		if [[ ! -z $make_cache ]]
+		then	# Create cache, display if verbose
+			tui-printf "Create cache..." "$WORK" ; printf ""
+			[[ $doLog -eq 0 ]] && tui-log "$LOG" "Creating cache: $make_cache"
+			
+			$make_cache && RET=0 || RET=1
+			[[ $verbose -eq 0 ]] && tui-status $RET "Created cache."
+		fi
+		# Actualy install the packages
+		for app in ${ARGS[*]};do
+			cmd_all="$APP $cmd $app"
+			
+			[[ $doLog -eq 0 ]] && tui-log "$LOG" "Trying to execute: $cmd_all"
+			tui-printf "Installing: $app" "$count_total / $#"
+			
+			$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+			tui-status $RET "Installed package: $app" && \
+				( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Successfully installed: $app" ) || \
+				( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Failed to install: $app" )
+			
+			[[ 0 -eq $RET ]] && good_ones+=" $app" && ((count_good++))
+			((count_total++))
+		done
+		tui-echo "There were $count_good packages ($good_ones) successfully installed." "$INFO"
+	else	# Do all in one bunch
+		cmd_all="$APP $cmd $@"
+		[[ $doLog -eq 0 ]] && tui-log "$LOG" "Trying to execute: $cmd_all"
+		
+		$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+		tui-status $RET "Installed: '${pkgs[@]}' " && \
+			 ( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Successfully installed: '$pkgs'" ) || \
+			 ( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Failed to install: '$pkgs'" )
+	fi
+	exit $RET
