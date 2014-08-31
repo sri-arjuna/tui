@@ -23,7 +23,7 @@
 #	Help text
 #
 	ME=tui-wait
-	script_version=0.3
+	script_version=0.4
 	help_text="
 $ME ($script_version)
 Usage: 		$ME TIME [MSG]
@@ -42,7 +42,7 @@ Examples:	$ME 2m
 #	Variables
 #
 	TIME="${1/[a-zA-Z]/}"
-	UNIT="${1/[0-9][0-9]/}"
+	UNIT="$(printf ${1}|tr -d [:digit:])"
 	[[ -z $TIME ]] && printf "$help_text" && exit 1
 	[[ -z $UNIT ]] && UNIT=s
 	[[ -z "$2" ]] && \

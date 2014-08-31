@@ -17,16 +17,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-#	Simon Arjuna Erat (sea), erat.simon@gmail.com @ 2014-05-20
-#	Simply writes a log file
+#	Simon Arjuna Erat (sea), erat.simon@gmail.com
+#
+#	File:		tui-log
+#	License:	GNU Lesser General Public License (LGPL3)
+#	Created:	2014.05.20
+#	Changed:	2014.08.06
+#
+#	Description:	Simply writes a log file
 #
 #
 #	Variables
 #
-	#source /etc/profile.d/tui.sh
 	ME="${0##*/}"			# Basename of $0
 	script_version=0.4
-	TITLE=""
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
@@ -93,5 +97,5 @@ Where options are:
 		printf "${PRE}${MSG}" | grep -q "$D" || \
 			( grep -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
 	fi
-	[[ " " = "${PRE:0:1}" ]] && PRE="${PRE:1}"
+	while [[ " " = "${PRE:0:1}" ]] ;do PRE="${PRE:1}";done	# Remove leading spaces
 	printf "${PRE}${MSG}\n" >> "$LOG"
