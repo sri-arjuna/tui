@@ -37,12 +37,10 @@
 	[[ "." = "$(basename $0)" ]] && \
 		home="$(pwd)" || \
 		home="$(dirname $0)"
-	
+	oPWD=$(pwd)
 #
 #	Action
 #
-	#set -x
-	
 	# Prepare
 	cd "$home"
 	[[ -d $HOME/rpmbuild ]] && rpmdev-wipetree
@@ -59,16 +57,13 @@
 	
 	# Get packages
 	cd "$HOME"/rpmbuild
-	raw=$(find | grep $app | grep ".rpm")
-	
-	for l in $raw;do echo "$l"; [ "\.rpm" = "${l:0:-4}" ] && LIST+=" $l " ; done
-	
-#	echo $LIST ; exit
-	
-	
-	mv $LIST "$dir_out"
+	raw=$(find | grep $app | grep rpm)
+	mv $raw "$dir_out"
+	cd "$dir_out"
+	pwd
+	ls $dir_out/ | grep rpm$
 #
 #	Clean up
 #
 	rpmdev-wipetree
-	cd "$OLDPWD"
+	cd "$oPWD"
