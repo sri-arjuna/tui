@@ -10,11 +10,11 @@ Source0:     http://sea.fedorapeople.org/Review/%{name}/%{name}-%{version}.tar.g
 
 BuildArch:   noarch
 
-Requires:    gedit
-Requires:    nano
-Requires:    w3m
-Requires:    wget
-Requires:    xterm
+#Requires:    gedit
+#Requires:    nano
+#Requires:    w3m
+#Requires:    wget
+#Requires:    xterm
 
 %description
 It does NOT try to emulate a window'd system,
@@ -58,6 +58,7 @@ rm -rf       %{buildroot}
 rm %{name}/install.sh \
 	%{name}/uninstall.sh \
 	%{name}/README.md \
+	%{name}/build-rpm-%{name}.sh \
 	#%{name}/tui.spec
 mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
@@ -66,14 +67,14 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_datarootdir}/%{name}/templates \
                      %{buildroot}%{_docdir}/%{name}
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
-mv %{name}/conf/*    %{buildroot}%{_sysconfdir}/%{name}/
+mv %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
+mv %{name}/conf.home     %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/templates/* %{buildroot}%{_datarootdir}/%{name}/templates/
 mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
 
-#rm -fr %{name}/profile.d/
-mv %{name}/profile.d/* %{buildroot}%{_sysconfdir}/profile.d/
-
+mv %{name}/profile.d/%{name}.sh %{buildroot}%{_sysconfdir}/profile.d/
+rm -fr %{name}/profile.d/*
 
 %clean
 rm -rf %{buildroot}
@@ -89,9 +90,10 @@ rm -rf %{buildroot}
 %{_bindir}/%{name}-*
 
 %changelog
-* Thu May 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-0
-- Rewrote for performance: tui is shown ~1 sec faster (0.6s now)
-- Added tui-browser, tui-new-browser ; Filebrowser/Script Manager
+* Sun Aug 31 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-0
+- Rewrote for performance
+- Added tui-browser, tui-new-browser
+- Added tui-install, tui-wait
 
 * Thu Mar 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.4.1-0
 - Introducing $USER_SHELL, used for tui-newscript as shell definition
