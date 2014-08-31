@@ -26,44 +26,57 @@
 #	Variables
 #
 	app=tui
+	[[ -z $1 ]] && \
+		dir_out="$HOME" || \
+		dir_out="$1"
 	ext=tar.gz
 	# If this is not found, retrieve code from git
 	CHECK_FOR=bin/$app
 	HUB_USER=sri-arjuna
 	GIT=https://github.com/$HUB_USER/$app.git
 	#build_link=/usr/bin/rpm-build-$app
-	dir_out="$HOME"
 	# Get script & spec homedir
 	[[ "." = "$(basename $0)" ]] && \
 		home="$(pwd)" || \
 		home="$(dirname $0)"
 	oPWD=$(pwd)
 #
-#	Action
+#	Prepare
 #
-	# Prepare
 	cd "$home"
 	[[ -d $HOME/rpmbuild ]] && rpmdev-wipetree
 	rpmdev-setuptree
-	[[ -f "$CHECK_FOR" ]] || git clone https://github.com/sri-arjuna/tui.git .
+	[[ -f "$CHECK_FOR" ]] || git clone https://github.com/sri-arjuna/tui.git ../$app
+#
+#	Version & tarball name
+#
 	VER=$(grep -i "Version:" "$app.spec"|awk '{print $2}')
 	TARBALL=$app-$VER.$ext #$(basename $(grep -i "Source0:" "$app.spec"|grep -v ^"#"|awk '{print $2}'))
-	
-	cp $app.spec				$HOME/rpmbuild/SPECS
-	tar -acf $HOME/rpmbuild/SOURCES/$TARBALL 	../$app
-	
-	# Build
+#
+#	Place file in rpmbuild and $dir_out
+#	
+	cp $app.spec			$HOME/rpmbuild/SPECS
+	cp $app.spec			"$dir_out"
+	[[ -d ../$app ]] || (mkdir ../$app;cp -r * ../$app )
+	tar -acf $dir_out/$TARBALL 	../$app
+	ln -sf $dir_out/$TARBALL 	$HOME/rpmbuild/SOURCES/$TARBALL
+#	
+# 	Build
+#
 	rpmbuild -ba $app.spec || exit
-	
-	# Get packages
+#	
+# 	Get packages
+#
 	cd "$HOME"/rpmbuild
 	raw=$(find | grep $app | grep rpm)
 	mv $raw "$dir_out"
+	
 	cd "$dir_out"
 	pwd
-	ls $dir_out/ | grep rpm$
+	ls $dir_out/ | grep $app
 #
 #	Clean up
 #
 	rpmdev-wipetree
+	rm -fr $HOME/rpmbuild
 	cd "$oPWD"
