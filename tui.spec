@@ -3,7 +3,7 @@ Version:     0.5.0
 Release:     0%{?dist}
 Summary:     Text User Interface for scripts
 
-License:     LGPL
+License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
 #Source0:     https://github.com/sri-arjuna/tui/archive/master.zip
 Source0:     http://sea.fedorapeople.org/Review/%{name}/%{name}-%{version}.tar.gz
@@ -13,24 +13,25 @@ BuildArch:   noarch
 #Requires:    gedit
 #Requires:    nano
 #Requires:    w3m
-#Requires:    wget
+Requires:    coreutils
+Requires:    wget
 #Requires:    xterm
 
 %description
-It does NOT try to emulate a window'd system,
+It does NOT try to emulate a windowed system,
 as it is a Text Interface for scripts,
 its output is per-line.
 
 
 It enables you to write scripts which simulate a TUI
 in Emergency, Multiuser and Graphical stages.
-Furthermore, the TUI will work in bash, csh and 
-zsh too as its written in sh.
+Furthermore, the TUI should work in all shells,
+as long 'sh' is available.
 
 This package offers various commands to display text
-in diffrent alignments, an 'optical interpretation'
+in different alignments, an 'optical interpretation'
 of last exit code (status), handlers for download (wget), 'tar'
-and 'dd' to display transfered amount of data.
+and 'dd' to display transferred amount of data.
 
 Those commands are thought to be used in your scripts, 
 'replacing' other/some calls of 'echo' and/or 'printf'.
@@ -39,13 +40,14 @@ center or right aligned.
 Other commands will return strings or bool (true/false) values,
 and handle the passed info to be displayed accordingly if applicable.
 
-It is also highly customizable,
+It is also open to customization,
 and easy accessible by executing 'tui':
 ~/.config/tui/apps.conf
     Provides your favorite ${BROWSER,EDITOR}_{GUI_CLI} and $TERMINAL
 ~/.config/tui/user.conf
-    Provides $USER_{NAME,EMAIL} and $DEFAULT_LICENSE[_URL].
-    tui-newscript for example will use that information
+    Provides $USER_{NAME,EMAIL} and $DEFAULT_LICENSE[_URL]
+    tui-new-script for example will re-use that information
+    to provide you with 'filled in' with your values .
 
 %prep
 %setup -q -c %{name}-%{version}
@@ -73,8 +75,10 @@ mv %{name}/templates/* %{buildroot}%{_datarootdir}/%{name}/templates/
 mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
 
-mv %{name}/profile.d/%{name}.sh %{buildroot}%{_sysconfdir}/profile.d/
-rm -fr %{name}/profile.d/*
+
+%config
+%{_sysconfdir}/%{name}/
+%{_sysconfdir}/profile.d/%{name}.sh
 
 %clean
 rm -rf %{buildroot}
@@ -83,11 +87,14 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)   
 %doc %{_docdir}/%{name}/
 %{_mandir}/man1/%{name}*.1.gz
-%{_sysconfdir}/profile.d/%{name}.*
 %{_datarootdir}/%{name}/
-%{_sysconfdir}/%{name}/
 %{_bindir}/%{name}
 %{_bindir}/%{name}-*
+%{_sysconfdir}/%{name}/
+%{_sysconfdir}/profile.d/%{name}.sh
+
+
+
 
 %changelog
 * Sun Aug 31 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-0
