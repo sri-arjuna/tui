@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.04.26
-	script_version=0.1
+#	Changed:	2014.09.03
+	script_version=0.2
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -27,26 +27,11 @@ Where options are:
 	optE_bool=false 	# For a working template
 	ARG_TOGGLE_ANOTHER=none # For a working template
 #
-#	Functions
-#
-	func() { # Argument examples
-	# Descriptional, ...
-	# Text here
-		echo $1
-	}
-#
 #	Catching Arguments
 #
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "a(another)e:(example):h(help)": name
+	while getopts "h" name
 	do 	case $name in
-		a|another)
-			ARG_TOGGLE_ANOTHER=set
-			;;
-		e|example)
-			optE_argument="$OPTARG"
-			optE_bool=true
-			;;
 		h|help)
 			printf "$help_text"
 			exit $RET_HELP
@@ -55,9 +40,6 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=(${*})			# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
-
 #
 #	Display & Action
 #
@@ -72,9 +54,10 @@ Where options are:
 	
 	tui-header "$ME ($script_version)" "$(date +'%F %T')"
 	tui-title "$TITLE"
-	tui-echo "Welcome to the guide about how to create a new framework based on $ME."
+	tui-echo "Welcome to the guide about how to create a new framework based on tui-browser."
+	tui-echo
 	# MUST BE
-	tui-printf -t "Required Information:"
+	tui-title "Required Information:"
 	APP_TITLE=$(tui-read "What is the frameworks's title:")
 	APP_FILE=$(tui-read "What is the frameworks's filename (only name):")
 	APP_BASE=$(tui-read "Where is the '$APP_FILE' saved (just path):")
@@ -86,6 +69,6 @@ Where options are:
 	APP_USER_LABEL=$(tui-read "What is the new label for 'user-area-label':")
 	#APP_TITLE=$(tui-read "What is the frameworks's title: ")
 	t=/usr/share
-	t=/home/sea/prjs
+	#t=/home/sea/prjs
 	mkdir -p "$APP_BASE/$APP_DATA"
 	source "$t/tui-browser/templates/browser" > "$APP_BASE/$APP_FILE"
