@@ -6,7 +6,7 @@ Summary:     Text User Interface for scripts
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
 #Source0:     https://github.com/sri-arjuna/tui/archive/master.zip
-Source0:     http://sea.fedorapeople.org/Review/%{name}/%{name}-%{version}.tar.gz
+Source0:     http://sea.fedorapeople.org/review/%{name}/%{name}-%{version}.tar.gz
 
 BuildArch:   noarch
 
@@ -74,11 +74,7 @@ mv %{name}/conf.home     %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/templates/* %{buildroot}%{_datarootdir}/%{name}/templates/
 mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
-
-
-%config
-%{_sysconfdir}/%{name}/
-%{_sysconfdir}/profile.d/%{name}.sh
+mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh
 
 %clean
 rm -rf %{buildroot}
@@ -93,7 +89,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/%{name}/
 %{_sysconfdir}/profile.d/%{name}.sh
 
-
+%config
+%{_sysconfdir}/%{name}/
+%{_sysconfdir}/profile.d/%{name}.sh
 
 
 %changelog

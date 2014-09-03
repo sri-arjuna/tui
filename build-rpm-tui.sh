@@ -25,9 +25,10 @@
 #
 #	Variables
 #
+	. $HOME/.config/fas/fas.conf
 	app=tui
 	[[ -z $1 ]] && \
-		dir_out="$HOME" || \
+		dir_out="$FAS_REVIEW/$app" || \
 		dir_out="$1"
 	ext=tar.gz
 	# If this is not found, retrieve code from git
@@ -46,7 +47,7 @@
 	cd "$home"
 	[[ -d $HOME/rpmbuild ]] && rpmdev-wipetree
 	rpmdev-setuptree
-	[[ -f "$CHECK_FOR" ]] || git clone https://github.com/sri-arjuna/tui.git ../$app
+	[[ -f "$CHECK_FOR" ]] || git clone $GIT ../$app
 #
 #	Version & tarball name
 #

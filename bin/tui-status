@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.5
+	script_version=0.6
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME ERRORLEVEL \"Message to user\" [\"centred Message\"]
@@ -30,7 +30,6 @@
 #	Variables to display
 #	Diffrent for GUI or CLI
 #
-	script_version=0.5
 	#[[ -z $DONE ]] && 
 	source /etc/tui/status.conf
 	count=${#@}
@@ -38,14 +37,14 @@
 #	Fill array according to return value
 #
 	unset retvalue[@]
-	retvalue[0]="$DONE" ;	retvalue[1]="$FAIL"
-	retvalue[2]="$WORK" ;retvalue[3]="$TODO"
-	retvalue[4]="$SKIP" ;	retvalue[5]="$NEXT"
-	retvalue[6]="$BACK" ;	retvalue[7]="$CANC"
+	retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
+	retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TODO"
+	retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
+	retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
 	
-	retvalue[10]="$ENAB";	retvalue[11]="$DIAB"
+	retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
 	
-	retvalue[99]="$HELP";	retvalue[111]="$INFO"
+	retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
 #
 #	Display
 #	

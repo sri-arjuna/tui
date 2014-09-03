@@ -4,21 +4,25 @@
 tui-progress (0.3)
 
 .SH SYNOPSIS
-\fBtui-progress\fP [options] [arguments]
+\fBtui-progress\fP [options] [MESSAGE]
 .br
 Example:	tui-progress "Message to user"
 .br
 		tui-progress -m 104 "Count up to 104"
 .br
 Where options are:
-.IP \fB-i\fP "VAL"
-Uses VAL as to keep diffrent instances apart
+.IP \fB-i WORD\fP
+Uses WORD as describor and tempfile name for the progress index
 .IP \fB-r\fP
 Resets an instances index to 0 (1 if -m is set)
-.IP \fB-m\fP "VAL"
-Set Max value to VAL, this changes the outout to:	counted num / max value
+.IP \fB-m MAXVAL\fP
+Set Max value to MAXVAL, this changes the output to: counted: 'num / max', where 'num' is the number of item currently worked on.
 .br
-As in: "4 / VAL"
+Note that this option requires a prior invoke of: \fBtui-progress -i APPNAME -m ${ARRAY[#*]}\fP
+.br
+whereby followed by \fBtui-progress -i APPNAME "Text of Task #"\fP
+.br
+As in: "4 / MAXVAL"
 
 .SH DESCRIPTION
 .PP

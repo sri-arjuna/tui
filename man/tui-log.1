@@ -1,0 +1,48 @@
+.TH "tui-log" 1 "2014 05 20" 0.5.0 TUI
+
+.SH NAME
+tui-log (0.4)
+
+.SH DESCRIPTION
+.PP
+Simply writes MESSAGE to LOGFILE according to optional options.
+.br
+Note that the order of options define their order in the LOGFILE.
+.br
+
+.SH SYNOPSIS
+\fBtui-log\fP [options] LOGFILE [MESSAGE]
+.br
+.PP
+Examples:
+.br
+ 	tui-log "/var/log/appname.log" "Message"
+.br
+	tui-log -dtp "LOGFILE" "Server started"
+.br
+	tui-log -pu "LOGFILE" "Changed background"
+.br
+
+.SH OPTIONS
+.IP "\fB-e\fP"
+Prints just the message, or an empty line
+.IP "\fB-d\fP"
+Adds the DATE (2014-09-01) in front
+.IP "\fB-t\fP"
+Adds the TIME (17:03:00) in front
+.IP "\fB-p\fP"
+Adds the PID  (25276) in front
+.IP "\fB-u\fP"
+Adds the USER in front
+.IP "\fB-s CHAR\fP"
+Changes the seperator to CHAR
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://sea.fedorapeople.org

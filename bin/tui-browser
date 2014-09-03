@@ -94,7 +94,7 @@ Where options are:
 #	Catching Arguments
 #
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "m:d:f:t:b:p:s:u:n(noclear)h(help)": name
+	while getopts "m:d:f:t:b:p:s:u:nh" name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
 		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
@@ -108,13 +108,13 @@ Where options are:
 		s|source) 	SOURCE="$OPTARG"	;;
 		t|title)	lbl_title="$OPTARG"	;;
 		u|user) 	lbl_user="$OPTARG"	;;
-		
+	#	l|label)	lbl_job="$OPTARG"	;;
 		esac
 	done
 	#shift $(($OPTIND - 1))
 	# Verify required variables
 	[ -z $BASE ] && BASE="$(pwd)" || cd "$BASE"
-	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
+#	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
 #
 #	Functions
 #
@@ -189,20 +189,21 @@ Where options are:
 					;;
 				esac
 				# Dont show title if no entries available
-				[ ! "" = "$(printf ${array[@]})" ] && \
-					tui-title "${content_title}:"
-				# Display array
-				while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
-					L="${array[$C]}"
-					M="${array[$D]}"
-					R="${array[$E]}"
-					C=$[ $C + 3 ]
-					D=$[ $D + 3 ]
-					E=$[ $E + 3 ]
-					# Only show lines with content
-					[ ! "" = "$(echo $L$M$R)" ] && \
-						tui-echo "$L" "$M" "$R"
-				done
+				if [ ! 0 = "${#array[@]}" ]
+				then 	tui-title "${content_title}:"
+					# Display array
+					while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
+						L="${array[$C]}"
+						M="${array[$D]}"
+						R="${array[$E]}"
+						C=$[ $C + 3 ]
+						D=$[ $D + 3 ]
+						E=$[ $E + 3 ]
+						# Only show lines with content
+						[ ! "" = "$(printf $L$M$R)" ] && \
+							tui-echo "$L" "$M" "$R"
+					done
+				fi
 			done
 			
 		fi
