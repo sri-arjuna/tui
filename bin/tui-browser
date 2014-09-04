@@ -315,6 +315,7 @@ Where options are:
 	#	Display	- TOP MENU
 	#
 		$doClear && clear
+		sleep 0.001
 		tui-header "$lbl_title" "$lbl_user"
 		tui-title "Location:"  "/$CUR_STR"
 	#

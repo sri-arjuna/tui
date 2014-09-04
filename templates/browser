@@ -26,18 +26,6 @@ cat << EOF
 		sh /tmp/tui.inst/install.sh #| echo 
 		rm -fr /tmp/tui.inst
 	fi
-	if [ ! -d /usr/share/tui-browser ]
-	then 	# Install GIT & TUI
-		echo
-		echo "	Installing tui-browser..."
-		echo 
-		! type git > /dev/zero && \
-			echo "Installing GIT, a source code manager...." && \\
-			yum install -y git 2>&1
-		git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
-		sh /tmp/tui.inst/install.sh #| echo 
-		rm -fr /tmp/tui.inst
-	fi
 #
 #	Variables
 #
@@ -45,6 +33,7 @@ cat << EOF
 	ME_DIR="\${0/${0##/*/}}"
 	ME_BASE="\$ME_DIR/$APP_LIB"
 	TITLE="\$APP_TITLE"
+	MORE_OPTS="$MORE_OPTS"
 #
 #	Display to user
 #

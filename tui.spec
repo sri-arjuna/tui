@@ -1,5 +1,5 @@
 Name:        tui
-Version:     0.5.0
+Version:     0.5.1
 Release:     0%{?dist}
 Summary:     Text User Interface for scripts
 
@@ -61,6 +61,8 @@ rm %{name}/install.sh \
 	%{name}/uninstall.sh \
 	%{name}/README.md \
 	%{name}/build-rpm-%{name}.sh \
+#	config.etc/color-org.conf \
+#	%{name}/config.etc/status-org.conf \
 	#%{name}/tui.spec
 mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
@@ -95,6 +97,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Sep 04 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.1-0
+- Changed: colors.conf
+- Changed: status.conf
+- Fixing ATM: colors spread over lines
+
 * Sun Aug 31 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.0-0
 - Rewrote for performance
 - Added tui-browser, tui-new-browser

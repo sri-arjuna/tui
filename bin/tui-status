@@ -51,7 +51,7 @@
 	
 	retval=""
 	#echo "$count $retval"
-	[[ -z "$1" ]] && ( $ME 1 "Usage: $ME ERRORLEVEL [ \"Message to user\" ]" ; return 1)
+	[[ -z "$1" ]] && ( $ME 1 "Usage: $ME ERRORLEVEL [ \"Message to user\" ]" ; exit 1)
 	if [[ "$1" = "-h" ]]
 	then	printf "
 $ME ($script_version)
