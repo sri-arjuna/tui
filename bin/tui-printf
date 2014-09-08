@@ -97,7 +97,12 @@ Options are:
 	if [[ $len -gt $WIDTH ]]
 	then 	len2=$[ ${#FIRST} + ${#SECOND} ]
 		#echo $len $len2 $WIDTH
-		if [[ $len2 -le $WIDTH ]]
+		if [[ $len2 -eq $len ]]
+		then	# Its 1 string
+			half=$[ ${#FIRST} / 2 ]
+			tui-printf -E "${FIRST:0:$half}"
+			tui-printf $optStyle "$FIRST:$half}"
+		elif [[ $len2 -le $WIDTH ]]
 		then 	# first & second match on one line
 			tui-printf -E "$FIRST" "$SECOND"
 			tui-printf $optStyle "$THIRD"
