@@ -100,7 +100,7 @@ Options are:
 		if [[ $len2 -eq $len ]]
 		then	# Its 1 string
 			half=$[ ${#FIRST} / 2 ]
-			tui-printf -E "${FIRST:0:$half}" "$FIRST:$half}"
+			tui-printf $optStyle "${FIRST:0:$half}" "$FIRST:$half}"
 			#tui-printf $optStyle 
 		elif [[ $len2 -le $WIDTH ]]
 		then 	# first & second match on one line
@@ -140,7 +140,7 @@ Options are:
 	elif [ $doHeader = true ]
 	then	# Full line
 		#COLOR_LINE_START="${TUI_COLOR_RESET}\r${TUI_COLOR_RESET}${HEAD_BG}${HEAD_FG}"
-		COLOR_LINE_START="\r${TUI_COLOR_RESET}${HEAD_BG}${HEAD_FG}"
+		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		#COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
