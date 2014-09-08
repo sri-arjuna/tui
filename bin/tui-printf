@@ -100,8 +100,8 @@ Options are:
 		if [[ $len2 -eq $len ]]
 		then	# Its 1 string
 			half=$[ ${#FIRST} / 2 ]
-			tui-printf -E "${FIRST:0:$half}"
-			tui-printf $optStyle "$FIRST:$half}"
+			tui-printf -E "${FIRST:0:$half}" "$FIRST:$half}"
+			#tui-printf $optStyle 
 		elif [[ $len2 -le $WIDTH ]]
 		then 	# first & second match on one line
 			tui-printf -E "$FIRST" "$SECOND"
