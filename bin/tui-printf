@@ -98,6 +98,7 @@ Options are:
 	if [[ $len -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
+		set -x
 		len2=$[ ${#FIRST} + ${#SECOND} ]
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
@@ -114,14 +115,15 @@ Options are:
 					part1="${FIRST:0:$half}"
 					part2="${FIRST:$half}"
 				# unten hängt es
-					tui-printf $optStyleTMP "$part1" "$part2"
+					tui-printf $optStyleTMP "$part1"
+					tui-printf $optStyle "$part2"
 				# oben hängt es
 					#exit
-					[[ -z $SECOND ]] && \
-						tui-printf $optStyle "$part2" || \
-						tui-printf $optStyle "$part2" "$SECOND"
-					[[ -z $THIRD ]] || \
-						tui-printf $optStyle "$THIRD"
+				#	[[ -z $SECOND ]] && \
+				#		tui-printf $optStyle "$part2" || \
+				#		tui-printf $optStyle "$part2" "$SECOND"
+				#	[[ -z $THIRD ]] || \
+				#		tui-printf $optStyle "$THIRD"
 				fi
 			fi ;;
 		2)	# Print each of the 2 arguments on a single line...
@@ -132,6 +134,7 @@ Options are:
 			tui-printf $optStyle "$THIRD"
 			;;
 		esac
+		set +x
 		# Since this is special handling, 
 		# calling itself with reduced string lengths
 		# so we can exit after this is done
@@ -213,18 +216,18 @@ Options are:
 #	BETA "if more"
 #
 	#unset ARGS[0] ARGS[1] ARGS[2]
-	if [ $doMore = true ]
-	then	# there are remains..
-		C=0
-		for A in "${ARGS[*]}";do 
-			[ "$1" = "$A" ] && unset ARGS[$C] && echo $A
-			[ "$2" = "$A" ] && unset ARGS[$C] && echo $A
-			[ "$3" = "$A" ] && unset ARGS[$C] && echo $A
-			((C++))
-		done
-		tui-title "DEBUG"
-		tui-echo  "Too many arguments:" "$ARGS_COUNT($ARGS_COUNT_org)=${ARGS[*]}"
+#	if [ $doMore = true ]
+#	then	# there are remains..
+#		C=0
+#		for A in "${ARGS[*]}";do 
+#			[ "$1" = "$A" ] && unset ARGS[$C] && echo $A
+#			[ "$2" = "$A" ] && unset ARGS[$C] && echo $A
+#			[ "$3" = "$A" ] && unset ARGS[$C] && echo $A
+#			((C++))
+#		done
+#		tui-title "DEBUG"
+#		tui-echo  "Too many arguments:" "$ARGS_COUNT($ARGS_COUNT_org)=${ARGS[*]}"
 		# DEBUG
-		echo $ME $optStyle "${ARGS[*]}"
-		exit
-	fi
+#		echo $ME $optStyle "${ARGS[*]}"
+#		exit
+#	fi
