@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2014.06.10
-	script_version=0.9
+	script_version=0.9.1
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -90,37 +90,48 @@ Options are:
 	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
 	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
 	[ ! -z "$4" ] && doMore=true || doMore=false
+	[ -z $optStyle ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
 #
 #	Verify all fit on 1 line
 #
 	len=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
 	if [[ $len -gt $WIDTH ]]
-	then 	len2=$[ ${#FIRST} + ${#SECOND} ]
-		#echo $len $len2 $WIDTH
-		if [[ $len2 -eq $len ]]
-		then	# Its 1 string
-			half=$[ ${#FIRST} / 2 ]
-			tui-printf $optStyle "${FIRST:0:$half}" "$FIRST:$half}"
-			#tui-printf $optStyle 
-		elif [[ $len2 -le $WIDTH ]]
-		then 	# first & second match on one line
-			tui-printf -E "$FIRST" "$SECOND"
+	then 	# All vars are larger than the line supports
+		# Splitting required
+		len2=$[ ${#FIRST} + ${#SECOND} ]
+		case $ARGS_COUNT in
+		1)	# Split up the only argument passed
+			if [[ $len2 -le $WIDTH ]]
+			then 	# FIRST & SECOND match on one line
+				tui-printf $optStyleTMP "$FIRST" "$SECOND"
+				# Now prints the third and let it handle itself
+				tui-printf $optStyle "$THIRD"
+			else	# FIRST needs further spliting:
+				if [[ ${#FIRST} -le $WIDTH ]]
+				then 	tui-printf $optStyleTMP "$FIRST"
+					tui-printf $optStyle "$SECOND" "$THIRD"
+				else	half=$[ ${#FIRST} / 2 ]
+					part1="${FIRST:0:$half}"
+					part2="${FIRST:$half}"
+				# unten hängt es
+					tui-printf $optStyleTMP "$part1" "$part2"
+				# oben hängt es
+					#exit
+					[[ -z $SECOND ]] && \
+						tui-printf $optStyle "$part2" || \
+						tui-printf $optStyle "$part2" "$SECOND"
+					[[ -z $THIRD ]] || \
+						tui-printf $optStyle "$THIRD"
+				fi
+			fi ;;
+		2)	# Print each of the 2 arguments on a single line...
+			tui-printf $optStyleTMP "$FIRST"
+			tui-printf $optStyle "$SECOND"
+			;;
+		3)	tui-printf $optStyleTMP "$FIRST" "$SECOND"
 			tui-printf $optStyle "$THIRD"
-		else	# it needs further spliting:
-			if [[ ${#FIRST} -le $WIDTH ]]
-			then 	tui-printf -E "$FIRST"
-				tui-printf $optStyle "$SECOND" "$THIRD"
-			else	half=$[ ${#FIRST} / 2 ]
-				part1="${FIRST:0:$half}"
-				part2="${FIRST:$half}"
-				tui-printf -E "$part1"
-				[[ -z $SECOND ]] && \
-					tui-printf -E "$part2" || \
-					tui-printf -E "$part2" "$SECOND"
-				[[ -z $THIRD ]] || \
-					tui-printf $optStyle "$THIRD"
-			fi
-		fi
+			;;
+		esac
 		# Since this is special handling, 
 		# calling itself with reduced string lengths
 		# so we can exit after this is done
@@ -148,7 +159,7 @@ Options are:
 	elif [ $doTitle = true ]
 	then	# 'Inlay'
 		#COLOR_LINE_START="${TUI_RESET}\r${TUI_COLOR_RESET}"
-		COLOR_LINE_START="${TUI_COLOR_RESET}\r${TUI_COLOR_RESET}"
+		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
 		COLOR_LINE_CLOSE="${TUI_COLOR_RESET}"
 		#COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
