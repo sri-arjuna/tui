@@ -30,7 +30,7 @@
 #	Variables
 #
 	#source tui
-	[ -z "$BORDER_LEFT$HEAD_BG" ] && source /etc/profile.d/tui.sh
+	[ -z $HEAD_BG ] && source /etc/profile.d/tui.sh
 	TITLE="tui-printf"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
@@ -54,8 +54,9 @@ Options are:
 	SECOND=""
 	THIRD=""
 	WIDTH=$( [ -z $COLUMNS ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
-	#TOTAL="$WIDTH"
-	WIDTH=$[ $WIDTH - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - 2 ]	# Subtract default 'borders'
+	#WIDTH=${COLUMNS:−$(tput cols)} 
+	#WIDTH=$[ $WIDTH - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - 2 ]	# Subtract default 'borders'
+	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 
 	WIDTH=$[ $WIDTH / 2 * 2 ]					# Make it even 
 	EMPTY="$(printf '%*s' $WIDTH)"					# Get 'width' spaces
 	doEcho=false
@@ -98,7 +99,7 @@ Options are:
 	if [[ $len -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
-		set -x
+		#set -x
 		len2=$[ ${#FIRST} + ${#SECOND} ]
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
@@ -134,7 +135,7 @@ Options are:
 			tui-printf $optStyle "$THIRD"
 			;;
 		esac
-		set +x
+		#set +x
 		# Since this is special handling, 
 		# calling itself with reduced string lengths
 		# so we can exit after this is done
@@ -200,10 +201,11 @@ Options are:
 		half=$[ ${#EMPTY} / 2 ]
 		
 		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
-		len_compare=$[ $len_strings / 2 * 2  ]
-		[ $len_compare -lt $len_strings ] && \
-			adder=1 || \
-			adder=0
+		#len_compare=$[ $len_strings / 2 * 2  ]
+		#[ $len_compare -lt $len_strings ] && \
+		#	adder=1 || \
+		#	adder=0
+		adder=$((len_strings % 2))
 		
 		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
 		;;
