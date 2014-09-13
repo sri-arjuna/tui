@@ -30,9 +30,6 @@
 #	Variables to display
 #	Diffrent for GUI or CLI
 #
-	#[[ -z $DONE ]] && 
-	#source /etc/tui/{colors,status}.conf
-	source /etc/tui/colors.conf
 	source /etc/tui/status.conf
 	count=${#@}
 #

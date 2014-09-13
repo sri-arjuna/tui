@@ -1,0 +1,34 @@
+#!/bin/bash
+source /etc/profile.d/tui.sh
+
+cat > "$DEST.1" << EOF
+.TH "$(basename $DEST)" "1" "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
+
+.SH NAME
+$(basename $DEST) (0.1)
+
+.SH SYNOPSIS
+\fB$(basename $DEST)\fP [options] [arguments]
+.br
+Example: $(basename $DEST)
+.br
+Where options are:
+.IP "\fB-XY\fP"
+does this
+.IP "\fB-YX\fP"
+does that
+
+.SH DESCRIPTION
+.PP
+Some descriptional text
+
+.SH LICENSE
+$DEFAULT_LICENSE
+.br
+$DEFAULT_LICENSE_URL
+
+.SH CONTACT
+$USER_EMAIL
+.br
+$USER_HOMEPAGE
+EOF

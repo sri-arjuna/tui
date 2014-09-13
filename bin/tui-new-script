@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.3
+	script_version=0.9.4
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -32,8 +32,9 @@ Examples:	$ME fileA.sh			# Creates a script in $HOME/bin
 		$ME -p /opt/bin/fileB.sh	# Creates a full application script in /opt/bin
 Where options are:
 	-h		This screen
-	-p		Create a full application script template
-	-m		Create a header less than -p, but more than no option
+	-p(rogram)	Create a full application script template
+	-m(inimal)	Create a header less than -p, but more than no option
+	-r(egular)	Creates a header and basic option handling & help text
 
 "
 	DEST=""
@@ -44,18 +45,18 @@ Where options are:
 #
 	tui-title "$TITLE ($script_version)"
 	source $HOME/.config/tui/user.conf
-	while getopts "hmp" name
+	while getopts "hmpr" name
 	do 	case $name in
 		m)	SHELL_EXT="_min"	;;
 		p)	SHELL_EXT="_app"	;;
+		r)	SHELL_EXT="_regular"	;;
+		
 		h)	printf "$help_text"
 			exit $RET_HELP	;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=(${*})			# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 #
 #	Display
 #
@@ -84,48 +85,17 @@ Where options are:
 	APP_DIR=/usr/share/tui
 	source $APP_DIR/templates/scripts/$USER_SHELL$SHELL_EXT || \
 		( tui-status 1 "$USER_SHELL$SHELL_EXT is not available in templates..." ; exit 1)
-	if tui-status $? "Saved: $(echo $DEST)"
+	if tui-status $? "Saved: $(printf $DEST)"
 	then	chmod +x "$DEST"
 		[[ ! xterm = "$TERM" ]] && \
 			$USER_SHELL $DEST -h && \
 			sleep 1
 		tui-edit "$DEST"
-		#$EDITOR "$DEST"
 	fi
 	doMan=false
 	
 	tui-yesno "Create a manpage too?" && \
 		doMan=true && \
-		cat > "$DEST.1" << EOF
-.TH "$(basename $DEST)" "1" "$(DATE|sed s/'\.'/' '/g)" "$USER_NAME"
-
-.SH NAME
-$(basename $DEST) (0.1)
-
-.SH SYNOPSIS
-\fB$(basename $DEST)\fP [options] [arguments]
-.br
-Example: $(basename $DEST)
-.br
-Where options are:
-.IP "\fB-XY\fP"
-does this
-.IP "\fB-YX\fP"
-does that
-
-.SH DESCRIPTION
-.PP
-Some descriptional text
-
-.SH LICENSE
-$DEFAULT_LICENSE
-.br
-$DEFAULT_LICENSE_URL
-
-.SH CONTACT
-$USER_EMAIL
-.br
-$USER_HOMEPAGE
-EOF
+		source $APP_DIR/templates/manpage > $DEST.1
 	$doMan && tui-edit "$DEST.1"
 	$doMan && man "$DEST.1"

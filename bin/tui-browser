@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.05.01
-	script_version=0.3
+#	Changed:	2014.09.12
+	script_version=0.4
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
@@ -41,6 +41,11 @@ Where options are:
 	-h(elp)		This screen
 	-b(lacklist)	ARG	TODO
 	-d(ir)  	ARG	Folders will be labled as ARG
+	-D(efault)	NAME	Changes the filename startings from 'default' to 'NAME'
+				These files will be hidden from the menu, and according to their
+				extension be called on diffrent purposes...
+				default.info	- Will be shown upon folder entry
+				default.cmd	- Will be executed upon folder entry
 	-f(ile) 	ARG	Files will be labled as ARG
 	-l(ocation)  	ARG	Location will be labled as ARG
 	-m(ode) 	ARG	Can be 'text' (nice n' slow, default)
@@ -64,6 +69,8 @@ Where options are:
 	MENU_MODE=text
 	doClear=true
 	BASE=""
+	SPECIAL_NAME="default"
+	SPECIAL_EXT=(info help cmd )
 #
 # 	Are these really needed ?
 #
@@ -94,11 +101,12 @@ Where options are:
 #	Catching Arguments
 #
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "m:d:f:t:b:p:s:u:nh" name
+	while getopts "m:d:D:f:t:b:p:s:u:l:nh" name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
 		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
 		d|dir) 		lbl_dir="$OPTARG"	;;
+		D|default)	SPECIAL_NAME="$OPTARG"	;;
 		f|file) 	lbl_file="$OPTARG"	;;
 		h|help)		printf "$help_text"
 				exit $RET_HELP		;;
@@ -111,9 +119,10 @@ Where options are:
 	#	l|label)	lbl_job="$OPTARG"	;;
 		esac
 	done
-	#shift $(($OPTIND - 1))
+	shift $(($OPTIND - 1))
+	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
 	# Verify required variables
-	[ -z $BASE ] && BASE="$(pwd)" || cd "$BASE"
+	[ -z $BASE ] && BASE="$PWD_OLD" || cd "$BASE"
 #	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
 #
 #	Functions
@@ -164,11 +173,29 @@ Where options are:
 			# Fill specific arrays
 			ARRAY=( * )
 			for e in "${ARRAY[@]}";do
-				if [ -d "$e" ]
-				then	folders[$CD]="$e"
-					((CD++))
-				else	files[$CF]="$e"
-					((CF++))
+				# verify its not a 'default' file
+				num=
+				if  [[ ! "${e:0:${#SPECIAL_NAME}}." = "${SPECIAL_NAME}." ]] # || [[ ! ${e:0:-${#SPECIAL_EXT}+1} = ".$SPECIAL_EXT" ]]
+				then	# Its not, so split entries to files & folders
+					if [ -d "$e" ]
+					then	folders[$CD]="$e"
+						((CD++))
+					else	files[$CF]="$e"
+						((CF++))
+					fi
+				else	# Its a $SPECIAL_NAME (default file)
+					case "${e:${#SPECIAL_NAME}+1}" in
+					".cmd")		. "$e"
+							;;
+					*)		#echo "Show the INFO!"
+							while read line;do
+								tui-echo "$line"
+							done < "$e"
+							tui-echo
+							;;
+					# "help")		tui-status 111 "TODO $e - handling"
+					#		;;
+					esac
 				fi
 			done
 			for task in folder files;do
@@ -200,8 +227,7 @@ Where options are:
 						D=$[ $D + 3 ]
 						E=$[ $E + 3 ]
 						# Only show lines with content
-						[ ! "" = "$(printf $L$M$R)" ] && \
-							tui-echo "$L" "$M" "$R"
+						[ -z $L ] || tui-echo "$L" "$M" "$R"
 					done
 				fi
 			done
@@ -302,12 +328,25 @@ Where options are:
 #	Display & Action
 #
 	cd "$BASE"
+	len="${#BASE}"
+	if [[ ! -z $1 ]]
+	then	# Arguments been passed
+		tmp_dir="$BASE"	
+		ARGS="${@}"
+		C=0
+		while [[ -d $tmp_dir ]];do
+			tmp_dir+="/${ARGS[$C]}"
+			((C++))
+		done
+		[[ -f $tmp_dir ]] && \
+			sh $tmp_dir || \
+			cd $tmp_dir
+	fi
 	while [ ! $menu = "quit-browser" ];do
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
 	#
 		CURRENT="$(pwd)"
-		len="${#BASE}"
 		[ "$BASE" = "$CURRENT" ] && \
 			CUR_STR="" || \
 			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
@@ -318,6 +357,20 @@ Where options are:
 		sleep 0.001
 		tui-header "$lbl_title" "$lbl_user"
 		tui-title "Location:"  "/$CUR_STR"
+		# This must be double, since its outside the loop
+		if [[ $MENU_MODE = num ]]
+		then	for T in info help;do
+				case $T in
+				"$SPECIAL_NAME.cmd")
+					. "$SPECIAL_NAME.cmd"
+					;;
+				help)	tui-echo "TODO: $(pwd) help" ;;
+				*)	[[ -f $SPECIAL_NAME.$T ]] && \
+						while read line;do tui-echo "$line";done<$SPECIAL_NAME.$T
+					;;
+				esac
+			done
+		fi			
 	#
 	#	MENU :: TEXT
 	#
@@ -410,7 +463,7 @@ Where options are:
 		#
 		# MENU :: NUM
 		#
-			select e in * Back Quit;do 
+			select e in $(ls|grep -v $SPECIAL_NAME. ) Back Quit;do 
 				case "$e" in
 				Back)	menu="back"
 					break	;;

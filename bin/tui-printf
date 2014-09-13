@@ -99,20 +99,19 @@ Options are:
 	if [[ $len -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
-		#set -x
-		len2=$[ ${#FIRST} + ${#SECOND} ]
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
-			if [[ $len2 -le $WIDTH ]]
-			then 	# FIRST & SECOND match on one line
-				tui-printf $optStyleTMP "$FIRST" "$SECOND"
+			#if [[ $len2 -le $WIDTH ]]
+			#then 	# FIRST & SECOND match on one line
+			#	tui-printf $optStyleTMP "$FIRST" "$SECOND"
 				# Now prints the third and let it handle itself
-				tui-printf $optStyle "$THIRD"
-			else	# FIRST needs further spliting:
-				if [[ ${#FIRST} -le $WIDTH ]]
-				then 	tui-printf $optStyleTMP "$FIRST"
-					tui-printf $optStyle "$SECOND" "$THIRD"
-				else	half=$[ ${#FIRST} / 2 ]
+			#	tui-printf $optStyle "$THIRD"
+			#else	# FIRST needs further spliting:
+			#	if [[ ${#FIRST} -le $WIDTH ]]
+			#	then 	tui-printf $optStyleTMP "$FIRST"
+			#		tui-printf $optStyle "$SECOND" "$THIRD"
+			#	else
+					half=$[ ${#FIRST} / 2 ]
 					part1="${FIRST:0:$half}"
 					part2="${FIRST:$half}"
 				# unten hängt es
@@ -125,13 +124,15 @@ Options are:
 				#		tui-printf $optStyle "$part2" "$SECOND"
 				#	[[ -z $THIRD ]] || \
 				#		tui-printf $optStyle "$THIRD"
-				fi
-			fi ;;
+			#	fi
+			#fi
+			;;
 		2)	# Print each of the 2 arguments on a single line...
 			tui-printf $optStyleTMP "$FIRST"
 			tui-printf $optStyle "$SECOND"
 			;;
-		3)	tui-printf $optStyleTMP "$FIRST" "$SECOND"
+		3)	# Print only 2 on the first line
+			tui-printf $optStyleTMP "$FIRST" "$SECOND"
 			tui-printf $optStyle "$THIRD"
 			;;
 		esac
@@ -146,35 +147,27 @@ Options are:
 #	Prepare Colors & Strings
 #
 	if [ $doEcho = true ]
-	then	#COLOR_LINE_START="${TUI_COLOR_RESET}\r${TUI_COLOR_RESET}"
-		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
+	then	COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
-		#COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
-		COLOR_LINE_END="${TUI_COLOR_RESET}\n"
+		COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
 	elif [ $doHeader = true ]
 	then	# Full line
-		#COLOR_LINE_START="${TUI_COLOR_RESET}\r${TUI_COLOR_RESET}${HEAD_BG}${HEAD_FG}"
 		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
-		#COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
-		COLOR_LINE_END="${TUI_COLOR_RESET}\n"
+		COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
 	elif [ $doTitle = true ]
 	then	# 'Inlay'
-		#COLOR_LINE_START="${TUI_RESET}\r${TUI_COLOR_RESET}"
 		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
 		COLOR_LINE_CLOSE="${TUI_COLOR_RESET}"
-		#COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
-		COLOR_LINE_END="${TUI_COLOR_RESET}\n"
+		COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
 	else	# The default
-		#COLOR_LINE_START="${TUI_COLOR_RESET}\r${TUI_COLOR_RESET}"
 		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
-		#COLOR_LINE_END="${TUI_COLOR_RESET}"
-		COLOR_LINE_END=""
+		COLOR_LINE_END="${TUI_COLOR_RESET}"
 	fi
 	case $ARGS_COUNT in
 	0)	FIRST="$EMPTY"

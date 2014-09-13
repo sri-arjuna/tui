@@ -20,18 +20,17 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
 		\rOpens provided FILE/s in EDITOR_[CLI,GUI]
 		\r"
 	ARGS=($@)
-	ARGS_COUNT=$#
 #
 #	Check for the environment to load
 #
-	type printx &>/dev/zero || source tui
+	source tui
 #
 #	Variable handling
 #
@@ -47,4 +46,4 @@
 	then	export EDITOR=$(which $EDITOR_GUI)
 	else	export EDITOR=$(which $EDITOR_CLI)
 	fi
-	$EDITOR ${ARGS[@]}
+	$EDITOR "${ARGS[@]}"

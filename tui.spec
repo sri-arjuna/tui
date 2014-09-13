@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.5.1
-Release:     1%{?dist}
+Version:     0.5.2
+Release:     0%{?dist}
 Summary:     Text User Interface for scripts
 
 License:     GPLv3
@@ -88,8 +88,8 @@ rm -rf %{buildroot}
 %{_datarootdir}/%{name}/
 %{_bindir}/%{name}
 %{_bindir}/%{name}-*
-%{_sysconfdir}/%{name}/
-%{_sysconfdir}/profile.d/%{name}.sh
+#%{_sysconfdir}/%{name}/
+#%{_sysconfdir}/profile.d/%{name}.sh
 
 %config
 %{_sysconfdir}/%{name}/
