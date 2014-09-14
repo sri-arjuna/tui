@@ -329,18 +329,30 @@ Where options are:
 #
 	cd "$BASE"
 	len="${#BASE}"
+	# Arguments been passed
+	#echo $1
 	if [[ ! -z $1 ]]
-	then	# Arguments been passed
+	then	# Parse arguments, execute the file or enter the folder
+		tui-header "$lbl_title" "$lbl_user"
+		tui-title "Location:"  "/$CUR_STR"
 		tmp_dir="$BASE"	
-		ARGS="${@}"
+		ARGS=(${@})
 		C=0
+		tmp_dir+="/${ARGS[$C]}"
+		echo "$tmp_dir"
+		sleep 2
 		while [[ -d $tmp_dir ]];do
-			tmp_dir+="/${ARGS[$C]}"
 			((C++))
+			tmp_dir+="/${ARGS[$C]}"
 		done
-		[[ -f $tmp_dir ]] && \
-			sh $tmp_dir || \
-			cd $tmp_dir
+		if [[ -f $tmp_dir ]]
+		then	str=$0
+			for a in ${@};do str+=" $a";done
+			sh $tmp_dir 
+			tui-status $? "$str"
+			exit $?
+		else	cd $tmp_dir
+		fi
 	fi
 	while [ ! $menu = "quit-browser" ];do
 	#
