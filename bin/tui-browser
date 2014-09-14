@@ -339,14 +339,12 @@ Where options are:
 		ARGS=(${@})
 		C=0
 		tmp_dir+="/${ARGS[$C]}"
-		echo "$tmp_dir"
-		sleep 2
 		while [[ -d $tmp_dir ]];do
 			((C++))
 			tmp_dir+="/${ARGS[$C]}"
 		done
 		if [[ -f $tmp_dir ]]
-		then	str=$0
+		then	str="${0##*/}"
 			for a in ${@};do str+=" $a";done
 			sh $tmp_dir 
 			tui-status $? "$str"
