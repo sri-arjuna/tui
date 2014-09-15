@@ -122,7 +122,8 @@ Where options are:
 	shift $(($OPTIND - 1))
 	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
 	# Verify required variables
-	[ -z $BASE ] && BASE="$PWD_OLD" || cd "$BASE"
+	[ -z $BASE ] && BASE="$PWD_OLD"
+	cd "$BASE"
 #	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
 #
 #	Functions
@@ -328,6 +329,7 @@ Where options are:
 #	Display & Action
 #
 	cd "$BASE"
+	BASE="$(pwd)"
 	len="${#BASE}"
 	# Arguments been passed
 	#echo $1
@@ -336,10 +338,10 @@ Where options are:
 		tui-header "$lbl_title" "$lbl_user"
 		tui-title "Location:"  "/$CUR_STR"
 		tmp_dir="$BASE"	
-		ARGS=(${@})
+		ARGS=("${@}")
 		C=0
 		tmp_dir+="/${ARGS[$C]}"
-		while [[ -d $tmp_dir ]];do
+		while [[ -d "$tmp_dir" ]];do
 			((C++))
 			tmp_dir+="/${ARGS[$C]}"
 		done
@@ -349,7 +351,7 @@ Where options are:
 			sh $tmp_dir 
 			tui-status $? "$str"
 			exit $?
-		else	cd $tmp_dir
+		else	cd "$tmp_dir"
 		fi
 	fi
 	while [ ! $menu = "quit-browser" ];do
