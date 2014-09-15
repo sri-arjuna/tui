@@ -185,10 +185,12 @@ Where options are:
 						((CF++))
 					fi
 				else	# Its a $SPECIAL_NAME (default file)
+					#echo "${e:${#SPECIAL_NAME}+1}"
+					#exit
 					case "${e:${#SPECIAL_NAME}+1}" in
 					".cmd")		. "$e"
 							;;
-					*)		#echo "Show the INFO!"
+					info)		#echo "Show the INFO!"
 							while read line;do
 								tui-echo "$line"
 							done < "$e"
