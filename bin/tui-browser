@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>
 #
 # ------------------------------------------------------------------------
 #
@@ -185,8 +185,6 @@ Where options are:
 						((CF++))
 					fi
 				else	# Its a $SPECIAL_NAME (default file)
-					#echo "${e:${#SPECIAL_NAME}+1}"
-					#exit
 					case "${e:${#SPECIAL_NAME}+1}" in
 					".cmd")		. "$e"
 							;;
@@ -392,7 +390,7 @@ Where options are:
 		#
 		#	DISPLAY - Show content
 		#
-		ShowContent "$CURRENT"
+			ShowContent "$CURRENT"
 		#
 		#	Fetch input
 		#
@@ -483,17 +481,13 @@ Where options are:
 					break	;;
 				Quit)	menu="quit-browser"
 					exit 0	;;
-				*)	[ -d "$e" ] && \
-						cd "$e" && \
-						CURRENT="$e" && \
-						break
-					[ -f "$e" ] && \
-						( ./"$e" ; break )
+				*)	menu=up
+					[ -f "$e" ] &&  ./"$e"
+					[ -d "$e" ] && cd "$e"
+					break
 					;;
 				esac
 			done
-			#mnuNum "$CURRENT"
-			
 		else	tui-status 1 "Error, MENU_MODE = $MENU_MODE"
 		fi
 	# Check for BACK
