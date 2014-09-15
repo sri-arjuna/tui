@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.09.12
-	script_version=0.4
+#	Changed:	2014.09.15
+	script_version=0.5
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
@@ -366,7 +366,7 @@ Where options are:
 	#	Display	- TOP MENU
 	#
 		$doClear && clear
-		sleep 0.001
+		sleep 0.01	# This is required for arrangement (in WM cases)
 		tui-header "$lbl_title" "$lbl_user"
 		tui-title "Location:"  "/$CUR_STR"
 		# This must be double, since its outside the loop
