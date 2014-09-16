@@ -52,6 +52,7 @@ Where options are:
 				or 'num' (functional n' fast)
 	-p(ath)		ARG	Will use ARG as basedir
 	-n(oclear)		Dont clear screen after menu actions
+	-s(ource)	PATH	Sources all files in that dir
 	-t(itle)	ARG	Title-label (upper-left) is set to ARG
 	-u(ser) 	ARG	User-label (upper-right) is set to ARG
 	
@@ -346,7 +347,8 @@ Where options are:
 			tmp_dir+="/${ARGS[$C]}"
 		done
 		if [[ -f $tmp_dir ]]
-		then	str="${0##*/}"
+		then	#str="${0##*/}"
+			str="$lbl_title"
 			for a in ${@};do str+=" $a";done
 			sh $tmp_dir 
 			tui-status $? "$str"
@@ -376,7 +378,7 @@ Where options are:
 				"$SPECIAL_NAME.cmd")
 					. "$SPECIAL_NAME.cmd"
 					;;
-				help)	tui-echo "TODO: $(pwd) help" ;;
+				help)	[[ -f $SPECIAL_NAME.help ]] && tui-echo "TODO: $(pwd) help" ;;
 				*)	[[ -f $SPECIAL_NAME.$T ]] && \
 						while read line;do tui-echo "$line";done<$SPECIAL_NAME.$T
 					;;
