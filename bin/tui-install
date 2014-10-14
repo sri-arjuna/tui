@@ -57,8 +57,8 @@ Where options are:
 #	Variables
 #
 	source /etc/profile.d/tui.sh
-	doLog=1
-	verbose=1
+	doLog=false
+	verbose=false
 	LOG=""
 #
 #	Functions
@@ -121,7 +121,7 @@ Where options are:
 	shift $(($OPTIND - 1))
 	ARGS=("${*}")			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
-	pkgs=${ARGS[*]}
+	pkgs="${ARGS[*]}"
 #
 #	Display & Action
 #
@@ -142,7 +142,7 @@ Where options are:
 	case $APP in
 	yum)		[[ $verbose -eq 0 ]] && cmd="-C"
 			cmd+=" -q -y install"
-			make_cache="$APP -q makecache"
+			#make_cache="$APP -q makecache"
 			;;	
 	apt-get)	cmd="-q -y install"
 			make_cache=""
@@ -153,7 +153,7 @@ Where options are:
 	esac
 	
 	# Install depending upon verbosity	
-	if [[ $verbose -eq 0 ]]
+	if $verbose
 	then	# Is on, install each package on its own line...
 		count_good=0
 		good_ones=""
@@ -161,11 +161,11 @@ Where options are:
 		# To reduce time, we create a new cache, and tell the PKMGR later to use cache only
 		if [[ ! -z $make_cache ]]
 		then	# Create cache, display if verbose
-			tui-printf "Create cache..." "$WORK" ; printf ""
-			[[ $doLog -eq 0 ]] && tui-log "$LOG" "Creating cache: $make_cache"
+			tui-printf "Create cache..." "$WORK" #; printf ""
+			$doLog && tui-log "$LOG" "Creating cache: $make_cache"
 			
 			#$make_cache && RET=0 || RET=1
-			[[ $verbose -eq 0 ]] && tui-status $RET "Created cache."
+			$verbose && tui-status $RET "Created cache."
 		fi
 		# Actualy install the packages
 		for app in ${ARGS[*]};do
