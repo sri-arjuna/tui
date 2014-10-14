@@ -112,9 +112,9 @@ Where options are:
 			distro
 			exit 0
 			;;
-		l)	dolog=0
+		l)	dolog=true
 			LOG="$OPTARG" 	;;
-		v)	verbose=0	;;
+		v)	verbose=true	;;
 		*)	printf "$help_text" ; exit $?	;;
 		esac
 	done
@@ -140,8 +140,7 @@ Where options are:
 	cmd=""
 	make_cache=""
 	case $APP in
-	yum)		[[ $verbose -eq 0 ]] && cmd="-C"
-			cmd+=" -q -y install"
+	yum)		cmd+=" -q -y install"
 			#make_cache="$APP -q makecache"
 			;;	
 	apt-get)	cmd="-q -y install"
@@ -151,11 +150,11 @@ Where options are:
 			make_cache=""
 			;;
 	esac
-	
+#	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
 	if $verbose
 	then	# Is on, install each package on its own line...
-		count_good=0
+		ount_good=0
 		good_ones=""
 		count_total=1
 		# To reduce time, we create a new cache, and tell the PKMGR later to use cache only
@@ -171,13 +170,13 @@ Where options are:
 		for app in ${ARGS[*]};do
 			cmd_all="$APP $cmd $app"
 			
-			[[ $doLog -eq 0 ]] && tui-log "$LOG" "Trying to execute: $cmd_all"
+			$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
 			tui-printf "Installing: $app" "$count_total / $#"
 			
 			$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
 			tui-status $RET "Installed package: $app" && \
-				( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Successfully installed: $app" ) || \
-				( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Failed to install: $app" )
+				( $doLog && tui-log "$LOG" "Successfully installed: $app" ) || \
+				( $doLog && tui-log "$LOG" "Failed to install: $app" )
 			
 			[[ 0 -eq $RET ]] && good_ones+=" $app" && ((count_good++))
 			((count_total++))
@@ -185,11 +184,12 @@ Where options are:
 		tui-echo "There were $count_good packages ($good_ones) successfully installed." "$INFO"
 	else	# Do all in one bunch
 		cmd_all="$APP $cmd $@"
-		[[ $doLog -eq 0 ]] && tui-log "$LOG" "Trying to execute: $cmd_all"
+		$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
 		
 		$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+		[[ -z "$RET" ]] && RET=1
 		tui-status $RET "Installed: '${pkgs[@]}' " && \
-			 ( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Successfully installed: '$pkgs'" ) || \
-			 ( [[ $doLog -eq 0 ]] && tui-log "$LOG" "Failed to install: '$pkgs'" )
+			 ( $doLog && tui-log "$LOG" "Successfully installed: '$pkgs'" ) || \
+			 ( $doLog && tui-log "$LOG" "Failed to install: '$pkgs'" )
 	fi
 	exit $RET
