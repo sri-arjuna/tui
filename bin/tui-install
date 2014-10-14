@@ -154,8 +154,9 @@ Where options are:
 	# Install depending upon verbosity	
 	if $verbose
 	then	# Is on, install each package on its own line...
-		ount_good=0
+		count_good=0
 		good_ones=""
+		bad_ones=""
 		count_total=1
 		# To reduce time, we create a new cache, and tell the PKMGR later to use cache only
 		if [[ ! -z $make_cache ]]
@@ -178,11 +179,15 @@ Where options are:
 				( $doLog && tui-log "$LOG" "Successfully installed: $app" ) || \
 				( $doLog && tui-log "$LOG" "Failed to install: $app" )
 			
-			[[ 0 -eq $RET ]] && good_ones+=" $app" && ((count_good++))
+			[[ 0 -eq $RET ]] && \
+				good_ones+=" $app" && ((count_good++)) || \
+				bad_ones+=" $app"
 			((count_total++))
 		done
-		tui-echo "There were $count_good packages ($good_ones) successfully installed." "$INFO"
+		[[ -z "$bad_ones" ]] && \
+			tui-echo "There were $[ $count_total - $count_good ] errors, namely these: $bad_ones"
 	else	# Do all in one bunch
+		tui-echo "Installing $@"
 		cmd_all="$APP $cmd $@"
 		$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
 		
