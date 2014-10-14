@@ -20,24 +20,24 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
-		\rUsage: $ME ERRORLEVEL \"Message to user\" [\"centred Message\"]
-		\rWhere ERRORLEVEL must be numeric
-		\r"
+Usage: $ME ERRORLEVEL \"Message to user\" [\"centred Message\"]
+Where ERRORLEVEL must be numeric
+"
 #
 #	Variables to display
 #	Diffrent for GUI or CLI
 #
-	source /etc/tui/status.conf
+	[[ -z "$TUI_DONE" ]] && source /etc/tui/status.conf
 	count=${#@}
 #
 #	Fill array according to return value
 #
 	unset retvalue[@]
 	retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
-	retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TODO"
+	retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
 	retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
 	retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
 	
@@ -47,10 +47,7 @@
 #
 #	Display
 #	
-	
-	retval=""
-	#echo "$count $retval"
-	[[ -z "$1" ]] && ( $ME 1 "Usage: $ME ERRORLEVEL [ \"Message to user\" ]" ; exit 1)
+	[[ -z "$1" ]] && ( tui-status 1 "Usage: tui-status ERRORLEVEL [ \"Message to user\" ]" ; exit 1)
 	if [[ "$1" = "-h" ]]
 	then	printf "
 $ME ($script_version)
@@ -58,19 +55,19 @@ Usage: $ME \$? [ \"Message to user\" ]
 Interpreted numbers:\n"
 		for num in $(seq 0 1 120)
 		do	str="${retvalue[$num]}"
-			[[ ! "" = "$(echo $str)" ]] && \
+			[[ ! "" = "$(printf '%s' $str)" ]] && \
 				printf "\t$str : $num\n"
 		done
-		echo
+		printf "\n"
 		exit $RET_HELP
 	else	if [[ ! "" = "${retvalue[$1]}" ]]
 		then	case $count in	
-			1)	tui-echo  " " "${retvalue[$1]}"		;;
+			1)	tui-printf -E " " "${retvalue[$1]}"		;;
 			2)	tui-printf -E "$2" "${retvalue[$1]}"		;;
 			3)	tui-printf -E "$2" "$3" "${retvalue[$1]}"	;;
 			4)	tui-status 1 "Too many args: $@"		;;
 			esac
-		else	tui-echo  "$2" "$3"  "ErrNr: $1"
+		else	tui-printf -E  "$2" "$3"  "ErrNr: $1"
 		fi
 	fi
 	exit $1
