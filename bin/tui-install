@@ -164,7 +164,7 @@ Where options are:
 			tui-printf "Create cache..." "$WORK" ; printf ""
 			[[ $doLog -eq 0 ]] && tui-log "$LOG" "Creating cache: $make_cache"
 			
-			$make_cache && RET=0 || RET=1
+			#$make_cache && RET=0 || RET=1
 			[[ $verbose -eq 0 ]] && tui-status $RET "Created cache."
 		fi
 		# Actualy install the packages
