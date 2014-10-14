@@ -5,21 +5,21 @@ cat > "$DEST" << EOF
 #!/bin/bash
 # ------------------------------------------------------------------------
 #
-# Copyright (c) $(date +'%Y') by $USER_NAME  <$USER_EMAIL>
+# Copyright (c) $(date +'%Y') by $USER_NAME, $USER_EMAIL
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published
+# under the terms of the $DEFAULT_LICENSE as published
 # by the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
+# $DEFAULT_LICENSE for more details.
 #
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# You should have received a copy of the $DEFAULT_LICENSE
+# along with this program.  If not, see $DEFAULT_LICENSE_URL
 #
 # ------------------------------------------------------------------------
 #
@@ -48,8 +48,12 @@ cat > "$DEST" << EOF
 ## If you need more configuration files, simply add them, within quotes, to the array below
 	CONFIG_FILE_ARRAY=("\$CONFIG")		# An array of all configuration scripts used by ${DEST##*/}
 	LOG="\$CONFIG_DIR/\$ME.log"		# Logfile
-	tempfile="\$CONFIG_DIR/\$ME.tmp"		# Tempfile
-	REQUIRES="pack ages as string"
+	TEMPFILE="\$CONFIG_DIR/\$ME.tmp"		# Tempfile
+	REQUIRES="tui bash"
+#
+#	Variable defaults (options)
+#
+	beVerbose=false
 #
 #	Help text
 #
@@ -67,9 +71,8 @@ Where options are:
 	-h(elp) 		This screen
 	-C(onf			Show the config menu
 	-L(og)			Show the log file (\$LOG)
-	-------------------------------------------------------
-	-e(xample)	ARG	Example with mandatory argument
-	-a(nother)	[ARG]	Example with optinal argument
+	-v(erbose)		Enables the scripts verbosity
+	
 
 Files:
 --------------------------------------
@@ -78,7 +81,7 @@ Script-Dir:	\$ME_DIR
 Config: 	\$CONFIG
 Config_Dir:	\$CONFIG_DIR
 Log:		\$LOG
-Tempfile:	\$tempfile
+Tempfile:	\$TEMPFILE
 "
 #
 # This script requires TUI - Text User Interface
@@ -133,69 +136,16 @@ Tempfile:	\$tempfile
 	# See 'tui-log -h' for more info
 		tui-log -t "\$LOG" "\$1"
 	}
-	checkReqs() { # LIST
-	# Installs missing packages
-	# Requires a config file
-	#
-	#	vars
-	#
-		req_str="req_inst"
-		req_inst=\$(tui-value-get "\$CONFIG" "\$req_str" )
-	#
-	#	Display
-	#
-		[[ \$req_inst = true ]] && return 0
-#		tui-progress -ri \$ME-reqs -m \$req_total) " "
-		doLog "Req : Checking for installed packages"
-		
-		tui-install -v \$@
-		return \$?
-		
-		# Create a list of packages to install
-#		for R in \$REQUIRES;do
-#			tui-progress \\
-#				-i \$ME-reqs \\
-#				-m \$(printf \${REQUIRES}|wc|awk '{print \$2}') \\
-#				"Check for required: \$R"
-#			rpm -qa \$F > /dev/zero && \\
-#				doLog "Req : Found \$R" || \\
-#				( REQUIRED+=" \$R" ; doLog "Req : Missing \$R" )
-#		done
-		
-		# Install the missing packages
-		if [[ ! " " = "\$(printf "\${REQUIRED} ")" ]]
-		then 	[[ ! 0 -eq \$UID ]] && \\
-				tui-echo "YUM requires root access!" && \\
-				return 1
-			tui-title "Installing missing packages"
-			doLog "Req : Installing missing packages: \$REQUIRED"
-			yum install -y \$REQUIRED && \\
-				printf "req_inst=true\n" >> "\$CONFIG"
-			tui-status \$? "Installed: \$REQUIRED"
-			[[ 0 -eq \$? ]] && \\
-				ret_info="succeeded" || \\
-				ret_info="failed"
-			doLog "Req: Installation of \$REQUIRED \$ret_info"
-		else 	[[ ! true = "\$req_inst" ]] && \\
-				printf "req_inst=true\n" >> "\$CONFIG" && \\
-				doLog "Req : All required packages are already installed"
-		fi
-	}
 	ConfigMenu() { # 
 	# Configures the variables/files used by the script
 	#
 	#	Check for config file
-	#
 		[[ -f "\$CONFIG" ]] || \\
 			( printf "\$config_template" > "\$CONFIG" ; doLog "Config: Default configurationfile created" )
-	#
 	#	Menu entries
-	#
 		opwd=\$(pwd)
 		cd "\$CONFIG_DIR"
-	#
 	#	Menu / Action
-	#
 		setup_toggle=true
 		while \$setup_toggle ; do
 			# While there are more files, printf 'header'
@@ -203,7 +153,7 @@ Tempfile:	\$tempfile
 			tui-header "\$ME (\$script_version)" "\$TITLE" "\$(date +'%F %T')"
 			tui-title "Setup : \$ME"
 			
-			# Select among files
+		# Select among files
 			if [[ 1 -eq \${#CONFIG_FILE_ARRAY[@]} ]]
 			then	# Its only 1 file, preview
 				for VAR in \$(tui-value-get -l "\$CONFIG");do 
@@ -228,8 +178,8 @@ Tempfile:	\$tempfile
 					tui-echo "Currently '\$VAR' is set to '\$VAL'."
 					tui-yesno "Do you really want to change this?" || break
 					newval=\$(tui-read "Please type new value:")
-					msg="Changed \"$var\" from \"$val\" to \"$newval\""
-					tui-value-set "\$CONFIG" "\$var" "\$newval"
+					msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
+					tui-value-set "\$CONFIG" "\$VAL" "\$newval"
 					tui-status \$? "\$msg" && \\
 						doLog "Setup: \$msg" || \\
 						doLog "Setup: Failed to c\$(printf \${msg:1}|sed s,ged,ge,g)"
@@ -237,7 +187,7 @@ Tempfile:	\$tempfile
 				esac
 				done
 				
-			else	# There are more than one CONFIG to choose from
+			else	# There are more than one CONFIGFILE to choose from
 				tui-echo "Please select a file to open:"
 				select FILE in Back "\${CONFIG_FILE_ARRAY[*]}"
 				do 	# VARS is a list of all found VARIABLES of FILE
@@ -256,7 +206,7 @@ Tempfile:	\$tempfile
 #
 #		TODO
 #	Custom case states, in case you want to let the user 
-#	select values from specific lists/arrays or even diffrent
+#	select values from specific lists/arrays or even diffrent -- This "commented out" section is not yet working!
 #			-->		-->		"SomeValue")
 #								LIST_A="A B C D
 #								tui-echo "Please select from this list:"
@@ -271,7 +221,7 @@ Tempfile:	\$tempfile
 #			-->		-->			;;
 							*)	if tui-yesno "Change this value?"
 								then 	newval=\$(tui-read "Please type new value:")
-									msg="Changed \"$var\" from \"$val\" to \"$newval\""
+									msg="Changed \\"\$var\\" from \\"\$val\\" to \\"\$newval\\""
 									# Save the new value to variable in config 
 									tui-value-set "\$CONFIG" "\$var" "\$newval"
 									tui-status \$? "\$msg" && \\
@@ -298,7 +248,7 @@ Tempfile:	\$tempfile
 	# This is optimized for a one-time setup
 	if [[ ! -e "\$CONFIG" ]]
 	then	[[ -d "\$CONFIG_DIR" ]] || \\
-			( mkdir -p "\$CONFIG_DIR" ; tui-echo "Entering first time setup." "\$SKIP" )
+			( mkdir -p "\$CONFIG_DIR" ; tui-echo "Entering first time setup." "\$TUI_SKIP" )
 		[[ ! -e "\$LOG" ]] && \\
 			touch \$LOG && \\
 			doLog "------------------------------------------" && \\
@@ -315,7 +265,7 @@ Tempfile:	\$tempfile
 #
 	#[[ -z \$1 ]] && printf "\$help_text" && exit \$RET_FAIL	## Uncomment to exit with help if nothing is passed
 	# A ':' after a char indicates that this option requires an argument
-	while getopts "ae:hCL" opt
+	while getopts "ChLv" opt
 	do 	case \$opt in
 		h)	printf "\$help_text"
 			exit \$RET_HELP
@@ -326,17 +276,14 @@ Tempfile:	\$tempfile
 		C)	ConfigMenu
 			exit \$RET_DONE
 			;;
-## TODO
-## Apply your chages below
-		a)	# This is only demo
-			ARG_TOGGLE_ANOTHER=set
-			;;
-		e)	# This is only demo
-			optE_argument="\$OPTARG"
-			optE_bool=true
+		v)	beVerbose=true
+			log_msg="Enabled verbosity"
 			;;
 		# *)	printf "\$help_text" ; exit \$?	;;
 		esac
+		# Print \$log_msg to \$LOG and print \$log_msg to user if verbosity is enabled
+		doLog "Options: \$log_msg"
+		\$beVerbose && tui-echo "\$log_msg"
 	done
 	shift \$((\$OPTIND - 1))
 	ARGS=("\${*}")			# Remaining arguments
