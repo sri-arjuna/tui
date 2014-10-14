@@ -1,9 +1,9 @@
 #!/bin/bash
 MORE_OPTS=""
-[ -z $APP_USER_LABEL ]	|| MORE_OPTS+=" -u '$APP_USER_LABEL'"
-[ -z $APP_FILES ] 	|| MORE_OPTS+=" -d '$APP_FILES'"
-[ -z $APP_FOLDERS ]	|| MORE_OPTS+=" -f '$APP_FOLDERS'"
-[ -z $APP_SCRIPTS ] 	|| MORE_OPTS+=" -s '$APP_SCRIPTS'"
+[[ -z $APP_USER_LABEL ]] || MORE_OPTS+=" -u '$APP_USER_LABEL'"
+[[ -z $APP_FILES ]]	|| MORE_OPTS+=" -d '$APP_FILES'"
+[[ -z $APP_FOLDERS ]]	|| MORE_OPTS+=" -f '$APP_FOLDERS'"
+[[ -z $APP_SCRIPTS ]] 	|| MORE_OPTS+=" -s '$APP_SCRIPTS'"
 cat << EOF
 #!/bin/bash
 #	Description:	
@@ -12,31 +12,36 @@ cat << EOF
 #	Date:		$(date +'%F')
 #
 #	This script requires TUI - Text User Interface & tui-browser  by (sea)
-#	
+#	Check if TUI is installed...
 #
-	if [ ! -d /usr/share/tui ]
-	then 	# Install GIT & TUI
-		echo
-		echo "	Installing TUI..."
-		echo 
-		! type git > /dev/zero && \
-			echo "Installing GIT, a source code manager...." && \\
-			yum install -y git 2>&1
-		git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
-		sh /tmp/tui.inst/install.sh #| echo 
-		rm -fr /tmp/tui.inst
-	fi
+	S=/etc/profile.d/tui.sh
+	if [[ ! -f \$S ]]
+	then 	[[ ! 0 -eq \$UID ]] && \\
+			printf "\\n#\\n#\\tPlease restart the script as root to install TUI (Text User Interface).\\n#\\n#\\n" && \\
+			exit 1
+		if ! git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
+		then 	mkdir -p /tmp/tui.inst ; cd /tmp/tui.inst/
+			curl --progress-bar -L https://github.com/sri-arjuna/tui/archive/master.zip -o master.zip
+			unzip master.zip && rm -f master.zip
+			mv tui-master/* . ; rmdir tui-master
+		fi
+    		sh /tmp/tui.inst/install.sh || \\
+    			(printf "\\n#\\n#\\tPlease report this issue of TUI installation fail.\\n#\\n#\\n";exit 1)
+    	fi
+    	source \$S ; S=""
 #
 #	Variables
 #
+	APP_VERSION=0.1
 	ME="\${0##*/}"
-	ME_DIR="\${0/${0##/*/}}"
+	ME_DIR="\${0/\${0##/*/}}"
 	ME_BASE="\$ME_DIR/$APP_LIB"
-	TITLE="\$APP_TITLE"
+	TITLE="$APP_TITLE (\$APP_VERSION)"
 	MORE_OPTS="$MORE_OPTS"
 #
 #	Display to user
 #
 	cd "\$ME_BASE"
-	tui-browser	-t "\$TITLE" $MORE_OPTS
+	tui-browser \\
+		-t \"\$TITLE\" \$MORE_OPTS
 EOF

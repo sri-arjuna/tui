@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.09.03
-	script_version=0.2
+#	Changed:	2014.10.14
+	script_version=0.3
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -19,9 +19,7 @@ $ME ($script_version)
 $TITLE
 Usage: 	$ME [options] [arguments]
 Where options are:
-	-h|--help		This screen
-	-e|--example	ARG	Example with mandatory argument
-	-a|--another	[ARG]	Example with optinal argument
+	-h(help)		This screen
 
 "
 	optE_bool=false 	# For a working template

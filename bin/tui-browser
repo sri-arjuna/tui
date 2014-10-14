@@ -41,6 +41,7 @@ Where options are:
 	-h(elp)		This screen
 	-b(lacklist)	ARG	TODO
 	-d(ir)  	ARG	Folders will be labled as ARG
+	-C(onfig)	FILE	Full path to configfile of the project
 	-D(efault)	NAME	Changes the filename startings from 'default' to 'NAME'
 				These files will be hidden from the menu, and according to their
 				extension be called on diffrent purposes...
@@ -72,6 +73,7 @@ Where options are:
 	BASE=""
 	SPECIAL_NAME="default"
 	SPECIAL_EXT=(info help cmd )
+	MAIN_CFG=""
 #
 # 	Are these really needed ?
 #
@@ -102,11 +104,12 @@ Where options are:
 #	Catching Arguments
 #
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "m:d:D:f:t:b:p:s:u:l:nh" name
+	while getopts "m:C:d:D:f:t:b:p:s:u:l:nh" name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
 		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
 		d|dir) 		lbl_dir="$OPTARG"	;;
+		C|config)	MAIN_CFG="$OPTARG"	;;
 		D|default)	SPECIAL_NAME="$OPTARG"	;;
 		f|file) 	lbl_file="$OPTARG"	;;
 		h|help)		printf "$help_text"
@@ -310,18 +313,32 @@ Where options are:
 		echo $1
 	}
 #
-#	Load BLACKLIST & SOURCE
+#	Load Main configuration, BLACKLIST & SOURCE
 #
-	[ -z "$BLACKLIST" ] && \
+	[[ -z "$BLACKLIST" ]] && \
 		checkBlacklist=false || \
 		checkBlacklist=true
-	if [ ! -z $SOURCE ]
-	then 	if [ -d "$SOURCE" ] 
+	# Main configuration of the script that uses tui-browser
+	if [[ -f $MAIN_CFG ]]
+	then 	source "$MAIN_CFG" && printf "."
+		# Now read the file and export each var
+		for V in $(tui-value-get -l $MAIN_CFG);do export $V;done
+	fi
+	# Include/Sourced files
+	if [[ ! -z $SOURCE ]]
+	then 	if [[ -d "$SOURCE" ]]
 		then 	cd "$SOURCE"
-			for f in *;do [ -f "$f" ] && source "$f";printf ".";done
+			for f in *;do
+				# Source the file, so we get all vars n' vals
+				[[ -f "$f" ]] && source "$f";printf "."
+				# Now read the file and export each var
+				for V in $(tui-value-get -l $f);do export $V;done
+			done
 			cd "$OLDPWD"
 		elif [ -f "$SOURCE"]
 		then 	source "$SOURCE"
+			# Now read the file and export each var
+			for V in $(tui-value-get -l $SOURCE);do export $V;done
 		else	tui-status 1 "Error occoured with -s $SOURCE"
 			exit $?
 		fi
@@ -333,11 +350,8 @@ Where options are:
 	BASE="$(pwd)"
 	len="${#BASE}"
 	# Arguments been passed
-	#echo $1
 	if [[ ! -z $1 ]]
 	then	# Parse arguments, execute the file or enter the folder
-		tui-header "$lbl_title" "$lbl_user"
-		tui-title "Location:"  "/$CUR_STR"
 		tmp_dir="$BASE"	
 		ARGS=("${@}")
 		C=0
@@ -346,9 +360,24 @@ Where options are:
 			((C++))
 			tmp_dir+="/${ARGS[$C]}"
 		done
+		
+	#
+	#	Set vars that must be re-read/set upon reload of current dir
+	#
+		CURRENT="$(pwd)"
+		[ "$BASE" = "$CURRENT" ] && \
+			CUR_STR="" || \
+			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
+	#
+	#	Print top header
+	#
+		tui-header "$lbl_title" "$lbl_user"
+		tui-title "Location:"  "/$CUR_STR"
+	#
+	#	now exeute it
+	#
 		if [[ -f $tmp_dir ]]
-		then	#str="${0##*/}"
-			str="$lbl_title"
+		then	str="$lbl_title"
 			for a in ${@};do str+=" $a";done
 			sh $tmp_dir 
 			tui-status $? "$str"
