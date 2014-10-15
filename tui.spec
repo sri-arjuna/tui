@@ -1,5 +1,5 @@
 Name:        tui
-Version:     0.5.2
+Version:     0.5.3
 Release:     0%{?dist}
 Summary:     Text User Interface for scripts
 

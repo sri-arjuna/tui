@@ -23,7 +23,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.3
+	script_version=0.4
 	ME="$(basename $0)"
 	[[ -z $TUI_TEMP_FILE ]] && source /etc/profile.d/tui.sh
 	help_text="\r$ME ($script_version)
@@ -72,7 +72,7 @@
 		if [[ true = $CHECKFILE ]]
 		then 	FS=$(ls -lh "$FILECHECK"|awk '{print $5}')
 			tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
-		else	tui-printf "$(eval printf $TXT_PROGRESS)" "[  $(tui-indi)   ]" 2>&1
+		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi
 		sleep $WAIT
 	done
