@@ -1,0 +1,58 @@
+.TH "tui-bg-scripts" "1" "2014-10-15" "Simon Arjuna Erat (sea)"
+
+.SH NAME
+tui-bg-scripts (0.1)
+
+.SH SYNOPSIS
+\fBtui-bg-scripts\fP [options] [arguments]
+.br
+Example:	tui-bg-scripts script1 script2
+.br
+		tui-bg-scripts -cl 5 *
+.br
+	
+.br
+Where options are:
+.IP "\fB-h\fP"
+This screen
+.IP "\fB-L\fP"
+Shows the logfile
+.IP "\fB-l NUM\fP"
+Limits the number of paralell executed scripts.
+.br
+5 default
+.br
+0 to disable
+.IP "\fB-w NUM\fP"
+Wait NUM seconds between value updates.
+.br
+The lower the number, the more intense the cpu usage will be.
+.br
+.IP "\fB-q NUM\fP"
+Be quiet
+.br
+Just silent and non-verbose.
+.br
+
+.IP "\fB-c\fP"
+The exit code is now the number of successfully executed scripts.
+.br
+
+.SH DESCRIPTION
+.PP
+Executes as many scripts as you pass to it.
+.br
+Can also return the number of successfully ended scripts.
+.br
+
+.SH LICENSE
+GNU General Public License (LGPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+.br
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://sea.fedorapeople.org
+.br
