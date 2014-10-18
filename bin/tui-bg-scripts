@@ -5,29 +5,30 @@
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License (LGPL) as published
+# under the terms of the GNU General Public License (GPL) as published
 # by the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (LGPL) for more details.
+# GNU General Public License (GPL) for more details.
 #
-# You should have received a copy of the GNU General Public License (LGPL)
+# You should have received a copy of the GNU General Public License (GPL)
 # along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
 #
 # ------------------------------------------------------------------------
 #
+	. /etc/profile.d/tui.sh
 #	File:		tui-bg-scripts
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
-#	License:	GNU General Public License (LGPL)
+#	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
-#	Changed:	2014.10.15
-	script_version=0.0.1
+#	Changed:	2014.10.18
+	script_version=0.6
 	TITLE="Paralell Script Manager"
-#	Description:	Executes all scripts in paralell 
+#	Description:	Executes all scripts in paralell, unless LIMIT says diffrent, default 5, disabled 0
 #
 #
 #	Script Environment
@@ -39,29 +40,22 @@
 		ME_DIR="$(pwd)"			# Dirname of tui-bg-scripts
 	CONFIG_DIR="$HOME/.config/$ME"		# Configuration directory
 	CONFIG="$CONFIG_DIR/$ME.conf"		# Configuration file
-	TEMP="$CONFIG_DIR/temp"
+	TEMP="$CONFIG_DIR/temp/$$"
 	LOG="$CONFIG_DIR/$ME.log"		# Logfile
-	TEMPFILE="$CONFIG_DIR/$ME.tmp"		# Tempfile
 	LIMIT=5
 	WAIT=5
 	COUNT=false
 	QUIET=false
-	. tui
+	DEBUG=false
 #
-#	Variable defaults (options)
-#
-	beVerbose=false
 #
 #	Help text
-#
-#	TODO
-#	Add your own options, be sure to add them to "getopts" handling too
 #
 	help_text="
 $ME ($script_version)
 ${TITLE^}
 Usage: 		$ME [options] [arguments]
-Examples:	$ME script1 script2
+Examples:	$ME ./script1 /some/path/script2
 		$ME -c script[1-9] ; echo \$?
 Where options are:
 	-h(elp) 		This screen
@@ -79,7 +73,7 @@ Script-Dir:	$ME_DIR
 Config: 	$CONFIG
 Config_Dir:	$CONFIG_DIR
 Log:		$LOG
-Tempfile:	$TEMPFILE
+Tempdir:	$TEMP
 "
 #
 #	Functions
@@ -89,16 +83,10 @@ Tempfile:	$TEMPFILE
 	# See 'tui-log -h' for more info
 		tui-log -t "$LOG" "$1"
 	}
-	getPID() { # STRING
-	# Returns the PID of STRING (true)
-	# Returns empty if not running (false)
-		[[ -z "$1" ]] && printf "%s\n" "Usage: getPID STRING" "Where STRING could be a filename or any other word" && return 1
-		ps -ef | grep -v grep | grep "$1" | awk '{print $2}'
-		return $?
-	}
 #
 #	Environment checks
 #
+	[[ -d "$TEMP" ]] || mkdir -p "$TEMP"
 	[[ ! -e "$LOG" ]] && \
 		touch $LOG && \
 		doLog "------------------------------------------" && \
@@ -107,15 +95,19 @@ Tempfile:	$TEMPFILE
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
-	# A ':' after a char indicates that this option requires an argument
-	while getopts "chLl:qw:" opt
+	while getopts "cdhLl:qvw:" opt
 	do 	case $opt in
 		h)	printf "$help_text"
+			rm -fr "$TEMP"
 			exit $RET_HELP
 			;;
 		L)	less "$LOG"	
+			rm -fr "$TEMP"
 			exit $RET_DONE
+			;;
+		d)	printf "" > "$LOG"
+			rm -fr "$TEMP"
+			exit $?
 			;;
 		l)	LIMIT=$OPTARG
 			log_msg="Changed the limit to: $LIMIT"
@@ -126,115 +118,111 @@ Tempfile:	$TEMPFILE
 		q)	QUIET=true
 			log_msg="Enabled quiet mode"
 			;;
+		v)	DEBUG=true
+			log_msg="Enabled DEBUG mode"
+			;;
 		w)	WAIT=$OPTARG
 			log_msg="Change the wait intervall to: $WAIT"
-		# *)	printf "$help_text" ; exit $?	;;
+			;;
 		esac
 		# Print $log_msg to $LOG and print $log_msg to user if verbosity is enabled
 		doLog "Options: $log_msg"
 	done
 	shift $(($OPTIND - 1))
-	SCRIPTS=( $(echo "${*}"))
-	SCRIPTS2=("${*}")
+#
+#	Variable presets
+#
+	script_name=( "${@}" )		# Contains all files
+	MAX=${#script_name[@]}		# Max amount of scripts
+	script_status=( $(for s in "${script_name[@]}";do echo "3";done) )		# Status with same counter of that file	: done(0) failed(1) running(2) todo(3)
+	script_pid=()			# PID with the same counter of that file
+
+	# Counters
+	RUN=0			# How many scripts are currently running
 #
 #	Display & Action
-#	-- Since this is a 'task' manager, we loop the display --
 #
-	scripts_total=${#SCRIPTS[@]} 
-	scripts_running=0
-	scripts_done=0
-	unset scripts_todo
-	
-	doLog "Initialize $ME with $scripts_todo scripts"
-	
-	while [[ ! "" = "${SCRIPTS2[@]}" ]]
-	do
-		$QUIET || tui-header "$ME ($script_version)" 	"$(date +'%F %T')"
-		$QUIET || tui-title "$TITLE"
+	while [[ $DONE -lt $MAX ]]
+	do	# Loop the menu
+		C=0
+		DONE=0			# How many scripts are 'done' (regardless of status)
+		GOOD=0			# How many scripts ended succesffully
+		if ! $QUIET
+		then	clear
+			tui-header "$TITLE ($script_version)" "$(date +'%Y.%m.%d')"
+			tui-title "Status"
+		fi
 		
-	# Vars & Status
-		current_count=${#scripts_todo[@]}
-		$QUIET || tui-echo "Running in background:" 	"$scripts_running/$LIMIT"
-		$QUIET || tui-echo "Tasks remaining:" 		"$current_count"
+		while [[ $C -lt $MAX ]]
+		do	# Vars
+			STATUS="${script_status[$C]}"	# Current status
+			RET_FILE="$TEMP/$(basename ${script_name[$C]}).ret"
 		
-	# Start scripts as long lower than limit
-		case $LIMIT in
-		0)	# Execute all scripts
-			echo TODO
-			;;
-		*)	# Only start as many scripts as the limit is set (default!)
-			#set -x
-			[[ $scripts_running -lt $LIMIT ]] && ( $QUIET || tui-title "Executing scripts...") 
-			while [[ $scripts_running -lt $LIMIT ]]
-			do	# Start a script
-				C=0
-				VAL=""
-				while [[ "" = "${SCRIPTS[$C]}" ]] ;do ((C++));[[ $C -gt $scripts_total ]] && break ;done
-				VAL="${SCRIPTS[$C]}"
-				
-				[[ -z "$VAL" ]] && break
-				scripts_todo[$current_count]="$VAL"
-				unset SCRIPTS[$C]
-				
-				((scripts_running++))
-				((current_count++))
-				
-				# Actualy send script to background
-				( "$script" ; echo $? > $TEMP/$script.ret ) &
-			done
-			#set +x
-			;;
-		esac
-		
-	# Check the status of the scripts
-		$QUIET || tui-title "Status overview of $script_running scripts..."
-		for script in "${scripts_todo[@]}";do
-			PID=$(getPID "$script")
-			# TODO TEMP fix only
-			PID=$(printf $PID)
-			$QUIET || tui-echo "$script" "${PID}" "$TUI_WORK"
-		done
-	
-	
-	
-	
-	
-	# Wait for next update
-		tui-echo
-		tui-wait $WAIT "Next update in:"
-	done
-	
-exit
- # -------------------------------------
-		echo "Starting background scripts..."
-		for script in "${scripts_list[@]}";do
-			printf "%s" "Starting: $script..."
-			sh ./$script &
-			printf " %s\n" "$!"
-		done
-	
-		# Continute even with equal values, so the "last number of jobs done" can be printed.
-		while [[ $scripts_done -le $scripts_todo ]]
-		do	# Little UI
-			echo
-			for s in $(seq 1 1 $wait_intervall);do printf "\rUpdate in $[ $wait_intervall - $[ $s - 1 ] ] seconds"; sleep 1;done
-			clear
-			echo "Jobs in queue: ${scripts_list[@]}"
-			echo "Last number of jobs done: $scripts_done/$scripts_todo"
-			# Exit if they're equal
-			[[ $scripts_done -eq $scripts_todo ]] && break
-			# Reset vars
-			scripts_done=0
-			# action
-			for script in "${scripts_list[@]}";do
-				printf "\rChecking: %s..." "$script"
-				PID=""
-				PID=$(getPID "$script")
-				if [[ -z "$PID" ]] 
-				then 	((scripts_done++))
-					printf "%s\n" "finished" 
-				else 	printf "%s\n" "($PID) running"
+			# Do action according to current status
+			case $STATUS in
+			0|1)	((DONE++))
+				[[ $STATUS -eq 0 ]] && ((GOOD++))
+				;;
+			2)	# IS PID still available?
+				pid=${script_pid[$C]} 
+				if [[ ! -z "$(echo $pid)" ]]
+				then	#if ! ls /proc/${script_pid[$C]}
+					if ! ps $pid > /dev/zero
+					#if kill -0 $pid  2>&/dev/null
+					then	# Its finished
+						read RET < "$RET_FILE"
+						[[ -z "$RET" ]] && RET=1
+						script_status[$C]=$RET
+						((RUN--))
+					fi
+				else 	tui-status 1 "This should not happen, empty pid while running"
 				fi
-			done
+				;;
+			3)	# Its TODO, can we start it?
+				if [[ $RUN -lt $LIMIT ]] || [[ $LIMIT -eq 0 ]]
+				then 	script_status[$C]=2
+					((RUN++))
+					script="${script_name[$C]}"
+					[[ [./] = "${script:0:1}" ]] && PRE="" || PRE="./"
+					cmd="\"${PRE}$script\" ; echo \$? > \"$RET_FILE\""
+					touch "$RET_FILE"
+					( eval "$cmd" ) &
+					script_pid[$C]=$!
+				fi
+				;;
+			*)	tui-echo "Invalid STATUS ($STATUS) on $C ${script_name[$C]}" "$TUI_FAIL"
+				((DONE++))
+				;;
+			esac
+
+			# Display latest status
+			if ! $QUIET
+			then	case $STATUS in
+				0|1)	tui-status $STATUS "Finished ${script_name[$C]}"  ;;
+				2)	tui-status $STATUS "Running ${script_name[$C]}" "${script_pid[$C]}" ;;
+				3)	tui-status $STATUS "Waiting ${script_name[$C]}" ;;
+				esac
+				((C++))
+			fi
 		done
+		
+		if ! $QUIET
+		then	tui-echo
+			tui-title "Overview"
+			tui-echo "Scripts completed:" "$DONE/$MAX"
+			tui-echo "Currently running:" "$RUN/$LIMIT"
+			
+			tui-echo
+			tui-wait $WAIT "Wait for update..."
+			echo
+		else	sleep $WAIT
+		fi
 	done
+#
+#	Exit how the user want
+#
+	rm -fr "$TEMP"
+	if $COUNT
+	then	exit $GOOD
+	else	exit 0
+	fi
