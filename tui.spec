@@ -97,6 +97,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Oct 18 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.3-0
+- Added tui-psm (Paralell Script Manager)
+
 * Thu Sep 04 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.1-0
 - Changed: colors.conf
 - Changed: status.conf

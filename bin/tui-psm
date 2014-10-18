@@ -26,7 +26,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
 #	Changed:	2014.10.18
-	script_version=0.6
+	script_version=0.7
 	TITLE="Paralell Script Manager"
 #	Description:	Executes all scripts in paralell, unless LIMIT says diffrent, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
@@ -150,7 +150,7 @@ Tempdir:	$TEMP
 		GOOD=0			# How many scripts ended succesffully
 		if ! $QUIET
 		then	clear
-			tui-header "$TITLE ($script_version)" "$(date +'%Y.%m.%d')"
+			tui-header "$TITLE ($script_version)" "$(date +'%F %T')"
 			tui-title "Status"
 		fi
 		
@@ -161,9 +161,6 @@ Tempdir:	$TEMP
 		
 			# Do action according to current status
 			case $STATUS in
-			0|1)	((DONE++))
-				[[ $STATUS -eq 0 ]] && ((GOOD++))
-				;;
 			2)	# IS PID still available?
 				pid=${script_pid[$C]} 
 				if [[ ! -z "$(echo $pid)" ]]
@@ -175,6 +172,7 @@ Tempdir:	$TEMP
 						[[ -z "$RET" ]] && RET=1
 						script_status[$C]=$RET
 						((RUN--))
+						doLog "Finished script: ${script_name[$C]} with $RET"
 					fi
 				else 	tui-status 1 "This should not happen, empty pid while running"
 				fi
@@ -182,6 +180,7 @@ Tempdir:	$TEMP
 			3)	# Its TODO, can we start it?
 				if [[ $RUN -lt $LIMIT ]] || [[ $LIMIT -eq 0 ]]
 				then 	script_status[$C]=2
+					STATUS=2
 					((RUN++))
 					script="${script_name[$C]}"
 					[[ [./] = "${script:0:1}" ]] && PRE="" || PRE="./"
@@ -189,10 +188,11 @@ Tempdir:	$TEMP
 					touch "$RET_FILE"
 					( eval "$cmd" ) &
 					script_pid[$C]=$!
+					doLog "Started script: $script @ $!"
 				fi
 				;;
-			*)	tui-echo "Invalid STATUS ($STATUS) on $C ${script_name[$C]}" "$TUI_FAIL"
-				((DONE++))
+			*)	((DONE++))
+				[[ $STATUS -eq 0 ]] && ((GOOD++))
 				;;
 			esac
 
@@ -201,17 +201,20 @@ Tempdir:	$TEMP
 			then	case $STATUS in
 				0|1)	tui-status $STATUS "Finished ${script_name[$C]}"  ;;
 				2)	tui-status $STATUS "Running ${script_name[$C]}" "${script_pid[$C]}" ;;
-				3)	tui-status $STATUS "Waiting ${script_name[$C]}" ;;
+				3)	tui-status $STATUS "Waiting ${script_name[$C]}"	;;
+				127)	tui-status 1 "Typo in script: \"${script_name[$C]}\""	;;
+				*)	tui-status 1 "Invalid STATUS ($STATUS) on $C ${script_name[$C]}"	;;
 				esac
-				((C++))
 			fi
+			((C++))
 		done
 		
 		if ! $QUIET
 		then	tui-echo
-			tui-title "Overview"
+			tui-title "Summary"
 			tui-echo "Scripts completed:" "$DONE/$MAX"
 			tui-echo "Currently running:" "$RUN/$LIMIT"
+			tui-echo "Successfully executed:" "$GOOD"
 			
 			tui-echo
 			tui-wait $WAIT "Wait for update..."
@@ -222,6 +225,8 @@ Tempdir:	$TEMP
 #
 #	Exit how the user want
 #
+	doLog "You started $MAX scripts, of which $GOOD exited with success"
+	tui-log -E ""
 	rm -fr "$TEMP"
 	if $COUNT
 	then	exit $GOOD
