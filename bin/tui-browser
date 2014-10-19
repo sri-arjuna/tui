@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.09.15
-	script_version=0.5
+#	Changed:	2014.10.19
+	script_version=0.6
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
@@ -307,11 +307,6 @@ Where options are:
 		tui-status 1 "Failed to open $FN ($TYPE)"
 		return $?
 	}
-	func() { # Argument examples
-	# Returns successfully if 
-	# Text here
-		echo $1
-	}
 #
 #	Load Main configuration, BLACKLIST & SOURCE
 #
@@ -379,7 +374,7 @@ Where options are:
 		if [[ -f $tmp_dir ]]
 		then	str="$lbl_title"
 			for a in ${@};do str+=" $a";done
-			sh $tmp_dir 
+			sh $tmp_dir "${@}"
 			tui-status $? "$str"
 			exit $?
 		else	cd "$tmp_dir"
@@ -471,7 +466,7 @@ Where options are:
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	[ -d "$item" ] && \
 								mnu_Folder x "$item" || \
-								( mnu_File   x "$item" ; tui-press)
+								( mnu_File x "$item" ; tui-press)
 						fi					;;
 				i|info) 	menu=info
 						if [ -z $item ]
