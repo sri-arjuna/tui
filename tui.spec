@@ -1,7 +1,7 @@
 Name:        tui
-Version:     0.5.3
+Version:     0.5.4
 Release:     0%{?dist}
-Summary:     Text User Interface for scripts
+Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -18,36 +18,39 @@ Requires:    wget
 #Requires:    xterm
 
 %description
-It does NOT try to emulate a windowed system,
-as it is a Text Interface for scripts,
-its output is per-line.
+It is a framework of commands, to assist administrators and
+developers with some tasks, to simply realize a basic
+Text User Interface with their own scripts.
 
+Core commands are:
+* tui-header
+* tui-title
+* tui-printf
+* tui-echo
+* tui-status
 
-It enables you to write scripts which simulate a TUI
-in Emergency, Multiuser and Graphical stages.
-Furthermore, the TUI should work in all shells,
-as long 'sh' is available.
-
-This package offers various commands to display text
-in different alignments, an 'optical interpretation'
-of last exit code (status), handlers for download (wget), 'tar'
-and 'dd' to display transferred amount of data.
-
-Those commands are thought to be used in your scripts, 
-'replacing' other/some calls of 'echo' and/or 'printf'.
-They will give you the opportunity to place strings left,
-center or right aligned.
-Other commands will return strings or bool (true/false) values,
-and handle the passed info to be displayed accordingly if applicable.
-
-It is also open to customization,
-and easy accessible by executing 'tui':
-~/.config/tui/apps.conf
-    Provides your favorite ${BROWSER,EDITOR}_{GUI_CLI} and $TERMINAL
-~/.config/tui/user.conf
-    Provides $USER_{NAME,EMAIL} and $DEFAULT_LICENSE[_URL]
-    tui-new-script for example will re-use that information
-    to provide you with 'filled in' with your values .
+These assistant commands are:
+* tui-bgjob
+* tui-bol-dir
+* tui-browser
+* tui-dd
+* tui-download
+* tui-edit
+* tui-indi
+* tui-install
+* tui-log
+* tui-new-browser
+* tui-new-script
+* tui-press
+* tui-progress
+* tui-psm
+* tui-read
+* tui-str-usb
+* tui-tar
+* tui-value-get
+* tui-value-set
+* tui-wait
+* tui-yesno
 
 %prep
 %setup -q -c %{name}-%{version}
@@ -97,6 +100,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Oct 19 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.4-0
+- Fixed: tui-browser, now passes passed arguments
+- Updated %%description
+
 * Sat Oct 18 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.3-0
 - Added tui-psm (Paralell Script Manager)
 
