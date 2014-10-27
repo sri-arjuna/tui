@@ -101,7 +101,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Mon Oct 27 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.5-0
-- Fixed: tui-browser, 
+- Fixed: tui-browser, location display & passed path/file recognition
 
 * Sun Oct 19 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.4-0
 - Fixed: tui-browser, now passes passed arguments
