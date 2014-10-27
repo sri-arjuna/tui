@@ -1,5 +1,5 @@
 Name:        tui
-Version:     0.5.4
+Version:     0.5.5
 Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
@@ -100,6 +100,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Oct 27 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.5-0
+- Fixed: tui-browser, 
+
 * Sun Oct 19 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.4-0
 - Fixed: tui-browser, now passes passed arguments
 - Updated %%description

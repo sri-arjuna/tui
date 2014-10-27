@@ -350,10 +350,11 @@ Where options are:
 		tmp_dir="$BASE"	
 		ARGS=("${@}")
 		C=0
-		tmp_dir+="/${ARGS[$C]}"
-		while [[ -d "$tmp_dir" ]];do
-			((C++))
+	#	tmp_dir+="/${ARGS[$C]}"
+		while [[ -d "$tmp_dir/${ARGS[$C]}" ]];do
+			
 			tmp_dir+="/${ARGS[$C]}"
+			((C++))
 		done
 		
 	#
@@ -371,14 +372,20 @@ Where options are:
 	#
 	#	now exeute it
 	#
-		if [[ -f $tmp_dir ]]
+		if [[ -f "$tmp_dir/${ARGS[$C]}"	 ]]
 		then	str="$lbl_title"
 			for a in ${@};do str+=" $a";done
-			sh $tmp_dir "${@}"
+			sh "$tmp_dir/${ARGS[$C]}" "${@}"
 			tui-status $? "$str"
 			exit $?
 		else	cd "$tmp_dir"
 		fi
+		
+		
+		
+		
+		
+		
 	fi
 	while [ ! $menu = "quit-browser" ];do
 	#
