@@ -356,10 +356,10 @@ Where options are:
 			tmp_dir+="/${ARGS[$C]}"
 			((C++))
 		done
-		
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
 	#
+		[[ -d "$tmp_dir" ]] && cd "$tmp_dir"
 		CURRENT="$(pwd)"
 		[ "$BASE" = "$CURRENT" ] && \
 			CUR_STR="" || \
