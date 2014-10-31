@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.5.5
-Release:     0%{?dist}
+Release:     1%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -10,12 +10,12 @@ Source0:     http://sea.fedorapeople.org/review/%{name}/%{name}-%{version}.tar.g
 
 BuildArch:   noarch
 
-#Requires:    gedit
-#Requires:    nano
-#Requires:    w3m
+Requires:    leafpad
+Requires:    nano
+Requires:    w3m
 Requires:    coreutils
 Requires:    wget
-#Requires:    xterm
+Requires:    xterm
 
 %description
 It is a framework of commands, to assist administrators and
@@ -100,6 +100,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Oct 29 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.5-1
+- Changed: tui-psm, attempt to hide default output of scripts working on
+- Readded: Some reqs for the spec - leafpad, nano, w3m, xterm
+
 * Mon Oct 27 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.5-0
 - Fixed: tui-browser, location display & passed path/file recognition
 

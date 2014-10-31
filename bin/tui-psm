@@ -26,7 +26,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
 #	Changed:	2014.10.18
-	script_version=0.7
+	script_version=0.7.2
 	TITLE="Paralell Script Manager"
 #	Description:	Executes all scripts in paralell, unless LIMIT says diffrent, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
@@ -164,9 +164,7 @@ Tempdir:	$TEMP
 			2)	# IS PID still available?
 				pid=${script_pid[$C]} 
 				if [[ ! -z "$(echo $pid)" ]]
-				then	#if ! ls /proc/${script_pid[$C]}
-					if ! ps $pid > /dev/zero
-					#if kill -0 $pid  2>&/dev/null
+				then	if ! ps $pid > /dev/zero
 					then	# Its finished
 						read RET < "$RET_FILE"
 						[[ -z "$RET" ]] && RET=1
@@ -175,6 +173,7 @@ Tempdir:	$TEMP
 						doLog "Finished script: ${script_name[$C]} with $RET"
 					fi
 				else 	tui-status 1 "This should not happen, empty pid while running"
+					doLog "FAILED script: Empty pid while running : ${script_name[$C]} with $pid returned $RET"
 				fi
 				;;
 			3)	# Its TODO, can we start it?
@@ -186,7 +185,7 @@ Tempdir:	$TEMP
 					[[ [./] = "${script:0:1}" ]] && PRE="" || PRE="./"
 					cmd="\"${PRE}$script\" ; echo \$? > \"$RET_FILE\""
 					touch "$RET_FILE"
-					( eval "$cmd" ) &
+					( eval "$cmd" 1>/dev/zero ) &
 					script_pid[$C]=$!
 					doLog "Started script: $script @ $!"
 				fi
@@ -212,8 +211,8 @@ Tempdir:	$TEMP
 		if ! $QUIET
 		then	tui-echo
 			tui-title "Summary"
-			tui-echo "Scripts completed:" "$DONE/$MAX"
-			tui-echo "Currently running:" "$RUN/$LIMIT"
+			tui-echo "Scripts completed:" 	  "$DONE/$MAX"
+			tui-echo "Currently running:" 	  "$RUN/$LIMIT"
 			tui-echo "Successfully executed:" "$GOOD"
 			
 			tui-echo
@@ -226,7 +225,7 @@ Tempdir:	$TEMP
 #	Exit how the user want
 #
 	doLog "You started $MAX scripts, of which $GOOD exited with success"
-	tui-log -E ""
+	tui-log -e ""
 	rm -fr "$TEMP"
 	if $COUNT
 	then	exit $GOOD
