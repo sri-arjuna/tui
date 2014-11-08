@@ -1,0 +1,112 @@
+#!/bin/bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2014 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+#	File:		tui-list
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2014.11.06
+#	Changed:	2014.11.06
+	script_version=0.1
+	TITLE="tui-list"
+#	Description:	Text TODO
+#			...  TODO
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-list
+	ME="${ME/.sh/}"				# Cut off .sh extension
+#
+#	Variable defaults (options)
+#
+	MODE=num
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+${TITLE^}
+Usage: 		$ME [options] [arguments]
+Examples:	$ME 
+		$ME -a one 'long string' three
+Where options are:
+	-h(elp) 		This screen
+	-a(lpha)		Use letters instead of numbers
+
+"
+#	-r(oman)		Use roman letters as numbers
+
+	#[[ -z $1 ]] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
+	# A ':' after a char indicates that this option requires an argument
+	while getopts "ah" opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		a)	MODE=alpha 	;;
+#		r)	MODE=roman 	;;
+			
+		# *)	printf "$help_text" ; exit $?	;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS=("${@}")			# Remaining arguments
+	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
+#
+#	Functions
+#
+	list=( $(echo {a..z} {a..z}{a..z} {a..z}{a..z}{a..z} ))
+	num2char() { # NUM
+	# Returns a letter string: a-z
+	# Or: aa-az ba-bz, etc
+		num=$1
+		out=""
+	#	if [[ $num -lt ${#list[@]} ]]
+	#	then
+			out="${list[$num]}"
+	#	else	high=$[ $num / ${#list[@]} ]
+			#c2=$[ $high * ${#list[@]} ]
+			#high=$((high-1))
+			#n2=$[$num - $c2 ]
+	#		out="${list[$high-1]}"
+	#		out+="${list[$num - ($high * ${#list[@]})]}"
+	#	fi
+		echo "$out"
+	}
+	num2roman() { # NUM
+	#
+	#
+		echo "ROMAN TODO"
+	}
+#
+#	Display & Action
+#
+	C=0
+	while [[ ! "" = "${ARGS[$C]}" ]];do
+		case $MODE in
+		num)	count=$[ $C +1 ]	;;
+		alpha)	count=$(num2char $C)	;;
+		roman)	count=$(num2roman $C)	;;
+		esac
+		tui-echo "$count) ${ARGS[$C]}"
+		C=$((C+1))
+	done
