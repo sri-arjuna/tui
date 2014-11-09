@@ -43,7 +43,7 @@
 #
 #	Display
 #
-	if [[ xterm = "$TERM" ]] OR [[ ! "" = "$DESKTOP_SESSION" ]] OR [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
+	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
 	then	export EDITOR=$(which $EDITOR_GUI)
 	else	export EDITOR=$(which $EDITOR_CLI)
 	fi

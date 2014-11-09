@@ -22,7 +22,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2014.06.09
+#	Changed:	2014.11.09
 	script_version=0.4
 #	Description:	Set a value in an 'conf/ini' file
 #
@@ -112,6 +112,10 @@ Where options are:
 #	Display & Action
 #
 	SEARCH="$(grep $OPT "${VARNAME}=" "$CONFFILE"|grep -v ^#|tr -d [:space:])"
+#	echo "$SEARCH"
+#	SEARCH="${2}=${3}"
+#	echo "$SEARCH"
+	
 	$SMALL && VARNAME="${VARNAME,,}"
 	$CAPS  && VARNAME="${VARNAME^^}"
 	printf  "$SEARCH"|grep -q "\"" && \
@@ -132,9 +136,13 @@ Where options are:
 	printf "$SEARCH"|grep -q "\$" && \
 		SEARCH="$(printf "$SEARCH"|sed s,'\$','\\\$',g)" && \
 		hadDollar=true
+#	[[ -z "$SEARCH" ]] && \
+#		SEARCH="$VARNAME=$VALUE"
 	
 	# Generate the command
 	cmd="sed s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i \"$CONFFILE\""
+#	echo "$cmd" > $HOME/$ME.out
+#	echo "$cmd"
 
 	# Save changes
 	! grep -q "$VARNAME" "$CONFFILE" && \

@@ -5,16 +5,16 @@
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License (LGPL) as published
+# under the terms of the GNU General Public License (GPL) as published
 # by the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License (LGPL) for more details.
+# GNU General Public License (GPL) for more details.
 #
-# You should have received a copy of the GNU General Public License (LGPL)
+# You should have received a copy of the GNU General Public License (GPL)
 # along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
 #
 # ------------------------------------------------------------------------
@@ -22,11 +22,11 @@
 #	File:		tui-config-editor
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
-#	License:	GNU General Public License (LGPL)
+#	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
-#	Changed:	2014.11.03
-	script_version=0.2
-	TITLE="tui-config-editor"
+#	Changed:	2014.11.09
+	script_version=0.3
+	TITLE="Configuration Editor"
 #	Description:	Text TODO
 #			...  TODO
 #
@@ -42,9 +42,6 @@
 	beVerbose=false
 #
 #	Help text
-#
-#	TODO
-#	Add your own options, be sure to add them to "getopts" handling too
 #
 	help_text="
 $ME ($script_version)
@@ -68,10 +65,6 @@ Log:		$LOG
 	# See 'tui-log -h' for more info
 		tui-log -t "$LOG" "$1"
 	}
-
-
-
-
 	ConfigMenu() { # CONFIG
 	# Configures the variables/files used by the script
 	#
@@ -79,28 +72,20 @@ Log:		$LOG
 		CONFIG="$1"
 		[[ ! -f "$CONFIG" ]] && \
 			tui-echo "$CONFIG: Does not exist." "$TUI_FAIL" && \
-			exit 1
+			return 1
 		
-		# Its only 1 file, preview
+		# Preview
 		for VAR in $(tui-value-get -l "$CONFIG");do 
 			val="$(tui-value-get $CONFIG $VAR)"
-			tui-echo "$VAR" "$val"
+			tui-echo " " "$VAR" "$val"
 		done
-		#grep -v ^"#" "$CONFIG" > "$tempfile"
-		#oifs="$IFS" ; IFS="="
-		#while read var val;do
-		#[[ $# -gt 0 ]] && tui-echo "$var" "$val"
-		#done<"$tempfile"
-		#IFS="$oifs"
+		
 		tui-echo "Please select wich value to change:"
 		select VAR in Back Edit $(tui-value-get -l "$CONFIG");do
 			doSelect=false
 			case $VAR in
-			Back) 	setup_toggle=false
-				break
-				;;
-			Edit)	tui-edit "$CONFIG"
-				;;
+			Back) 	break				;;
+			Edit)	tui-edit "$CONFIG"		;;
 			*)	VAL=$(tui-value-get "$CONFIG" "$VAR")
 				[[ " " = "${VAL:0:1}" ]] && VAL="${VAL:1}"
 				case "$VAL" in
@@ -110,25 +95,22 @@ Log:		$LOG
 				on|off)		doSelect=true
 						selection="on off"
 						;;
-				[0-9])		doSelect=true
-						selection={0..9}
-						;;
 				esac
 				tui-echo "Currently '$VAR' is set to '$VAL'."
-				tui-yesno "Do you really want to change this?" || break
+				if tui-yesno "Do you really want to change this?"
+				then 	if $doSelect
+					then	tui-echo "Please select the new value:"
+						select newval in $selection;do break;done
+					else	newval=$(tui-read "Please type new value:")
+					fi
 				
-				if $doSelect
-				then	tui-echo "Please select the new value:"
-					select newval in $selection;do break;done
-				else	newval=$(tui-read "Please type new value:")
+					[[ ! -z "$newval" ]] && \
+						msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\"" && \
+						tui-value-set "$CONFIG" "$VAR" "$newval"
+					tui-status $? "$msg" && \
+						doLog "Setup: $msg" || \
+						doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
 				fi
-				
-				[[ ! -z "$newval" ]] && \
-					msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\"" && \
-					tui-value-set "$CONFIG" "$VAL" "$newval"
-				tui-status $? "$msg" && \
-					doLog "Setup: $msg" || \
-					doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
 				;;
 			esac
 		done
@@ -144,14 +126,10 @@ Log:		$LOG
 		L)	less "$LOG"	
 			exit $RET_DONE
 			;;
-		# *)	printf "$help_text" ; exit $?	;;
 		esac
-		# Print $log_msg to $LOG and print $log_msg to user if verbosity is enabled
-		#doLog "Options: $log_msg"
-		#$beVerbose && tui-echo "$log_msg"
 	done
 	shift $(($OPTIND - 1))
-	ARGS=("${*}")			# Remaining arguments
+	ARGS=( $(echo "${*}"))		# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 #
 #	Display & Action
@@ -160,17 +138,28 @@ Log:		$LOG
 	while $show_menu;do
 		clear
 		tui-header "$ME ($script_version)" "$(date +'%F %T')"
-		tui-title "$TITLE"
 		case $ARGS_COUNT in
 		0)	printf "$help_text"
 			exit $RET_HELP
 			;;
-		1)	ConfigMenu "$1"
-		#tui-press
+		1)	tui-title "Configuration: $1"
+			ConfigMenu "$1"
+			break
 			;;
-		*)	tui-echo "Please select the configuration to edit:"
-			select config in "${ARGS[@]}";do
-				ConfigMenu "$config"
+		*)	tui-title "$TITLE"
+			tui-echo "Please select the configuration to edit:"
+			select config in Back "${ARGS[@]}";do
+				case "$config" in
+				Back) 	show_menu=false
+					break
+					return 0
+					;;
+				*)	tui-title "Configuration: $config"
+					ConfigMenu "$config"
+					tui-echo "Please select the configuration to edit:"
+					;;
+				esac
+				break
 			done
 			;;
 		esac
