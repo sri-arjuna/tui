@@ -23,7 +23,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
 #	Changed:	2014.06.09
-	script_version=0.3
+	script_version=0.4
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -60,7 +60,7 @@ Where options are:
 #
 #	Catching Arguments
 #
-	while getopts "icslh": name
+	while getopts "icslh" name
 	do 	case $name in
 		c)
 			CAPS=true
@@ -83,7 +83,7 @@ Where options are:
 			;;
 		esac
 	done
-	[[ -z $2 ]] && printf "$help_text" && exit 1
+	[[ -z "$2" ]] && printf "$help_text" && exit 1
 	
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
@@ -93,6 +93,7 @@ Where options are:
 #
 #	Functions
 #
+	[[ ! -f "$CONFFILE" ]]  && tui-echo "$CONFFILE dont exist?" "$TUI_FAIL" && exit 1
 	isQuoted() { # STRING
 	# Returns 0 if STRING contains "
 	#
@@ -110,7 +111,7 @@ Where options are:
 #
 #	Display & Action
 #
-	SEARCH="$(grep $OPT "$VARNAME=" "$CONFFILE"|grep -v ^#|tr -d [:space:])"
+	SEARCH="$(grep $OPT "${VARNAME}=" "$CONFFILE"|grep -v ^#|tr -d [:space:])"
 	$SMALL && VARNAME="${VARNAME,,}"
 	$CAPS  && VARNAME="${VARNAME^^}"
 	printf  "$SEARCH"|grep -q "\"" && \

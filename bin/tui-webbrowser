@@ -23,8 +23,8 @@
 	script_version=0.6
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
-		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
-		\rOpens provided FILE/s in EDITOR_[CLI,GUI]
+		\rUsage: $ME [options] 'URL1' 'URL2' ...
+		\rOpens provided URL/s in \$BROWSER_[CLI,GUI]
 		\r"
 	ARGS=($@)
 #
@@ -43,9 +43,9 @@
 #
 #	Display
 #
-	if [[ xterm = "$TERM" ]] OR [[ ! "" = "$DESKTOP_SESSION" ]] OR [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
-	then	export EDITOR=$(which $EDITOR_GUI)
-	else	export EDITOR=$(which $EDITOR_CLI)
+	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
+	then	export BROWSER=$(which $BROWSER_GUI)
+	else	export BROWSER=$(which $BROWSER_CLI)
 	fi
-	[[ -z "$EDITOR" ]] && export EDITOR=nano 
-	$EDITOR "${ARGS[@]}"
+	[[ -z "$BROWSER" ]] && export BROWSER=w3m
+	$BROWSER "${ARGS[@]}"

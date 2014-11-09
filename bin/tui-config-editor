@@ -25,7 +25,7 @@
 #	License:	GNU General Public License (LGPL)
 #	Created:	2014.11.03
 #	Changed:	2014.11.03
-	script_version=0.0.1
+	script_version=0.2
 	TITLE="tui-config-editor"
 #	Description:	Text TODO
 #			...  TODO
@@ -35,17 +35,7 @@
 #
 	ME="${0##*/}"				# Basename of tui-config-editor
 	ME="${ME/.sh/}"				# Cut off .sh extension
-	[[ ! "." = "$(dirname $0)" ]] && \
-		ME_DIR="$(dirname $0)" || \
-		ME_DIR="$(pwd)"			# Dirname of tui-config-editor
-	CONFIG_DIR="$HOME/.config/$ME"		# Configuration directory
-	CONFIG="$CONFIG_DIR/$ME.conf"		# Configuration file
-## TODO
-## If you need more configuration files, simply add them, within quotes, to the array below
-	CONFIG_FILE_ARRAY=("$CONFIG")		# An array of all configuration scripts used by tui-config-editor
-	LOG="$CONFIG_DIR/$ME.log"		# Logfile
-	TEMPFILE="$CONFIG_DIR/$ME.tmp"		# Tempfile
-	REQUIRES="tui bash"
+	LOG="$HOME/.config/tui/tui.log"		# Logfile
 #
 #	Variable defaults (options)
 #
@@ -61,23 +51,16 @@ $ME ($script_version)
 ${TITLE^}
 Usage: 		$ME [options] [arguments]
 Examples:	$ME 
-		$ME -a
-		$ME -e optVAL
+		$ME /etc/tui/tui.conf
+		
 Where options are:
 	-h(elp) 		This screen
-	-C(onf			Show the config menu
 	-L(og)			Show the log file ($LOG)
-	-v(erbose)		Enables the scripts verbosity
-	
 
 Files:
 --------------------------------------
 Script:		$ME
-Script-Dir:	$ME_DIR
-Config: 	$CONFIG
-Config_Dir:	$CONFIG_DIR
 Log:		$LOG
-Tempfile:	$TEMPFILE
 "
 
 	doLog() { # "MESSAGE STRING"
@@ -89,136 +72,71 @@ Tempfile:	$TEMPFILE
 
 
 
-	ConfigMenu() { # 
+	ConfigMenu() { # CONFIG
 	# Configures the variables/files used by the script
 	#
 	#	Check for config file
-		[[ -f "$CONFIG" ]] || \
-			( printf "$config_template" > "$CONFIG" ; doLog "Config: Default configurationfile created" )
-	#	Menu entries
-		opwd=$(pwd)
-		cd "$CONFIG_DIR"
-	#	Menu / Action
-		setup_toggle=true
-		while $setup_toggle ; do
-			# While there are more files, printf 'header'
-			clear 
-			tui-header "$ME ($script_version)" "$TITLE" "$(date +'%F %T')"
-			tui-title "Setup : $ME"
-			
-		# Select among files
-			if [[ 1 -eq ${#CONFIG_FILE_ARRAY[@]} ]]
-			then	# Its only 1 file, preview
-				for VAR in $(tui-value-get -l "$CONFIG");do 
-					val="$(tui-value-get $CONFIG $VAR)"
-					tui-echo "$VAR" "$val"
-				done
-				#grep -v ^"#" "$CONFIG" > "$tempfile"
-				#oifs="$IFS" ; IFS="="
-				#while read var val;do
-				#[[ $# -gt 0 ]] && tui-echo "$var" "$val"
-				#done<"$tempfile"
-				#IFS="$oifs"
-				tui-echo "Please select wich value to change:"
-				select VAR in Back Edit $(tui-value-get -l "$CONFIG");do
-				case $VAR in
-				Back) 	setup_toggle=false
-					break
-					;;
-				Edit)	tui-edit "$CONFIG"
-					;;
-				*)	VAL=$(tui-value-get "$CONFIG" "$VAR")
-					tui-echo "Currently '$VAR' is set to '$VAL'."
-					tui-yesno "Do you really want to change this?" || break
-					newval=$(tui-read "Please type new value:")
-					msg="Changed \"\" from \"\" to \"\""
-					tui-value-set "$CONFIG" "$VAL" "$newval"
-					tui-status $? "$msg" && \
-						doLog "Setup: $msg" || \
-						doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
-					;;
-				esac
-				done
-				
-			else	# There are more than one CONFIGFILE to choose from
-				tui-echo "Please select a file to open:"
-				select FILE in Back "${CONFIG_FILE_ARRAY[*]}"
-				do 	# VARS is a list of all found VARIABLES of FILE
-					VARS=$(tui-value-get -l "$FILE"|grep -v ^"#")
-					case "$FILE" in
-					Back)	setup_toggle=false	# To exit the while loop
-						break			# To exit the current select loop
-						;;
-					*)	tui-title "Configuration File: $FILE"
-						tui-echo "Which variable to change?"
-						select var in Back $VARS
-						do	val=$(tui-value-get "$CONFIG" "$var")
-							tui-echo "${var^} is set to:" "$val"
-							case $var in
-							Back)	break	;;	# Just exit the select loop, and return back to FILE selection
-#
-#		TODO
-#	Custom case states, in case you want to let the user 
-#	select values from specific lists/arrays or even diffrent -- This "commented out" section is not yet working!
-#			-->		-->		"SomeValue")
-#								LIST_A="A B C D
-#								tui-echo "Please select from this list:"
-#								select newval in $LIST_A;do break;done
-#								tui-echo "Selected:" "$newval"
-#								msg="Changed \"\" from \"\" to \"\""
-#								# Save the new value to variable in config 
-#			-->		-->			tui-value-set "$CONFIG" "$var" "$newval"
-#								tui-status $? "$msg" && \
-#									doLog "Setup: $msg" || \
-#									doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
-#			-->		-->			;;
-							*)	if tui-yesno "Change this value?"
-								then 	newval=$(tui-read "Please type new value:")
-									msg="Changed \"$var\" from \"$val\" to \"$newval\""
-									# Save the new value to variable in config 
-									tui-value-set "$CONFIG" "$var" "$newval"
-									tui-status $? "$msg" && \
-										doLog "Setup: $msg" || \
-										doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
-								fi
-								;;
-							esac
-						
-						done
-						;;
-					esac
-				done
-			fi
+		CONFIG="$1"
+		[[ ! -f "$CONFIG" ]] && \
+			tui-echo "$CONFIG: Does not exist." "$TUI_FAIL" && \
+			exit 1
+		
+		# Its only 1 file, preview
+		for VAR in $(tui-value-get -l "$CONFIG");do 
+			val="$(tui-value-get $CONFIG $VAR)"
+			tui-echo "$VAR" "$val"
 		done
-		cd "$pwd"
+		#grep -v ^"#" "$CONFIG" > "$tempfile"
+		#oifs="$IFS" ; IFS="="
+		#while read var val;do
+		#[[ $# -gt 0 ]] && tui-echo "$var" "$val"
+		#done<"$tempfile"
+		#IFS="$oifs"
+		tui-echo "Please select wich value to change:"
+		select VAR in Back Edit $(tui-value-get -l "$CONFIG");do
+			doSelect=false
+			case $VAR in
+			Back) 	setup_toggle=false
+				break
+				;;
+			Edit)	tui-edit "$CONFIG"
+				;;
+			*)	VAL=$(tui-value-get "$CONFIG" "$VAR")
+				[[ " " = "${VAL:0:1}" ]] && VAL="${VAL:1}"
+				case "$VAL" in
+				true|false)	doSelect=true
+						selection="true false"
+						;;
+				on|off)		doSelect=true
+						selection="on off"
+						;;
+				[0-9])		doSelect=true
+						selection={0..9}
+						;;
+				esac
+				tui-echo "Currently '$VAR' is set to '$VAL'."
+				tui-yesno "Do you really want to change this?" || break
+				
+				if $doSelect
+				then	tui-echo "Please select the new value:"
+					select newval in $selection;do break;done
+				else	newval=$(tui-read "Please type new value:")
+				fi
+				
+				[[ ! -z "$newval" ]] && \
+					msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\"" && \
+					tui-value-set "$CONFIG" "$VAL" "$newval"
+				tui-status $? "$msg" && \
+					doLog "Setup: $msg" || \
+					doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
+				;;
+			esac
+		done
 	}
-## TODO
-## Got more functions to add?
-##
-#
-#	Environment checks
-#
-	# This is optimized for a one-time setup
-	if [[ ! -e "$CONFIG" ]]
-	then	[[ -d "$CONFIG_DIR" ]] || \
-			( mkdir -p "$CONFIG_DIR" ; tui-echo "Entering first time setup." "$TUI_SKIP" )
-		[[ ! -e "$LOG" ]] && \
-			touch $LOG && \
-			doLog "------------------------------------------" && \
-			doLog "Created logfile of $ME ($script_version)" && \
-			doLog "------------------------------------------" && \
-			doLog "Setup : First config"
-		ConfigMenu
-	fi
-	# Load default values before argument handling
-## TODO : Remove these line if you want to read the defaults from CONFIG manualy
-	source "$CONFIG" || ( doLog "Failed to load: $CONFIG" ; tui-status 1 "Failed to load: $CONFIG" )
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
-	# A ':' after a char indicates that this option requires an argument
-	while getopts "ChLv" opt
+	while getopts "hL" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
@@ -226,17 +144,11 @@ Tempfile:	$TEMPFILE
 		L)	less "$LOG"	
 			exit $RET_DONE
 			;;
-		C)	ConfigMenu
-			exit $RET_DONE
-			;;
-		v)	beVerbose=true
-			log_msg="Enabled verbosity"
-			;;
 		# *)	printf "$help_text" ; exit $?	;;
 		esac
 		# Print $log_msg to $LOG and print $log_msg to user if verbosity is enabled
-		doLog "Options: $log_msg"
-		$beVerbose && tui-echo "$log_msg"
+		#doLog "Options: $log_msg"
+		#$beVerbose && tui-echo "$log_msg"
 	done
 	shift $(($OPTIND - 1))
 	ARGS=("${*}")			# Remaining arguments
@@ -244,5 +156,22 @@ Tempfile:	$TEMPFILE
 #
 #	Display & Action
 #
-	tui-header "$ME ($script_version)" "$(date +'%F %T')"
-	tui-title "$TITLE"
+	show_menu=true
+	while $show_menu;do
+		clear
+		tui-header "$ME ($script_version)" "$(date +'%F %T')"
+		tui-title "$TITLE"
+		case $ARGS_COUNT in
+		0)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		1)	ConfigMenu "$1"
+		#tui-press
+			;;
+		*)	tui-echo "Please select the configuration to edit:"
+			select config in "${ARGS[@]}";do
+				ConfigMenu "$config"
+			done
+			;;
+		esac
+	done

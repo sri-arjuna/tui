@@ -13,13 +13,14 @@
 	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
 	for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
+	[[ ! $HOME = /root ]] && for cfg in apps user;do source $HOME/.config/tui/$cfg.conf;done
 	TUI_VERSION=0.5.3
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	[[ 0 -eq $UID ]] && \
-		LOG="/var/log/$ME.log" || \
-		LOG="$HOME/.config/$ME/$ME.log"
+		export TUI_LOG="/var/TUI_LOG/$ME.TUI_LOG" || \
+		TUI_LOG="$HOME/.config/$ME/$ME.TUI_LOG"
 	help_text="
 $ME ($script_version)
 $TITLE
@@ -32,10 +33,10 @@ Where options are:
 #
 #	Functions
 #
-	doLog() { # "MESSAGE STRING"
+	doLOG() { # "MESSAGE STRING"
 	# Prints: Time & "Message STRING"
-	# See 'tui-log -h' for more info
-		tui-log -t "$LOG" "$1"
+	# See 'tui-TUI_LOG -h' for more info
+		tui-log -t "$TUI_LOG" "$1"
 	}
 	ConfigTUI() { #
 	#
@@ -77,9 +78,9 @@ Where options are:
 					cur=$(eval printf $(tui-value-get "$ConfigSection" "$var2chg"))
 					newval=$(tui-read "What is the new value of $var2chg ($cur):")
 					MSG_out="$ConfigSection: Changed $var2chg to $newval"
-					tui-value-set "$ConfigSection" "$var2chg" "$newval"
+					[[ -z "$newval" ]] || tui-value-set "$ConfigSection" "$var2chg" "$newval"
 					tui-status $? "$MSG_out" && \
-						doLog "$MSG_out"
+						doTUI_LOG "$MSG_out"
 					tui-printf -T "$MSG_next"
 				done
 			fi
