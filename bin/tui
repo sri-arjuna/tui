@@ -19,7 +19,7 @@
 	[[ 0 -eq $UID ]] && \
 		export TUI_LOG="/var/TUI_LOG/$ME.TUI_LOG" || \
 		export TUI_LOG="$HOME/.config/$ME/$ME.TUI_LOG"
-		for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
+	for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
 #
 #	Functions
 #
@@ -81,11 +81,9 @@
 	# Checks if the user configuration is present
 	# Effectless as root user
 		tmp="$HOME/.config/tui/"
-		num=$(ls $tmp|wc -l)
-		[[ ! -d "$T" ]] && \
-			[[ $num -ge 2 ]] && \
-			mkdir -p "$T" && \
-			cp -R /usr/share/tui/conf/*  "$T"
+		[[ ! -f "$tmp/user.conf" ]] && \
+			mkdir -p "$tmp" && \
+			cp -R /usr/share/tui/conf/*  "$tmp"
 	}
 	[[ 0 -eq $UID ]] || \
 		( [[ -d "$HOME/.config/tui/" ]] || FirstUse )
