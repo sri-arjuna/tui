@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.5.5
-Release:     18%{?dist}
+Version:     0.5.6
+Release:     1%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -100,6 +100,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Nov 12 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.6-0
+- 'tui' should be fixed again for first call
+- changed manpage for 'tui'
+
 * Wed Oct 29 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.5-1
 - Changed: tui-psm, attempt to hide default output of scripts working on
 - Readded: Some reqs for the spec - leafpad, nano, w3m, xterm

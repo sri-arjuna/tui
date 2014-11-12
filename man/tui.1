@@ -1,76 +1,218 @@
-.TH "tui" "1" "2013 09 24"  "Simon A. Erat (sea)" "TUI 0.4.0"
+.ig
+TUI - Text User Interface
+Copyright (C) November 2014 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+.. ....................................................
 
-.SH "NAME"
-tui \- Textual User Interface
+.TH "tui" 1 "2014-11-09" "Tui Version 0.6.0"
 
-.SH "SYNOPSIS"
-source \fBtui\fP | \fBtui\fP
-.br
 
-.SH "DESCRIPTION"
-.PP 
-\fBtui\fP is providing a way to present your scripts easy with color(-name)s,
-with the use of just some few new commands, starting with: tui-<tab>
+.SH NAME
+TUI \- Text User Interface
+
+
+.SH SYNOPSIS
+...SY tui
+...OP options
+...RI [ arguments .\|.\|.]
 .br
-For the use with scripts, you will have high benefit of sourcing 'tui',
-.br
-just like: source \fBtui\fP
-.br
-That will provide several set-able variables, such as DEFAULT_[EMAIL,USER,HOMEPAGE] and DEFAULT_LICENSE[_URL].
-.br
-These variables are used while creating new scripts and the according manual using tui-newscript for example.
-.br
-But their usage is not limited to such simple task, you might use the DEFAULT_[EMAIL,USER] to be used for new GIT projects, 
-or whatever you can think of...
+source \fBtui\fP | \fBtui\fP config
+
+
+.SH DESCRIPTION
 .PP
-While the main commands (tui-[echo,header,printf,status,title]) are just for presentation,
-there are also commands which aim to ease scripting, such as: tui-
+TUI is an abrevihation for "Text User Interface", it is a framework of commands to help you creating a line based text interface.
+
 .br
-* bol-dir
+It enables you to write scripts which when using the tui-'simulation a TUI in any terminal window or tty console.
 .br
-* bol-yesno
+Due to the 'limitation's of a VT or a Terminal window, it is a line-based-interface.
 .br
-* edit
+It is ment for scripts that  want to present themself a little bit more attractive to endusers.
+
+Do not get overhelmed by the many commands provided by TUI.
 .br
-* indi
+It is just based upon these 4 commands, all other commands are just assistants for specific tasks, to help you match them into TUI, or to ease some very repeative tasks.
 .br
-* press
+All of these 4 commands share some behaviour:
+.RS 4
+.B
+1.
+You may pass from none to 3 strings.
 .br
-And more to come, please see each one's manual for more information.
+.B
+2. 
+String alignment:
+.RS 4
+0 strings will print the borders, and colors where applicable, but no strings
+.br
+1 string will be left aligned
+.br
+2 strings will be first on the left, second on the right side aligned.
+.br
+3 strings will be first on the left, second in the middle, third on the right side aligned.
 
 
-.SH BUILTINS
-.PP 
-.IP "\fBDATE\fP"
+.IP "\fBtui-printf\fP"
+The very core of TUI. It works with 'echo-like' syntax, but without ending <newline>.
 .br
-Prints current date in format: YYYY.MM.DD
-.IP "\fBTIME\fP"
+As long it fits on a single line, each additional call of tui-printf will be replacing its previous one.
 .br
-Prints current time in format: HH:MM:DD
-.IP "\fBgetspace\fP"
-getspace NUM
-.br
-Prints a string of NUM spaces.
+Otherwise it will attemp to print the last available string on a new line, 
+if only one is available, it will split it up equaly.
 
-.SH CONFIGURATION
-* /etc/tui/tui.conf
+
+.IP "\fBtui-echo\fP"
+Prints up to three strings on the same line, and an ending <newline>.
+
+.IP "\fBtui-header\fP"
+Prints a blue background with white font, filling complete line.
+
+.IP "\fBtui-title\fP"
+Prints the first string in the middle.
+Prints a white background with blue font inlined of the borders
 .br
-* /usr/share/tui/user.conf
+
+
+
+
+.SH OPTIONS
+All of the tui-* commands, share a common option trigger, which is:
+.br
+.OP \-h
+	Shows command version and help
+.br
+
+
+
+
+
+
+.SH FILES
+.RE
+.RS 2
+Testing
+
+.IP /etc/tui
+System wide configuration
+.B
+apps.conf
+.B
+colors.conf
+.B
+status.conf
+.B
+tui.conf
+
+.IP ~/.config/tui/*
+Personal user configuration
+.B
+apps.conf
+.B
+user.conf
+
+
+.RS 2
+apps.conf stores the variables for your default applications used by their specific tui-APP command (tui-edit).
+
+
+
+
+
+
+
+
+
+.SH SEE ALSO
 .PP
-How it appears for you may be configured in /etc/tui/tui.conf systemwide (not recomended)
-.br
-or per user if you copy /usr/share/tui/user.conf to $HOME/.config/tui/user.conf
+.B tui-bgjob
+(1),
+.B tui-bol-dir
+(1),
+.B tui-browser
+(1),
+.B tui-config-editor
+(1),
+.B tui-dd
+(1),
+.B tui-download
+(1),
+.B tui-echo
+(1),
+.B tui-edit
+(1),
+.B tui-header
+(1),
+.B tui-indi
+(1),
+.B tui-install
+(1),
+.B tui-list
+(1),
+.B tui-log
+(1),
+.B tui-new-browser
+(1),
+.B tui-new-script
+(1),
+.B tui-press
+(1),
+.B tui-printf
+(1),
+.B tui-progress
+(1),
+.B tui-psm
+(1),
+.B tui-read
+(1),
+.B tui-status
+(1),
+.B tui-str-usb
+(1),
+.B tui-tar
+(1),
+.B tui-title
+(1),
+.B tui-value-get
+(1),
+.B tui-value-set
+(1),
+.B tui-wait
+(1),
+.B tui-yesno
+(1)
+
+
 
 .SH LICENSE
 GNU General Public License (GPL)
 .br
 http://www.gnu.org/licenses/gpl.html
 
+
+.SH "KNOW BUGS"
+.IP "item 1"
 .br
-The CLI package is a logical consequence of my previous project: Script-Tools.
+text of item 1
+.IP "item 2"
 .br
-This offers all the nice CLI handling i've been using there, so i can reuse it and offer others to have the same benefits and joy writing their scripts.
+text of item 2
+
+
+.SH BUG REPORTS
+Please visit "https://github.com/sri-arjuna/tui/issues" to report bugs,
+.br
+or send me an email to the adress listed in
+.B
+CONTACT
+
+
+.SH AUTHORS
+Simon Arjuna Erat (sea), Organisation/Club/Title
+.br
+http://sea.fedorapeople.org
 
 
 .SH CONTACT
-erat.simon@gmail.com
+Simon Arjuna Erat (sea), erat.simon@gmail.com
+.br
+http://sea.fedorapeople.org

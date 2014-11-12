@@ -12,7 +12,7 @@
 #
 	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
-	TUI_VERSION=0.5.3
+	TUI_VERSION=0.5.6
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
