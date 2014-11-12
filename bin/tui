@@ -4,32 +4,22 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
-#	Changed:	2014.07.18
-	script_version=1.0
+#	Changed:	2014.11.12
+	script_version=1.1
 #	Description:	Tool to configure TUI
 #
 #	Variables
 #
 	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
-	for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
-	[[ ! $HOME = /root ]] && for cfg in apps user;do source $HOME/.config/tui/$cfg.conf;done
 	TUI_VERSION=0.5.3
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	[[ 0 -eq $UID ]] && \
 		export TUI_LOG="/var/TUI_LOG/$ME.TUI_LOG" || \
-		TUI_LOG="$HOME/.config/$ME/$ME.TUI_LOG"
-	help_text="
-$ME ($script_version)
-$TITLE
-Usage: 	$ME [options] [config]
-Where options are:
-	-h		This screen
-	config		Enters directly into config mode
-
-"
+		export TUI_LOG="$HOME/.config/$ME/$ME.TUI_LOG"
+		for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
 #
 #	Functions
 #
@@ -99,6 +89,17 @@ Where options are:
 	}
 	[[ 0 -eq $UID ]] || \
 		( [[ -d "$HOME/.config/tui/" ]] || FirstUse )
+	[[ ! $HOME = /root ]] && \
+		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
+	help_text="
+$ME ($script_version)
+$TITLE
+Usage: 	$ME [options] [config]
+Where options are:
+	-h		This screen
+	config		Enters directly into config mode
+
+"
 #
 #	Catching Arguments
 #
@@ -132,6 +133,6 @@ Where options are:
 		tui-printf -E "Also there is a sample script:" "/usr/share/tui/sample"
 		tui-printf -E "To create a new script in ~/bin or ~/.local/bin, type:" "tui-new-script SCRIPTNAME"
 		tui-printf -E
-		#tui-yesno "Configure it now?" || exit 0
+		tui-yesno "Configure it now?" || exit 0
 		ConfigTUI	
 	fi
