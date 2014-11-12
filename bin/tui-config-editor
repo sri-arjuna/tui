@@ -24,18 +24,19 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
-#	Changed:	2014.11.09
-	script_version=0.3
+#	Changed:	2014.11.12
+	script_version=0.4
 	TITLE="Configuration Editor"
-#	Description:	Text TODO
-#			...  TODO
+#	Description:	Basic configuration file editor
 #
 #
 #	Script Environment
 #
 	ME="${0##*/}"				# Basename of tui-config-editor
 	ME="${ME/.sh/}"				# Cut off .sh extension
-	LOG="$HOME/.config/tui/tui.log"		# Logfile
+	[[ 0 -eq $UID ]] && \
+		LOG="/var/log/$ME.log" || \
+		LOG="$HOME/.config/tui/$ME.log"		# Logfile
 #
 #	Variable defaults (options)
 #
@@ -77,12 +78,15 @@ Log:		$LOG
 		# Preview
 		for VAR in $(tui-value-get -l "$CONFIG");do 
 			val="$(tui-value-get $CONFIG $VAR)"
-			tui-echo " " "$VAR" "$val"
+			tui-echo "$VAR" "$val"
 		done
 		
 		tui-echo "Please select wich value to change:"
 		select VAR in Back Edit $(tui-value-get -l "$CONFIG");do
 			doSelect=false
+			msg=""
+			newval=""
+			
 			case $VAR in
 			Back) 	break				;;
 			Edit)	tui-edit "$CONFIG"		;;
@@ -97,17 +101,29 @@ Log:		$LOG
 						;;
 				esac
 				tui-echo "Currently '$VAR' is set to '$VAL'."
-				if tui-yesno "Do you really want to change this?"
+				if tui-yesno "Do you want to change this?"
 				then 	if $doSelect
 					then	tui-echo "Please select the new value:"
 						select newval in $selection;do break;done
 					else	newval=$(tui-read "Please type new value:")
 					fi
-				
-					[[ ! -z "$newval" ]] && \
-						msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\"" && \
+					
+					if [[ ! -z "$newval" ]]
+					then	if [[ 0 -eq $UID ]]
+						then	if [[ password = "${VAR,,}" ]] OR [[ pw = "${VAR,,}" ]]
+							then	msg="Changed \"$VAR\" from \"*******\" to \"*******\"" 
+							else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
+							fi
+						else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
+						fi
 						tui-value-set "$CONFIG" "$VAR" "$newval"
-					tui-status $? "$msg" && \
+						RET=$?
+					else	tui-yesno "This will overwrite \"$VAR\" value ($VAL) with an empty string \"\", continue?" && \
+							tui-value-set "$CONFIG" "$VAR" "$newval"
+						RET=?
+					fi
+					
+					tui-status $RET "$msg" && \
 						doLog "Setup: $msg" || \
 						doLog "Setup: Failed to c$(printf ${msg:1}|sed s,ged,ge,g)"
 				fi
