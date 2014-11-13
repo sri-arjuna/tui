@@ -105,12 +105,12 @@ Log:		$LOG
 				then 	if $doSelect
 					then	tui-echo "Please select the new value:"
 						select newval in $selection;do break;done
-					else	newval=$(tui-read "Please type new value:")
+					else	newval=$(tui-read "Please type the new value:")
 					fi
 					
 					if [[ ! -z "$newval" ]]
 					then	if [[ 0 -eq $UID ]]
-						then	if [[ password = "${VAR,,}" ]] OR [[ pw = "${VAR,,}" ]]
+						then	if [[ password = "${VAR,,}" ]] || [[ pw = "${VAR,,}" ]]
 							then	msg="Changed \"$VAR\" from \"*******\" to \"*******\"" 
 							else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
 							fi

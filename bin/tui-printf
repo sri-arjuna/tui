@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2014.06.10
-	script_version=0.9.1
+	script_version=0.9.4
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -54,7 +54,6 @@ Options are:
 	SECOND=""
 	THIRD=""
 	WIDTH=$( [ -z $COLUMNS ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
-	#WIDTH=${COLUMNS:−$(tput cols)} 
 	#WIDTH=$[ $WIDTH - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - 2 ]	# Subtract default 'borders'
 	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 
 	WIDTH=$[ $WIDTH / 2 * 2 ]					# Make it even 
@@ -66,7 +65,6 @@ Options are:
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
 	while getopts "EHTh?" name
 	do 	case $name in
 		E|echo) 	doEcho=true
@@ -81,55 +79,41 @@ Options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=("${*}")			# Remaining arguments	| These two fail on spaced-strings
-	ARGS_COUNT_org=${#ARGS[@]}	# Amount of remaining
-	#FIRST="${ARGS[0]}"
-	#SECOND="${ARGS[1]}"
-	#THIRD="${ARGS[2]}"
 	ARGS_COUNT=0
 	[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
 	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
 	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
+	len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
 	[ ! -z "$4" ] && doMore=true || doMore=false
 	[ -z $optStyle ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
 #
 #	Verify all fit on 1 line
 #
-	len=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
-	if [[ $len -gt $WIDTH ]]
+	#len=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
+	if [[ $len_strings -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
-			#if [[ $len2 -le $WIDTH ]]
-			#then 	# FIRST & SECOND match on one line
-			#	tui-printf $optStyleTMP "$FIRST" "$SECOND"
-				# Now prints the third and let it handle itself
-			#	tui-printf $optStyle "$THIRD"
-			#else	# FIRST needs further spliting:
-			#	if [[ ${#FIRST} -le $WIDTH ]]
-			#	then 	tui-printf $optStyleTMP "$FIRST"
-			#		tui-printf $optStyle "$SECOND" "$THIRD"
-			#	else
-					half=$[ ${#FIRST} / 2 ]
-					part1="${FIRST:0:$half}"
-					part2="${FIRST:$half}"
-				# unten hängt es
-					tui-printf $optStyleTMP "$part1"
-					tui-printf $optStyle "$part2"
-				# oben hängt es
-					#exit
-				#	[[ -z $SECOND ]] && \
-				#		tui-printf $optStyle "$part2" || \
-				#		tui-printf $optStyle "$part2" "$SECOND"
-				#	[[ -z $THIRD ]] || \
-				#		tui-printf $optStyle "$THIRD"
-			#	fi
-			#fi
+			half=$[ ${#FIRST} / 2 ]
+			part1="${FIRST:0:$half}"
+			part2="${FIRST:$half}"
+			tui-printf $optStyleTMP "$part1"
+			tui-printf $optStyle "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
-			tui-printf $optStyleTMP "$FIRST"
-			tui-printf $optStyle "$SECOND"
+			
+			half=$[ ${#FIRST} / 2 ]
+			if [[ $[ $half + ${#SECOND} ] -lt $WIDTH ]]
+			then	part1="${FIRST:0:$half}"
+				part2="${FIRST:$half}"
+			
+				tui-printf $optStyleTMP "$part1"
+				tui-printf $optStyle "$part2" "$SECOND"
+			else	# OLD WORKING
+				tui-printf $optStyleTMP "$FIRST"
+				tui-printf $optStyle "$SECOND"
+			fi
 			;;
 		3)	# Print only 2 on the first line
 			tui-printf $optStyleTMP "$FIRST" "$SECOND"
@@ -192,14 +176,7 @@ Options are:
 	*)	# 3 (BETA - and more - handler)
 		EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
 		half=$[ ${#EMPTY} / 2 ]
-		
-		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
-		#len_compare=$[ $len_strings / 2 * 2  ]
-		#[ $len_compare -lt $len_strings ] && \
-		#	adder=1 || \
-		#	adder=0
 		adder=$((len_strings % 2))
-		
 		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
 		;;
 	esac
@@ -207,22 +184,3 @@ Options are:
 #	Display & Action
 #
 	printf "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"
-#
-#	BETA "if more"
-#
-	#unset ARGS[0] ARGS[1] ARGS[2]
-#	if [ $doMore = true ]
-#	then	# there are remains..
-#		C=0
-#		for A in "${ARGS[*]}";do 
-#			[ "$1" = "$A" ] && unset ARGS[$C] && echo $A
-#			[ "$2" = "$A" ] && unset ARGS[$C] && echo $A
-#			[ "$3" = "$A" ] && unset ARGS[$C] && echo $A
-#			((C++))
-#		done
-#		tui-title "DEBUG"
-#		tui-echo  "Too many arguments:" "$ARGS_COUNT($ARGS_COUNT_org)=${ARGS[*]}"
-		# DEBUG
-#		echo $ME $optStyle "${ARGS[*]}"
-#		exit
-#	fi

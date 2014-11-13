@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2014.11.09
-	script_version=0.4
+#	Changed:	2014.11.13
+	script_version=0.5
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -60,91 +60,71 @@ Where options are:
 #
 #	Catching Arguments
 #
+	[[ -z "$2" ]] && printf "$help_text" && exit 1
 	while getopts "icslh" name
 	do 	case $name in
-		c)
-			CAPS=true
+		c)	CAPS=true
 			SMALL=false
 			;;
-		s)
-			SMALL=true
+		s)	SMALL=true
 			CAPS=false
 			;;
-		i)
-			OPT="-i"
+		i)	OPT="-i"
 			;;
-		l)
-			grep -v ^# "$2"|grep "="|sed s,"="," ",g|awk '{print $1}'
+		l)	grep -v ^# "$2"|grep "="|sed s,"="," ",g|awk '{print $1}'
 			exit 0
 			;;
-		h)
-			printf "$help_text"
+		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
 		esac
 	done
-	[[ -z "$2" ]] && printf "$help_text" && exit 1
-	
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
 	VARNAME="$2"
 	VALUE="$3"
 	hadDollar=false
+	# Exit if it does not exist
+	if [[ ! -f "$CONFFILE" ]]
+	then	tui-status 1 "$CONFFILE does not exist!"
+		exit 1
+	fi
 #
-#	Functions
-#
-	[[ ! -f "$CONFFILE" ]]  && tui-echo "$CONFFILE dont exist?" "$TUI_FAIL" && exit 1
-	isQuoted() { # STRING
-	# Returns 0 if STRING contains "
-	#
-		printf "$1"|grep -q "\"" && \
-			return 0 || \
-			return 1
-	}
-	isFound() { # FILE STRING
-	# Returns 0 if STRING is found
-	#
-		grep -q "$2" "$1" && \
-			return 0 || \
-			return 1
-	}
-#
-#	Display & Action
+# 	Preformat strings
 #
 	SEARCH="$(grep $OPT "${VARNAME}=" "$CONFFILE"|grep -v ^#|tr -d [:space:])"
-#	echo "$SEARCH"
-#	SEARCH="${2}=${3}"
-#	echo "$SEARCH"
-	
 	$SMALL && VARNAME="${VARNAME,,}"
 	$CAPS  && VARNAME="${VARNAME^^}"
 	printf  "$SEARCH"|grep -q "\"" && \
 		REPLACE="$VARNAME=\"$VALUE\"" || \
 		REPLACE="$VARNAME=$VALUE"
-	
 	# Set proper SED 'divider'
 	SD=","
-	if printf "$REPLACE"|grep -q "$SD"
+	if echo "$REPLACE"|grep -q "$SD"
 	then 	# Coma was found
 		SD="/"
-		printf "$REPLACE"|grep ","|grep "$SD"|grep -q '\\' && SD="\\"
-		# Forward slash was found
-		printf "$REPLACE"|grep ","|grep "$SD"|grep -q "/" && SD="|"	# This line is 'beta'
-		# backslash was found
+		printf "$REPLACE"|grep ","|grep "$SD"|grep -q '\\' && SD="\\"	# backslash was found
+		[[ ! "$SD" = "/" ]] && \
+			printf "$REPLACE"|grep ","|grep "$SD"|grep -q "/" && SD="|"	# Forward slash was found
 	fi
 	# Troubles with VARIABLES due to leading '$'
 	printf "$SEARCH"|grep -q "\$" && \
 		SEARCH="$(printf "$SEARCH"|sed s,'\$','\\\$',g)" && \
 		hadDollar=true
-#	[[ -z "$SEARCH" ]] && \
-#		SEARCH="$VARNAME=$VALUE"
-	
+#
+#	Display & Action
+#
 	# Generate the command
-	cmd="sed s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i \"$CONFFILE\""
-#	echo "$cmd" > $HOME/$ME.out
-#	echo "$cmd"
-
+	cmd="$(which sed) s${SD}'${SEARCH}'${SD}'${REPLACE}'${SD}g -i \"$CONFFILE\""
 	# Save changes
-	! grep -q "$VARNAME" "$CONFFILE" && \
-		printf "${REPLACE}\n" >> "$CONFFILE" || \
-		( [[ true = $hadDollar ]] && $(eval $cmd) || $cmd )
+	if ! grep -q "$VARNAME" "$CONFFILE"
+	then	# Its not there yet, just append it
+		printf "${REPLACE}\n" >> "$CONFFILE"
+	elif $hadDollar
+	then	eval "$cmd"
+	else	$cmd
+	fi
+	#
+	# Return true if replaced string was found
+	# This is required, since using RET=$? returned true eventhough value was not saved...
+	grep -q "$REPLACE" "$CONFFILE"

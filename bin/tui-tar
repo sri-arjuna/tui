@@ -23,7 +23,7 @@
 	script_version=0.4
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
-		\rUsage: $ME [options] [[/path/to/]tar]
+		\rUsage: $ME [options] [[/path/to/]directory]
 		\rWhere options are:
 		\r\t-h\tThis screen
 		\r"
@@ -31,6 +31,9 @@
 	ARGS=(${@})
 	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
 	FILE_CMD="$TUI_TEMP_DIR/bgjob"
+	TMP=$TUI_TEMP_FILE
+	#[[ -z "$TMP" ]] && TMP=$HOME/.config/tui/tmp.tmp
+	touch $TMP
 	umask 022 $FILE_CMD $FILE_TEMP
 	DEST=""
 #
@@ -52,17 +55,20 @@
 		THIS="$(basename $FOLDER)"
 		DEST="$(pwd)/$THIS.$TAR_EXT"
 		PWD_ORG="$(pwd)"
-		echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero" > $FILE_CMD
+		#echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero ; echo \$? > $TMP" > $FILE_CMD
+		echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 		cd "$(dirname $FOLDER)"
 		chmod +x $FILE_CMD
 		$FILE_CMD &
-		sleep 1
+		sleep 0.5
 		while [[ ! "" = "$(ps|grep -v tui|grep tar)" ]]
-		do	tmp_size="$(ls -hl $DEST |awk '{print $5}')"
-			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi)"
-			sleep 1
+		do	[[ -f "$DEST" ]] && \
+				tmp_size="$(ls -hl $DEST |awk '{print $5}')" || \
+				tmp_size="0 btytes"
+			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi) ]"
+			sleep 0.7
 		done
 		cd "$PWD_ORG"
+		[[ -f "$DEST" ]]
 		tui-status $? "Compressed: $DEST"
-		
 	done 

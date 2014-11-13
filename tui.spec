@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.5.6
-Release:     2%{?dist}
+Version:     0.5.7
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -100,6 +100,14 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Nov 13 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.7-0
+- Fixed: tui-tar, compress 'indicator' was not properly shown
+- Fixed: tui-read, now shows the border
+- Fixed: tui-config-editor, had a check wrong formated
+- Fixed: tui-printf, less split up aligments
+- Fixed: tui-value-set, didnt change value but reported so
+- Removed: tui-printf-optimized, no more things to apply
+
 * Wed Nov 12 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.6-0
 - 'tui' should be fixed again for first call
 - changed manpage for 'tui'

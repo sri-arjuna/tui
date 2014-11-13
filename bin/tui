@@ -83,12 +83,12 @@
 		tmp="$HOME/.config/tui/"
 		[[ ! -f "$tmp/user.conf" ]] && \
 			mkdir -p "$tmp" && \
-			cp -R /usr/share/tui/conf/*  "$tmp"
+			cp -R /usr/share/tui/*conf  "$tmp"
 	}
-	[[ 0 -eq $UID ]] || \
-		( [[ -d "$HOME/.config/tui/" ]] || FirstUse )
-	[[ ! $HOME = /root ]] && \
+	if [[ 0 -ne $UID ]]
+	then 	[[ -d "$HOME/.config/tui/" ]] || FirstUse
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
+	fi
 	help_text="
 $ME ($script_version)
 $TITLE

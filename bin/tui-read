@@ -23,7 +23,8 @@
 #
 #	Variable defaults
 #
-	script_version=0.3
+	. tui
+	script_version=0.4
 	ME="$(basename $0)"
 	help_text="
 $ME ($script_version)
