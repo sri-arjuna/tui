@@ -2,12 +2,12 @@
 TUI - Text User Interface
 Copyright (C) November 2014 by Simon Arjuna Erat (sea), erat.simon@gmail.com
 .. ....................................................
-
 .TH "tui" 1 "2014-11-09" "Tui Version 0.6.0"
-
 
 .SH NAME
 TUI \- Text User Interface
+
+
 
 
 .SH SYNOPSIS
@@ -16,6 +16,8 @@ TUI \- Text User Interface
 ...RI [ arguments .\|.\|.]
 .br
 source \fBtui\fP | \fBtui\fP config
+
+
 
 
 .SH DESCRIPTION
@@ -34,7 +36,7 @@ Do not get overhelmed by the many commands provided by TUI.
 It is just based upon these 4 commands, all other commands are just assistants for specific tasks, to help you match them into TUI, or to ease some very repeative tasks.
 .br
 All of these 4 commands share some behaviour:
-.RS 4
+.br
 .B
 1.
 You may pass from none to 3 strings.
@@ -69,6 +71,7 @@ Prints a blue background with white font, filling complete line.
 
 .IP "\fBtui-title\fP"
 Prints the first string in the middle.
+.br
 Prints a white background with blue font inlined of the borders
 .br
 
@@ -84,40 +87,51 @@ All of the tui-* commands, share a common option trigger, which is:
 
 
 
-
-
-
 .SH FILES
-.RE
-.RS 2
-Testing
+These files are used as settings and user customization
+.br
+Generaly speaking, you dont need to take care about the files when using tui-* commands
+.br
+If you want to change settings, please use:
+.B
+tui config
+.br
 
-.IP /etc/tui
+.IP \fI/etc/tui/\fP
 System wide configuration
-.B
-apps.conf
-.B
-colors.conf
-.B
-status.conf
-.B
-tui.conf
+.br
+.RS 7
+.IP \fBapps.conf\fP
+This stores the default applications tui might want/need to interact with
+.br
 
-.IP ~/.config/tui/*
+.IP \fBcolors.conf\fP
+Contains a list of colors.
+.br
+You could change them, but it is highly recomended not to do so!
+.br
+
+.IP \fBstatus.conf\fP
+Defines how tui-status will report the different statuses
+.br
+
+.IP \fBtui.conf\fP
+Some basic configurations, like TUI_TEMP_{DIR,FILE}
+.br
+
+.RE
+.IP \fI~/.config/tui/\fP
 Personal user configuration
-.B
-apps.conf
-.B
-user.conf
 
+.br
+.RS 7
+.IP \fBapps.conf\fP
+Personal favorite applications, will overwrite the system wide defaults
+.br
 
-.RS 2
-apps.conf stores the variables for your default applications used by their specific tui-APP command (tui-edit).
-
-
-
-
-
+.IP \fBuser.conf\fP
+Some basic reusable info about you
+.br
 
 
 
@@ -183,19 +197,24 @@ apps.conf stores the variables for your default applications used by their speci
 
 
 
+
 .SH LICENSE
 GNU General Public License (GPL)
 .br
 http://www.gnu.org/licenses/gpl.html
 
 
-.SH "KNOW BUGS"
-.IP "item 1"
-.br
-text of item 1
-.IP "item 2"
-.br
-text of item 2
+
+
+...SH "KNOW BUGS"
+...IP "item 1"
+...br
+..text of item 1
+...IP "item 2"
+...br
+..text of item 2
+
+
 
 
 .SH BUG REPORTS
@@ -206,10 +225,13 @@ or send me an email to the adress listed in
 CONTACT
 
 
-.SH AUTHORS
-Simon Arjuna Erat (sea), Organisation/Club/Title
-.br
-http://sea.fedorapeople.org
+
+...SH AUTHORS
+...IX Header "AUTHORS"
+..Simon Arjuna Erat (sea), Organisation/Club/Title
+...br
+..http://sea.fedorapeople.org
+
 
 
 .SH CONTACT
