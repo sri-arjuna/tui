@@ -12,19 +12,19 @@
 #
 	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
-	TUI_VERSION=0.5.6
+	TUI_VERSION=0.5.7
 	TITLE="Text User Inferface (TUI) - Configuration"
-	ME=tui
+	ME=${0##*/}
 	[[ 0 -eq $UID ]] && \
-		export TUI_LOG="/var/TUI_LOG/$ME.TUI_LOG" || \
-		export TUI_LOG="$HOME/.config/$ME/$ME.TUI_LOG"
+		export TUI_LOG="/var/log/tui.log" || \
+		export TUI_LOG="$HOME/.config/tui/tui.log"
 	for cfg in apps colors status tui;do source /etc/tui/$cfg.conf;done
 #
 #	Functions
 #
 	doLog() { # "MESSAGE STRING"
 	# Prints: Time & "Message STRING"
-	# See 'tui-TUI_LOG -h' for more info
+	# See 'tui-log -h' for more info
 		tui-log -t "$TUI_LOG" "$1"
 	}
 	ConfigTUI() { #
@@ -87,6 +87,10 @@
 #
 #	Action & Display
 #
+	if [ 0 -eq $UID ]
+	then	USER_NAME=".: r o o t :."
+	else	USER_NAME="$USER"
+	fi
 	if [[ 0 -ne $UID ]]
 	then 	[[ -d "$HOME/.config/tui/" ]] || FirstUse
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
@@ -104,7 +108,7 @@ Where options are:
 #	Catching Arguments
 #
 	while getopts "h" name
-	do 	case $name in
+	do 	case "$name" in
 		h|help)
 			printf "$help_text"
 			exit $RET_HELP
@@ -112,18 +116,20 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	if [ "$1" = "config" ]
+	if [[ "$1" = "config" ]]
 	then 	ConfigTUI
 		exit $?
 	fi
 	
 	# /etc/tui/* & $HOME/.config/tui/* were read, TUI_THEME should be available
+	# There is a copy in tui-printf... check before deletion
 	if [[ ! -z "$TUI_THEME" ]] && [[ -f "/usr/share/tui/themes/$TUI_THEME" ]]
 	then	source "/usr/share/tui/themes/$TUI_THEME"
 		doLog "Using theme: $TUI_THEME"
 		BORDER_RIGHT=""
 		# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+		#BORDER_LEFT BORDER_RIGHT
 		HEAD_BG="$TUI_BACKGROUND"
 		HEAD_FG="$TUI_FOREGROUND"
 		TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"

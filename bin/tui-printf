@@ -29,11 +29,27 @@
 #
 #	Variables
 #
-	#source tui
-	#[[ -z $TUI_THEME ]] && source tui
-	[[ -z "$TUI_THEME" ]] && TUI_THEME=default
+	source /etc/tui/colors.conf
+	if [[ -z $TUI_THEME ]]
+	then	if [[ 0 -eq $UID ]]
+		then	source /etc/tui/tui.conf
+			TUI_THEME=$TUI_THEME_ROOT
+		else	source "$HOME/.config/tui/user.conf"
+		fi
+	fi
 	source "/usr/share/tui/themes/$TUI_THEME"
-	
+
+	# Prepare for output:
+	BORDER_RIGHT=""
+	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
+	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+	HEAD_BG="$TUI_BACKGROUND"
+	HEAD_FG="$TUI_FOREGROUND"
+	TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"
+	TITLE_FG="$TUI_FONT_INVERT$TUI_FOREGROUND"
+#
+#	Regular data
+#	
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	TITLE="$ME"
