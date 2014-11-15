@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.5.7
-Release:     2%{?dist}
+Release:     30%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -18,39 +18,50 @@ Requires:    wget
 Requires:    xterm
 
 %description
-It is a framework of commands, to assist administrators and
-developers with some tasks, to simply realize a basic
+It is a framework of commands, to simply realize a basic
 Text User Interface with their own scripts.
+Besides 4(5) core commands, there are many other commands
+which ease the task of writing a script.
+Once you got use
 
-Core commands are:
-* tui-header
-* tui-title
-* tui-printf
-* tui-echo
-* tui-status
+Core Interface Commands:
+* tui-echo (Prints up to 3 strings, newline)
+* tui-header (Shows ForeGround color as font, and BG as BG)
+* tui-printf (Prints up to 3 strings, stays_on_current_line)
+* tui-title (Shows BG color as font, and FG color as BG)
 
-These assistant commands are:
-* tui-bgjob
+Core Code helpers
+* tui-bgjob (Executes script in the background,
+             showing an animation while working...)
+* tui-progress (Showing the next animation step per call)
+* tui-read
+* tui-status (Prints another message according to exit code) 
+* tui-yesno (Returs TRUE on 'y', and FALSE on 'n')
+
+Core Tools:
+* tui-browser (Browsed given path as 'root')
+* tui-conf-editor (Basic wizzard editor)
+* tui-conf-get (Function as script)
+* tui-conf-set (Function as script)
+* tui-log (Helps you manage log file/s(-entries))
+* tui-new-browser
+* tui-new-script
+* tui-psm (Paralell Script Manager)
+
+The assistant commands are:
 * tui-bol-dir
-* tui-browser
 * tui-dd
 * tui-download
 * tui-edit
 * tui-indi
 * tui-install
-* tui-log
-* tui-new-browser
-* tui-new-script
+* tui-list
 * tui-press
-* tui-progress
-* tui-psm
-* tui-read
 * tui-str-usb
 * tui-tar
-* tui-value-get
-* tui-value-set
+* tui-terminal
 * tui-wait
-* tui-yesno
+* tui-web
 
 %prep
 %setup -q -c %{name}-%{version}
@@ -72,11 +83,13 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_sysconfdir}/%{name}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
                      %{buildroot}%{_datarootdir}/%{name}/templates \
+                     %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name}
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
 mv %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
 mv %{name}/conf.home/*     %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/templates/* %{buildroot}%{_datarootdir}/%{name}/templates/
+mv %{name}/themes/* %{buildroot}%{_datarootdir}/%{name}/themes/
 mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
 mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh

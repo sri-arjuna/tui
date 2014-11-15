@@ -97,25 +97,34 @@ If you want to change settings, please use:
 tui config
 .br
 
+
 .IP \fI/etc/tui/\fP
 System wide configuration
 .br
 .RS 7
 .IP \fBapps.conf\fP
+(tui-edit, tui-web, tui-terminal)
+.br
 This stores the default applications tui might want/need to interact with
 .br
 
 .IP \fBcolors.conf\fP
+(tui-header, tui-title)
+.br
 Contains a list of colors.
 .br
 You could change them, but it is highly recomended not to do so!
 .br
 
 .IP \fBstatus.conf\fP
+(tui-status)
+.br
 Defines how tui-status will report the different statuses
 .br
 
 .IP \fBtui.conf\fP
+(tui-new-browser, tui-new-script)
+.br
 Some basic configurations, like TUI_TEMP_{DIR,FILE}
 .br
 
@@ -126,10 +135,14 @@ Personal user configuration
 .br
 .RS 7
 .IP \fBapps.conf\fP
+(tui-edit, tui-web, tui-terminal)
+.br
 Personal favorite applications, will overwrite the system wide defaults
 .br
 
 .IP \fBuser.conf\fP
+(tui-new-browser, tui-new-script)
+.br
 Some basic reusable info about you
 .br
 
@@ -144,7 +157,11 @@ Some basic reusable info about you
 (1),
 .B tui-browser
 (1),
-.B tui-config-editor
+.B tui-conf-editor
+(1),
+.B tui-conf-get
+(1),
+.B tui-conf-set
 (1),
 .B tui-dd
 (1),
@@ -185,10 +202,6 @@ Some basic reusable info about you
 .B tui-tar
 (1),
 .B tui-title
-(1),
-.B tui-value-get
-(1),
-.B tui-value-set
 (1),
 .B tui-wait
 (1),

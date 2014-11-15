@@ -31,7 +31,9 @@ Writes SOURCE to TARGET
 
 SOURCE and TARGET can be, a partition, disk, directory, file
 "
-	[[ -z $WORK ]] && source tui
+	source /etc/tui/apps.conf
+	source /etc/tui/tui.conf
+	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
 	SOURCE="$1"
 	TARGET="$2"
 	printf "" > $TUI_TEMP_FILE

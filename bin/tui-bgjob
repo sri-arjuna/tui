@@ -23,9 +23,9 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
-	[[ -z $TUI_TEMP_FILE ]] && source /etc/profile.d/tui.sh
+	[[ -z $TUI_TEMP_FILE ]] && source /etc/tui/tui.conf
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.

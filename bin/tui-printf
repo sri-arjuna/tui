@@ -30,10 +30,13 @@
 #	Variables
 #
 	#source tui
-	[ -z $HEAD_BG ] && source /etc/profile.d/tui.sh
-	TITLE="tui-printf"
+	#[[ -z $TUI_THEME ]] && source tui
+	[[ -z "$TUI_THEME" ]] && TUI_THEME=default
+	source "/usr/share/tui/themes/$TUI_THEME"
+	
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
+	TITLE="$ME"
 	help_text="
 $ME ($script_version)
 $TITLE

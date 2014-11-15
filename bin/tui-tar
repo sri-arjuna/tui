@@ -27,7 +27,10 @@
 		\rWhere options are:
 		\r\t-h\tThis screen
 		\r"
-	source tui
+	source /etc/tui/apps.conf
+	source /etc/tui/tui.conf
+	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
+	
 	ARGS=(${@})
 	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
 	FILE_CMD="$TUI_TEMP_DIR/bgjob"

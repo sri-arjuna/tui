@@ -28,8 +28,6 @@
 #
 #	Variables
 #
-	#set -x
-	#source tui
 	RET_HELP=99
 	TITLE="Get values from conf files"
 	ME="${0##*/}"

@@ -317,7 +317,7 @@ Where options are:
 	if [[ -f $MAIN_CFG ]]
 	then 	source "$MAIN_CFG" && printf "."
 		# Now read the file and export each var
-		for V in $(tui-value-get -l $MAIN_CFG);do export $V;done
+		for V in $(tui-conf-get -l $MAIN_CFG);do export $V;done
 	fi
 	# Include/Sourced files
 	if [[ ! -z $SOURCE ]]
@@ -327,13 +327,13 @@ Where options are:
 				# Source the file, so we get all vars n' vals
 				[[ -f "$f" ]] && source "$f";printf "."
 				# Now read the file and export each var
-				for V in $(tui-value-get -l $f);do export $V;done
+				for V in $(tui-conf-get -l $f);do export $V;done
 			done
 			cd "$OLDPWD"
 		elif [ -f "$SOURCE"]
 		then 	source "$SOURCE"
 			# Now read the file and export each var
-			for V in $(tui-value-get -l $SOURCE);do export $V;done
+			for V in $(tui-conf-get -l $SOURCE);do export $V;done
 		else	tui-status 1 "Error occoured with -s $SOURCE"
 			exit $?
 		fi

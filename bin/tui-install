@@ -56,7 +56,7 @@ Where options are:
 #
 #	Variables
 #
-	source /etc/profile.d/tui.sh
+	#source /etc/profile.d/tui.sh
 	doLog=false
 	verbose=false
 	LOG=""

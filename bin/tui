@@ -14,8 +14,7 @@
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
 	TUI_VERSION=0.5.6
 	TITLE="Text User Inferface (TUI) - Configuration"
-	ME="${0##*/}"
-	ME_DIR="${0/${0##/*/}}"
+	ME=tui
 	[[ 0 -eq $UID ]] && \
 		export TUI_LOG="/var/TUI_LOG/$ME.TUI_LOG" || \
 		export TUI_LOG="$HOME/.config/$ME/$ME.TUI_LOG"
@@ -23,7 +22,7 @@
 #
 #	Functions
 #
-	doLOG() { # "MESSAGE STRING"
+	doLog() { # "MESSAGE STRING"
 	# Prints: Time & "Message STRING"
 	# See 'tui-TUI_LOG -h' for more info
 		tui-log -t "$TUI_LOG" "$1"
@@ -53,11 +52,11 @@
 				
 				tui-printf -T "Change section: $ConfigSection (overview)"
 				# Single file edit below
-				CONFIGS=$(tui-value-get -l "$ConfigSection")
+				CONFIGS=$(tui-conf-get -l "$ConfigSection")
 				
 				# Show content of the file
 				for VAR in $CONFIGS;do
-					cur=$(tui-value-get "$ConfigSection" "$VAR")
+					cur=$(tui-conf-get "$ConfigSection" "$VAR")
 					tui-printf -E "Setting '$VAR'"  "$cur"
 				done
 				
@@ -65,12 +64,12 @@
 				MSG_next="Which variable to change in $ConfigSection?"
 				select var2chg in Back $CONFIGS;do 
 					[ Back = "$var2chg" ] && break
-					cur=$(eval printf $(tui-value-get "$ConfigSection" "$var2chg"))
+					cur=$(eval printf $(tui-conf-get "$ConfigSection" "$var2chg"))
 					newval=$(tui-read "What is the new value of $var2chg ($cur):")
 					MSG_out="$ConfigSection: Changed $var2chg to $newval"
-					[[ -z "$newval" ]] || tui-value-set "$ConfigSection" "$var2chg" "$newval"
+					[[ -z "$newval" ]] || tui-conf-set "$ConfigSection" "$var2chg" "$newval"
 					tui-status $? "$MSG_out" && \
-						doTUI_LOG "$MSG_out"
+						doLog "$MSG_out"
 					tui-printf -T "$MSG_next"
 				done
 			fi
@@ -85,6 +84,9 @@
 			mkdir -p "$tmp" && \
 			cp -R /usr/share/tui/*conf  "$tmp"
 	}
+#
+#	Action & Display
+#
 	if [[ 0 -ne $UID ]]
 	then 	[[ -d "$HOME/.config/tui/" ]] || FirstUse
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
@@ -110,13 +112,31 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=(${*})			# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 	if [ "$1" = "config" ]
 	then 	ConfigTUI
 		exit $?
 	fi
-	#shift $(($OPTIND - 1))
+	
+	# /etc/tui/* & $HOME/.config/tui/* were read, TUI_THEME should be available
+	if [[ ! -z "$TUI_THEME" ]] && [[ -f "/usr/share/tui/themes/$TUI_THEME" ]]
+	then	source "/usr/share/tui/themes/$TUI_THEME"
+		doLog "Using theme: $TUI_THEME"
+		BORDER_RIGHT=""
+		# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
+		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+		HEAD_BG="$TUI_BACKGROUND"
+		HEAD_FG="$TUI_FOREGROUND"
+		TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"
+		TITLE_FG="$TUI_FONT_INVERT$TUI_FOREGROUND"
+	else	# No theme found, use the defaults
+		BORDER_LEFT="# |"
+		BORDER_RIGHT="| #"
+		
+		TITLE_BG="$TUI_COLOR_BG_WHITE"
+		TITLE_FG="$TUI_COLOR_FG_BLUE"
+		HEAD_BG="$TUI_COLOR_BG_BLUE"
+		HEAD_FG="$TUI_COLOR_FG_WHITE"
+	fi
 #
 #	Display & Action
 #

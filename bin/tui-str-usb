@@ -36,7 +36,9 @@
 #
 #	Load own/users TUI configuration?
 #
-	source tui
+	source /etc/tui/apps.conf
+	source /etc/tui/tui.conf
+	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
 #
 #	Variable handling
 #

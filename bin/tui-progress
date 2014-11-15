@@ -29,7 +29,8 @@
 #
 #	Variables
 #
-	source /etc/profile.d/tui.sh
+	#source /etc/tui/status.conf
+	source /etc/tui/tui.conf
 	TITLE="Progress indicator"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"

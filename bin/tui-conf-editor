@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
-#	Changed:	2014.11.12
-	script_version=0.4
+#	Changed:	2014.11.13
+	script_version=0.5
 	TITLE="Configuration Editor"
 #	Description:	Basic configuration file editor
 #
@@ -76,13 +76,13 @@ Log:		$LOG
 			return 1
 		
 		# Preview
-		for VAR in $(tui-value-get -l "$CONFIG");do 
-			val="$(tui-value-get $CONFIG $VAR)"
+		for VAR in $(tui-conf-get -l "$CONFIG");do 
+			val="$(tui-conf-get $CONFIG $VAR)"
 			tui-echo "$VAR" "$val"
 		done
 		
 		tui-echo "Please select wich value to change:"
-		select VAR in Back Edit $(tui-value-get -l "$CONFIG");do
+		select VAR in Back Edit $(tui-conf-get -l "$CONFIG");do
 			doSelect=false
 			msg=""
 			newval=""
@@ -90,7 +90,7 @@ Log:		$LOG
 			case $VAR in
 			Back) 	break				;;
 			Edit)	tui-edit "$CONFIG"		;;
-			*)	VAL=$(tui-value-get "$CONFIG" "$VAR")
+			*)	VAL=$(tui-conf-get "$CONFIG" "$VAR")
 				[[ " " = "${VAL:0:1}" ]] && VAL="${VAL:1}"
 				case "$VAL" in
 				true|false)	doSelect=true
@@ -116,10 +116,10 @@ Log:		$LOG
 							fi
 						else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
 						fi
-						tui-value-set "$CONFIG" "$VAR" "$newval"
+						tui-conf-set "$CONFIG" "$VAR" "$newval"
 						RET=$?
 					else	tui-yesno "This will overwrite \"$VAR\" value ($VAL) with an empty string \"\", continue?" && \
-							tui-value-set "$CONFIG" "$VAR" "$newval"
+							tui-conf-set "$CONFIG" "$VAR" "$newval"
 						RET=?
 					fi
 					

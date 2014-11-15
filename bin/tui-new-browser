@@ -10,7 +10,7 @@
 #
 #	Variables
 #
-	source tui
+	#source tui
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	TITLE="Create a new framework project using $ME"

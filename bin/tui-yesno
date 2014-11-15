@@ -31,7 +31,9 @@
 #
 #	Check for the environment to load
 #
-	type printx &>/dev/zero || source tui
+	source /etc/tui/tui.conf
+	[[ -f "$HOME/.config/tui/user.conf" ]] && source $HOME/.config/tui/user.conf
+	source /usr/share/tui/themes/$TUI_THEME
 #
 #	Variable handling
 #

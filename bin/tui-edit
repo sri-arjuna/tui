@@ -30,8 +30,8 @@
 #
 #	Check for the environment to load
 #
-	source tui
-	#[[ ! 0 -eq $UID ]] && source $HOME/.config/tui/apps.conf
+	source /etc/tui/apps.conf
+	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
 #
 #	Variable handling
 #

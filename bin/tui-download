@@ -23,7 +23,7 @@
 #
 #	STABLE: 2013.10.13	--- DONT CHANGE IT ---
 #				unless everything is STABLE & BACKED UP !!
-	source tui
+	#source tui
 	script_version=0.4
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
