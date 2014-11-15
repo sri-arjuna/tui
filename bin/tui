@@ -5,14 +5,14 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
 #	Changed:	2014.11.12
-	script_version=1.1
+	script_version=1.2
 #	Description:	Tool to configure TUI
 #
 #	Variables
 #
 	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
 	#alias tui-printf="/home/sea/.local/bin/tui-printf"
-	TUI_VERSION=0.5.7
+	TUI_VERSION=0.5.8
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME=${0##*/}
 	[[ 0 -eq $UID ]] && \

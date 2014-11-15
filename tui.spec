@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.5.7
-Release:     49%{?dist}
+Version:     0.5.8
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -113,6 +113,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Nov 13 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.8-0
+- Added: Colors and Borders are now changeable by a theme
+- Renamed: tui-value-* to tui-conf-*
+- Renamed: tui-config-editor to tui-conf-editor
+
 * Thu Nov 13 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.7-0
 - Fixed: tui-tar, compress 'indicator' was not properly shown
 - Fixed: tui-read, now shows the border
