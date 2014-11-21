@@ -20,32 +20,80 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.9
 	ME="$(basename $0)"
-	help_text="$ME ($script_version)
-		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
-		\rOpens provided FILE/s in EDITOR_[CLI,GUI]
-		\r"
 	ARGS=($@)
 #
 #	Check for the environment to load
 #
 	source /etc/tui/apps.conf
-	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
+	[[ 0 -eq $UID ]] && \
+		CONF=/etc/tui/apps.conf || \
+		CONF="$HOME/.config/tui/apps.conf"
+	[[ -f "$CONF" ]] && source "$CONF"
+	
+	help_text="$ME ($script_version)
+		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
+		\rOpens provided FILE/s in the favorite editor according to environment.
+		\rIn VT it will open \"$EDITOR_CLI\" and in GUI it will open \"$EDITOR_GUI\"
+		\r"
 #
 #	Variable handling
 #
-	[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
+	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
 	esac
 #
+#	Functions
+#
+	GetAvailableApp() { # gui|cli
+	# Returns the first found editor for either GUI or CLI
+	#
+		[[ -z "$1" ]] && echo "GetAvailableEditor requires: gui or cli" && return 1
+		
+		case $1 in
+		cli)	LIST="vim nano vi emacs"	;;
+		gui)	LIST="notepadqq emacs code-editor brackets geany pluma gedit leafpad kedit"	;;
+		esac
+		
+		for L in $LIST;do
+			which $L 2>/dev/zero && \
+				echo "$L" && \
+				return 0
+		done
+		return 1
+	}
+#
 #	Display
 #
 	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
-	then	export EDITOR=$(which $EDITOR_GUI)
-	else	export EDITOR=$(which $EDITOR_CLI)
+	then	MODE=gui
+	else	MODE=cli
 	fi
-	[[ -z "$EDITOR" ]] && export EDITOR=nano 
-	$EDITOR "${ARGS[@]}"
+	
+	if [[ -z "$EDITOR" ]]
+	then	case $MODE in
+		cli)	export EDITOR=$(which $EDITOR_CLI 2>/dev/zero)
+			;;
+		gui)	export EDITOR=$(which $EDITOR_GUI 2>/dev/zero)
+			;;
+		esac
+	fi
+	
+	# Failsafe check, use first available editor found if set EDITOR was not found
+	if ! which $EDITOR 2>/dev/zero
+	then 	# The EDITOR is not available, search for default
+		EDITOR=$(GetAvailableApp $MODE)
+		[[ $MODE = cli ]] && \
+			var=EDITOR_CLI || \
+			var=EDITOR_GUI
+		[[ -z "$EDITOR" ]] && tui-echo "No editor could be found, please change \"$CONF\" manualy!" && exit 1
+		tui-conf-set "$CONF" $var $EDITOR
+		export EDITOR
+	fi
+	
+	for A in "${ARGS[@]}";do
+		$EDITOR "$A"
+	done

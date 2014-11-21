@@ -120,7 +120,7 @@ Log:		$LOG
 						RET=$?
 					else	tui-yesno "This will overwrite \"$VAR\" value ($VAL) with an empty string \"\", continue?" && \
 							tui-conf-set "$CONFIG" "$VAR" "$newval"
-						RET=?
+						RET=$?
 					fi
 					
 					tui-status $RET "$msg" && \

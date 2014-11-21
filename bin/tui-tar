@@ -20,12 +20,14 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] [[/path/to/]directory]
 		\rWhere options are:
 		\r\t-h\tThis screen
+		\r
+		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
 		\r"
 	source /etc/tui/apps.conf
 	source /etc/tui/tui.conf
@@ -48,6 +50,7 @@
 		;;
 	"")	unset ARGS[@]
 		ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
+		;;
 	esac
 #
 #	Display
@@ -68,7 +71,7 @@
 		do	[[ -f "$DEST" ]] && \
 				tmp_size="$(ls -hl $DEST |awk '{print $5}')" || \
 				tmp_size="0 btytes"
-			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi) ]"
+			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
 			sleep 0.7
 		done
 		cd "$PWD_ORG"

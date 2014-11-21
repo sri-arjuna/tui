@@ -1,4 +1,4 @@
-.TH "tui-edit" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-edit" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.6.0"
 
 
 .SH NAME
@@ -13,6 +13,15 @@ tui-edit testfile.txt
 
 .SH DESCRIPTION
 Opens provided FILE/s in EDITOR_[CLI,GUI]
+.br
+As not all editors support the opening of multiple files at once, when passing multiple files, it will loop through all of them calling the editor for each single file.
+
+.SH FILES
+.IP /etc/tui/apps.conf
+Provides the favorite applications defaults for the system.
+.IP ~/.config/tui/apps.conf
+Provides the favorite applications defaults for the user.
+
 
 .SH SEE ALSO
 sh(1)

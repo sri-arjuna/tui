@@ -10,8 +10,6 @@
 #
 #	Variables
 #
-	#[[ -z $FAIL ]] && source /etc/profile.d/tui.sh
-	#alias tui-printf="/home/sea/.local/bin/tui-printf"
 	TUI_VERSION=0.5.8
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME=${0##*/}
@@ -120,29 +118,33 @@ Where options are:
 	then 	ConfigTUI
 		exit $?
 	fi
-	
+
+#
+#	is this required?
+#
 	# /etc/tui/* & $HOME/.config/tui/* were read, TUI_THEME should be available
 	# There is a copy in tui-printf... check before deletion
-	if [[ ! -z "$TUI_THEME" ]] && [[ -f "/usr/share/tui/themes/$TUI_THEME" ]]
-	then	source "/usr/share/tui/themes/$TUI_THEME"
-		doLog "Using theme: $TUI_THEME"
-		BORDER_RIGHT=""
+#	if [[ ! -z "$TUI_THEME" ]] && [[ -f "/usr/share/tui/themes/$TUI_THEME" ]]
+#	then	source "/usr/share/tui/themes/$TUI_THEME"
+#		doLog "Using theme: $TUI_THEME"
+#		BORDER_RIGHT=""
 		# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
-		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+#		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 		#BORDER_LEFT BORDER_RIGHT
-		HEAD_BG="$TUI_BACKGROUND"
-		HEAD_FG="$TUI_FOREGROUND"
-		TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"
-		TITLE_FG="$TUI_FONT_INVERT$TUI_FOREGROUND"
-	else	# No theme found, use the defaults
-		BORDER_LEFT="# |"
-		BORDER_RIGHT="| #"
+#		HEAD_BG="$TUI_BACKGROUND"
+#		HEAD_FG="$TUI_FOREGROUND"
+#		TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"
+#		TITLE_FG="$TUI_FONT_INVERT$TUI_FOREGROUND"
+#	else	# No theme found, use the defaults
+#		BORDER_LEFT="# |"
+#		BORDER_RIGHT="| #"
 		
-		TITLE_BG="$TUI_COLOR_BG_WHITE"
-		TITLE_FG="$TUI_COLOR_FG_BLUE"
-		HEAD_BG="$TUI_COLOR_BG_BLUE"
-		HEAD_FG="$TUI_COLOR_FG_WHITE"
-	fi
+#		TITLE_BG="$TUI_COLOR_BG_WHITE"
+#		TITLE_FG="$TUI_COLOR_FG_BLUE"
+#		HEAD_BG="$TUI_COLOR_BG_BLUE"
+#		HEAD_FG="$TUI_COLOR_FG_WHITE"
+#	fi
+
 #
 #	Display & Action
 #

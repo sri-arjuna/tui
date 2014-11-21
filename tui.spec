@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.5.8
-Release:     1%{?dist}
+Release:     28%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -113,6 +113,13 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Nov 18 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.8-21
+- Fixed: tui-edit, was very slow loading
+- Fixed: tui-browser passes now arguments to scripts it executes
+
+* Thu Nov 13 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.8-1
+- Fixed: Showed $USER instead of whoami ($USER_NAME)
+
 * Thu Nov 13 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.8-0
 - Added: Colors and Borders are now changeable by a theme
 - Renamed: tui-value-* to tui-conf-*

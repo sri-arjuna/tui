@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.10.27
-	script_version=0.6.5
+#	Changed:	2014.11.18
+	script_version=0.6.7
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
@@ -60,7 +60,15 @@ Where options are:
 "
 	# Default Interface:
 	lbl_title="$ME ($script_version) - $TITLE"
-	lbl_user="$USER @ $(date +'%F %T')"
+	if [[ 0 -eq $UID ]]
+	then	source /etc/tui/tui.conf
+	else	cfg="$HOME/.config/tui/user.conf"
+		[[ ! -f "$cfg" ]] && \
+			mkdir -p "$(dirname $cfg)" && \
+			cp /usr/share/tui/*conf "$(dirname $cfg)"
+		source "$cfg"
+	fi
+	lbl_user="$USER_NAME @ $(date +'%F %T')"
 	lbl_dir="Folders"
 	lbl_file="Files"
 	menu=show
@@ -354,6 +362,7 @@ Where options are:
 		while [[ -d "$tmp_dir/${ARGS[$C]}" ]];do
 			
 			tmp_dir+="/${ARGS[$C]}"
+			unset ARGS[$C]
 			((C++))
 		done
 	#
@@ -364,28 +373,22 @@ Where options are:
 		[ "$BASE" = "$CURRENT" ] && \
 			CUR_STR="" || \
 			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
-	#
-	#	Print top header
-	#
-		tui-header "$lbl_title" "$lbl_user"
-		tui-title "Location:"  "/$CUR_STR"
+	
 	#
 	#	now exeute it
 	#
 		if [[ -f "$tmp_dir/${ARGS[$C]}"	 ]]
-		then	str="$lbl_title"
+		then	# Print top header
+			tui-header "$lbl_title" "$lbl_user"
+			tui-title "Location:"  "/$CUR_STR"
+			# Execute it
+			str="$lbl_title"
 			for a in ${@};do str+=" $a";done
-			sh "$tmp_dir/${ARGS[$C]}" "${@}"
+			sh "$tmp_dir/${ARGS[$C]}" "${@:1}"
 			tui-status $? "$str"
 			exit $?
 		else	cd "$tmp_dir"
 		fi
-		
-		
-		
-		
-		
-		
 	fi
 	while [ ! $menu = "quit-browser" ];do
 	#
