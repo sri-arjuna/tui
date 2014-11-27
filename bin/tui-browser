@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.11.18
-	script_version=0.6.7
+#	Changed:	2014.11.27
+	script_version=0.6.9
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
@@ -40,22 +40,22 @@ Usage: 	$ME [options] [arguments]
 Where options are:
 	-h(elp)		This screen
 	-b(lacklist)	ARG	TODO
-	-d(ir)  	ARG	Folders will be labled as ARG
+	-d(ir)  	STR	Folders will be labled as ARG
 	-C(onfig)	FILE	Full path to configfile of the project
-	-D(efault)	NAME	Changes the filename startings from 'default' to 'NAME'
+	-D(efault)	STR	Changes the filename startings from 'default' to 'NAME'
 				These files will be hidden from the menu, and according to their
 				extension be called on diffrent purposes...
 				default.info	- Will be shown upon folder entry
 				default.cmd	- Will be executed upon folder entry
-	-f(ile) 	ARG	Files will be labled as ARG
-	-l(ocation)  	ARG	Location will be labled as ARG
-	-m(ode) 	ARG	Can be 'text' (nice n' slow, default)
+	-f(ile) 	STR	Files will be labled as ARG
+	-l(ocation)  	STR	Location will be labled as ARG
+	-m(ode) 	MODE	Can be 'text' (nice n' slow, default)
 				or 'num' (functional n' fast)
-	-p(ath)		ARG	Will use ARG as basedir
+	-p(ath)		PATH	Will use ARG as basedir
 	-n(oclear)		Dont clear screen after menu actions
 	-s(ource)	PATH	Sources all files in that dir
-	-t(itle)	ARG	Title-label (upper-left) is set to ARG
-	-u(ser) 	ARG	User-label (upper-right) is set to ARG
+	-t(itle)	STR	Title-label (upper-left) is set to ARG
+	-u(ser) 	STR	User-label (upper-right) is set to ARG
 	
 "
 	# Default Interface:
@@ -107,6 +107,49 @@ Where options are:
 			out="${str:1}"
 		# Replace the slashes with something else  (space-slash-space)
 		printf " $out"|sed s\\"/"\\" / "\\g
+	}
+	GetStringDirs() { # ARGS[@]
+	# Parses ARGS[@] and prints a 'path-string'
+	#
+		[[ -z "$BASE" ]] && return 1
+		[[ -z "$1" ]] && return 1
+		out="$BASE/"
+		for a in "${@}";do
+			[[ -d "$out/$a" ]] && out+="$a/"
+		done
+		echo "$out"
+	}
+	GetStringFile() { # ARGS[@]
+	# Parses ARGS[@] and prints a 'path-string'
+	#
+		[[ -z "$BASE" ]] && return 1
+		[[ -z "$1" ]] && return 1
+		dir="$BASE/"
+		for a in "${@}";do
+			if [[ -d "$dir/$a" ]]
+			then	dir+="$a/"
+			elif [[ -f "$dir/$a" ]]
+			then	file="$a"
+			fi
+		done
+		echo "$file"
+	}
+	GetStringArgs() { # ARGS[@]
+	# Parses ARGS[@] and prints a 'path-string'
+	#
+		[[ -z "$BASE" ]] && return 1
+		[[ -z "$1" ]] && return 1
+		dir="$BASE/"
+		for a in "${@}";do
+			if [[ -d "$dir/$a" ]]
+			then	dir+="$a/"
+				shift
+			elif [[ -f "$dir/$a" ]]
+			then	file="$a"
+				shift
+			else	echo "$@"
+			fi
+		done
 	}
 #
 #	Catching Arguments
@@ -244,7 +287,6 @@ Where options are:
 					done
 				fi
 			done
-			
 		fi
 	}
 	has_shebang() { # FILE
@@ -260,61 +302,7 @@ Where options are:
 		[ $size -lt $2 ] && \
 			return 0 || return 1
 	}
-	OpenMime() { # /path/to/file
-	# Attemps to open passed file with proper mime-application
-	# Returns successfully if app was found, fails if not
-		if [ $TERM = xterm ]
-		then	xdg-open "$1"
-			return $?
-		else	PDF=$(which mupdf) 		# Temporary fix TODO
-			PIC_VIEW=$(which gpicview)	# Temporary fix TODO
-			FN="$1" 					# Filename
-			has_shebang "$FN" && ./"$FN" && return 0
-			TYPE=$(mimetype "$FN"|awk '{print $2}')	# Type of it:
-			TYP=${TYPE##/*}
-			SUB=${TYPE##*/}
-			echo "DEBUG:: $TYP -- $SUB"
-			# 'Supportet' file types
-			case "${TYPE:0:4}" in
-			"appl")	case "$SUB" in
-				# "")		; return $?	;;
-				# "")	echo	; return $?	;;
-				"pdf")	$PDF "$FN"	;;
-				"x-compressed-tar")	tui-yesno "Uncompress $FN now?" || return 1
-				   			tui-yesno "Here ($CURRENT)?" && \
-				   				exTO="$CURRENT" || \
-				   				exTO=$(tui-read "Where do you want to extract the files to: ")
-					   		[ -d "$exTO" ] || mkdir -p "$exTO"
-					   		tar -axf "$FN" -C "$exTO"	;;
-				"x-shellscript")	./"$FN" 	; return $?	;;
-				*)	tui-status 1 "$TYPE not supported on console #$VTNR"	; return $?	;;
-				esac
-				;;
-			"inod")	case "$SUB" in
-				"diectory")	cd "$FN" 	; return $?	;;
-				# "")	echo TODO		; return $?	;;
-				*)	tui-status 1 "$TYPE not handled yet"	; return $?	;;
-				esac
-				;;
-			"imag")	$PIC_VIEW "$FN"	; return $?
-				;;
-			"text")	case "$SUB" in
-				"plain") tui-edit "$FN"		; return $?	;;
-				"html")	"$BROWSER" "$FN"	; return $?	;;
-				# "")	echo		; return $?	;;
-				# "")	echo		; return $?	;;
-				# "")	echo		; return $?	;;
-				# *)	#more "$FN" ; return $?	;;
-				esac
-				;;
-			# if everything else fails...
-			*)		tui-status 1 "Mimetype: '$TYPE' for file '$FN' is not supportet yet!"
-					return $?			;;
-			esac
-		fi
-		tui-status 1 "Failed to open $FN ($TYPE)"
-		return $?
-	}
+
 #
 #	Load Main configuration, BLACKLIST & SOURCE
 #
@@ -346,6 +334,8 @@ Where options are:
 			exit $?
 		fi
 	fi
+	# Update project label to the one matching, if applicable
+	#lbl_title="$ME ($script_version) - $TITLE"
 #
 #	Display & Action
 #
@@ -355,39 +345,29 @@ Where options are:
 	# Arguments been passed
 	if [[ ! -z $1 ]]
 	then	# Parse arguments, execute the file or enter the folder
-		tmp_dir="$BASE"	
-		ARGS=("${@}")
-		C=0
-	#	tmp_dir+="/${ARGS[$C]}"
-		while [[ -d "$tmp_dir/${ARGS[$C]}" ]];do
-			
-			tmp_dir+="/${ARGS[$C]}"
-			unset ARGS[$C]
-			((C++))
-		done
-	#
-	#	Set vars that must be re-read/set upon reload of current dir
-	#
 		[[ -d "$tmp_dir" ]] && cd "$tmp_dir"
-		CURRENT="$(pwd)"
+		CURRENT="$(GetStringDirs $@ )"
 		[ "$BASE" = "$CURRENT" ] && \
 			CUR_STR="" || \
 			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
-	
 	#
 	#	now exeute it
 	#
-		if [[ -f "$tmp_dir/${ARGS[$C]}"	 ]]
+		file=$(GetStringFile $@)
+		args=$(GetStringArgs $@)
+		if [[ -f "$CURRENT/$file" ]] && [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
 		then	# Print top header
 			tui-header "$lbl_title" "$lbl_user"
 			tui-title "Location:"  "/$CUR_STR"
 			# Execute it
-			str="$lbl_title"
-			for a in ${@};do str+=" $a";done
-			sh "$tmp_dir/${ARGS[$C]}" "${@:1}"
-			tui-status $? "$str"
+			
+			out=""
+			for a in "${@:1}";do out+=" $a";done
+			sh "$CURRENT/$file" $args
+			tui-status $? "$lbl_title $out"
+			#tui-status $? "$lbl_title $file $args"
 			exit $?
-		else	cd "$tmp_dir"
+		else	cd "$CURRENT"
 		fi
 	fi
 	while [ ! $menu = "quit-browser" ];do

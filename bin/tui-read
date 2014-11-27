@@ -23,13 +23,12 @@
 #
 #	Variable defaults
 #
-	[[ 0 -eq $UID ]] && \
-		CONF=/etc/tui/tui.conf || \
-		CONF=$HOME/.config/tui/user.conf
-	. $CONF
-	. /usr/share/tui/themes/$THEME
+	. /etc/tui/tui.conf
+	[[ 0 -ne $UID ]] && . $HOME/.config/tui/user.conf
+	#[[ -z "$THEME" ]] && THEME=default
+	. /usr/share/tui/themes/$TUI_THEME
 	
-	script_version=0.5
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="
 $ME ($script_version)
@@ -61,5 +60,5 @@ Examples:	$ME \"What is your favorite color?\"
 		txt="Type your input:" || \
 		txt="$1"
 	read ${doPassword} -p "$BORDER_LEFT $txt " INPUT
-	printf "$INPUT"
+	printf '%s\n' "$INPUT"
 	
