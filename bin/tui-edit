@@ -20,15 +20,14 @@
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=1.0
 	ME="$(basename $0)"
 	ARGS=($@)
 #
 #	Check for the environment to load
 #
 	source /etc/tui/apps.conf
-	[[ 0 -eq $UID ]] && \
-		CONF=/etc/tui/apps.conf || \
+	[[ 0 -eq $UID ]] || \
 		CONF="$HOME/.config/tui/apps.conf"
 	[[ -f "$CONF" ]] && source "$CONF"
 	
@@ -81,11 +80,11 @@
 			;;
 		esac
 	fi
-	
+	set -x
 	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $EDITOR 2>/dev/zero
+	if ! which $EDITOR > /dev/zero
 	then 	# The EDITOR is not available, search for default
-		EDITOR=$(GetAvailableApp $MODE)
+	EDITOR=$(GetAvailableApp $MODE)
 		[[ $MODE = cli ]] && \
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
