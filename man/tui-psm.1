@@ -1,52 +1,62 @@
-.TH "tui-psm" "1" "2014-10-15" "Simon Arjuna Erat (sea)"
+.TH "tui-psm" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-Paralell Script Manager (0.1)
+Paralell Script Manager (0.7.2)
+
+.SH DESCRIPTION
+Executes as many scripts as you pass to it.
+.br
+Can also return the number of successfully ended scripts as exit code.
+.br
 
 .SH SYNOPSIS
 \fBtui-psm\fP [options] [arguments]
 .br
-Example:	tui-psm script1 script2
+
+Examples:
 .br
-		tui-psm -cl 5 *
+		\fBtui-psm\fP script1 script2
+.br
+		\fBtui-psm\fP -cl 5 *
 .br
 	
 .br
-Where options are:
-.IP "\fB-h\fP"
-This screen
-.IP "\fB-L\fP"
-Shows the logfile
-.IP "\fB-l NUM\fP"
+
+.SH OPTIONS
+.OP -c
+.RS 4
+Returns the number of successfully executed (as in ended) scripts as exit code.
+.RE
+
+.OP -l NUM
+.RS 4
 Limits the number of paralell executed scripts.
 .br
-5 default
+5 is default
 .br
 0 to disable
-.IP "\fB-w NUM\fP"
+.RE
+
+.OP -w NUM
+.RS 4
 Wait NUM seconds between value updates.
 .br
 The lower the number, the more intense the cpu usage will be.
 .br
-.IP "\fB-q NUM\fP"
+The default is 5 seconds.
+.RE
+
+.OP -q NUM
+.RS 4
 Be quiet
 .br
 Just silent and non-verbose.
-.br
+.RE
 
-.IP "\fB-c\fP"
-The exit code is now the number of successfully executed scripts.
-.br
 
-.SH DESCRIPTION
-.PP
-Executes as many scripts as you pass to it.
-.br
-Can also return the number of successfully ended scripts.
-.br
 
 .SH LICENSE
-GNU General Public License (LGPL)
+GNU General Public License (GPL)
 .br
 http://www.gnu.org/licenses/gpl.html
 .br

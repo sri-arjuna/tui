@@ -1,19 +1,22 @@
-.TH "tui-edit" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.6.0"
-
+.TH "tui-edit" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-edit
+tui-edit (0.9)
 
 .SH SYNOPSIS
 \fBtui-edit\fP [options] [/path/to/]FILE [../]FILE2 ...
 .br
+
 Example: 
 .br
-tui-edit testfile.txt
+		\fBtui-edit\fP /path/to/testfile.txt
+.br
+		\fBtui-edit\fP *html
 
 .SH DESCRIPTION
 Opens provided FILE/s in EDITOR_[CLI,GUI]
 .br
+
 As not all editors support the opening of multiple files at once, when passing multiple files, it will loop through all of them calling the editor for each single file.
 
 .SH FILES
@@ -24,7 +27,14 @@ Provides the favorite applications defaults for the user.
 
 
 .SH SEE ALSO
-sh(1)
+.B bash
+(1),
+.B tui
+(1),
+.B tui-terminal
+(1),
+.B tui-web
+(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

@@ -1,20 +1,25 @@
-.TH "tui-dd" "1" "2013 10 06" "Simon A. Erat (sea)"
+.TH "tui-dd"  1  "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-dd (0.1)
+tui-dd (0.5)
 
 .SH SYNOPSIS
 \fBtui-dd\fP SOURCE TARGET
 .br
-Example: tui-dd somefile.iso $(tui-str-usb)
+
+Example:
+.br
+		tui-dd /path/to/somefile.iso $(tui-str-usb)
+.br
+		tui-dd somefile.iso /dev/sdc
 
 .SH DESCRIPTION
-.PP
 Writes SOURCE to TARGET using DD.
+.br
 Showing amount of data written during the process.
 
 .SH SEE ALSO
-dd(1), ps(1), sh(1)
+dd(1), ps(1), bash(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

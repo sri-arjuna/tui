@@ -1,14 +1,66 @@
-.TH "tui-newscript" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-new-script" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-newscript
-
-.SH SYNOPSIS
-\fBtui-newscript\fP [/path/to/]SCRIPTNAME
+tui-newscript (0.9.4)
 
 .SH DESCRIPTION
-.PP
-Places SCRIPTNAME in ~/bin or absolute path if provided [/path/to].
+Creates a scriptefile with execution flag set.
+.br
+If no (absolute/relative) path is is provied prior to the scriptname,
+it will create it in either ~/bin or ~/.local/bin.
+.br
+If either one exists and you want the script in current dir to be created, you must pass
+.B ./SCRIPTNAME
+
+
+.SH SYNOPSIS
+\fBtui-new-script\fP [options] [/path/to/]SCRIPTNAME
+
+.SH OPTIONS
+.OP -m
+.br
+Creates a minimal script, providing these things:
+.br
+.RS 4
+* shebang
+.br
+* empty 'Variables' & 'Display & Action' sections
+.RE
+
+.OP -p
+.br
+Create a full program script template, providing these sections:
+.RS 4
+* shebang
+.br
+* header disclaimer
+.br
+* check for tui
+.br
+* dynamic variables
+.br
+* helptext
+.br
+* getopts
+.br
+* example 'Display & Action' section
+.RE
+
+.OP -r
+.br
+Creates a regular script, providing these sections:
+.RS 4
+* shebang
+.br
+* header disclaimer
+.br
+* Variable defaults
+.br
+* getopts
+.br
+* empty 'Display & Action' section
+.br
+.RE
 
 .SH SEE ALSO
 sh(1), man(1)

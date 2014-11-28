@@ -1,7 +1,16 @@
-.TH "tui-yesno" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-yesno" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-yesno
+tui-yesno (0.4)
+
+.SH DESCRIPTION
+Asks the user supplied question and returns 0 (true) for 
+.B y,j,o,s
+which are the starting letters for
+.I yes
+in english, spanish, italian, german and french.
+.br
+Returns 1 (false) for anything else.
 
 .SH SYNOPSIS
 \fBtui-yesno\fP "Question"
@@ -17,16 +26,9 @@ else echo "do female stuff"
 .br
 fi
 
-.SH DESCRIPTION
-.PP
-Asks the user supplied question and returns 0 for y,j,o,s
-.br
-which are the starting letters for yes in english, spanish, italian, german and french
-.br
-or 1 for anything else.
 
 .SH SEE ALSO
-read(1), sh(1)
+read(1), bash(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

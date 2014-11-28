@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.5.9
-Release:     0%{?dist}
+Release:     1%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -113,6 +113,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Nov 28 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.9-1
+- General manpage update and unifiquation.
+
 * Thu Nov 27 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.9-0
 - tui-browser 'fix' argument passing to sub scripts
 - tui-read, properly uses theme now

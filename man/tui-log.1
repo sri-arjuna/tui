@@ -1,4 +1,4 @@
-.TH "tui-log" 1 "2014 05 20" 0.5.0 TUI
+.TH "tui-log" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
 tui-log (0.4)
@@ -13,28 +13,39 @@ Note that the order of options define their order in the LOGFILE.
 .SH SYNOPSIS
 \fBtui-log\fP [options] LOGFILE [MESSAGE]
 .br
-.PP
+
 Examples:
 .br
- 	tui-log "/var/log/appname.log" "Message"
+ 	\fBtui-log\fP "/var/log/appname.log" "Message"
 .br
-	tui-log -dtp "LOGFILE" "Server started"
+	\fBtui-log\fP -dtp "LOGFILE" "Server started"
 .br
-	tui-log -pu "LOGFILE" "Changed background"
+	\fBtui-log\fP -pu "LOGFILE" "Changed background"
 .br
 
 .SH OPTIONS
-.IP "\fB-e\fP"
+.OP "-e"
+.br
 Prints just the message, or an empty line
-.IP "\fB-d\fP"
+
+.OP "-d"
+.br
 Adds the DATE (2014-09-01) in front
-.IP "\fB-t\fP"
+
+.OP "-t"
+.br
 Adds the TIME (17:03:00) in front
-.IP "\fB-p\fP"
+
+.OP "-p"
+.br
 Adds the PID  (25276) in front
-.IP "\fB-u\fP"
+
+.OP "-u"
+.br
 Adds the USER in front
-.IP "\fB-s CHAR\fP"
+
+.OP "-s CHAR"
+.br
 Changes the seperator to CHAR
 
 .SH LICENSE

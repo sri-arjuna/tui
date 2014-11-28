@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
-#	Changed:	2014.11.13
-	script_version=0.5
+#	Changed:	2014.11.27
+	script_version=0.6
 	TITLE="Configuration Editor"
 #	Description:	Basic configuration file editor
 #
@@ -54,6 +54,8 @@ Examples:	$ME
 Where options are:
 	-h(elp) 		This screen
 	-L(og)			Show the log file ($LOG)
+	-l [/path/to/]file.log	Change the log file to this
+	-t \"Your prj title\"	Change the title to this
 
 Files:
 --------------------------------------
@@ -134,13 +136,17 @@ Log:		$LOG
 #
 #	Catching Arguments
 #
-	while getopts "hL" opt
+	while getopts "hLl:t:" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
 		L)	less "$LOG"	
 			exit $RET_DONE
+			;;
+		t)	TITLE="$OPTARG"
+			;;
+		l)	LOG="$OPTARG"
 			;;
 		esac
 	done

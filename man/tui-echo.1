@@ -1,19 +1,27 @@
-.TH "tui-echo" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-echo" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 
 .SH NAME
-tui-echo
-.br
+tui-echo (0.7)
 
 
 .SH SYNOPSIS
 \fBtui-echo\fP [STRING1] [STRING2] [STRING3]
 .br
 
+Example:
+.br
+		\fBtui-echo\fP 'left'
+.br
+		\fBtui-echo\fP '' 'center' 'right'
+.br
+		\fBtui-echo\fP 'left'  'right'
+		
+
 
 .SH DESCRIPTION
 .PP
-Prints supplied STRING[1-3] aligned according to their position encapsuled by BORDER_LEFT and BORDER_RIGHT and sends cur
+Prints supplied STRING[1-3] aligned according to their position encapsuled by BORDER_LEFT and BORDER_RIGHT and prints a newline.
 .br
 STRING1 : LEFT
 .br
@@ -22,8 +30,29 @@ STRING2 : RIGHT (or middle if 3)
 STRING3 : RIGHT
 .br
 
+.SH FILES
+.IP /etc/tui/tui.conf
+Provies the color names used by the
+.B THEMES
+
+.IP /usr/share/tui/themes/*
+Provides the configurations for the
+.B THEMES
+used.
+
+.IP /etc/tui/tui.conf
+Provides the default theme 
+.IP ~/.config/tui/user.conf
+Provides the THEME the user uses.
+
+
 .SH SEE ALSO
-printf(1), sh(1), tput(1)
+.B bash
+(1),
+.B tui-printf
+(1),
+.B tput
+(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

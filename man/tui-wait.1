@@ -1,22 +1,22 @@
-.TH "tui-wait" "1" "" "Simon Arjuna Erat (sea)"
+.TH "tui-wait" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-wait (0.1)
-
-.SH SYNOPSIS
-\fBtui-wait\fP [options] [arguments]
-.br
-Example: tui-wait
-.br
-Where options are:
-.IP "\fB-XY\fP"
-does this
-.IP "\fB-YX\fP"
-does that
+tui-wait (0.4)
 
 .SH DESCRIPTION
-.PP
-Some descriptional text
+Waits for provided time and shows the user a message if provided.
+.br
+Append either a 'm' or 'h' to wait for NUM 'minutes' or 'hours'.
+
+.SH SYNOPSIS
+\fBtui-wait\fP NUM[mh] ["Messsage to user"]
+.br
+
+Example:
+.br
+		tui-wait 4m "Message to user"
+.br
+
 
 .SH LICENSE
 GNU General Public License (GPL)

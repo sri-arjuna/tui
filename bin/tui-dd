@@ -41,7 +41,7 @@ SOURCE and TARGET can be, a partition, disk, directory, file
 #	Variable handling
 #
 	if [[ "$1" = "-h" ]] || [[ -z $2 ]];then
-	printf -e "$help_text" && exit $RET_HELP;fi
+	printf "$help_text" && exit $RET_HELP;fi
 	[[ 0 -eq $UID ]] || tui-status 1 "Requires root" || exit 1
 #
 #	Display

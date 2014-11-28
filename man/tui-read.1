@@ -1,19 +1,30 @@
-.TH "tui-read" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-read" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-read
+tui-read (0.7)
 
 .SH SYNOPSIS
-\fBtui-read\fP [options] "Question"
+\fBtui-read\fP [-p] "Question"
 .br
-Example: MYHAIR=$(tui-read "what color is your hair?")
+
+Examples:
+.br
+		MYHAIR=$(tui-read "what color is your hair?")
+.br
+		PASSWORD=$(tui-read -p "Enter your password:"
+.br
 
 .SH DESCRIPTION
-.PP
-Some descriptional text
+Simply reads the input given by user while showing him the 'Question'.
+
+.SH OPTIONS
+.OP -p
+.RS 4
+Wont show characters typed in.
+.RE
 
 .SH SEE ALSO
-read(1), sh(1)
+read(1), bash(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

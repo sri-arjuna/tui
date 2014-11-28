@@ -1,16 +1,37 @@
-.TH "tui-status" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.5.0"
+.TH "tui-status" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-status
-
-.SH SYNOPSIS
-\fBtui-status\fP $? ["MESSAGE" ["Centred message"] ]
+tui-status (0.7)
 
 .SH DESCRIPTION
-.PP
-tui-status always exists with the numeric argument that must be passed.
+tui-status always exit with the numeric argument that must be passed as first argument.
 .br
-Returns the error level passed as first (numeric) argument and prints the MESSAGE's if supplied.
+Returns the error code passed as argument and prints the MESSAGE if supplied.
+.br
+
+.SH SYNOPSIS
+\fBtui-status\fP NUM ["MESSAGE" ["Centred message"] ]
+.br
+
+Examples:
+.br
+		\fBtui-status\fP $? "Executed previous command"
+.br
+		\fBtui-status\fP $RET_SKIP "Skipped entry"
+.br
+		\fBtui-status\fP 1 "Command failed"
+
+.SH STATUS
+There are a number of scripts interpreted, but not all covered.
+.br
+To use these variables containing the numbers tui-status is interpreting, you have to
+.B source tui
+by using
+.B source tui
+in your scripts.
+.br
+
+Then, these variables will be available and set:
 .br
 RET_DONE=0
 .br
@@ -36,12 +57,29 @@ RET_HELP=99
 .br
 RET_INFO=111
 .br
-Just use the strinparg after _, $INFO, will display what you see on the right side upon:
-tui-status $RET_INFO "Info message"
+
+In the same way, you can use:
 .br
+$TUI_DONE
+.br
+$TUI_FAIL
+.br
+ ...
+.br
+$TUI_SKIP
+.br
+ ...
+.br
+$TUI_INFO
+
+.SH FILES
+.IP /etc/tui/status.conf
+Provides the RET_{XY} values and the strings shown by tui-status.
+.br
+The $TUI_{DONE,FAIL,..} look diffrent depening whether your are in a VT or GUI.
 
 .SH SEE ALSO
-printf(1), sh(1), tput(1)
+tui-printf(1), bash(1), tput(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

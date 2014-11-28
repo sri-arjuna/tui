@@ -1,16 +1,28 @@
-.TH "tui-bgjob" "1" "2013 10 26" "Simon A. Erat (sea)"
+.TH "tui-bgjob"  1  "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-bgjob (0.2)
+tui-bgjob (0.5)
 
 .SH SYNOPSIS
-\fBtui-bgjob\fP SCRIPTFILE  'Progress String'  'Exit String'  [ WAIT ]
+\fBtui-bgjob\fP [-f OUTFILE] SCRIPTFILE  'Progress String'  'Exit String'  [ WAIT ]
+.br
+
+Examples:
+.br
+		tui-bgjob $HOME/script.sh "\\$(ls -l \\$some_var/FILE|awk '{print \\$5}')" "Script executed"
+.br
+		tui-bgjob scriptname "Working, please wait..." "Finished" 5
+.br
+
 .br
 NOTE:\t'Progress String' may contain shell escaped commands.
 .br
-Example1: tui-bgjob $HOME/script.sh "\\$(ls -l \\$some_var/FILE|awk '{print \\$5}')" "Script executed"
-.br
-Example2: tui-bgjob scriptname "Working, please wait..." "Finished" 5
+If
+.B
+-f OUTFILE
+is passed, it will check for OUTFILE and print its 
+.I filesize.
+
 .SH DESCRIPTION
 .PP
 Executes SCRIPTFILE and prints 'Progress String' while running.

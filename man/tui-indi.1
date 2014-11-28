@@ -1,23 +1,30 @@
-.TH "tui-indi" "1" "2013 09 15" "Simon A. Erat (sea)" "TUI 0.4.0"
+.TH "tui-indi" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 
 .SH NAME
-tui-indi
+tui-indi (0.)
 
 .SH SYNOPSIS
 \fBtui-indi\fP
 .br
-Example: 
-while [ true ];do tui-printf $(tui-indi);done
+
+Example:
+.br
+		while [ true ];do tui-printf $(
+.B tui-indi
+);done
+.br
 
 .SH DESCRIPTION
 .PP
 Each call it prints the next symbol of this order:
 .br
 - \\ | /
+.br
+So it can easy be used to 'indicate' progress while remain on the same line.
 
 .SH SEE ALSO
-sh(1)
+bash(1)
 
 .SH LICENSE
 GNU General Public License (GPL)

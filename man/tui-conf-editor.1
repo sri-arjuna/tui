@@ -1,0 +1,45 @@
+.TH "tui-conf-editor" 1  "Simon A. Erat (sea)" "TUI 0.6.0"
+
+.SH NAME
+tui-conf-editor (0.1)
+
+.SH DESCRIPTION
+This is a basic configuration editor.
+.br
+It does only work with plain text, offers no selection menus.
+.br
+The only exception beeing if the value is either 'true' or 'false'.
+
+
+.SH SYNOPSIS
+\fBtui-conf-editor\fP [options] CONFFILE1 [CONFFILE2 ..]
+.br
+
+Example:
+.br
+		"\fBtui-conf-editor\fP $HOME/.config/my-app/*.conf
+.br
+Looks for all conf files in 
+.I $HOME/.config/my-app/
+and asks which one the user wants to change/edit.
+
+.SH OPTIONS
+.OP -l /path/to/file.log
+.br
+Use this file to log actions.
+
+.OP -t 'Project Title'
+.br
+Changes the title to 
+.B "Project Title"
+
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://sea.fedorapeople.org

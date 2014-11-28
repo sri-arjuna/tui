@@ -1,26 +1,30 @@
-.TH "tui-tar" "1" "2013 09 29" "Simon A. Erat (sea)" "tui-tar 0.1"
+.TH "tui-tar" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-tar
+tui-tar (0.5)
 
 .SH SYNOPSIS
-\fBtui-tar\fP [options] [[/path/to/]tar] [[/path/to/]tar2] ...
+\fBtui-tar\fP [options] [[/path/to/]folder1] [[/path/to/]folder2] ...
 .br
-Example: tui-tar /some/dir /some/{reg,ex}
+
+Example:
 .br
-NOTE: Wildcards only will fail
-Where options are:
+	\fBtui-tar\fP /some/dir /another/dir-with/{reg,ex}
 .br
-.IP "\fB-h\fP"
-Shows this
-.br
+Will create 2 tarballs, the first beeing named like:
 
 
 .SH DESCRIPTION
-.PP
-Tar's provided /path/to/tar or asks for it.
+Tar's a complete folder, naming the tarball to the last subfolder-name.
 .br
-Tarball is placed within current (pwd) path.
+
+
+.SH FILES
+.IP /etc/tui/apps.conf
+Provides systemwide defaults for $TAR_EXT which is used as extension for tui-tar.
+.IP ~/.config/tui/apps.conf
+Provides the users setting for $TAR_EXT which is used as extension for tui-tar.
+
 
 .SH LICENSE
 GNU General Public License (GPL)

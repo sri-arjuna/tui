@@ -1,0 +1,46 @@
+.TH "tui-conf-get" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
+
+.SH NAME
+tui-conf-get (0.4)
+
+.SH DESCRIPTION
+tui-conf-get was designed to ease a developers task on getting values of variables.
+.br
+As of current state it removes any occouring '"' or '=' in the string returning.
+
+
+.SH SYNOPSIS
+\fBtui-conf-get\fP [options] [arguments]
+.br
+
+Example:
+.br
+		\fBtui-conf-get\fP   /etc/default/grub GRUB_CMDLINE_LINUX
+.br
+		\fBtui-conf-get\fP -i /etc/default/grub grub_cmdline_linux
+.br
+		\fBtui-conf-get\fP -l /etc/default/grub
+
+.br
+
+.SH OPTIONS
+.OP -l
+.RS 4
+Shows a list of all variables available in the file.
+.RE
+
+.OP -i
+.RS 4
+Whether the variable name to look for is provided in capitals or not is no longer relevant.
+.RE
+
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://sea.fedorapeople.org

@@ -1,4 +1,4 @@
-.TH "tui-progress" "1" "2014 04 26" "Simon Arjuna Erat (sea)" "TUI 0.5.0"
+.TH "tui-progress" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
 tui-progress (0.3)
@@ -6,23 +6,58 @@ tui-progress (0.3)
 .SH SYNOPSIS
 \fBtui-progress\fP [options] [MESSAGE]
 .br
-Example:	tui-progress "Message to user"
+
+Example:
+.br
+		tui-progress "Message to user"
 .br
 		tui-progress -m 104 "Count up to 104"
 .br
-Where options are:
-.IP \fB-i WORD\fP
-Uses WORD as describor and tempfile name for the progress index
-.IP \fB-r\fP
-Resets an instances index to 0 (1 if -m is set)
-.IP \fB-m MAXVAL\fP
+
+.SH OPTIONS
+.OP -i WORD
+.RS 4
+Uses WORD as describor and tempfile name for the progress index.
+.br
+This is specialy helpfull when running several scripts in the background where numbering for each is enabled.
+.RE
+
+.OP \fB-r\fP
+.RS 4
+Resets the tempfile which is diffrent if
+.B -i WORD
+is provided.
+.RE
+
+.OP -m MAXVAL
+.RS 4
 Set Max value to MAXVAL, this changes the output to: counted: 'num / max', where 'num' is the number of item currently worked on.
 .br
-Note that this option requires a prior invoke of: \fBtui-progress -i APPNAME -m ${ARRAY[#*]}\fP
+Note that this option requires a prior invoke of:
+.B "tui-progress -ri APPNAME -m 104"
 .br
-whereby followed by \fBtui-progress -i APPNAME "Text of Task #"\fP
+whereby followed by
+.B "tui-progress -i APPNAME 'Text of Task: $FILENAME'"
 .br
-As in: "4 / MAXVAL"
+Which will be shown similar to:
+.br
+
+# | Text of Task: Currentfile.txt	 	 	 	CUR / 104 | #
+.br
+
+Where
+.B CUR
+is the current number of the invoke of 
+.B "tui-progress -i APPNAME 'Text of Task: $FILENAME'"
+which is saved and increased from the tempfile 'APPNAME'.
+.RE
+
+.OP -v
+.RS 4
+Will enable verbose mode, but only applies when
+.B "-m NUM"
+is inovked.
+.RE
 
 .SH DESCRIPTION
 .PP

@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.5
+	script_version=0.6
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
@@ -32,6 +32,7 @@
 		\rdo\t$ME
 		\rdone
 		\r"
+	[[ "-h" = "$1" ]] && printf "$help_text" && exit 
 	[[ -z $TUI_TEMP_DIR ]] && \
 		source /etc/tui/tui.conf && \
 		export TUI_TEMP_DIR tmpfile="$TUI_TEMP_DIR/tui-indi.num"
