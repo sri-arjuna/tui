@@ -42,37 +42,7 @@
 		cd "$thisconf"
 		
 		# Show & Edit files
-		tui-printf -T "$MSG_MENU_title"
-		select ConfigSection in Quit Edit_All * ;do
-			if [ ! "" = "$(printf $ConfigSection)" ];then
-				[ Quit = $ConfigSection ] && exit 0
-				[ Edit_All = $ConfigSection ] && tui-edit "$thisconf"/* && exit 0
-				
-				tui-printf -T "Change section: $ConfigSection (overview)"
-				# Single file edit below
-				CONFIGS=$(tui-conf-get -l "$ConfigSection")
-				
-				# Show content of the file
-				for VAR in $CONFIGS;do
-					cur=$(tui-conf-get "$ConfigSection" "$VAR")
-					tui-printf -E "Setting '$VAR'"  "$cur"
-				done
-				
-				# Change?
-				MSG_next="Which variable to change in $ConfigSection?"
-				select var2chg in Back $CONFIGS;do 
-					[ Back = "$var2chg" ] && break
-					cur=$(eval printf $(tui-conf-get "$ConfigSection" "$var2chg"))
-					newval=$(tui-read "What is the new value of $var2chg ($cur):")
-					MSG_out="$ConfigSection: Changed $var2chg to $newval"
-					[[ -z "$newval" ]] || tui-conf-set "$ConfigSection" "$var2chg" "$newval"
-					tui-status $? "$MSG_out" && \
-						doLog "$MSG_out"
-					tui-printf -T "$MSG_next"
-				done
-			fi
-			tui-printf -T "$MSG"
-		done
+		tui-conf-editor *conf
 	}
 	FirstUse() { #
 	# Checks if the user configuration is present
@@ -82,15 +52,44 @@
 			mkdir -p "$tmp" && \
 			cp -R /usr/share/tui/*conf  "$tmp"
 	}
+	ResetTUI() { #
+	#
+	#
+		case $UID in
+		0)	# ROOT, system wide
+			RANGE="System defaults"
+			CFG_DIR=/etc/tui
+			SRC_DIR=/usr/share/tui/conf.etc
+			;;
+		*)	# USER, personal only
+			RANGE="Personal settings"
+			CFG_DIR=$HOME/.config/tui
+			SRC_DIR=/usr/share/tui
+			;;
+		esac
+		
+		[[ -d "$CFG_DIR" ]] || mkdir -p "$CFG_DIR"
+		cd "$CFG_DIR"
+		if [[ $? -eq 0 ]]  && $YES
+		then	rm -fr *
+		else	tui-yesno "Are you sure to remove $RANGE?" || return 1
+			rm -fr *
+		fi
+		
+		cd "$SRC_DIR"
+		cp *conf "$CFG_DIR"
+		return $?
+	}
 #
 #	Action & Display
 #
 	if [ 0 -eq $UID ]
 	then	USER_NAME=".: r o o t :."
 	else	USER_NAME="$USER"
+		[[ -f $HOME/.config/tui/user.conf ]] && souorce $HOME/.config/tui/user.conf
 	fi
 	if [[ 0 -ne $UID ]]
-	then 	[[ -d "$HOME/.config/tui/" ]] || FirstUse
+	then 	[[ -d "$HOME/.config/tui/" ]] || ( YES=true ; ResetTUI ) 
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
 	fi
 	help_text="
@@ -100,6 +99,8 @@ Usage: 	$ME [options] [config]
 Where options are:
 	-h		This screen
 	config		Enters directly into config mode
+	reset		Resets configuration to defaults, root will reset systemwide defaults
+	reset-yes	Doesnt ask for verification
 
 "
 #
@@ -114,37 +115,22 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	if [[ "$1" = "config" ]]
+	
+	MODE=$1
+	YES=false
+	if [[ "$MODE" = "config" ]]
 	then 	ConfigTUI
 		exit $?
+	elif [[ "$MODE" = "reset-yes" ]]
+	then	MODE=reset
+		YES=true
 	fi
-
-#
-#	is this required?
-#
-	# /etc/tui/* & $HOME/.config/tui/* were read, TUI_THEME should be available
-	# There is a copy in tui-printf... check before deletion
-#	if [[ ! -z "$TUI_THEME" ]] && [[ -f "/usr/share/tui/themes/$TUI_THEME" ]]
-#	then	source "/usr/share/tui/themes/$TUI_THEME"
-#		doLog "Using theme: $TUI_THEME"
-#		BORDER_RIGHT=""
-		# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
-#		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
-		#BORDER_LEFT BORDER_RIGHT
-#		HEAD_BG="$TUI_BACKGROUND"
-#		HEAD_FG="$TUI_FOREGROUND"
-#		TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"
-#		TITLE_FG="$TUI_FONT_INVERT$TUI_FOREGROUND"
-#	else	# No theme found, use the defaults
-#		BORDER_LEFT="# |"
-#		BORDER_RIGHT="| #"
-		
-#		TITLE_BG="$TUI_COLOR_BG_WHITE"
-#		TITLE_FG="$TUI_COLOR_FG_BLUE"
-#		HEAD_BG="$TUI_COLOR_BG_BLUE"
-#		HEAD_FG="$TUI_COLOR_FG_WHITE"
-#	fi
-
+	
+	if [[ "$MODE" = "reset" ]]
+	then	ResetTUI
+		tui-status $? "Reset $RANGE"
+		exit
+	fi
 #
 #	Display & Action
 #
