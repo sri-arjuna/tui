@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.5.9
-Release:     1%{?dist}
+Release:     2%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -70,29 +70,33 @@ The assistant commands are:
 # nothing to do
 
 %install
+# Clean buildroot
 rm -rf       %{buildroot}
-rm %{name}/install.sh \
-	%{name}/uninstall.sh \
-	%{name}/README.md \
-	%{name}/build-rpm-%{name}.sh \
-#	config.etc/color-org.conf \
-#	%{name}/config.etc/status-org.conf \
-	#%{name}/tui.spec
+# Remove non-used files to reduce package size
+rm -fr  %{name}/build-rpm-%{name}.sh \
+        %{name}/install.sh \
+        %{name}/uninstall.sh
+# Prepare directories
 mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
                      %{buildroot}%{_sysconfdir}/%{name}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
-                     %{buildroot}%{_datarootdir}/%{name}/templates \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name}
+# Move the executeables
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
-mv %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
-mv %{name}/conf.home/*     %{buildroot}%{_datarootdir}/%{name}/
-mv %{name}/templates/* %{buildroot}%{_datarootdir}/%{name}/templates/
-mv %{name}/themes/* %{buildroot}%{_datarootdir}/%{name}/themes/
-mv %{name}/docs/*    %{buildroot}%{_docdir}/%{name}
-mv %{name}/man/*.1   %{buildroot}%{_mandir}/man1
-mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh
+# Copy system defaults to system
+cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
+# Move system defaults to app dir
+mv %{name}/conf.etc    %{buildroot}%{_datarootdir}/%{name}/
+
+cp %{name}/conf.home/*  %{buildroot}%{_datarootdir}/%{name}/
+mv %{name}/templates    %{buildroot}%{_datarootdir}/%{name}/
+mv %{name}/themes       %{buildroot}%{_datarootdir}/%{name}/
+mv %{name}/docs/*       %{buildroot}%{_docdir}/%{name}
+mv %{name}/man/*.1      %{buildroot}%{_mandir}/man1
+# Lets try once again without this...
+#mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh
 
 %clean
 rm -rf %{buildroot}
@@ -109,10 +113,13 @@ rm -rf %{buildroot}
 
 %config
 %{_sysconfdir}/%{name}/
-%{_sysconfdir}/profile.d/%{name}.sh
+#%{_sysconfdir}/profile.d/%{name}.sh
 
 
 %changelog
+* Fri Nov 28 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.9-2
+- Updated website in the manpages & prepared spec for 'tui reset'
+
 * Fri Nov 28 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.9-1
 - General manpage update and unifiquation.
 
