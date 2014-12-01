@@ -30,13 +30,14 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.4
+	script_version=0.5
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
 	T="$(date +%T)"
 	daily_date_str="#### $(date +'%F') ####"	# Only used if log dont uses the date otherwise
 	SEP="\t"
+	beVerbose=false
 #
 #	Help text
 #
@@ -56,13 +57,14 @@ Where options are:
 	-p(id)			Adds the PID  ($$) in front
 	-u(ser)			Adds the USER ($USER) in front
 	-s(eperator)	ARG	Changes the the seperator ($SEP) to ARG
+	-v(erbose)		Prints the MESSAGE also to screen using tui-echo
 
 "
 #
 #	Catching arguments
 #
 	[[ -z $2 ]] && printf "$help_text" && exit $RET_FAIL
-	while getopts "hedtpus:" opt
+	while getopts "hedtpus:v" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
@@ -72,6 +74,7 @@ Where options are:
 		p)	PRE+=" $$"		;;
 		u)	PRE+=" $USER"		;;
 		s)	SEP="$OPTARG"		;;
+		v)	beVerbose=true		;;
 		esac
 	done
 	shift $(($OPTIND - 1))
@@ -98,4 +101,6 @@ Where options are:
 			( grep -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
 	fi
 	while [[ " " = "${PRE:0:1}" ]] ;do PRE="${PRE:1}";done	# Remove leading spaces
+	$beVerbose && tui-echo "$MSG"
 	printf "${PRE}${MSG}\n" >> "$LOG"
+	
