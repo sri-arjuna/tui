@@ -80,7 +80,6 @@
 			;;
 		esac
 	fi
-	set -x
 	# Failsafe check, use first available editor found if set EDITOR was not found
 	if ! which $EDITOR > /dev/zero
 	then 	# The EDITOR is not available, search for default
