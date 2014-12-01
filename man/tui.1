@@ -85,13 +85,30 @@ All of the tui-* commands, share a common option trigger, which is:
 	Shows command version and help
 .br
 
+Please see their respective help or manpage information for their options and syntax.
 
+
+
+
+.SH TEXT USER INTERFACE
+Sourcing TUI by either
+.B
+.I ". tui"
+or
+.B
+.I "source tui"
+will provide the variables listed in the 
+.B FILES 
+section.
 
 .SH FILES
-These files are used as settings and user customization
+These files are used as settings and user customization.
 .br
-Generaly speaking, you dont need to take care about the files when using tui-* commands
+Generaly speaking, these are ment so the user configures the 'endpoints' (theme, applications), 
+and the developer can focus on writing functions, and simply use tui-edit instead of looking which text 
+editor is installed, and wether or not the user is in graphical interface.
 .br
+
 If you want to change settings, please use:
 .B
 tui config
@@ -99,7 +116,7 @@ tui config
 
 
 .IP \fI/etc/tui/\fP
-System wide configuration
+System wide defaults
 .br
 .RS 7
 .IP \fBapps.conf\fP
@@ -107,6 +124,31 @@ System wide configuration
 .br
 This stores the default applications tui might want/need to interact with
 .br
+.I
+Provides:
+.RS 11
+.IP BROSER_CLI
+The internetbrowser for the CLI, default: w3m
+.IP BROWSER_GUI
+The internetbrowser for the Graphical Interface, default: firefox
+.IP EDITOR_CLI
+Your favorite console editor, default: nano
+.IP EDITOR_GUI
+Your favorite graphical editor, default: leafpad
+.IP FILEMGR
+Name of your favorite filebrowser, default: pcmanfm
+.IP TERMINAL
+Name of your favorite terminal window, default: xterm
+.IP TAR_EXT
+Default extension used by 
+.B tui-tar
+, defaults: tar.gz
+.IP DD_BS
+Bytesize used by 
+.B tui-dd
+to read and write per cycle, default: 4M
+.br
+.RE
 
 .IP \fBcolors.conf\fP
 (tui-header, tui-title)
@@ -115,20 +157,124 @@ Contains a list of colors.
 .br
 You could change them, but it is highly recomended not to do so!
 .br
+.I
+Provides:
+.br
+.RS 11
+.IP TUI_COLOR_RESET
+Resets any color settings upon echo.
+.IP TUI_RESET
+Resets any color settings upon echo. (lazy)
+.IP TUI_FONT_BOLD
+Makes the font bold
+.IP TUI_FONT_STRIKE
+Makes the font stroke-through
+.IP TUI_FONT_INVERT
+Inverts the color settings
+.IP TUI_FONT_UNDERSCORE
+Underlines the text
+
+.IP TUI_COLOR_{BG,FG}_{COLORNAME}
+Where the color names are: 
+.B BLACK BLUE CYAN GREEN GREY RED WHITE YELLOW 
+.br
+As in:
+.br
+TUI_COLOR_BG_WHITE
+.br
+TUI_COLOR_FG_BLACK
+.RE
 
 .IP \fBstatus.conf\fP
 (tui-status)
 .br
 Defines how tui-status will report the different statuses
 .br
+Note that (for example): TUI_DONE contains the string, where RET_DONE contains an integer value. 
+.br
+.I
+Provides:
+.br
+.RS 11
+.IP {RET,TUI}-DONE
+0
+.br
+[ DONE ]
+.IP {RET,TUI}-FAIL
+1
+.br
+[ FAIL ]
+.IP {RET,TUI}-WORK
+2
+.br
+[ WORK ]
+.IP {RET,TUI}-TODO
+3
+.br
+[ TODO ]
+.IP {RET,TUI}-SKIP
+4
+.br
+[ SKIP ]
+.IP {RET,TUI}-NEXT
+5
+.br
+[ NEXT ]
+.IP {RET,TUI}-BACK
+6
+.br
+[ BACK ]
+.IP {RET,TUI}-CANC
+7
+.br
+[ DONE ]
+.IP {RET,TUI}-ON
+10
+.br
+[  ON  ]
+.IP {RET,TUI}-OFF
+11
+.br
+[ OFF  ]
+.IP {RET,TUI}-HELP
+99
+.br
+[ HELP ]
+.IP {RET,TUI}-INFO
+111
+.br
+[ INFO ]
+.RE
 
 .IP \fBtui.conf\fP
 (tui-new-browser, tui-new-script)
 .br
 Some basic configurations, like TUI_TEMP_{DIR,FILE}
 .br
-
+.I
+Provides:
+.br
+.RS 11
+.IP THE_THEME
+Name of the default theme for the users, default (blue): default
+.IP TUI_THEME_ROOT
+Name of the theme for the root user, default (red): default-red
+.IP TUI_CONF
+Full path to itself
+.IP TUI_USER_CONF
+Full path to the user configuration file: ~/.config/tui/user.conf
+.IP TUI_USER_TEMPLATE
+Path to the templates for a new user: /usr/share/tui/user.conf/
+.IP TUI_TEMP_DIR
+Full path to first temp path existing
+.IP TUI_TEMP_FILE
+Full path to a file in $TUI_TEMP_DIR
+.IP DEFAULT_LICENSE
+Default licensing for tui-new-script, default: "GNU General Public License (GPL)"
+.IP DEFAULT_LICENSE_URL
+URL to the license, default: "http://www.gnu.org/licenses/gpl.html"
 .RE
+
 .IP \fI~/.config/tui/\fP
 Personal user configuration
 
@@ -139,14 +285,34 @@ Personal user configuration
 .br
 Personal favorite applications, will overwrite the system wide defaults
 .br
+.I
+Provides: 
+.B
+The same as /etc/tui/apps.conf 
+
 
 .IP \fBuser.conf\fP
 (tui-new-browser, tui-new-script)
 .br
-Some basic reusable info about you
+Some basic reusable info about you, so you can easly reuse these information inside your own scripts.
 .br
-
-
+.I
+Provides:
+.br
+.RS 11
+.IP USER_NAME
+Default username shown, default: $USER
+.IP USER_EMAIL
+Default email used, default: $USER AT $(hostname)
+.IP USER_HOMEPAGE
+Default URL shown when $USER_HOMEPAGE is used
+.IP DEFAULT_LICENSE
+Default licensing for tui-new-script, default: "GNU General Public License (GPL)"
+.IP DEFAULT_LICENSE_URL
+URL to the license, default: "http://www.gnu.org/licenses/gpl.html"
+.IP TUI_THEME
+The actualy theme name the user uses, default: $TUI_THEME
+.RE
 
 
 .SH SEE ALSO
