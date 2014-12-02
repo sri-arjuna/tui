@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.2
+	script_version=0.3
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options]
@@ -36,9 +36,13 @@
 #
 #	Load own/users TUI configuration?
 #
-	source /etc/tui/apps.conf
 	source /etc/tui/tui.conf
-	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
+	source /etc/tui/apps.conf
+	if [[ root = $(whoami) ]]
+	then	CONF_APP=/etc/tui/apps.conf
+	else	CONF_APP=$HOME/.config/tui/apps.conf
+		[[ -f "$CONF_APP" ]] && source "$CONF_APP"
+	fi
 #
 #	Variable handling
 #
@@ -48,30 +52,54 @@
 		;;
 	esac
 #
+#	Functions
+#
+	getspace() { # NUM
+	# Returns string of NUM space chars
+	#
+		C=0 ; out=""
+		while [[ $C -lt $1 ]];do out+=" ";let C++;done
+		printf "$out"
+	}
+#
 #	Display
 #
-	if [ "" = "$targetusb" ] ; then
-		#tui-title "Please choose the removable media: "
-		list="$(ls $devDisk|grep usb|grep -v part)"
-		while [ "" = "$list" ] ; do
-			left="$BORDER_LEFT Please connect an USB device..."
-			right="[  $(tui-indi) ] $BORDER_RIGHT"
-			devDisk=/dev/disk/by-id
-			printf "\r"
-			read -t 1 -p "$left$(getspace $[ $COLUMNS - ${#left} - ${#right} ] )$right"  buffer
-			printf "\lf"
-			list="$(ls $devDisk|grep usb|grep -v part[0-9])"
-		done
-		if [ ! "$list" = "$(echo $list)" ]
-		then	select targetUsb in $list ; do
-				tDev=$(readlink -f $devDisk/$targetUsb)
-				break
-			done
-		else	targetUsb=$list
-			tDev=$(readlink -f $devDisk/$targetUsb)
+	# Prepare selection
+	
+	list="$(ls $devDisk|grep usb|grep -v part)"
+	left="$BORDER_LEFT Please connect an USB device..."
+			
+	# Make sure there is something available
+	while [ "" = "$list" ] ; do
+		right="[  $(tui-indi) ] $BORDER_RIGHT"
+		printf "\r"
+		read -t 1 -p "$left$(getspace $[ $COLUMNS - ${#left} - ${#right} ] )$right"  buffer
+		printf "\lf"
+		list="$(ls $devDisk|grep usb|grep -v part[0-9])"
+	done
+	
+	# Is there more than 1 entry?
+	if [ ! "$list" = "$(echo $list)" ]
+	then	# yes, more than one
+		select targetUsb in $list ; do break; done
+	else	# Just this one
+		# Check if only item should be reported without interaction.
+		usbAsk=$(tui-conf-get $CONF_APP usbAsk)
+		if [[ -z "$usbAsk" ]]
+		then	# There is no setting yet
+			tui-echo "The only device available is:" "$list"
+			tui-yesno "Does this refer to a pluged in storage device?" && \
+				tui-conf-set $CONF_APP usbAsk false || \
+				tui-conf-set $CONF_APP usbAsk true
+			source $CONF_APP
 		fi
-	else	# Yet to re-impliment
-		targetUsb="$(  ls /dev/disk/by-id/ -l | grep $(basename $targetusb)|grep -v part|awk '{print $9}' )"	
-		tDev="$targetusb"
+		if $usbAsk
+		then	# Select
+			select targetUsb in $list;do break;done
+		else	# Auto-return
+			targetUsb=$(echo $list)
+		fi
+		
 	fi
+	tDev=$(readlink -f $devDisk/$targetUsb)
 	echo $tDev
