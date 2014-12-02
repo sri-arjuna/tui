@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.5.9
-Release:     2%{?dist}
+Version:     0.6.0
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -96,7 +96,10 @@ mv %{name}/themes       %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/docs/*       %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1      %{buildroot}%{_mandir}/man1
 # Lets try once again without this...
+rm -fr  %{name}/profile.d/tui.sh
 #mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh
+# Keep for compatiblity
+touch %{buildroot}%{_sysconfdir}/profile.d/tui.sh
 
 %clean
 rm -rf %{buildroot}
@@ -113,10 +116,15 @@ rm -rf %{buildroot}
 
 %config
 %{_sysconfdir}/%{name}/
-#%{_sysconfdir}/profile.d/%{name}.sh
+%{_sysconfdir}/profile.d/%{name}.sh
 
 
 %changelog
+* Mon Dez 01 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.0-0
+* Helptext update in tui-bgjob, tui-log, tui-wait
+* Added 'verbose' (-v) in: tui-{log, wait}
+* Fixes in: tui, tui-{browser, conf-editor}
+
 * Fri Nov 28 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.9-2
 - Updated website in the manpages & prepared spec for 'tui reset'
 

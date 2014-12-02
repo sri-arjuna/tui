@@ -23,21 +23,26 @@
 #	Help text
 #
 	ME=tui-wait
-	script_version=0.4
+	script_version=0.5
+	beVerbose=false
 	help_text="
 $ME ($script_version)
 Usage: 		$ME TIME [MSG]
 Examples:	$ME 2m
 		$ME 1h \"Until somewhat happens\"
-
+		$ME -v 5 05 sec countdown'
 "
 #
 #	Argument handling
 #
-	if [[ "-h" = "$1" ]] || [[ -z $1 ]] 
-	then	printf "$help_text"
-		exit 1
-	fi
+	case "$1" in
+	-h|--help|"")	printf "$help_text"
+			exit 1
+			;;
+	-v)		beVerbose=true
+			shift
+			;;
+	esac
 #
 #	Variables
 #
@@ -83,6 +88,7 @@ Examples:	$ME 2m
 		fi
 		
 		# Actualy wait a second
+		$beVerbose && printf "\n"
 		sleep 1
 	done
 	exit 0

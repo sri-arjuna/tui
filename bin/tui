@@ -4,13 +4,13 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
-#	Changed:	2014.11.12
-	script_version=1.2
+#	Changed:	2014.12.02
+	script_version=1.4
 #	Description:	Tool to configure TUI
 #
 #	Variables
 #
-	TUI_VERSION=0.5.8
+	TUI_VERSION=0.6.0
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME=${0##*/}
 	[[ 0 -eq $UID ]] && \
@@ -44,14 +44,6 @@
 		# Show & Edit files
 		tui-conf-editor *conf
 	}
-	FirstUse() { #
-	# Checks if the user configuration is present
-	# Effectless as root user
-		tmp="$HOME/.config/tui/"
-		[[ ! -f "$tmp/user.conf" ]] && \
-			mkdir -p "$tmp" && \
-			cp -R /usr/share/tui/*conf  "$tmp"
-	}
 	ResetTUI() { #
 	#
 	#
@@ -83,13 +75,10 @@
 #
 #	Action & Display
 #
-	if [ 0 -eq $UID ]
+	#if [ 0 -eq $UID ]
+	if [[ root = $(whoami) ]]
 	then	USER_NAME=".: r o o t :."
-	else	USER_NAME="$USER"
-		[[ -f $HOME/.config/tui/user.conf ]] && souorce $HOME/.config/tui/user.conf
-	fi
-	if [[ 0 -ne $UID ]]
-	then 	[[ -d "$HOME/.config/tui/" ]] || ( YES=true ; ResetTUI ) 
+	else	[[ -d "$HOME/.config/tui/" ]] || ( YES=true ; ResetTUI ) 
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
 	fi
 	help_text="
@@ -106,15 +95,17 @@ Where options are:
 #
 #	Catching Arguments
 #
-	while getopts "h" name
-	do 	case "$name" in
-		h|help)
-			printf "$help_text"
-			exit $RET_HELP
-			;;
-		esac
-	done
-	shift $(($OPTIND - 1))
+	if [[ "$ME" = tui ]]
+	then	while getopts "h" name
+		do 	case "$name" in
+			h|help)
+				printf "$help_text"
+				exit $RET_HELP
+				;;
+			esac
+		done
+		shift $(($OPTIND - 1))
+	fi
 	
 	MODE=$1
 	YES=false
@@ -136,7 +127,7 @@ Where options are:
 #
 	if [[ "$ME" = tui ]]
 	then	# Its not sourced, thus show info & config menu
-		tui-printf -H "TUI ($TUI_VERSION) by sea" "$(date +%F) $(date +%T)"
+		tui-printf -H "TUI ($TUI_VERSION) by sea" "$USER_NAME @ $(date +%F) $(date +%T)"
 		tui-printf -T "$TITLE ($script_version)"
 		tui-printf -E "Calling $ME like this gives you an impression how it may look like."
 		tui-printf -E

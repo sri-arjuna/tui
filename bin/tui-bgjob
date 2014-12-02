@@ -27,8 +27,10 @@
 	ME="$(basename $0)"
 	[[ -z $TUI_TEMP_FILE ]] && source /etc/tui/tui.conf
 	help_text="\r$ME ($script_version)
-		\rUsage: $ME SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
+		\rUsage: $ME [-f OUTFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
+		\r
+		\r\t-f /path/to/file\tPrint the filesize of passed file
 		\r
 		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
 		\rPrints 'Exit String' when done, regardless of exit code (0,1,?).

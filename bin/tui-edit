@@ -39,9 +39,9 @@
 #
 #	Variable handling
 #
-	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
+	[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
 	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	"-h")	printf "$help_text" ; exit $RET_HELP
 		;;
 	esac
 #
@@ -74,22 +74,20 @@
 	
 	if [[ -z "$EDITOR" ]]
 	then	case $MODE in
-		cli)	export EDITOR=$(which $EDITOR_CLI 2>/dev/zero)
-			;;
-		gui)	export EDITOR=$(which $EDITOR_GUI 2>/dev/zero)
-			;;
+		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero)	;;
+		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero)	;;
 		esac
+		export EDITOR
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
 	if ! which $EDITOR > /dev/zero
 	then 	# The EDITOR is not available, search for default
-	EDITOR=$(GetAvailableApp $MODE)
+		EDITOR=$(GetAvailableApp $MODE)
 		[[ $MODE = cli ]] && \
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
 		[[ -z "$EDITOR" ]] && tui-echo "No editor could be found, please change \"$CONF\" manualy!" && exit 1
 		tui-conf-set "$CONF" $var $EDITOR
-		export EDITOR
 	fi
 	
 	for A in "${ARGS[@]}";do

@@ -25,7 +25,8 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
 #	Changed:	2014.11.27
-	script_version=0.6
+	. tui
+	script_version=0.6.1
 	TITLE="Configuration Editor"
 #	Description:	Basic configuration file editor
 #
@@ -37,6 +38,8 @@
 	[[ 0 -eq $UID ]] && \
 		LOG="/var/log/$ME.log" || \
 		LOG="$HOME/.config/tui/$ME.log"		# Logfile
+	#. /etc/tui/tui.conf
+	
 #
 #	Variable defaults (options)
 #
@@ -159,7 +162,7 @@ Log:		$LOG
 	show_menu=true
 	while $show_menu;do
 		clear
-		tui-header "$ME ($script_version)" "$(date +'%F %T')"
+		tui-header "$ME ($script_version)" "$USER_NAME @ $(date +'%F %T')"
 		case $ARGS_COUNT in
 		0)	printf "$help_text"
 			exit $RET_HELP
