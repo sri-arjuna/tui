@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2014.11.13
-	script_version=0.5
+#	Changed:	2014.12.05
+	script_version=0.6
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -55,6 +55,8 @@ Where options are:
 	VARNAME=""
 	CAPS=false
 	SMALL=false
+	hadDollar=false
+	SD=","
 #
 #	Catching Arguments
 #
@@ -81,48 +83,58 @@ Where options are:
 	CONFFILE="$1"
 	VARNAME="$2"
 	VALUE="$3"
-	hadDollar=false
+	
 	# Exit if it does not exist
 	if [[ ! -f "$CONFFILE" ]]
 	then	tui-status 1 "$CONFFILE does not exist!"
-		exit 1
+		exit $?
 	fi
 #
 # 	Preformat strings
 #
-	SEARCH="$(grep $OPT "${VARNAME}=" "$CONFFILE"|grep -v ^#|tr -d [:space:])"
+	SEARCH="$(grep $OPT "${VARNAME}=" "$CONFFILE"|grep -v ^#)" #|tr -d [:space:])"
+	
+	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
 	$CAPS  && VARNAME="${VARNAME^^}"
-	printf  "$SEARCH"|grep -q "\"" && \
+	
+	# Check for quotes
+	printf  "$VALUE"|grep -q " " && \
 		REPLACE="$VARNAME=\"$VALUE\"" || \
 		REPLACE="$VARNAME=$VALUE"
+	
 	# Set proper SED 'divider'
-	SD=","
-	if echo "$REPLACE"|grep -q "$SD"
+	if echo "$SEARCH$REPLACE"|grep -q "$SD"
 	then 	# Coma was found
 		SD="/"
-		printf "$REPLACE"|grep ","|grep "$SD"|grep -q '\\' && SD="\\"	# backslash was found
+		printf "$REPLACE"|grep "$SD"|grep -q '\\' && SD="\\"	# backslash was found
 		[[ ! "$SD" = "/" ]] && \
 			printf "$REPLACE"|grep ","|grep "$SD"|grep -q "/" && SD="|"	# Forward slash was found
 	fi
-	# Troubles with VARIABLES due to leading '$'
-	printf "$SEARCH"|grep -q "\$" && \
-		SEARCH="$(printf "$SEARCH"|sed s,'\$','\\\$',g)" && \
-		hadDollar=true
+	
+	# Troubles with VARIABLES due to chars that need to be escaped
+	if echo "$REPLACE$SEARCH" | grep  -q '[%$+\/]'
+	then	hadDollar=true
+		REPLACE=$(echo "$REPLACE"|sed 's|[%"$/\|\@]|\\&|g')
+		SEARCH=$(echo "$SEARCH"|sed 's|[%"$/\|\@]|\\&|g')
+	fi
 #
 #	Display & Action
 #
 	# Generate the command
 	cmd="$(which sed) s${SD}'${SEARCH}'${SD}'${REPLACE}'${SD}g -i \"$CONFFILE\""
+	
 	# Save changes
 	if ! grep -q "$VARNAME" "$CONFFILE"
 	then	# Its not there yet, just append it
-		printf "${REPLACE}\n" >> "$CONFFILE"
+		$hadDollar && \
+			printf "$(eval $REPLACE)\n" >> "$CONFFILE" || \
+			printf "${REPLACE}\n" >> "$CONFFILE"
 	elif $hadDollar
-	then	eval "$cmd"
+	then	# Remove the escape chars while saving it.
+		eval $cmd
 	else	$cmd
 	fi
-	#
+	
 	# Return true if replaced string was found
-	# This is required, since using RET=$? returned true eventhough value was not saved...
 	grep -q "$REPLACE" "$CONFFILE"
