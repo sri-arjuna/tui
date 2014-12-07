@@ -1,5 +1,5 @@
 Name:        tui
-Version:     0.6.0
+Version:     0.6.1
 Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
@@ -84,6 +84,7 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name}
 # Move the executeables
+#rm %{name}/bin/tui-sele*
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
 # Copy system defaults to system
 cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
@@ -120,10 +121,15 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Dez 01 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.0-0
-* Helptext update in tui-bgjob, tui-log, tui-wait
-* Added 'verbose' (-v) in: tui-{log, wait}
-* Fixes in: tui, tui-{browser, conf-editor}
+* Mon Dec 01 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.1-0
+- Fixed: tui-conf-set, automaticly shell escapes when writing values
+- Updated: tui-new-script, handling & templates
+- Introducing: tui-select
+
+* Mon Dec 01 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.0-0
+- Helptext update in tui-bgjob, tui-log, tui-wait
+- Added verbose: (-v) in: tui-{log, wait}
+- Fixes in: tui, tui-{browser, conf-editor}
 
 * Fri Nov 28 2014 - Simon A. Erat - erat.simon@gmail.com - 0.5.9-2
 - Updated website in the manpages & prepared spec for 'tui reset'

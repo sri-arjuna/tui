@@ -1,0 +1,86 @@
+#!/bin/bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2014 by Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	Descriptional text here...
+#	and here...
+#
+#
+#
+#	Variables
+#
+	#source tui
+	. /etc/tui/tui.conf
+	[[ 0 -ne $UID ]] && . $HOME/.config/tui/user.conf
+	[[ -z "$TUI_THEME" ]] && TUI_THEME=default
+	. /usr/share/tui/themes/$TUI_THEME
+	#. /etc/tui/themes/$TUI_THEME
+
+	#source /etc/tui/themes/$TUI_THEME
+	ME=${0##*/}
+	ARGS=("${@}") # ; echo ${ARGS[@]}
+	script_version=0.1
+	counter=1
+	COLUMNS=$(tput cols)
+	help_text="
+$ME ($script_version)
+Usage: 		$ME LIST 'of items' ..
+Examples:	ret=\$($ME one two three)
+		$ME 
+		
+"
+#
+#	Action
+#
+	[[ -z "$1" ]] && printf "$help_text" && exit 99
+	[[ "-h" = "$1" ]] && printf "$help_text" && exit 99
+	unset OUT
+	MAX=2
+	CUR=0
+	for OPT in "${ARGS[@]}"
+	do	if [[ $CUR -lt $MAX ]]
+		then	len=0
+			for O in "${OUT[@]}";do len=$[ $len + ${#O} ];done
+			sum=$[ $len + ( ${#BORDER_LEFT} * 2 ) + 2 ]
+			if [[ $sum -lt $COLUMNS ]]
+			then	OUT[$CUR]="$counter) $OPT"
+				shown=false
+				CUR=$(( $CUR + 1 ))
+			else	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" > /dev/stderr
+				shown=true
+			fi
+		fi
+		if [[ $CUR -eq $MAX ]]
+		then 	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" > /dev/stderr
+			shown=true
+		fi
+		counter=$(( $counter + 1 ))
+		$shown && CUR=0 && unset OUT[@]
+	done
+	
+	len=${#counter}
+	#NUM=$( tui-read -n $len -p "$TUI_BORDER_LEFT Which number is your choice:" )
+	tui-echo "" > /dev/stderr
+	read -n $len -p "$BORDER_LEFT Which number is your choice: " NUM
+	NUM=$(( $NUM - 1 ))
+	#clear /dev/tty$XDG_VTNR
+	printf '\n%s\n' "${ARGS[$NUM]}" > /dev/stdout
+	#echo
+	#echo  "$counter ${#ARGS[@]}"
