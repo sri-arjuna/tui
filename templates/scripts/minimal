@@ -1,0 +1,22 @@
+#!/bin/bash
+source tui
+
+cat > "$DEST" << EOF
+#!/bin/bash
+# ${DEST##*/}
+# $DEFAULT_LICENSE $(date +'%Y') by $USER_NAME ($USER_EMAIL)
+# Description:	
+# ------------------------------------------------------
+#
+#	Variables
+#
+	
+#
+#	Functions
+#
+	
+#
+#	Display & Action
+#
+		
+EOF

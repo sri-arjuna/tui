@@ -1,5 +1,0 @@
-cat > "$DEST" << EOF
-#!$(which $USER_SHELL)
-# ${DEST##*/} by $USER_NAME ($USER_EMAIL) on $(date +'%F')
-
-EOF

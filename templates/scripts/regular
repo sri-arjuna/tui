@@ -1,13 +1,16 @@
+#!/bin/bash
+source tui
+
 cat > "$DEST" << EOF
 #!/bin/bash
 # ------------------------------------------------------------------------
 #
-# Copyright (c) $(date +'%Y') by $USER_NAME  <$USER_EMAIL>
+# Copyright (c) $(date +'%Y') by $USER_NAME, $USER_EMAIL
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the $DEFAULT_LICENSE as published
-# by the Free Software Foundation, either version shipped with the script, or
+# by the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -16,9 +19,11 @@ cat > "$DEST" << EOF
 # $DEFAULT_LICENSE for more details.
 #
 # You should have received a copy of the $DEFAULT_LICENSE
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# along with this program.  If not, see $DEFAULT_LICENSE_URL
 #
 # ------------------------------------------------------------------------
+#
+	s=/bin/tui ; [[ -f \$s ]] && . \$s  && s=
 #
 #	File:		${DEST##*/}
 #	Author: 	$USER_NAME
@@ -40,16 +45,8 @@ cat > "$DEST" << EOF
 		ME_DIR="\$(dirname \$0)" || \\
 		ME_DIR="\$(pwd)"			# Dirname of ${DEST##*/}
 	CONFIG_DIR="\$HOME/.config/\$ME"		# Configuration directory
-	CONFIG="\$CONFIG_DIR/\$ME.conf"		# Configuration file
-	tempfile="\$CONFIG_DIR/\$ME.tmp"		# Tempfile
-#
-#	Default configuration
-#
-	[[ -f \$CONFIG ]] || \
-		cat > \$CONFIG << EOF
-# \$ME configuration
-variable=value
-EOF
+	CONFIG="\$CONFIG_DIR/\$ME.conf"			# Configuration file
+	TEMPFILE="\$TUI_TEMP_DIR/\$ME.tmp"		# Tempfile
 #
 #	Help text
 #
@@ -59,14 +56,13 @@ EOF
 	help_text="
 \$ME (\$script_version)
 \${TITLE^}
-Usage: 		\$ME [options] [arguments]
+Usage: 		\$ME [options] arguments
 Examples:	\$ME 
 		\$ME -a
 		\$ME -e optVAL
 Where options are:
 	-h(elp) 		This screen
-	-e(xample)	ARG	Example with mandatory argument
-	-a(nother)	[ARG]	Example with optinal argument
+	
 
 Files:
 --------------------------------------
@@ -74,34 +70,40 @@ Script:		\$ME
 Script-Dir:	\$ME_DIR
 Config: 	\$CONFIG
 Config_Dir:	\$CONFIG_DIR
-Tempfile:	\$tempfile
+Tempfile:	\$TEMPFILE
 "
+#
+#	Functions
+#
+	
+#
+#	Environment checks
+#
+	
 #
 #	Catching Arguments
 #
 	# A ':' after a char indicates that this option requires an argument
-	while getopts "ae:hCL" opt
+	while getopts "h" opt
 	do 	case \$opt in
 		h)	printf "\$help_text"
 			exit \$RET_HELP
 			;;
-## TODO
-## Apply your chages below
-		a)	# This is only demo
-			ARG_TOGGLE_ANOTHER=set
+		*)	printf "\$help_text" 
+			exit \$?
 			;;
-		e)	# This is only demo
-			optE_argument="\$OPTARG"
-			optE_bool=true
-			;;
-		## Uncomment to exit with help if nothing is passed
-		# *)	printf "\$help_text" ; exit \$?	;;
 		esac
 	done
-	shift \$((\$OPTIND - 1))
+	shift \$((\$OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
+	ARGS=("\${*}")			# Remaining arguments
+	ARGS_COUNT=\${#ARGS[@]}		# Amount of remaining
 #
 #	Display & Action
 #
 	tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
 	tui-title "\$TITLE"
+#
+## TODO : Your own stuff :)
+#
+	
 EOF

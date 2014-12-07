@@ -1,0 +1,173 @@
+#!/bin/bash
+source tui
+
+cat > "$DEST" << EOF
+#!/bin/bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) $(date +'%Y') by $USER_NAME, $USER_EMAIL
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the $DEFAULT_LICENSE as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# $DEFAULT_LICENSE for more details.
+#
+# You should have received a copy of the $DEFAULT_LICENSE
+# along with this program.  If not, see $DEFAULT_LICENSE_URL
+#
+# ------------------------------------------------------------------------
+#
+	s=/bin/tui ; [[ -f \$s ]] && . \$s  && s=
+#
+#	File:		${DEST##*/}
+#	Author: 	$USER_NAME
+#	Contact:	$USER_EMAIL
+#	License:	$DEFAULT_LICENSE
+#	Created:	$(date +'%Y.%m.%d')
+#	Changed:	$(date +'%Y.%m.%d')
+	script_version=0.0.1
+	TITLE="${DEST##*/}"
+#	Description:	Text TODO
+#			...  TODO
+#
+#
+#	Script Environment
+#
+	ME="\${0##*/}"				# Basename of ${DEST##*/}
+	ME="\${ME/.sh/}"				# Cut off .sh extension
+	[[ ! "." = "\$(dirname \$0)" ]] && \\
+		ME_DIR="\$(dirname \$0)" || \\
+		ME_DIR="\$(pwd)"			# Dirname of ${DEST##*/}
+	CONFIG_DIR="\$HOME/.config/\$ME"		# Configuration directory
+	CONFIG="\$CONFIG_DIR/\$ME.conf"			# Configuration file
+	TEMPFILE="\$TUI_TEMP_DIR/\$ME.tmp"		# Tempfile
+#
+#	Variable defaults (options)
+#
+	beVerbose=false
+#
+#	Help text
+#
+#	TODO
+#	Add your own options, be sure to add them to "getopts" handling too
+#
+	help_text="
+\$ME (\$script_version)
+\${TITLE^}
+Usage: 		\$ME [options] arguments
+Examples:	\$ME 
+		\$ME -a
+		\$ME -e optVAL
+Where options are:
+	-h(elp) 		This screen
+	-C(onf			Show the config menu
+	-q(uiet)		Mutes all output
+	-v(erbose)		Enables the scripts verbosity
+	
+
+Files:
+--------------------------------------
+Script:		\$ME
+Script-Dir:	\$ME_DIR
+Config: 	\$CONFIG
+Config_Dir:	\$CONFIG_DIR
+Tempfile:	\$TEMPFILE
+"
+#
+# This script requires TUI - Text User Interface
+# See:		https://github.com/sri-arjuna/tui
+#
+#	Check if TUI is installed...
+#
+	S=\$(which tui 2>/dev/zero )
+	if [[ ! -f \$S ]]
+	then 	[[ ! 0 -eq \$UID ]] && \\
+			printf "\\n#\\n#\\tPlease restart the script as root to install TUI (Text User Interface).\\n#\\n#\\n" && \\
+			exit 1
+		if ! git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
+		then 	mkdir -p /tmp/tui.inst ; cd /tmp/tui.inst/
+			curl --progress-bar -L https://github.com/sri-arjuna/tui/archive/master.zip -o master.zip
+			unzip master.zip && rm -f master.zip
+			mv tui-master/* . ; rmdir tui-master
+		fi
+    		sh /tmp/tui.inst/install.sh || \\
+    			(printf "\\n#\\n#\\tPlease report this issue of TUI installation fail.\\n#\\n#\\n";exit 1)
+    	fi
+    	source \$S ; S=""
+#
+#	Configuration file template
+#
+#
+	config_template="# Configuration file for \$ME (\$script_version)
+#
+#	Booleans
+#
+	beVerbose=false
+	beQuiet=false
+#
+#	Variables
+#
+	DIR_CONFIG=\"\$HOME/.config/\$ME\"
+	TEMPFILE=\"\$DIR_CONFIG/tmp.tmp~)\"
+"
+#
+#	Functions
+#
+	
+#
+#	Environment checks
+#
+	[[ ! -f "\$CONFIG" ]] && \\
+		echo "\$config_template" > "\$CONFIG"
+## TODO : Remove this 'source block' if you want to read the variables from CONFIG manualy
+	# Load default values before parsing options
+	if ! source "\$CONFIG" 
+	then	# Could not source the configuuration...
+		tui-status 1 "Failed to load: \$CONFIG"
+	fi
+#
+#	Catching Arguments
+#
+	# A ':' after a char indicates that this option requires an argument
+	while getopts "Chqv" opt
+	do 	case \$opt in
+		h)	printf "\$help_text"
+			exit \$RET_HELP
+			;;
+		C)	tui-conf-editor \\
+				-t \"\$TITLE - Configuration\" \\
+				-l \"\$LOG\" \\
+				\"\$CONFIG\"
+				
+			exit \$RET_DONE
+			;;
+		q)	beQuiet=true
+			log_msg="Forced silence"
+			;;
+		v)	beVerbose=true
+			log_msg="Enabled verbosity"
+			;;
+		*)	printf "\$help_text" ; exit \$?	;;
+		esac
+		\$beVerbose && \\
+			tui-echo "\$log_msg"
+	done
+	shift \$((\$OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
+	ARGS=("\${*}")			# Remaining arguments
+	ARGS_COUNT=\${#ARGS[@]}		# Amount of remaining
+#
+#	Display & Action
+#
+	tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
+	tui-title "\$TITLE"
+#
+## TODO : Your own stuff :)
+#
+	
+EOF
