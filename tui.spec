@@ -121,7 +121,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Dec 01 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.1-0
+* Sun Dec 07 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.1-0
 - Fixed: tui-conf-set, automaticly shell escapes when writing values
 - Updated: tui-new-script, handling & templates
 - Introducing: tui-select
