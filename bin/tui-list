@@ -25,7 +25,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
 #	Changed:	2014.12.08
-	script_version=0.4
+	script_version=0.5
 	TITLE="tui-list"
 #	Description:	Text TODO
 #			...  TODO
@@ -81,12 +81,14 @@ Where options are:
 	# Or: aa-az ba-bz, etc
 		num=$1
 		out=""
-		list=( $(echo {a..z} {a..z}{a..z} {a..z}{a..z}{a..z} ))
+		[[ $num -gt 700 ]] && \
+			list=( $(echo {a..z} {a..z}{a..z} {a..z}{a..z}{a..z} ))	|| \
+			list=( $(echo {a..z} {a..z}{a..z} )) 	# Be fast for letters in range..
 		out="${list[$num]}"
 		echo "$out"
 	}
 	num2roman() { # NUM
-	# Returns roman letters
+	# Returns NUM in roman letters
 	#
 		input=$1	# input num
 		output=""	# Clear output string
@@ -117,11 +119,7 @@ Where options are:
 					N=$(($N-1))
 				done
 				;;
-			9)	while [[ $N -lt 10 ]]
-				do	out+="$one"
-					N=$(($N+1))
-				done
-				out+="$ten"
+			9)	out+="$one$ten"
 				;;
 			esac
 			echo $out
@@ -159,16 +157,6 @@ Where options are:
 #
 #	Display & Action
 #
-#	C=0
-#	while [[ ! "" = "${ARGS[$C]}" ]];do
-	#	case $MODE in
-	#	num)	count=$DONE	;;
-	#	alpha)	count=$(num2char $DONE)	;;
-	#	roman)	count=$(num2roman $DONE)	;;
-	#	esac
-#		tui-echo "$count) ${ARGS[$C]}"
-#		C=$((C+1))
-#	done
 	unset OUT[@]
 	OUT[0]=""
 	shown=false
@@ -181,7 +169,7 @@ Where options are:
 		# Do the visible counter
 		case $MODE in
 		num)	count=$DONE	;;
-		alpha)	count=$(num2char $DONE)	;;
+		alpha)	count=$(num2char $[ $DONE - 1 ] )	;;
 		roman)	count=$(num2roman $DONE)	;;
 		esac
 		
@@ -204,5 +192,5 @@ Where options are:
 		$shown && CUR=0 && unset OUT[@]
 	done
 	# Print unprinted
-	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr
-	#echo ${OUT[@]} bb ${ARGS[@]}
+	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr && printf "\n"
+	exit 0
