@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.1
-Release:     1%{?dist}
+Release:     2%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -84,7 +84,7 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name}
 # Move the executeables
-#rm %{name}/bin/tui-sele*
+rm -fr %{name}/screenshots
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
 # Copy system defaults to system
 cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
