@@ -36,14 +36,14 @@
 	#source /etc/tui/themes/$TUI_THEME
 	ME=${0##*/}
 	ARGS=("${@}") # ; echo ${ARGS[@]}
-	script_version=0.1
+	script_version=0.3
 	counter=1
 	COLUMNS=$(tput cols)
 	help_text="
 $ME ($script_version)
 Usage: 		$ME LIST 'of items' ..
 Examples:	ret=\$($ME one two three)
-		$ME 
+		$ME *
 		
 "
 #
@@ -52,7 +52,7 @@ Examples:	ret=\$($ME one two three)
 	[[ -z "$1" ]] && printf "$help_text" && exit 99
 	[[ "-h" = "$1" ]] && printf "$help_text" && exit 99
 	unset OUT
-	MAX=2
+	MAX=3
 	CUR=0
 	for OPT in "${ARGS[@]}"
 	do	if [[ $CUR -lt $MAX ]]
@@ -63,24 +63,47 @@ Examples:	ret=\$($ME one two three)
 			then	OUT[$CUR]="$counter) $OPT"
 				shown=false
 				CUR=$(( $CUR + 1 ))
-			else	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" > /dev/stderr
+			else	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" >> /dev/stderr  
 				shown=true
 			fi
 		fi
 		if [[ $CUR -eq $MAX ]]
-		then 	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" > /dev/stderr
+		then 	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" >> /dev/stderr  
 			shown=true
 		fi
 		counter=$(( $counter + 1 ))
 		$shown && CUR=0 && unset OUT[@]
 	done
+	# Print unprinted
+	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr
 	
+	# This many digits to read at max
 	len=${#counter}
-	#NUM=$( tui-read -n $len -p "$TUI_BORDER_LEFT Which number is your choice:" )
-	tui-echo "" > /dev/stderr
-	read -n $len -p "$BORDER_LEFT Which number is your choice: " NUM
-	NUM=$(( $NUM - 1 ))
-	#clear /dev/tty$XDG_VTNR
-	printf '\n%s\n' "${ARGS[$NUM]}" > /dev/stdout
-	#echo
-	#echo  "$counter ${#ARGS[@]}"
+	
+	# Repeat input while invalid
+	invalid=true
+	while $invalid
+	do	# Get input
+		read -n $len -p "$BORDER_LEFT > " NUM
+		
+		if	[[ "" = "$(echo $NUM|tr -d [:digit:])" ]]
+		then	# It is a number in range?
+			[[ $NUM -gt $[ $counter - 2 ] ]] && \
+				invalid=true && \
+				printf "\r$BORDER_LEFT >   \r" || \
+				invalid=false
+			
+			# Array starts at 0
+			NUM=$(( $NUM - 1 ))
+		fi
+	done
+	
+	# Make 'nice to have' linebreak when read automaticly stops reading
+	if [[ 1 -eq $len ]]
+	then	printf "\n" > /dev/stderr
+	elif [[ ${#NUM} -eq $len ]] 
+	then	printf "\n" > /dev/stderr
+	fi
+	
+	# This is the output
+	printf '%s\n' "${ARGS[$NUM]}" > /dev/stdout
