@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.1
-Release:     2%{?dist}
+Version:     0.6.2
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -121,6 +121,14 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Dec 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.2-0
+- Fixed:   tui-select now uses tui-list to print its options
+- Updated: tui-list now supports roman numbers
+- Updated: tui-select seems stable now, wrong input fills the line though...
+- Updated: tui-conf-editor uses now tui-select
+- Fixed:   tui-conf-editor applies supplied title
+- Added:   demo & sample scripts, screenshots
+
 * Sun Dec 07 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.1-0
 - Fixed: tui-conf-set, automaticly shell escapes when writing values
 - Updated: tui-new-script, handling & templates

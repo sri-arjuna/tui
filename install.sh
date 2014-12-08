@@ -1,5 +1,5 @@
 #!/bin/sh
-# 2014.07.18 by sea
+# 2014.12.08 by sea
 #
 #	Variables
 #
@@ -31,6 +31,7 @@
 	cp README.md $DIR_APP
 	cp bin/* $DIR_BIN
 	cp conf.etc/* $DIR_CFG
+	cp conf.etc $DIR_APP/
 	cp conf.home/* $DIR_APP/conf
 	cp -R docs/[A-Z]* $DIR_DOC
 	cp -R docs/* $DIR_APP
@@ -39,7 +40,5 @@
 	cp -R templates/* $DIR_TPL
 	cp profile.d/* /etc/profile.d
 	RET=$?
-	source /etc/profile.d/tui.sh
-	MSG="Installed $app"
-	tui-status $? "$MSG"
+	tui-status $? "Installed $app"
 #	tui-yesno "Remove these tempfiles here ($pwd)/* ?" && rm ./*
