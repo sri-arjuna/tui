@@ -55,7 +55,6 @@ Examples:	ret=\$($ME one two three)
 	# This many digits to read at max
 	ARGS=("${@}")
 	len=${#ARGS[@]}
-	echo $len
 	
 	# Show the options
 	tui-list "${ARGS[@]}" > /dev/stderr
