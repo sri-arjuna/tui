@@ -23,6 +23,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
 #	Changed:	2014.11.27
+	. tui
 	script_version=0.6.9
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
@@ -58,19 +59,16 @@ Where options are:
 	-u(ser) 	STR	User-label (upper-right) is set to ARG
 	
 "
-	# Default Interface:
+#
+# 	Default Interface:
+#
 	lbl_title="$ME ($script_version) - $TITLE"
-	if [[ 0 -eq $UID ]]
-	then	source /etc/tui/tui.conf
-	else	cfg="$HOME/.config/tui/user.conf"
-		[[ ! -f "$cfg" ]] && \
-			mkdir -p "$(dirname $cfg)" && \
-			cp /usr/share/tui/*conf "$(dirname $cfg)"
-		source "$cfg"
-	fi
 	lbl_user="$USER_NAME @ $(date +'%F %T')"
-	lbl_dir="Folders"
-	lbl_file="Files"
+	lbl_dir="Section"
+	lbl_file="Task"
+#
+#	Internal defaults
+#
 	menu=show
 	default_actions="delete edit execute help info new rename quit"
 	PWD_OLD="$(pwd)"
@@ -83,17 +81,7 @@ Where options are:
 	SPECIAL_EXT=(info help cmd )
 	MAIN_CFG=""
 #
-# 	Are these really needed ?
-#
-	###########source tui
-	#for D in /etc/tui/ $HOME/.config/tui
-	#do	for F in apps colors status tui
-	#	do	T=$D/$F.conf
-	#		[ -f $T ] && source $T
-	#	done
-	#done
-#
-#	Pre-funccction
+#	Pre-functions
 #
 	MakeCurStr() { # PATH
 	# Parses PATH and 'make it look nice'

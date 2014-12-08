@@ -35,8 +35,8 @@
 
 	#source /etc/tui/themes/$TUI_THEME
 	ME=${0##*/}
-	ARGS=("${@}") # ; echo ${ARGS[@]}
-	script_version=0.3
+	
+	script_version=0.4
 	counter=1
 	COLUMNS=$(tput cols)
 	help_text="
@@ -51,50 +51,33 @@ Examples:	ret=\$($ME one two three)
 #
 	[[ -z "$1" ]] && printf "$help_text" && exit 99
 	[[ "-h" = "$1" ]] && printf "$help_text" && exit 99
-	unset OUT
-	MAX=3
-	CUR=0
-	for OPT in "${ARGS[@]}"
-	do	if [[ $CUR -lt $MAX ]]
-		then	len=0
-			for O in "${OUT[@]}";do len=$[ $len + ${#O} ];done
-			sum=$[ $len + ( ${#BORDER_LEFT} * 2 ) + 2 ]
-			if [[ $sum -lt $COLUMNS ]]
-			then	OUT[$CUR]="$counter) $OPT"
-				shown=false
-				CUR=$(( $CUR + 1 ))
-			else	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" >> /dev/stderr  
-				shown=true
-			fi
-		fi
-		if [[ $CUR -eq $MAX ]]
-		then 	tui-echo "${OUT[0]}" "${OUT[1]}" "${OUT[2]}" >> /dev/stderr  
-			shown=true
-		fi
-		counter=$(( $counter + 1 ))
-		$shown && CUR=0 && unset OUT[@]
-	done
-	# Print unprinted
-	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr
 	
 	# This many digits to read at max
-	len=${#counter}
+	ARGS=("${@}")
+	len=${#ARGS[@]}
+	echo $len
+	
+	# Show the options
+	tui-list "${ARGS[@]}" > /dev/stderr
 	
 	# Repeat input while invalid
 	invalid=true
 	while $invalid
 	do	# Get input
-		read -n $len -p "$BORDER_LEFT > " NUM
+		read -n ${#len} -p "$BORDER_LEFT > " NUM
 		
-		if	[[ "" = "$(echo $NUM|tr -d [:digit:])" ]]
+		if [[ -z "$NUM" ]]
+		then	printf "\r" > /dev/stderr
+		elif [[ "" = "$(echo $NUM|tr -d [:digit:])" ]]
 		then	# It is a number in range?
-			[[ $NUM -gt $[ $counter - 2 ] ]] && \
+			[[ $NUM -gt $[ $len - 1 ] ]] && \
 				invalid=true && \
 				printf "\r$BORDER_LEFT >   \r" || \
 				invalid=false
 			
 			# Array starts at 0
 			NUM=$(( $NUM - 1 ))
+		else 	printf "\r" > /dev/stderr
 		fi
 	done
 	

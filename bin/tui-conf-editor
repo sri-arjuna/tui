@@ -26,8 +26,7 @@
 #	Created:	2014.11.03
 #	Changed:	2014.11.27
 	. tui
-	script_version=0.6.1
-	TITLE="Configuration Editor"
+	script_version=0.7
 #	Description:	Basic configuration file editor
 #
 #
@@ -35,9 +34,10 @@
 #
 	ME="${0##*/}"				# Basename of tui-config-editor
 	ME="${ME/.sh/}"				# Cut off .sh extension
-	[[ 0 -eq $UID ]] && \
-		LOG="/var/log/$ME.log" || \
-		LOG="$HOME/.config/tui/$ME.log"		# Logfile
+	TITLE="$ME ($script_version)"
+	[[ root = $(whoami) ]] && \
+		LOG="/var/log/tui.log" || \
+		LOG="$HOME/.config/tui/tui.log"		# Logfile
 	#. /etc/tui/tui.conf
 	
 #
@@ -86,8 +86,14 @@ Log:		$LOG
 			tui-echo "$VAR" "$val"
 		done
 		
-		tui-echo "Please select wich value to change:"
-		select VAR in Back Edit $(tui-conf-get -l "$CONFIG");do
+		
+		# Loop while is not going back
+		VAR=stay
+		
+		while [[ Back != "$VAR" ]];do
+			tui-echo "Please select wich value to change:"
+			VAR=$(tui-select Back Edit $(tui-conf-get -l "$CONFIG"))
+		
 			doSelect=false
 			msg=""
 			newval=""
@@ -109,7 +115,7 @@ Log:		$LOG
 				if tui-yesno "Do you want to change this?"
 				then 	if $doSelect
 					then	tui-echo "Please select the new value:"
-						select newval in $selection;do break;done
+						newval=$(tui-select $selection)
 					else	newval=$(tui-read "Please type the new value:")
 					fi
 					
@@ -162,7 +168,7 @@ Log:		$LOG
 	show_menu=true
 	while $show_menu;do
 		clear
-		tui-header "$ME ($script_version)" "$USER_NAME @ $(date +'%F %T')"
+		tui-header "$TITLE" "$USER_NAME @ $(date +'%F %T')"
 		case $ARGS_COUNT in
 		0)	printf "$help_text"
 			exit $RET_HELP
@@ -173,19 +179,17 @@ Log:		$LOG
 			;;
 		*)	tui-title "$TITLE"
 			tui-echo "Please select the configuration to edit:"
-			select config in Back "${ARGS[@]}";do
-				case "$config" in
-				Back) 	show_menu=false
-					break
-					return 0
-					;;
-				*)	tui-title "Configuration: $config"
-					ConfigMenu "$config"
-					tui-echo "Please select the configuration to edit:"
-					;;
-				esac
+			config="$(tui-select Back ${ARGS[@]})"
+			case "$config" in
+			Back) 	show_menu=false
 				break
-			done
+				return 0
+				;;
+			*)	tui-title "Configuration: $config"
+				ConfigMenu "$config"
+				tui-echo "Please select the configuration to edit:"
+				;;
+			esac
 			;;
 		esac
 	done
