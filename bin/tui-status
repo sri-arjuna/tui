@@ -35,23 +35,22 @@ Where ERRORLEVEL must be numeric
 	
 	count=${#@}
 #
-#	Fill array according to return value
-#
-	#unset retvalue[@]
-	#retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
-	#retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
-	#retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
-	#retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
-	
-	#retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
-	
-	#retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
-#
 #	Display
 #	
 	[[ -z "$1" ]] && ( tui-status 1 "Usage: tui-status ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]" ; exit 1)
 	if [[ "$1" = "-h" ]]
-	then	printf "
+	then	#
+	#	Fill array according to return value
+	#
+		unset retvalue[@]
+		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
+		retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
+		retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
+		retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
+		retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
+		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
+		
+		printf "
 $ME ($script_version)
 Usage: $ME \$? [ \"Message to user\" ]
 Interpreted numbers:\n"

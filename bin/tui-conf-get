@@ -22,7 +22,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2014.05.29
+#	Changed:	2014.12.11
 	script_version=0.4
 #	Description:	Get a value from an 'conf/ini' file
 #
@@ -41,9 +41,9 @@ Example:	$ME -l /etc/default/grub
 		$ME -i /etc/default/grub grub_cmdline_linux
 		
 Where options are:
-	-h|--help		This screen
-	-i|--irrelevant		Is no longer case sensitive
-	-l|--list		Lists values vailabel in the file
+	-h		This screen
+	-i		Is no longer case sensitive
+	-l		Lists values vailabel in the file
 
 "
 	OPT=""
