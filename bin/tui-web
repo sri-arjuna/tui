@@ -58,7 +58,7 @@
 		
 		case $1 in
 		cli)	LIST="w3m lynx elinks"	;;
-		gui)	LIST="firefox chrome chromium epiphany midori opera seamonkey safari "	;;	;;
+		gui)	LIST="firefox chrome chromium epiphany midori opera seamonkey safari "	;;
 		esac
 		
 		for L in $LIST;do
