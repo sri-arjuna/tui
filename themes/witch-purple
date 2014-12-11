@@ -1,0 +1,13 @@
+# Simplified design:
+#
+#	BORDER_RIGHT will be mirrored of BORDER_LEFT
+#
+	BORDER_LEFT="\./"
+#
+#	tui-header will use TUI_BACKGROUND as background color,
+#	and TUI_FOREGROUND as font color.
+#
+#	tui-title will use inverted colors
+#
+	TUI_BACKGROUND="$TUI_COLOR_BG_PURPLE"
+	TUI_FOREGROUND="$TUI_COLOR_FG_CYAN"

@@ -4,8 +4,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
-#	Changed:	2014.12.03
-	script_version=1.5
+#	Changed:	2014.12.11
+	script_version=1.6
 #	Description:	Tool to configure TUI
 #
 #	Variables
@@ -78,18 +78,25 @@
 	#if [ 0 -eq $UID ]
 	if [[ root = $(whoami) ]]
 	then	USER_NAME=".: r o o t :."
+		APPS=/etc/tui/apps.conf
+		CONF=/etc/tui/tui.conf
 	else	[[ -d "$HOME/.config/tui/" ]] || ( YES=true ; ResetTUI ) 
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
+		APPS=$HOME/.config/tui/apps.conf
+		CONF=$HOME/.config/tui/user.conf
+		
 	fi
 	help_text="
-$ME ($script_version)
+$ME $TUI_VERSION (This script: $script_version)
 $TITLE
-Usage: 	$ME [options] [config]
+Usage: 	$ME [config|reset[-yes]|theme] (source tui)
 Where options are:
 	-h		This screen
 	config		Enters directly into config mode
 	reset		Resets configuration to defaults, root will reset systemwide defaults
 	reset-yes	Doesnt ask for verification
+	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme to THEME.
+			As root, changes the root theme only.
 
 "
 #
@@ -109,18 +116,36 @@ Where options are:
 	
 	MODE=$1
 	YES=false
-	if [[ "$MODE" = "config" ]]
-	then 	ConfigTUI
+	case $MODE in
+	config)
+		ConfigTUI
 		exit $?
-	elif [[ "$MODE" = "reset-yes" ]]
-	then	MODE=reset
+		;;
+	reset-yes)
+		MODE=reset
 		YES=true
-	fi
+		;;
+	theme)	#set +x
+		[[ 0 -eq $UID ]] && \
+			ITEM=TUI_THEME_ROOT || \
+			ITEM=TUI_THEME
+		if [[ -z $2 ]]
+		then	#ls /usr/share/tui/themes
+			tui-echo "$ITEM is set to:" "$(tui-conf-get $CONF $ITEM)"
+			exit $?
+		else	#sh -x /home/sea/prjs/tui/bin/
+			tui-conf-set $CONF $ITEM $2
+			tui-status $? "Changed $ITEM in $CONF to $2"
+			exit $?
+		fi
+		;;
+	esac
 	
 	if [[ "$MODE" = "reset" ]]
 	then	ResetTUI
+		# $RANGE should be set within the function 'ResetTUI'
 		tui-status $? "Reset $RANGE"
-		exit
+		exit $?
 	fi
 #
 #	Display & Action
