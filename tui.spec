@@ -82,20 +82,22 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_sysconfdir}/%{name}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
-                     %{buildroot}%{_docdir}/%{name}
+                     %{buildroot}%{_docdir}/%{name} \
+		     %{buildroot}%{_sysconfdir}/bash_completion.d/
 # Move the executeables
 rm -fr %{name}/screenshots
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
+mv %{name}/%{name}_compl.bash %{buildroot}%{_sysconfdir}/bash_completion.d/
 # Copy system defaults to system
 cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
 # Move system defaults to app dir
 mv %{name}/conf.etc    %{buildroot}%{_datarootdir}/%{name}/
-
 cp %{name}/conf.home/*  %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/templates    %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/themes       %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/docs/*       %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1      %{buildroot}%{_mandir}/man1
+
 # Lets try once again without this...
 rm -fr  %{name}/profile.d/tui.sh
 #mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh
@@ -118,15 +120,16 @@ rm -rf %{buildroot}
 %config
 %{_sysconfdir}/%{name}/
 %{_sysconfdir}/profile.d/%{name}.sh
-
+%{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Wed Dec 10 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-0
+* Thu Dec 11 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-0
 - Updated: tui-list, roman numbering now uses CI) rather than M.
 - Updated: tui-status, status.conf, uses now colors
 - Added:   tui-filemgr
 - Updated: tui-{edit,web}
 - Updated: manpages of tui-{edit, filemgr, web, terminal}
+- Added:   Bash completion
 
 * Mon Dec 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.2-1
 - Fixed:   tui-select now uses tui-list to print its options
