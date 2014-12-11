@@ -4,13 +4,13 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.10.14
-	script_version=0.3
+#	Changed:	2014.12.11
+	script_version=0.4
 #	Description:	Descriptional text goes here
 #
 #	Variables
 #
-	#source tui
+	source tui
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	TITLE="Create a new framework project using $ME"
@@ -68,5 +68,6 @@ Where options are:
 		APP_USER_LABEL=$(tui-read "What is the new label for 'user-area-label':")
 		#APP_TITLE=$(tui-read "What is the frameworks's title: ")
 	fi
-	tui-bol-dir "$APP_BASE/$APP_DATA"
-	source "/usr/share/tui/templates/browser" > "$APP_BASE/$APP_FILE"
+	tui-bol-dir "$APP_TITLE/$APP_DATA"
+	source "/usr/share/tui/templates/browser" > "$APP_TITLE/$APP_FILE"
+	tui-filemgr "$APP_TITLE"

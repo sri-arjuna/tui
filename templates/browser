@@ -35,13 +35,32 @@ cat << EOF
 	APP_VERSION=0.1
 	ME="\${0##*/}"
 	ME_DIR="\${0/\${0##/*/}}"
-	ME_BASE="\$ME_DIR/$APP_LIB"
+	ME_BASE="$APP_BASE/$APP_DATA"
 	TITLE="$APP_TITLE (\$APP_VERSION)"
 	MORE_OPTS="$MORE_OPTS"
 #
+#	Help text
+#
+	help_text="
+\$ME (\$script_version)
+\${TITLE^}
+Usage: 		\$ME [options] arguments
+Examples:	\$ME 
+		\$ME 
+Where options are:
+	-h(elp) 		This screen
+"
+	case $1 in
+	-h|--help)	printf '%s\n' "\$help_text"
+			exit 99
+			;;
+	esac
+#
 #	Display to user
 #
-	cd "\$ME_BASE"
+	#cd "\$ME_BASE"
 	tui-browser \\
-		-t \"\$TITLE\" \$MORE_OPTS
+		-p "\$ME_BASE" \\
+		-t "\$TITLE" \\
+		\$MORE_OPTS
 EOF
