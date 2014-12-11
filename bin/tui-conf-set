@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2014.12.05
-	script_version=0.6
+#	Changed:	2014.12.11
+	script_version=0.7
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -92,7 +92,7 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$(grep $OPT "${VARNAME}=" "$CONFFILE"|grep -v ^#)" #|tr -d [:space:])"
+	SEARCH="$( echo $(grep $OPT ${VARNAME}= "$CONFFILE"|grep -v ^#))" #|tr -d [:space:])"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
@@ -113,7 +113,7 @@ Where options are:
 	fi
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
-	if echo "$REPLACE$SEARCH" | grep  -q '[%$+\/]'
+	if echo "$REPLACE$SEARCH" | grep  -q '[%$+\@/]'
 	then	hadDollar=true
 		REPLACE=$(echo "$REPLACE"|sed 's|[%"$/\|\@]|\\&|g')
 		SEARCH=$(echo "$SEARCH"|sed 's|[%"$/\|\@]|\\&|g')
@@ -123,6 +123,7 @@ Where options are:
 #
 	# Generate the command
 	cmd="$(which sed) s${SD}'${SEARCH}'${SD}'${REPLACE}'${SD}g -i \"$CONFFILE\""
+	#printf "\n\n\n\t\t$cmd\n\n\n\n"
 	
 	# Save changes
 	if ! grep -q "$VARNAME" "$CONFFILE"
@@ -133,7 +134,9 @@ Where options are:
 	elif $hadDollar
 	then	# Remove the escape chars while saving it.
 		eval $cmd
-	else	$cmd
+		#$cmd
+	else	#printf "\n\n\n\t\t$cmd\n\n\n\n"
+		eval $cmd
 	fi
 	
 	# Return true if replaced string was found
