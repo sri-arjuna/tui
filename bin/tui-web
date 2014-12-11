@@ -20,33 +20,81 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.4
 	ME="$(basename $0)"
-	help_text="$ME ($script_version)
-		\rUsage: $ME [options] 'URL1' 'URL2' ...
-		\rOpens provided URL/s in \$BROWSER_[CLI,GUI]
-		\r"
-	ARGS=($@)
 #
 #	Check for the environment to load
 #
 	source /etc/tui/apps.conf
-	source /etc/tui/tui.conf
-	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
+	[[ 0 -eq $UID ]] || \
+		CONF="$HOME/.config/tui/apps.conf"
+	[[ -f "$CONF" ]] && source "$CONF"
+	
+	help_text="$ME ($script_version)
+		\rUsage: $ME [options] 'URL1' 'URL2' ...
+		\rOpens provided URL/s in \$BROWSER_[CLI,GUI]
+		\r"
 #
 #	Variable handling
 #
-	[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
-	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
+	for A in "${@}";do
+	case "$A" in
+	"-h")	printf "$help_text" ; exit $RET_HELP
+		;;
+	"-m")	MODE=$2
+		shift 2
 		;;
 	esac
+	done
+	ARGS=($(echo "${@}"))
+#
+#	Functions
+#
+	GetAvailableApp() { # gui|cli
+	# Returns the first found editor for either GUI or CLI
+	#
+		[[ -z "$1" ]] && echo "GetAvailableEditor requires: gui or cli" && return 1
+		
+		case $1 in
+		cli)	LIST="w3m lynx elinks"	;;
+		gui)	LIST="firefox chrome chromium epiphany midori opera seamonkey safari "	;;	;;
+		esac
+		
+		for L in $LIST;do
+			which $L 2>/dev/zero && \
+				echo "$L" && \
+				return 0
+		done
+		return 1
+	}
 #
 #	Display
 #
+	# Get the mode
 	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
-	then	export BROWSER=$(which $BROWSER_GUI)
-	else	export BROWSER=$(which $BROWSER_CLI)
+	then	MODE=gui
+	else	MODE=cli
 	fi
-	[[ -z "$BROWSER" ]] && export BROWSER=w3m
-	$BROWSER "${ARGS[@]}"
+	
+	if [[ -z "$BROWSER" ]]
+	then	case $MODE in
+		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero)	;;
+		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero)	;;
+		esac
+		export BROWSER
+	fi
+	# Failsafe check, use first available editor found if set EDITOR was not found
+	if ! which $BROWSER 2>/dev/zero
+	then 	# The EDITOR is not available, search for default
+		BROWSER=$(GetAvailableApp $MODE)
+		[[ $MODE = cli ]] && \
+			var=BROWSER_CLI || \
+			var=BROWSER_GUI
+		[[ -z "$BROWSER" ]] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
+		tui-conf-set "$CONF" $var $BROWSER
+	fi
+	
+	for A in "${ARGS[@]}";do
+		$BROWSER "$A"
+	done

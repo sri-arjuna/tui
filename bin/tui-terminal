@@ -47,14 +47,14 @@
 	xterm)			opt=""	;;
 	lxterminal)		opt=""	;;
 	gnomte-terminal)	opt=""	;;
-	konsole)		opts=""	;;
+	konsole)		opt=""	;;
 	esac
 #
 #	Display
 #
 	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
 	then	export TERMINAL #=$(which $BROWSER_GUI)
-		$TERMINAL "${ARGS[@]}"
+		$TERMINAL $opt "${ARGS[@]}"
 	else	tui-status $? "$TERMINAL cannot be executed in VT MODE"
 	fi
 	

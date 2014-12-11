@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2014.12.08
-	script_version=0.5
+#	Changed:	2014.12.10
+	script_version=0.6
 	TITLE="tui-list"
 #	Description:	Text TODO
 #			...  TODO
@@ -93,7 +93,8 @@ Where options are:
 		input=$1	# input num
 		output=""	# Clear output string
 		len=${#input}	# Initial length to count down
-		
+		U="\033[4m"	# Underscore, multiplies with 1000
+		R="\033[0m"	# Resets the underscore
 		roman_val() { # NUM one five ten
 		# This sub does the basic 'roman' algorythm
 		#
@@ -102,7 +103,6 @@ Where options are:
 			five=$3
 			ten=$4
 			out=""
-			
 			case $N in
 			0)	out+=""	;;
 			[123])	while [[ $N -gt 0 ]]
@@ -119,40 +119,42 @@ Where options are:
 					N=$(($N-1))
 				done
 				;;
-			9)	out+="$one$ten"
+			9)	while [[ $N -lt 10 ]]
+				do	out+="$one"
+					N=$(($N+1))
+				done
+				out+="$ten"
 				;;
 			esac
 			echo $out
 		}
-		
 		while [[ $len -gt 0  ]]
 		do	# There are letters to add
 			num=${input:0:1}
 			# Do action according position
 			case $len in
-			3)	# 100
-				output+="$(roman_val $num C D M)"
-				;;
-			2)	# 10
-				output+="$(roman_val $num X L C)"
-				;;
-			1)	# 1
-				output+="$(roman_val $num I V X)"
-				;;
-			*)	# 1000+
-				# What works for less than 1000, doesnt work for any higher...
-				# output+="$(roman_val $num M)"	# There are no higher numbers than 'M' for thousend
-				num=${input:0:(-3)}
-				while [[ $num -gt 0 ]]
-				do	output+="M"
-					num=$(($num-1))
+			1)	output+="$(roman_val $num I V X)"	;;
+			2)	output+="$(roman_val $num X L C)"	;;
+			3)	output+="$(roman_val $num C D M)"	;;
+			4)	output+="$(roman_val $num M ${U}V${R} ${U}X${R})"	;;
+			5)	output+="$(roman_val $num ${U}X${R} ${U}L${R} ${U}C${R})"	;;
+			*)	# Count it up
+				Tone=CI\)
+				Tfive=I\)
+				Tten=CCI\)\)
+				DEPTH=$[ $len - 3 ]	# 1 = 1000 = initial template
+				while [[ $DEPTH -gt 1 ]]
+				do	Tone="C$Tone)"
+					Tfive="C$Tfive)"
+					Tten="C$Tten)"
+					DEPTH=$(($DEPTH-1))
 				done
-				
+				output+="$(roman_val $num $Tone $Tfive $Tten  )"
 				;;
 			esac
 			input=${input:1} ; len=${#input}
 		done
-		echo $output
+		printf "$output "
 	}
 #
 #	Display & Action

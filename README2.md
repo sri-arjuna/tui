@@ -1,30 +1,23 @@
-README - 0.5.0
+README - 0.6.0
 ==============
 
-TUI - Text (based) User Interface
----------------------------------
 
+TUI - a (line based) Text User Interface framework
+---------------------------------
 
 
 Description:
 ------------
 TUI is an abrevihation for "Text User Interface".
-It enables you to write scripts which when using the tui-'simulation a TUI in any terminal window or tty console.
-Due to the 'limitation's of a TTY/Terminal, it is a line-based-interface.
+It provies you with commands named similar to their GNU originals, but enables you to wrap your output into a TUI.
 
-It is ment for scripts that are 'selective' with their output to the user, 
-and also want to present themself a little bit more attractive.
-By this i mean, if you want to write handlers, tools, 
-and therefor want to look a little bit more attractive.
+Eventhough ther are only 4 core commands for display use, there are 29 additional assistant commands for many tasks a scripter comes by daily (tui-{list,read,select,yesno)).
+Furthermore, it provides diffrent 'interactions' according to the mode the user is in, wether a VT or any GUI, 
+some of the commands will use diffrent applications (tui-{edit,filemgr,terminal,web}), or display its output in a slight other way (tui-status).
 
-With TUI you can give your scripts a touch of user interface, even at init 1 /emergency mode.
-It is 
+It is designed to be working during all stages, from init 1 to init 5.
 
-All the commands try to be as native langue OR self explaining as possible.
-!!
-   During the currently running ALPHA and BETA stages,
-   i'm open to any name change suggestions!
-!!
+
 
 Core Functions / Purpose:
 ------------------------

@@ -1,0 +1,58 @@
+.TH "tui-filemgr" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
+
+.SH NAME
+tui-filemgr (0.4)
+
+.SH SYNOPSIS
+\fBtui-filemgr\fP [options] [/path/to/]LOCATION1 [../]LOCATION2 ...
+.br
+
+Example: 
+.br
+		\fBtui-filemgr\fP /path/to/location
+.br
+		\fBtui-filemgr\fP *html
+
+.SH DESCRIPTION
+Opens provided LOCATION in FILEMGR
+.br
+
+As not all file managers support the opening of multiple loactions at once, when passing multiple locations, it will loop through all of them calling the file manager for each of them.
+
+.SH FILES
+.IP /etc/tui/apps.conf
+Provides the favorite applications defaults for the system.
+.IP ~/.config/tui/apps.conf
+Provides the favorite applications defaults for the user.
+
+.SH OPTIONS
+.PP
+.OP -m MODE
+Forces to use application according to passed MODE, where MODE is either
+.B cli
+or
+.B gui
+
+.SH SEE ALSO
+.B bash
+(1),
+.B tui
+(1),
+.B tui-edit
+(1),
+.B tui-filemngr
+(1),
+.B tui-terminal
+(1),
+.B tui-web
+(1)
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT (BUGS)
+erat.simon@gmail.com
+.br
+http://linux-scripter.blogspot.com

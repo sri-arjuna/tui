@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7
+	script_version=0.8
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 Usage: $ME ERRORLEVEL \"Message to user\" [\"centred Message\"]
@@ -30,7 +30,9 @@ Where ERRORLEVEL must be numeric
 #	Variables to display
 #	Diffrent for GUI or CLI
 #
+	source /etc/tui/colors.conf
 	[[ -z "$TUI_DONE" ]] && source /etc/tui/status.conf
+	
 	count=${#@}
 #
 #	Fill array according to return value
@@ -62,9 +64,14 @@ Interpreted numbers:\n"
 		exit $RET_HELP
 	else	if [[ ! "" = "${retvalue[$1]}" ]]
 		then	case $count in	
-			1)	tui-printf -E " " "${retvalue[$1]}"		;;
-			2)	tui-printf -E "$2" "${retvalue[$1]}"		;;
-			3)	tui-printf -E "$2" "$3" "${retvalue[$1]}"	;;
+			#1)	tui-printf -E " " "$(echo ${retvalue[$1]})"		;;
+			#2)	tui-printf -E "$2" "$(echo ${retvalue[$1]})"		;;
+			#3)	tui-printf -E "$2" "$(echo $3" "${retvalue[$1]})"	;;
+			*)	tui-printf -S "${@}"	;;
+			
+			#1)	tui-printf -S " " "${retvalue[$1]}"		;;
+			#2)	tui-printf -S "$2" "${retvalue[$1]}"		;;
+			#3)	tui-printf -S "$2" "$3" "${retvalue[$1]}"	;;
 			4)	tui-status 1 "Too many args: $@"		;;
 			esac
 		else	tui-printf -E  "$2" "$3"  "ErrNr: $1"

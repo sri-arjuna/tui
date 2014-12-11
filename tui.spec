@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.2
-Release:     1%{?dist}
+Version:     0.6.3
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -43,7 +43,7 @@ Core Tools:
 * tui-conf-editor (Basic wizzard editor)
 * tui-conf-get (Function as script)
 * tui-conf-set (Function as script)
-* tui-log (Helps you manage log file/s(-entries))
+* tui-log (Helps you manage log file/s(-entries) and print to screen)
 * tui-new-browser
 * tui-new-script
 * tui-psm (Paralell Script Manager)
@@ -121,13 +121,21 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Dec 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.2-0
+* Wed Dec 10 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-0
+- Updated: tui-list, roman numbering now uses CI) rather than M.
+- Updated: tui-status, status.conf, uses now colors
+- Added:   tui-filemgr
+- Updated: tui-{edit,web}
+- Updated: manpages of tui-{edit, filemgr, web, terminal}
+
+* Mon Dec 08 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.2-1
 - Fixed:   tui-select now uses tui-list to print its options
 - Updated: tui-list now supports roman numbers
 - Updated: tui-select seems stable now, wrong input fills the line though...
 - Updated: tui-conf-editor uses now tui-select
 - Fixed:   tui-conf-editor applies supplied title
 - Added:   demo & sample scripts, screenshots
+- Performance update for tui-list
 
 * Sun Dec 07 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.1-0
 - Fixed: tui-conf-set, automaticly shell escapes when writing values

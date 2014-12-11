@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2014.11.16
-	script_version=0.9.7
+	script_version=0.9.8
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -72,6 +72,7 @@ Options are:
 	-T(itle)	Prints 1st argument centred, if more - aligment like tui-echo
 			The inner background is colored white with blue font by default
 	-H(header)	Full line has a blue background and white font as default color
+	-S(tatus)	Does special handling with the last argument
 "
 	FIRST=""
 	SECOND=""
@@ -83,12 +84,24 @@ Options are:
 	EMPTY="$(printf '%*s' $WIDTH)"					# Get 'width' spaces
 	doEcho=false
 	doHeader=false
+	doStatus=false
 	doTitle=false
 	optStyle=""
 #
+#	Fill array according to return value
+#
+	source /etc/tui/status.conf
+	unset retvalue[@]
+	retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
+	retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
+	retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
+	retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
+	retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
+	retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
+#
 #	Catching Arguments
 #
-	while getopts "EHTh?" name
+	while getopts "EHTSh?" name
 	do 	case $name in
 		E|echo) 	doEcho=true
 				optStyle="-E"	;;
@@ -96,6 +109,8 @@ Options are:
 				optStyle="-H"	;;
 		T|title)	doTitle=true
 				optStyle="-T"	;;
+		S|status)	doStatus=true
+				optStyle="-S"	;;
 		h|"?"|*)	printf "$help_text"
 				exit $RET_HELP
 				;;
@@ -103,16 +118,51 @@ Options are:
 	done
 	shift $(($OPTIND - 1))
 	ARGS_COUNT=0
-	[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
-	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
-	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
-	len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
+	if $doStatus
+	then	case $# in
+		1)	FIRST="$2"
+			SECOND=" "
+			#THIRD=$1
+			#ARGS_COUNT=2
+			;;
+		2)	FIRST="$2"
+			SECOND=" "
+			#THIRD=$1
+			#ARGS_COUNT=3
+			;;
+		3)	FIRST="$2"
+			SECOND="$3"
+			;;
+		esac
+		ARGS_COUNT=3
+		THIRD="${retvalue[$1]}"
+	#	ARGS=$(echo "${@}")
+	#	TMP="${ARGS[${#ARGS[@]}]})"
+		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
+	else
+		[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
+		[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
+		[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
+		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
+	fi
+	
+	#if $doStatus
+	#then	len_strings=$[ 8 + ${#SECOND} + ${#THIRD} ] && \
+#		FIRST=${retvalue[$FIRST]}
+	#else
+	#	[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
+	#	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
+	#	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
+	#	len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
+	#fi
+	
+	
 	[ ! -z "$4" ] && doMore=true || doMore=false
 	[ -z $optStyle ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
+	#$doStatus && optStyleTMP="-E"
 #
 #	Verify all fit on 1 line
 #
-	#len=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
 	if [[ $len_strings -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
@@ -122,7 +172,7 @@ Options are:
 			part1="${FIRST:0:$half}"
 			part2="${FIRST:$half}"
 			tui-printf $optStyleTMP "$part1"
-			tui-printf $optStyle "$part2"
+			tui-printf $optStyle " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
 			
@@ -135,7 +185,7 @@ Options are:
 				tui-printf $optStyle "$part2" "$SECOND"
 			else	# OLD WORKING
 				tui-printf $optStyleTMP "$FIRST"
-				tui-printf $optStyle "$SECOND"
+				tui-printf $optStyle " " "$SECOND"
 			fi
 			;;
 		3)	# Print only 2 on the first line
@@ -153,7 +203,7 @@ Options are:
 #
 #	Prepare Colors & Strings
 #
-	if [ $doEcho = true ]
+	if [ $doEcho = true ] || [ $doStatus = true ]
 	then	COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
@@ -177,7 +227,8 @@ Options are:
 		COLOR_LINE_END="${TUI_COLOR_RESET}"
 	fi
 	case $ARGS_COUNT in
-	0)	FIRST="$EMPTY"
+	0)	FIRST="${EMPTY:8}"
+		SECOND=""
 		;;
 	1)	if [ $doTitle = true ]
 		then 	SECOND="$FIRST"
@@ -196,8 +247,13 @@ Options are:
 		THIRD="$SECOND"
 		SECOND="${EMPTY:${#FIRST}+${#SECOND}}"
 		;;
+#	3)	
+		
+#		;;
 	*)	# 3 (BETA - and more - handler)
-		EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
+		$doStatus && \
+			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+8}" || \
+			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
 		half=$[ ${#EMPTY} / 2 ]
 		adder=$((len_strings % 2))
 		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"

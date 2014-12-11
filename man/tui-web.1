@@ -1,23 +1,23 @@
-.TH "tui-edit" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
+.TH "tui-web" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
 
 .SH NAME
-tui-edit (1.0)
+tui-web (0.6)
 
 .SH SYNOPSIS
-\fBtui-edit\fP [options] [/path/to/]FILE [../]FILE2 ...
+\fBtui-web\fP [options] URL1 URL2
 .br
 
 Example: 
 .br
-		\fBtui-edit\fP /path/to/testfile.txt
+		\fBtui-web\fP google.com
 .br
-		\fBtui-edit\fP *html
+		\fBtui-web\fP *html
 
 .SH DESCRIPTION
-Opens provided FILE/s in EDITOR_[CLI,GUI]
+Opens provided URL in BROWSER
 .br
 
-As not all editors support the opening of multiple files at once, when passing multiple files, it will loop through all of them calling the editor for each single file.
+As not all browsers support the opening of multiple loactions at once, when passing multiple locations, it will loop through all of them calling the web browser for each of them.
 
 .SH OPTIONS
 .PP
@@ -38,6 +38,10 @@ Provides the favorite applications defaults for the user.
 .B bash
 (1),
 .B tui
+(1),
+.B tui-edit
+(1),
+.B tui-filemngr
 (1),
 .B tui-terminal
 (1),

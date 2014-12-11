@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.0
+	script_version=0.4
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -31,14 +31,10 @@
 	[[ -f "$CONF" ]] && source "$CONF"
 	
 	help_text="$ME ($script_version)
-		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
-		\rOpens provided FILE/s in the favorite editor according to environment.
-		\rIn VT it will open \"$EDITOR_CLI\" and in GUI it will open \"$EDITOR_GUI\"
+		\rUsage: $ME LOCATION1 [/path/to/]LOCATION2 [../]LOCATION3 ...
+		\rOpens provided LOCATION/s in the file manager.
+		\rDoes only work in GUI.
 		\r"
-	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
-	then	MODE=gui
-	else	MODE=cli
-	fi
 #
 #	Variable handling
 #
@@ -62,8 +58,8 @@
 		[[ -z "$1" ]] && echo "GetAvailableEditor requires: gui or cli" && return 1
 		
 		case $1 in
-		cli)	LIST="emacs vim nano vi"	;;
-		gui)	LIST="emacs notepadqq code-editor brackets geany pluma gedit leafpad kedit notepad editplus nedit"	;;
+		cli)	LIST="mc fd fdclone vifm"	;;
+		gui)	LIST="pacmanfm thunar nautilus dolphin konquerer krusader xfe 4pane gentoo filerunner "	;;	;;
 		esac
 		
 		for L in $LIST;do
@@ -76,26 +72,30 @@
 #
 #	Display
 #
-	if [[ -z "$EDITOR" ]]
+	# Get the mode
+	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
+	then	MODE=gui
+	else	MODE=cli
+	fi
+	
+	if [[ -z "$FILEMGR" ]]
 	then	case $MODE in
-		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero)	;;
-		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero)	;;
+		cli)	FILEMGR=$(which $FILEMGR_CLI 2>/dev/zero)	;;
+		gui)	FILEMGR=$(which $FILEMGR_GUI 2>/dev/zero)	;;
 		esac
-		export EDITOR
+		export FILEMGR
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $EDITOR > /dev/zero
+	if ! which $FILEMGR 2>/dev/zero
 	then 	# The EDITOR is not available, search for default
-		EDITOR=$(GetAvailableApp $MODE)
+		FILEMGR=$(GetAvailableApp $MODE)
 		[[ $MODE = cli ]] && \
-			var=EDITOR_CLI || \
-			var=EDITOR_GUI
-		[[ -z "$EDITOR" ]] && tui-echo "No editor for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
-		tui-conf-set "$CONF" $var $EDITOR
+			var=FILEMGR_CLI || \
+			var=FILEMGR_GUI
+		[[ -z "$FILEMGR" ]] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
+		tui-conf-set "$CONF" $var $FILEMGR
 	fi
 	
 	for A in "${ARGS[@]}";do
-		[[ ! -z $A ]] && \
-			tui-echo "Opening:" "$A" && \
-			$EDITOR "$A"
+		$FILEMGR "$A"
 	done
