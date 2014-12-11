@@ -23,9 +23,9 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2014.11.16
-	script_version=0.9.8
-#	Description:	Descriptional text goes here
+#	Changed:	2014.12.11
+	script_version=0.9.9
+#	Description:	The absolute core function for TUI
 #
 #	Variables
 #
@@ -88,17 +88,6 @@ Options are:
 	doTitle=false
 	optStyle=""
 #
-#	Fill array according to return value
-#
-	source /etc/tui/status.conf
-	unset retvalue[@]
-	retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
-	retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
-	retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
-	retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
-	retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
-	retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
-#
 #	Catching Arguments
 #
 	while getopts "EHTSh?" name
@@ -118,8 +107,27 @@ Options are:
 	done
 	shift $(($OPTIND - 1))
 	ARGS_COUNT=0
-	if $doStatus
-	then	case $# in
+	
+	# tui-status needs special treatment
+	if $doStatus ; then
+	#
+	#	Fill array according to return value
+	#
+		# Status requires first to be numeric
+		[[ ! "" = "$(echo $1|tr -d [:digit:])" ]] && tui-printf -S 1 "$ME: For option '-S' the first argument nees to be numeric!" && exit 1
+		
+		# get tĥe vars
+		source /etc/tui/status.conf
+		unset retvalue[@]
+		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
+		retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
+		retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
+		retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
+		retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
+		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
+		
+		# Make arguments in order
+		case $# in
 		1)	FIRST="$2"
 			SECOND=" "
 			#THIRD=$1
@@ -136,8 +144,6 @@ Options are:
 		esac
 		ARGS_COUNT=3
 		THIRD="${retvalue[$1]}"
-	#	ARGS=$(echo "${@}")
-	#	TMP="${ARGS[${#ARGS[@]}]})"
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
 	else
 		[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
@@ -146,20 +152,8 @@ Options are:
 		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
 	fi
 	
-	#if $doStatus
-	#then	len_strings=$[ 8 + ${#SECOND} + ${#THIRD} ] && \
-#		FIRST=${retvalue[$FIRST]}
-	#else
-	#	[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
-	#	[ ! -z "$2" ] && SECOND="$2" && ((ARGS_COUNT++))
-	#	[ ! -z "$3" ] && THIRD="$3" && ((ARGS_COUNT++))
-	#	len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
-	#fi
-	
-	
 	[ ! -z "$4" ] && doMore=true || doMore=false
 	[ -z $optStyle ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
-	#$doStatus && optStyleTMP="-E"
 #
 #	Verify all fit on 1 line
 #
@@ -189,11 +183,14 @@ Options are:
 			fi
 			;;
 		3)	# Print only 2 on the first line
-			tui-printf $optStyleTMP "$FIRST" "$SECOND"
-			tui-printf $optStyle "$THIRD"
+			if $doStatus
+			then	tui-printf $optStyleTMP "$FIRST" 
+				tui-printf $optStyle " " "$SECOND" "$THIRD"
+			else	tui-printf $optStyleTMP "$FIRST" "$SECOND"
+				tui-printf $optStyle "$THIRD"
+			fi
 			;;
 		esac
-		#set +x
 		# Since this is special handling, 
 		# calling itself with reduced string lengths
 		# so we can exit after this is done
@@ -226,9 +223,11 @@ Options are:
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="${TUI_COLOR_RESET}"
 	fi
+	
 	case $ARGS_COUNT in
-	0)	FIRST="${EMPTY:8}"
-		SECOND=""
+	0)	FIRST="${EMPTY:2}"
+		SECOND=" "
+		THIRD=" "
 		;;
 	1)	if [ $doTitle = true ]
 		then 	SECOND="$FIRST"

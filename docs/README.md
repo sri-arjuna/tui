@@ -1,22 +1,63 @@
-README - 0.5.0
+README - 0.6.0
 ==============
+
+
+TUI - a (line based) Text User Interface framework
+---------------------------------
+
 
 Description:
 ------------
 TUI is an abrevihation for "Text User Interface".
-It enables you to write scripts simulation a TUI in any terminal window or tty console.
-Due to the 'limitation's of a TTY/Terminal, it is a line-based-interface.
+It provies you with commands named similar to their GNU originals, but enables you to wrap your output into a TUI.
 
-It is ment for scripts that are 'selective' with their output to the user, 
-and also want to present themself a little bit more attractive.
+Eventhough ther are only 4 core commands for display use, there are 29 additional assistant commands for many tasks a scripter comes by daily (tui-{list,read,select,yesno)).
+Furthermore, it provides diffrent 'interactions' according to the mode the user is in, wether a VT or any GUI, 
+some of the commands will use diffrent applications (tui-{edit,filemgr,terminal,web}), or display its output in a slight other way (tui-status).
 
-With TUI you can give your scripts a touch of user interface, even at init 1 /emergency mode.
+It is designed to be working during all stages, from init 1 to init 5.
 
-All the commands try to be as native langue OR self explaining as possible.
-!!
-   During the currently running ALPHA and BETA stages,
-   i'm open to any name change suggestions!
-!!
+
+
+Core Functions / Purpose:
+------------------------
+* tui-echo (actualy uses printf with a trailing '\n' for compability reason)
+* tui-printf (Keeps writing on current line, replacing previous tui-printf outputs)
+* tui-header (Prints the whole line blue background, with white font :: default)
+* tui-title (Prints borders 'normal', between white background and blue font :: default)
+
+Each of these commands can display up to 3 strings.
+For all, but without tui-title, the alignemt goes:
+	1 String  = 1) left
+	2 Strings = 1) left 2) right
+	3 Strings = 1) left 2) center 3) right
+
+For tui-title it is:
+1 String = 1) center
+More Strings like the others...
+
+Thus, the commands have alignmends to the: left, center and the right.
+So each command that is supposed to just display strings,
+may be passed up to 3 strings at a time, or empty.
+
+
+
+Configuration Files:
+--------------------
+
+**/etc/tui/**
+	apps.conf
+	colors.conf
+	status.conf
+	tui.conf
+	
+**HOME/.config/tui/**
+	apps.conf
+	user.conf
+
+apps.conf stores the variables for your default applications used by their specific tui-APP command (tui-edit).
+
+
 
 Purpose & usage:
 ------------
@@ -33,16 +74,6 @@ This is if you need/want/have to provide scripts for users to use,
 and make it (a little) easier for them to 'read' the terminal,
 without to have to write 'presentation' handlers.
 
-So, for myself i wanted something to align the text shown.
-Thus, the commands have alignmends to the: left, center and the right.
-So each command that is supposed to just display strings,
-may be passed up to 3 strings at a time, or empty.
-
-That is also the absolute key-core of TUI!
-* tui-echo (actualy uses printf with a trailing '\n' for compability reason)
-* tui-printf (Writes on currently line, replacing previous tui-printf outputs)
-* tui-header (Prints the whole line blue background, with white font :: default)
-* tui-title (Prints borders 'normal', between white background and blue font :: default)
 
 Also inspired by the use of credentials files for the use of mounting a Network Attached Storage (NAS),
 i wanted to reuse my name and email easily without
