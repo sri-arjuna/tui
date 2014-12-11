@@ -19,14 +19,16 @@
 	tui-press
 	if tui-yesno "Remove custom configurations of all local users?"
 	then 	for usr in $(ls /home --hide=lost+found)
-		do 	tui-printf "Removing configuration of $usr"
+		do 	tui-printf "Removing TUI configuration of $usr"
 			rm -fr "/home/${usr}/.config/$app"
-			tui-status $? "Removed configuration of $usr"
+			tui-status $? "Removed TUI configuration of $usr"
 		done
 	fi
 	rm -fr $DIR_APP
 	rm -fr $DIR_CFG
 	rm -fr $DIR_DOC
+	rm -fr /etc/bash_completion.d/tui_compl.bash
+	rm -fr /etc/profile.d/tui.sh
 	rm $DIR_BIN/${app}*
 	rm $DIR_MAN1/${app}*
 	

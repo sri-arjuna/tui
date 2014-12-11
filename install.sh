@@ -29,6 +29,7 @@
 	read -p "Press enter to install $app OR press 'CTRL+c' to abort"
 	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 $DIR_TPL #$DIR_MAN8
 	cp README.md $DIR_APP
+	cp tui_compl.bash /etc/bash_completion.d/
 	cp bin/* $DIR_BIN
 	cp conf.etc/* $DIR_CFG
 	cp conf.etc $DIR_APP/
