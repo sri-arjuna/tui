@@ -1,7 +1,8 @@
 #!/bin/bash
-source /etc/profile.d/tui.sh
+#source tui
+ME=$(basename "${DEST/.1/}")
 
-cat > "$DEST.1" << EOF
+cat > "$DEST" << EOF
 .TH "$(basename $DEST)" "1" "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
 
 .SH NAME

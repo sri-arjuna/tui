@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 #
 # Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
@@ -21,7 +21,7 @@
 #	Variable defaults
 #
 	source tui
-	script_version=1.0.0
+	script_version=0.2
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -44,7 +44,7 @@ Where options are:
 #	Variable handling
 #
 	tui-title "$TITLE ($script_version)"
-	while getopts "hamr" name
+	while getopts "ham" name
 	do 	case $name in
 		a)	SHELL_EXT="application"	;;
 		m)	SHELL_EXT="minimal"	;;

@@ -1,13 +1,13 @@
 #!/bin/bash
-source tui
-ME=$(basename ${DEST/.1/})
+#source tui
+ME=$(basename "${DEST/.1/}")
 
 cat > "$DEST" << EOF
 .ig
 $ME - short description
 Copyright (C) $(date +'%B %d') by $USER_NAME - $USER_EMAIL
 .. ....................................................
-.TH "$(basename $DEST)" 1 "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
+.TH "$ME" 1 "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
 
 
 
@@ -61,10 +61,12 @@ Listing text
 Some descriptional text
 .RS 11
 .B 3.
-Indented list
+Indented
+.I list
 .br
 .B 4.
-Indented list
+Indented 
+.B list
 .RS 4
 .B 5.
 Sub ident
