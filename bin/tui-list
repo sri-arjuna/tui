@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2014.12.10
-	script_version=0.6
+#	Changed:	2014.12.12
+	script_version=0.7
 	TITLE="tui-list"
 #	Description:	Text TODO
 #			...  TODO
@@ -194,5 +194,5 @@ Where options are:
 		$shown && CUR=0 && unset OUT[@]
 	done
 	# Print unprinted
-	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr && printf "\n"
+	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr # && printf "\n"
 	exit 0
