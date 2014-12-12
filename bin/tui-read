@@ -28,7 +28,7 @@
 	#[[ -z "$THEME" ]] && THEME=default
 	. /usr/share/tui/themes/$TUI_THEME
 	
-	script_version=0.8
+	script_version=0.8.1
 	ME="$(basename $0)"
 	help_text="
 $ME ($script_version)
@@ -60,5 +60,5 @@ Examples:	$ME \"What is your favorite color?\"
 	tui-printf "$txt" > /dev/stderr
 	printf "\r$BORDER_LEFT $txt " > /dev/stderr
 	read ${doPassword} INPUT
-	printf '%s\n' "$INPUT"  > /dev/stdout
+	printf '%s' "$INPUT"  > /dev/stdout
 	tui-echo "$txt" "$INPUT"  > /dev/stderr
