@@ -34,7 +34,7 @@
 $ME ($script_version)
 Usage: 		$ME [options] MSG
 Examples:	$ME \"What is your favorite color?\"
-		$ME -p \"Enter your password:\" ; printf '\\\n'
+		$ME -p \"Enter your password:\"
 
 "
 	doPassword=""
@@ -42,13 +42,11 @@ Examples:	$ME \"What is your favorite color?\"
 #	Variable handling
 #
 	[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	txt="$1"
 	while getopts "hp" opt;do
 	case "$opt" in
 	"h")	printf "$help_text" ; exit $RET_HELP
 		;;
-	"p")	doPassword="-se"
-		txt="$1"	
+	"p")	doPassword="-se"	
 		;;
 	esac
 	done
