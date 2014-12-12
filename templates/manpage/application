@@ -1,0 +1,103 @@
+#!/bin/bash
+source tui
+ME=$(basename ${DEST/.1/})
+
+cat > "$DEST" << EOF
+.ig
+$ME - short description
+Copyright (C) $(date +'%B %d') by $USER_NAME - $USER_EMAIL
+.. ....................................................
+.TH "$(basename $DEST)" 1 "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
+
+
+
+.SH NAME
+$ME (0.1)
+
+
+
+.SH SYNOPSIS
+\fB$ME\fP 
+.OP option
+.RI arguments
+.br
+
+Example:	$ME filename
+.br
+		$ME
+.OP -v
+.OP -l label
+filename
+.br
+
+
+
+
+.SH OPTIONS
+.br
+.OP "-v"
+Optional option
+.br
+
+.OP "-l label" 
+Bold option with argument
+
+.IP "\fB-XY\fP" 
+Bold option
+.br
+
+
+
+.SH DESCRIPTION
+Some descriptional text
+.br
+.B 1.
+Listing text
+.br
+.B 2.
+Listing text
+.br
+.IP "\fBList Heading\fP"
+Some descriptional text
+.RS 11
+.B 3.
+Indented list
+.br
+.B 4.
+Indented list
+.RS 4
+.B 5.
+Sub ident
+.RE
+
+
+
+.SH SEE ALSO
+.B bash
+(1),
+.B man
+(1),
+.B tui
+(1)
+
+
+
+.SH LICENSE
+$DEFAULT_LICENSE
+.br
+$DEFAULT_LICENSE_URL
+
+
+
+.SH CONTACT
+$USER_EMAIL
+.br
+$USER_HOMEPAGE
+
+
+
+.SH BUG REPORTS
+Please visit "$USER_HOMEPAGE" to report bugs, or send me an email to the adress listed in
+.B
+CONTACT
+EOF

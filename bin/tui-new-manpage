@@ -21,26 +21,25 @@
 #	Variable defaults
 #
 	source tui
-	script_version=1.0.1
+	script_version=1.0.0
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
-Creates a new script in $HOME/bin, if $HOME/.local/bin doesnt exists.
+Creates a new manpage in $HOME/bin, if $HOME/.local/bin doesnt exists.
 Also asks to create a basic manpage template in the same location.
 
 Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
 Examples:	$ME fileA.sh			# Creates a script in $HOME/bin
-		$ME -a /opt/bin/fileB.sh	# Creates a full application script in /opt/bin
+		$ME -a /usr/share/man/man1/$ME[.1]	# Creates a full application script in /opt/bin
 Where options are:
 	-h		This screen
-	-a(pplication)	Create a full application script template
-	-r(egular)	Creates a same as default (no option), but less pre-sets
-	-m(inimal)	Creates a minimal header
+	-a(pplication)	Create a full application manpage template
+	-m(inimal)	Creates a minimal manpage template
 	
 "
 	DEST=""
-	TITLE="sea's New script script"
-	SHELL_EXT="medium"
+	TITLE="sea's New manpage script"
+	SHELL_EXT="minimal"
 #
 #	Variable handling
 #
@@ -49,10 +48,11 @@ Where options are:
 	do 	case $name in
 		a)	SHELL_EXT="application"	;;
 		m)	SHELL_EXT="minimal"	;;
-		r)	SHELL_EXT="regular"	;;
 		h)	printf "$help_text"
 			exit $RET_HELP	;;
-		# *)	printf "$help_text" ; exit $RET_HELP	;;
+		*)	# If improper argument
+			printf "$help_text"
+			exit $RET_HELP	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
@@ -78,23 +78,14 @@ Where options are:
 			DEST="$1"
 		fi
 	fi
+	
+	DEST="${DEST/.1/}.1"
 	if [[ -f "$DEST" ]]
 	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
 		tui-status $? "Overwrite file: $DEST"
 	fi
 	APP_DIR=/usr/share/tui
-	source $APP_DIR/templates/scripts/$SHELL_EXT
-	if tui-status $? "Saved: $(printf $DEST)"
-	then	chmod +x "$DEST"
-	else	exit $?
-	fi
-	doMan=false
-	
-	tui-yesno "Create a manpage too?" && \
-		doMan=true && \
-		source $APP_DIR/templates/manpage > $DEST.1
-	$doMan && tui-edit "$DEST.1"
-	$doMan && man "$DEST.1"
-	
+	source $APP_DIR/templates/manpage/$SHELL_EXT > "$DEST"
+	tui-status $? "Saved: $(printf $DEST)"
 	# Open the scriot AFTER the manpage... to encourage the writing of the manpage
 	tui-edit "$DEST"
