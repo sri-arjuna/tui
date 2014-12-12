@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.3
-Release:     4%{?dist}
+Release:     6%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -123,6 +123,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Fri Dec 12 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-6
+- Added: tui-new-manpage
+- Fixed: tui-read
+- Fixed: emptyline of tui-list/tui-select
+
 * Thu Dec 11 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-0
 - Updated: tui-list, roman numbering now uses CI) rather than M.
 - Updated: tui-status, status.conf, uses now colors
