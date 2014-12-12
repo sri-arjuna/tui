@@ -296,7 +296,7 @@ _tui_progress_module()
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
-		-m)	COMPREPLY=( $(compgen -W "my_MAX_VALUE -- $cur) )
+		-m)	COMPREPLY=( $(compgen -W "my_MAX_VALUE" -- $cur) )
 			return 0
 			;;
 		-i)	COMPREPLY=( $(compgen -W "my_MAXVAL_IDENTIFICATION" -- $cur) )
@@ -324,7 +324,7 @@ _tui_psm_module()
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
-		-l)	COMPREPLY=( $(compgen -W "my_LIMIT_VALUE -- $cur) )
+		-l)	COMPREPLY=( $(compgen -W "my_LIMIT_VALUE" -- $cur) )
 			return 0
 			;;
 		-w)	COMPREPLY=( $(compgen -W "SECS" -- $cur) )
@@ -355,7 +355,7 @@ _tui_status_module()
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
-		-l)	COMPREPLY=( $(compgen -W "my_LIMIT_VALUE -- $cur) )
+		-l)	COMPREPLY=( $(compgen -W "my_LIMIT_VALUE" -- $cur) )
 			return 0
 			;;
 		tui-status)

@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -48,7 +48,7 @@
 		;;
 	esac
 	done
-	ARGS=($(echo "${@}"))
+	ARGS=( "${@}")
 #
 #	Functions
 #
@@ -96,6 +96,6 @@
 		tui-conf-set "$CONF" $var $FILEMGR
 	fi
 	
-	for A in "${ARGS[@]}";do
+	for A in "${@}";do
 		$FILEMGR "$A"
 	done
