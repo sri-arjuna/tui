@@ -91,10 +91,7 @@ Where options are:
 	doMan=false
 	
 	tui-yesno "Create a manpage too?" && \
-		doMan=true && \
-		source $APP_DIR/templates/manpage > $DEST.1
-	$doMan && tui-edit "$DEST.1"
-	$doMan && man "$DEST.1"
+		tui-new-manpage "$DEST"
 	
 	# Open the scriot AFTER the manpage... to encourage the writing of the manpage
 	tui-edit "$DEST"
