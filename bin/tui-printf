@@ -162,6 +162,7 @@ Options are:
 		# Splitting required
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
+			#echo "1-- $len_strings, $WIDTH, F$FIRST S$SECOND T$THIRD"
 			half=$[ ${#FIRST} / 2 ]
 			part1="${FIRST:0:$half}"
 			part2="${FIRST:$half}"
@@ -169,20 +170,46 @@ Options are:
 			tui-printf $optStyle " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
-			
-			half=$[ ${#FIRST} / 2 ]
-			if [[ $[ $half + ${#SECOND} ] -lt $WIDTH ]]
-			then	part1="${FIRST:0:$half}"
+			#echo "2-- $len_strings, $WIDTH, F$FIRST S$SECOND T$THIRD"
+			if [[ "" = "$(echo $FIRST|tr -d [:space:])" ]]
+			then	# It is left aligned
+			#	len=$(( 1 + ${#SECOND} ))
+			#	if [[ $len -gt $WIDTH ]]
+			#	then	
+					half=$[ ${#SECOND} / 2 ]
+					part1="${SECOND:0:$half}"
+					part2="${SECOND:$half}"
+					tui-printf $optStyleTMP " " "$part1"
+					tui-printf $optStyle " " "$part2"
+			#	else	tui-printf $optStyleTMP " " "$SECOND"
+			#	fi
+			elif [[ $WIDTH -lt ${#FIRST} ]]
+			then	half=$[ ${#FIRST} / 2 ]
+				part1="${FIRST:0:$half}"
 				part2="${FIRST:$half}"
-			
 				tui-printf $optStyleTMP "$part1"
-				tui-printf $optStyle "$part2" "$SECOND"
+				tui-printf $optStyle " " "$part2"
 			else	# OLD WORKING
 				tui-printf $optStyleTMP "$FIRST"
 				tui-printf $optStyle " " "$SECOND"
 			fi
+			
+			
+			
+		#	half=$[ ${#FIRST} / 2 ]
+		#		if [[ $[ $half + ${#SECOND} ] -lt $WIDTH ]]
+		#		then	part1="${FIRST:0:$half}"
+		#			part2="${FIRST:$half}"
+
+		#			tui-printf $optStyleTMP "$part1"
+		#			tui-printf $optStyle "$part2" "$SECOND"
+		#		else	# OLD WORKING
+		#			tui-printf $optStyleTMP "$FIRST"
+		#			tui-printf $optStyle " " "$SECOND"
+		#		fi
 			;;
 		3)	# Print only 2 on the first line
+			echo "3-- $len_strings, $WIDTH, F$FIRST S$SECOND T$THIRD"
 			if $doStatus
 			then	tui-printf $optStyleTMP "$FIRST" 
 				tui-printf $optStyle " " "$SECOND" "$THIRD"
