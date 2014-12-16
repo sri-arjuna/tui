@@ -27,9 +27,9 @@ _tui_module()
 		[rt]*)	COMPREPLY=( $(compgen -W "${ARGS[*]}" -- $cur) )
 			return 0
 			;;
-		*)	COMPREPLY=( $(compgen -W "${OPTS[*]} ${ARGS[*]}" -- $cur) )
-			return 0
-			;;
+		#*)	COMPREPLY=( $(compgen -W "${OPTS[*]} ${ARGS[*]}" -- $cur) )
+		#	return 0
+		#	;;
 		esac
 
 		# This completes the custom entries from $DIR
@@ -41,7 +41,7 @@ _tui_module()
 			[a-zA-Z]*)	COMPREPLY=( $( compgen -W "$(cd $DIR 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
 					return 0
 					;;
-			*)		COMPREPLY=( $( compgen -W "$(cd $DIR 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
+			*)		COMPREPLY=( $( compgen -W "$(cd $DIR 2>/dev/null && echo *)" -- "$cur" ) ) 
 					return 0
 					;;
 			esac
@@ -49,6 +49,7 @@ _tui_module()
 		tui)	COMPREPLY=( $( compgen -W "reset reset-yes theme" -- "$cur" ) ) 
 			return 0
 			;;
+		reset*)	return 0;;
 		esac
 	}
 _tui_browser_module()
