@@ -74,7 +74,7 @@ Where options are:
 	PWD_OLD="$(pwd)"
 	BLACKLIST="su sudo"
 	SOURCE=""
-	MENU_MODE=text
+	MENU_MODE=num
 	doClear=true
 	BASE=""
 	SPECIAL_NAME="default"
