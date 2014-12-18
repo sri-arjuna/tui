@@ -25,7 +25,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
 #	Changed:	2014.12.18
-	script_version=0.3
+	script_version=0.4
 	TITLE="Install packages"
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
@@ -94,11 +94,12 @@ Where options are:
 		else	out=unknown
 			# Do further checkings
 			# Changes according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
-			which cave   2>/dev/zero && out=exherbo
-			which zypper 2>/dev/zero && out=suse
-			which emerge 2>/dev/zero && out=portage
-			which port  2>/dev/zero && out=macports
-			which brew   2>/dev/zero && out=homebrew
+			which cave   1>/dev/zero 2>/dev/zero && out=exherbo
+			which emerge 1>/dev/zero 2>/dev/zero && out=gentoo
+			which port   1>/dev/zero 2>/dev/zero && out=mac
+			which brew   1>/dev/zero 2>/dev/zero && out=mac
+			# Last release was somewhen in the middle of last year, we now have end of 2014
+			which zypper 1>/dev/zero 2>/dev/zero && out=opensuse
 		fi
 		echo $out
 	}
@@ -144,25 +145,26 @@ Where options are:
 	debian)		APP=apt-get	;;
 	redhat)		APP=yum		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
-	suse)		APP=zypper	;;
+	opensuse)	APP=zypper	;;
 	exherbo)	APP=cave	;;
-	portage)	APP=emerge	;;
-	macports)	APP=port	;;
-	homebrew)	APP=brew	;;
+	gentoo)		APP=emerge	;;
+	mac)		for APP in port brew
+			do
+				which $APP 2>/dev/zero 1>/dev/zero && break
+			done
+			;;
 	esac
 	
 	# Generate commands for the installer
 	cmd=""
-	make_cache=""
 	case $APP in
 	yum)		cmd+=" -q -y install"	;;	
 	apt-get)	cmd="-q -y install"	;;
 	pacman)		cmd="-qIY"		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (379-1056)
-	brew)		cmd="install"		;;
+	brew|port)	cmd="install"		;;
 	cave)		cmd="resolve -x "	;;
 	emerge)		cmd=""			;;
-	port)		cmd="install"		;;
 	zypper)		cmd="install"		;;
 	esac
 #	echo "$verbose -- $APP -- $cmd" ; exit

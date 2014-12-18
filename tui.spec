@@ -123,10 +123,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Dec 182 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.4-0
+* Thu Dec 18 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.4-0
 - tui-read: Works on more systems now, and hopefully fixed display issue
 - tui-install: Supports (hopefully) more systems now, thx 'drl'
-- tui-progress: Now also has a barv (#)
+- tui-progress: Now also has a bar (#)
 - Added several screenshots
 
 * Fri Dec 12 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-6
