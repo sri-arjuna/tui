@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.3
-Release:     38%{?dist}
+Version:     0.6.4
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -123,6 +123,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Thu Dec 182 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.4-0
+- tui-read: Works on more systems now, and hopefully fixed display issue
+- tui-install: Supports (hopefully) more systems now, thx 'drl'
+- tui-progress: Now also has a barv (#)
+- Added several screenshots
+
 * Fri Dec 12 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.3-6
 - Added: tui-new-manpage
 - Fixed: tui-read
