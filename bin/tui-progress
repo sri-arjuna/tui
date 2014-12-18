@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.04.26
-	script_version=0.3
+#	Changed:	2014.12.18
+	script_version=0.4
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -54,33 +54,42 @@ Where options are:
 	TYPE=dash
 	MAX=1
 	doReset=false
+	BAR="#"
 #
 #	Catching Arguments
 #
-	while getopts "i:m:rh" name
+	while getopts "B:bi:m:rh" name
 	do 	case $name in
-		i)	ID="$OPTARG"		;;
+		B)	BAR="$OPTARG"		;;
+		b)	TYPE=bar		;;
+		i)	ID=".$OPTARG"		;;
 		m)	MAX="$OPTARG"
-			TYPE=num		;;
+			[[ dash = $TYPE ]] && TYPE=num		;;
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
 		r)	doReset=true		;;
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=(${*})			# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
-	C=0
 	LEFT="$1"
 	MIDDLE="$2"
 	C=0
 #
 #	 Create initial tempfile if none exists
 #
-	TMPFILE="$TUI_TEMP_DIR/tui-progress.$ID"
+	TMPFILE="$TUI_TEMP_DIR/tui-progress$ID.tmp"
 	[ ! -f "$TMPFILE" ] && \
 		touch "$TMPFILE" && \
-		printf 0 > "$TMPFILE"
+		printf 1 > "$TMPFILE"
+	$doReset && printf 1 > "$TMPFILE" && exit 0
+#
+#	Check for all required options
+#
+	if [[ bar = $TYPE ]] && [[ $MAX -gt 1 ]]
+	then echo "All good" > /dev/zero
+	else	tui-status 1 "Displaymode \"$TYPE\" requires '-m <NUM>'"
+		exit $?
+	fi
 #
 #	Read initial value from tmpfile
 #
@@ -90,6 +99,22 @@ Where options are:
 		dash)	[[ $VAL -gt 3 ]] && VAL=2
 			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
 		num)	PROGRESS="$VAL / $MAX"		;;
+		bar)	procent=0
+			[[ -z "$COLUMS" ]] && COLUMNS=$(tput cols)
+			procent=$(( 100 / $MAX * $VAL ))
+			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 4 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
+			
+			[[ $procent -gt 100 ]] && \
+				procent=100
+			len=$(( $length / 100 * $procent  ))
+			
+			bars=$(printf '%*s' $len)
+			bars=$(echo "$bars"|sed s," ","$BAR",g)
+			#EMPTY="$(printf '%*s' $WIDTH)"	
+			
+			PROGRESS="$bars"
+			PROGRESS+=" [ ${procent}%% ]"
+			;;
 		*)	tui-status 1 "Error, type is $TYPE"	;;
 	esac
 	[[ -z $PROGRESS ]] && exit 1
@@ -98,9 +123,10 @@ Where options are:
 #
 	case "$TYPE" in
 	dash) 	[[ ! $VAL -ge $TOTAL ]] && \
-			( ((VAL++)) ; printf $VAL > "$TMPFILE" ) || \
+			( $(($VAL+1)) ; printf $VAL > "$TMPFILE" ) || \
 			printf 0 > "$TMPFILE"		;;
-	num)	((VAL++)) ; num=$VAL
+	num|bar)
+		num=$(($VAL+1)) #; num=$VAL
 		printf $num > "$TMPFILE"		;;
 	esac
 #
@@ -108,8 +134,5 @@ Where options are:
 #
 	[[ -z $LEFT ]] && LEFT=" " 
 	[[ -z $MIDDLE ]] && MIDDLE=" "
-	if [[ true = $doReset ]]
-	then 	tui-printf "$LEFT" "$MIDDLE" "$INFO"
-		printf 1 > "$TMPFILE"
-	else 	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
-	fi
+	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
+	
