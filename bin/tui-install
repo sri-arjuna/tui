@@ -24,9 +24,9 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2014.07.28
-	script_version=0.2
-	TITLE="tui-install"
+#	Changed:	2014.12.18
+	script_version=0.3
+	TITLE="Install packages"
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
 #
@@ -84,14 +84,23 @@ Where options are:
 	based() { #
 	# Returns arch, debian, redhat or unkown
 	#
-    		if [[ -f /etc/redhat-release ]] 
-		then	printf redhat
+    		out=""
+		if [[ -f /etc/redhat-release ]] 
+		then	out=redhat
 		elif [[ -f /etc/arch-release ]]
-		then	printf arch
+		then	out=arch
 		elif [[ -f /etc/debian_version ]]
-		then	printf debian
-		else	printf unknown
+		then	out=debian
+		else	out=unknown
+			# Do further checkings
+			# Changes according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
+			which cave   2>/dev/zero && out=exherbo
+			which zypper 2>/dev/zero && out=suse
+			which emerge 2>/dev/zero && out=portage
+			which port  2>/dev/zero && out=macports
+			which brew   2>/dev/zero && out=homebrew
 		fi
+		echo $out
 	}
 #
 #	Catching Arguments
@@ -134,21 +143,27 @@ Where options are:
 	arch)		APP=pacman	;;
 	debian)		APP=apt-get	;;
 	redhat)		APP=yum		;;
+	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
+	suse)		APP=zypper	;;
+	exherbo)	APP=cave	;;
+	portage)	APP=emerge	;;
+	macports)	APP=port	;;
+	homebrew)	APP=brew	;;
 	esac
 	
 	# Generate commands for the installer
 	cmd=""
 	make_cache=""
 	case $APP in
-	yum)		cmd+=" -q -y install"
-			#make_cache="$APP -q makecache"
-			;;	
-	apt-get)	cmd="-q -y install"
-			make_cache=""
-			;;
-	pacman)		cmd="-qIY"	# OR: -IY ?? // -Ssyu
-			make_cache=""
-			;;
+	yum)		cmd+=" -q -y install"	;;	
+	apt-get)	cmd="-q -y install"	;;
+	pacman)		cmd="-qIY"		;;
+	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (379-1056)
+	brew)		cmd="install"		;;
+	cave)		cmd="resolve -x "	;;
+	emerge)		cmd=""			;;
+	port)		cmd="install"		;;
+	zypper)		cmd="install"		;;
 	esac
 #	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
@@ -158,34 +173,25 @@ Where options are:
 		good_ones=""
 		bad_ones=""
 		count_total=1
-		# To reduce time, we create a new cache, and tell the PKMGR later to use cache only
-		if [[ ! -z $make_cache ]]
-		then	# Create cache, display if verbose
-			tui-printf "Create cache..." "$WORK" #; printf ""
-			$doLog && tui-log "$LOG" "Creating cache: $make_cache"
-			
-			#$make_cache && RET=0 || RET=1
-			$verbose && tui-status $RET "Created cache."
-		fi
 		# Actualy install the packages
+		tui-progress -r
 		for app in ${ARGS[*]};do
 			cmd_all="$APP $cmd $app"
+			$doLog && tui-log "$LOG" "Execute: $cmd_all"
 			
-			$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
-			tui-printf "Installing: $app" "$count_total / $#"
-			
+			tui-progress -m $# "Installing: $app"
 			$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+			
 			tui-status $RET "Installed package: $app" && \
 				( $doLog && tui-log "$LOG" "Successfully installed: $app" ) || \
 				( $doLog && tui-log "$LOG" "Failed to install: $app" )
-			
 			[[ 0 -eq $RET ]] && \
 				good_ones+=" $app" && ((count_good++)) || \
 				bad_ones+=" $app"
 			((count_total++))
 		done
 		[[ -z "$bad_ones" ]] && \
-			tui-echo "There were $[ $count_total - $count_good ] errors, namely these: $bad_ones"
+			tui-echo "There were $[ $count_total - $count_good ] errors, namely these:" "$bad_ones"
 	else	# Do all in one bunch
 		tui-echo "Installing $@"
 		cmd_all="$APP $cmd $@"
