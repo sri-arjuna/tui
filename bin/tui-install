@@ -98,8 +98,10 @@ Where options are:
 			which emerge 1>/dev/zero 2>/dev/zero && out=gentoo
 			which port   1>/dev/zero 2>/dev/zero && out=mac
 			which brew   1>/dev/zero 2>/dev/zero && out=mac
-			# Last release was somewhen in the middle of last year, we now have end of 2014
 			which zypper 1>/dev/zero 2>/dev/zero && out=opensuse
+			# Not sure if i handle these 2 properly
+			which pkg 1>/dev/zero 2>/dev/zero && out=openbsd
+			which pkgng 1>/dev/zero 2>/dev/zero && out=freebsd
 		fi
 		echo $out
 	}
@@ -153,6 +155,7 @@ Where options are:
 				which $APP 2>/dev/zero 1>/dev/zero && break
 			done
 			;;
+	*bsd)		APP=pkg	;;
 	esac
 	
 	# Generate commands for the installer
@@ -166,6 +169,7 @@ Where options are:
 	cave)		cmd="resolve -x "	;;
 	emerge)		cmd=""			;;
 	zypper)		cmd="install"		;;
+	pkg)		cmd="install"		;;
 	esac
 #	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
