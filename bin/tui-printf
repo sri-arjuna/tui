@@ -138,8 +138,14 @@ Options are:
 			;;
 		1)	FIRST="$1"
 			SECOND=" "
+			#echo "
+			#PASS 1
+			#"
 			;;
-		2)	FIRST="$1"
+		2)	#echo "
+			#PASS 2
+			#"
+			FIRST="$1"
 			SECOND="$2"
 			;;
 		*)	tui-printf -S 1 "Too many arguments ($#)!"
@@ -165,37 +171,42 @@ Options are:
 	if [[ $len_strings -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
+	#	echo "
+	#		TOO LONG
+	#		"
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
 			half=$[ ${#FIRST} / 2 ]
 			part1="${FIRST:0:$half}"
 			part2="${FIRST:$half}"
 			tui-printf $optStyleTMP "$part1"
-			tui-printf $optStyle "$NUM_ID" " " "$part2"
+			$doStatus && \
+				tui-printf $optStyle "$NUM_ID" " " "$part2" || \
+				tui-printf $optStyle " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
 			if [[ "" = "$(echo $FIRST|tr -d [:space:])" ]]
 			then	# It is left aligned
-			#	len=$(( 1 + ${#SECOND} ))
-			#	if [[ $len -gt $WIDTH ]]
-			#	then	
-					half=$[ ${#SECOND} / 2 ]
-					part1="${SECOND:0:$half}"
-					part2="${SECOND:$half}"
-					tui-printf $optStyleTMP " " "$part1"
+				half=$[ ${#SECOND} / 2 ]
+				part1="${SECOND:0:$half}"
+				part2="${SECOND:$half}"
+				tui-printf $optStyleTMP " " "$part1"
+				$doStatus && \
+					tui-printf $optStyle "$NUM_ID" " " "$part2" || \
 					tui-printf $optStyle " " "$part2"
-			#	else	tui-printf $optStyleTMP " " "$SECOND"
-			#	fi
 			elif [[ $WIDTH -lt ${#FIRST} ]]
 			then	half=$[ ${#FIRST} / 2 ]
 				part1="${FIRST:0:$half}"
 				part2="${FIRST:$half}"
 				tui-printf $optStyleTMP "$part1"
-				tui-printf $optStyle " " "$part2"
+				$doStatus && \
+					tui-printf $optStyle "$NUM_ID" " " "$part2" || \
+					tui-printf $optStyle " " "$part2"
 			else	# OLD WORKING
 				tui-printf $optStyleTMP "$FIRST"
 				tui-printf $optStyle " " "$SECOND"
 			fi
+			;;
 		3)	# Print only 2 on the first line
 			if $doStatus
 			then	tui-printf $optStyleTMP "$FIRST" 
@@ -218,10 +229,6 @@ Options are:
 	then	COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
-	#	$doStatus && \
-	#		$doReturn && \
-	#		NL="\r" || \
-	#		NL="\n"
 		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
 	elif [ $doHeader = true ]
 	then	# Full line

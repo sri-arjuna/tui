@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.4
-Release:     8%{?dist}
+Version:     0.6.5
+Release:     0%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -123,10 +123,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Sat Dec 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.4-8
+* Sat Dec 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-0
 - Updated version number
-- Fixed split issue with tui-status with 3 arguments,
-- in terminals smaller than 80 columns.
+- Fixed 'endless loop' issue with tui-status with 3 arguments,
+-    in terminals smaller than 80 columns, still needs optimal finetuning.
+- Fixed tui-list, didnt display items properly, therefor tui-select couldnt select right.
 
 * Thu Dec 18 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.4-0
 - tui-read: Works on more systems now, and hopefully fixed display issue

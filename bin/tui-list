@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2014.12.12
-	script_version=0.7
+#	Changed:	2014.12.21
+	script_version=0.8
 	TITLE="tui-list"
 #	Description:	Text TODO
 #			...  TODO
@@ -162,7 +162,7 @@ Where options are:
 	unset OUT[@]
 	OUT[0]=""
 	shown=false
-	MAX=3
+	MAX=2
 	CUR=0
 	DONE=0
 	for OPT in "${ARGS[@]}"
@@ -176,22 +176,29 @@ Where options are:
 		esac
 		
 		# Add the string to array, or print array
-		if [[ $CUR -lt $MAX ]]
+		if [[ $CUR -le $MAX ]]
 		then	len=0
 			for O in "${OUT[@]}";do len=$[ $len + ${#O} ];done
 			sum=$[ $len + 2  + ( ${#BORDER_LEFT} * 2 ) ]
+			
 			if [[ $sum -lt $COLUMNS ]]
 			then	OUT[$CUR]="$count) $OPT"
 				shown=false
 				CUR=$(( $CUR + 1 ))
 			else	tui-echo "${OUT[@]}" >> /dev/stderr
-				shown=true
+				CUR=0 && unset OUT[@] 
+				[[ -z "$OPT" ]] && shown=true
+				OUT[$CUR]="$count) $OPT"
+				CUR=$(( $CUR + 1 ))
 			fi
 		else 	tui-echo "${OUT[@]}" >> /dev/stderr
-			shown=true
+			CUR=0 && unset OUT[@] 
+			[[ -z "$OPT" ]] && shown=true
+			OUT[$CUR]="$count) $OPT"
+			CUR=$(( $CUR + 1 ))
 		fi
 		#counter=$(( $counter + 1 ))
-		$shown && CUR=0 && unset OUT[@]
+		
 	done
 	# Print unprinted
 	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr # && printf "\n"

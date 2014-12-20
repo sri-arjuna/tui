@@ -36,8 +36,8 @@
 	#source /etc/tui/themes/$TUI_THEME
 	ME=${0##*/}
 	
-	script_version=0.4
-	counter=1
+	script_version=0.6
+	counter=0
 	COLUMNS=$(tput cols)
 	help_text="
 $ME ($script_version)
@@ -67,8 +67,12 @@ Examples:	ret=\$($ME one two three)
 		
 		if [[ -z "$NUM" ]]
 		then	printf "\r" > /dev/stderr
-		elif [[ "" = "$(echo $NUM|tr -d [:digit:])" ]]
+		elif [[ "" = "$(echo $NUM|tr -d [:digit:])" ]] && [[ $NUM -ne 0 ]]
 		then	# It is a number in range?
+			[[ $NUM -eq ${#ARGS[@]} ]] && NUM=0
+			#	invalid=false || \
+			#	invalid=true
+			
 			[[ $NUM -gt $[ $len - 1 ] ]] && \
 				invalid=true && \
 				printf "\r$BORDER_LEFT >   \r" || \
