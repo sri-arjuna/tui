@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2014.12.11
-	script_version=0.9.9
+#	Changed:	2014.12.20
+	script_version=1.0
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -72,13 +72,13 @@ Options are:
 	-T(itle)	Prints 1st argument centred, if more - aligment like tui-echo
 			The inner background is colored white with blue font by default
 	-H(header)	Full line has a blue background and white font as default color
-	-S(tatus)	Does special handling with the last argument
+	-S(tatus)	Does special handling with the first argument
+	-r(eturn)	Optional to '-S', returns to line start, rather than newline.
 "
 	FIRST=""
 	SECOND=""
 	THIRD=""
 	WIDTH=$( [ -z $COLUMNS ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
-	#WIDTH=$[ $WIDTH - ${#BORDER_LEFT} - ${#BORDER_RIGHT} - 2 ]	# Subtract default 'borders'
 	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 
 	WIDTH=$[ $WIDTH / 2 * 2 ]					# Make it even 
 	EMPTY="$(printf '%*s' $WIDTH)"					# Get 'width' spaces
@@ -86,11 +86,13 @@ Options are:
 	doHeader=false
 	doStatus=false
 	doTitle=false
+	doReturn=false
 	optStyle=""
+	NL="\n"
 #
 #	Catching Arguments
 #
-	while getopts "EHTSh?" name
+	while getopts "EHTSh?r" name
 	do 	case $name in
 		E|echo) 	doEcho=true
 				optStyle="-E"	;;
@@ -100,6 +102,8 @@ Options are:
 				optStyle="-T"	;;
 		S|status)	doStatus=true
 				optStyle="-S"	;;
+		r|return)	doReturn=true
+				NL="\r" ;;
 		h|"?"|*)	printf "$help_text"
 				exit $RET_HELP
 				;;
@@ -114,7 +118,8 @@ Options are:
 	#	Fill array according to return value
 	#
 		# Status requires first to be numeric
-		[[ ! "" = "$(echo $1|tr -d [:digit:])" ]] && tui-printf -S 1 "$ME: For option '-S' the first argument nees to be numeric!" && exit 1
+		[[ ! "" = "$(echo $1|tr -d [:digit:])" ]] && tui-printf -S 1 "$ME: For option '-S'(tui-status) the first argument needs to be numeric only!" && exit 1
+		NUM_ID="$1" && shift
 		
 		# get tĥe vars
 		source /etc/tui/status.conf
@@ -128,22 +133,21 @@ Options are:
 		
 		# Make arguments in order
 		case $# in
-		1)	FIRST="$2"
+		0)	FIRST=" "
 			SECOND=" "
-			#THIRD=$1
-			#ARGS_COUNT=2
 			;;
-		2)	FIRST="$2"
+		1)	FIRST="$1"
 			SECOND=" "
-			#THIRD=$1
-			#ARGS_COUNT=3
 			;;
-		3)	FIRST="$2"
-			SECOND="$3"
+		2)	FIRST="$1"
+			SECOND="$2"
+			;;
+		*)	tui-printf -S 1 "Too many arguments ($#)!"
+			exit 1
 			;;
 		esac
 		ARGS_COUNT=3
-		THIRD="${retvalue[$1]}"
+		THIRD="${retvalue[$NUM_ID]}"
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
 	else
 		[ ! -z "$1" ] && FIRST="$1" && ((ARGS_COUNT++))
@@ -154,6 +158,7 @@ Options are:
 	
 	[ ! -z "$4" ] && doMore=true || doMore=false
 	[ -z $optStyle ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
+	$doStatus && optStyleTMP="-E"
 #
 #	Verify all fit on 1 line
 #
@@ -162,15 +167,13 @@ Options are:
 		# Splitting required
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
-			#echo "1-- $len_strings, $WIDTH, F$FIRST S$SECOND T$THIRD"
 			half=$[ ${#FIRST} / 2 ]
 			part1="${FIRST:0:$half}"
 			part2="${FIRST:$half}"
 			tui-printf $optStyleTMP "$part1"
-			tui-printf $optStyle " " "$part2"
+			tui-printf $optStyle "$NUM_ID" " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
-			#echo "2-- $len_strings, $WIDTH, F$FIRST S$SECOND T$THIRD"
 			if [[ "" = "$(echo $FIRST|tr -d [:space:])" ]]
 			then	# It is left aligned
 			#	len=$(( 1 + ${#SECOND} ))
@@ -193,26 +196,10 @@ Options are:
 				tui-printf $optStyleTMP "$FIRST"
 				tui-printf $optStyle " " "$SECOND"
 			fi
-			
-			
-			
-		#	half=$[ ${#FIRST} / 2 ]
-		#		if [[ $[ $half + ${#SECOND} ] -lt $WIDTH ]]
-		#		then	part1="${FIRST:0:$half}"
-		#			part2="${FIRST:$half}"
-
-		#			tui-printf $optStyleTMP "$part1"
-		#			tui-printf $optStyle "$part2" "$SECOND"
-		#		else	# OLD WORKING
-		#			tui-printf $optStyleTMP "$FIRST"
-		#			tui-printf $optStyle " " "$SECOND"
-		#		fi
-			;;
 		3)	# Print only 2 on the first line
-			echo "3-- $len_strings, $WIDTH, F$FIRST S$SECOND T$THIRD"
 			if $doStatus
 			then	tui-printf $optStyleTMP "$FIRST" 
-				tui-printf $optStyle " " "$SECOND" "$THIRD"
+				tui-printf $optStyle "$NUM_ID" " " "$SECOND" #"$THIRD"
 			else	tui-printf $optStyleTMP "$FIRST" "$SECOND"
 				tui-printf $optStyle "$THIRD"
 			fi
@@ -231,7 +218,11 @@ Options are:
 	then	COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
-		COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
+	#	$doStatus && \
+	#		$doReturn && \
+	#		NL="\r" || \
+	#		NL="\n"
+		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
 	elif [ $doHeader = true ]
 	then	# Full line
 		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
@@ -273,9 +264,14 @@ Options are:
 		THIRD="$SECOND"
 		SECOND="${EMPTY:${#FIRST}+${#SECOND}}"
 		;;
-#	3)	
-		
-#		;;
+	3)	# 3 (BETA - and more - handler)
+		$doStatus && \
+			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+8}" || \
+			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
+		half=$[ ${#EMPTY} / 2 ]
+		adder=$((len_strings % 2))
+		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
+		;;
 	*)	# 3 (BETA - and more - handler)
 		$doStatus && \
 			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+8}" || \
