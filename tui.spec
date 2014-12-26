@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.5
-Release:     0%{?dist}
+Release:     1%{?dist}
 Summary:     Text User Interface framework for scripts
 
 License:     GPLv3
@@ -123,6 +123,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Fri Dec 26 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-1
+- Hotfix for tui-read, accidently prints newline char to output, rather than screen.
+
 * Sat Dec 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-0
 - Updated version number
 - Fixed 'endless loop' issue with tui-status with 3 arguments,
