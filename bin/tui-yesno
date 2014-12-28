@@ -54,7 +54,7 @@ Example:
 #	Display
 #
 	tui-printf "$1" > /dev/stderr
-	printf "\r$BORDER_LEFT $1 (y/n)" > /dev/stderr
+	printf "\r$BORDER_LEFT $1 (y/n) " > /dev/stderr
 	read -n1 answer 
 	printf "\r"  > /dev/stderr
 	tui-echo "$1 (y/n)" "$answer"  > /dev/stderr
