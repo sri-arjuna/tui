@@ -124,7 +124,9 @@ rm -rf %{buildroot}
 
 %changelog
 * Fri Dec 26 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-1
-- Hotfix for tui-read, accidently prints newline char to output, rather than screen.
+- Update for tui-read, accidently prints newline char to output, rather than screen.
+- Updated tui-yesno
+- Added commands.conf to prepare compatiblity for solaris users
 
 * Sat Dec 20 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-0
 - Updated version number
