@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.12.18
-	script_version=0.4
+#	Changed:	2014.12.29
+	script_version=0.5
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -85,7 +85,7 @@ Where options are:
 #
 #	Check for all required options
 #
-	if [[ bar = $TYPE ]] && [[ $MAX -gt 1 ]]
+	if ( [[ bar = $TYPE ]] && [[ $MAX -gt 1 ]] ) || [[ dash = $TYPE ]]
 	then echo "All good" > /dev/zero
 	else	tui-status 1 "Displaymode \"$TYPE\" requires '-m <NUM>'"
 		exit $?

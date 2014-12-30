@@ -20,13 +20,11 @@
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=1.0
 	# higher number, and more and more in another script..lol
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
-Usage: $ME ERRORLEVEL \"Message to user\" [\"centred Message\"]
-Where ERRORLEVEL must be numeric
-"
+Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]"
 #
 #	Variables to display
 #	Diffrent for GUI or CLI
@@ -38,10 +36,14 @@ Where ERRORLEVEL must be numeric
 #
 #	Display
 #	
-	[[ -z "$1" ]] && ( tui-status 1 "Usage: tui-status ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]" ; exit 1)
-	if [[ "$1" = "-h" ]]
-	then	#
+	if [[ -z "$1" ]] 
+	then	tui-status 1 "Usage: tui-status [option] ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]" 
+		exit 1
+	elif [[ "$1" = "-h" ]]
+	then
+	#
 	#	Fill array according to return value
+	#	This is just required for the help output
 	#
 		unset retvalue[@]
 		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
@@ -51,31 +53,28 @@ Where ERRORLEVEL must be numeric
 		retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
 		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
 		
-		printf "
-$ME ($script_version)
-Usage: $ME \$? [ \"Message to user\" ]
-Interpreted numbers:\n"
+		printf "$help_text
+Interpreted errorlevels:\n"
 		for num in $(seq 0 1 120)
 		do	str="${retvalue[$num]}"
 			[[ ! "" = "$(printf '%s' $str)" ]] && \
-				printf "\t$str : $num\n"
+				printf "\t$num \tor \$RET_$(printf ${STATUS_TEXT[$num]})\t = \t$str\t\n"
 		done
-		printf "\n"
+		printf "
+Where options are:
+	-h	This
+	-r	Return on line, dont do a newline.
+"
 		exit $RET_HELP
-	else	#if [[ ! "" = "${retvalue[$1]}" ]]
-		#then
-		case $count in	
-			#1)	tui-printf -E " " "$(echo ${retvalue[$1]})"		;;
-			#2)	tui-printf -E "$2" "$(echo ${retvalue[$1]})"		;;
-			#3)	tui-printf -E "$2" "$(echo $3" "${retvalue[$1]})"	;;
-			1|2|3)	tui-printf -S "${@}"	;;
-			
-			#1)	tui-printf -S " " "${retvalue[$1]}"		;;
-			#2)	tui-printf -S "$2" "${retvalue[$1]}"		;;
-			#3)	tui-printf -S "$2" "$3" "${retvalue[$1]}"	;;
-			*)	tui-printf -S 1 "Too many args: $#"		;;
+	else	R=""
+		while getopts r opt
+		do	case $opt in	
+			r)	R="r"	;;
 			esac
-		#else	tui-printf -E  "$2" "$3"  "ErrNr: $1"
-		#fi
+		done
+		shift $(($OPTIND - 1))
+		
+		# TODO : i could do a check, so TUI_WORK (4) would automaticly have a 'return line'
+		tui-printf -${R}S "${@}"
 	fi
 	exit $1

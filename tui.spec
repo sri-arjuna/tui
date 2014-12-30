@@ -1,7 +1,7 @@
 Name:        tui
 Version:     0.6.5
-Release:     1%{?dist}
-Summary:     Text User Interface framework for scripts
+Release:     8%{?dist}
+Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -10,19 +10,27 @@ Source0:     http://sea.fedorapeople.org/review/%{name}/%{name}-%{version}.tar.g
 
 BuildArch:   noarch
 
-Requires:    leafpad
-Requires:    nano
-Requires:    w3m
+#Requires:    leafpad
+#Requires:    nano
+#Requires:    w3m
 Requires:    coreutils
 Requires:    wget
-Requires:    xterm
+#Requires:    xterm
 
 %description
-It is a framework of commands, to simply realize a basic
-Text User Interface with their own scripts.
-Besides 4(5) core commands, there are many other commands
-which ease the task of writing a script.
-Once you got use
+It is a framework of commands to simply realize a basic TUI with scripts.
+All the commands, but not tui-browser or tui-psm, are optimized to 
+generaly be a one-line output. If not possible, it automaticly splits
+up the output, and prints on a new line the remainings.
+
+Also, creating a TUI, one wants to have some commands to run in
+background and just report basic info to the console, 
+for just that reason tui-bgjob is there, which also can report
+the current filesize.
+
+If you are looking for those init-stlye status messages,
+you will love tui-status! 
+Supporting, but not limited to: DONE, FAIL, WORK, TODO, ON, OFF, SKIP...
 
 Core Interface Commands:
 * tui-echo (Prints up to 3 strings, newline)
@@ -123,6 +131,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-8
+- tui-status can now 'stay on line' with '-r'
+- removed unrequired calls of printf in status.conf
+
 * Fri Dec 26 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-1
 - Update for tui-read, accidently prints newline char to output, rather than screen.
 - Updated tui-yesno

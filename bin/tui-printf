@@ -103,7 +103,7 @@ Options are:
 		S|status)	doStatus=true
 				optStyle="-S"	;;
 		r|return)	doReturn=true
-				NL="\r" ;;
+				NL="\r" 	;;
 		h|"?"|*)	printf "$help_text"
 				exit $RET_HELP
 				;;
