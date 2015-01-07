@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.3
+	script_version=0.4
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options]
@@ -33,6 +33,7 @@
 	targetusb=""
 	devDisk=/dev/disk/by-id
 	tDev=""
+	AUTO=false		# Automaticly select only available option
 #
 #	Load own/users TUI configuration?
 #
@@ -47,10 +48,15 @@
 #	Variable handling
 #
 	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
-	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
-		;;
+	while getopts h opt
+	do	case "$opt" in
+		h)	echo -e "$help_text"
+			exit $RET_HELP
+			;;
+		a)	AUTO=true
+			;;
 	esac
+	shift $(($OPTINT - 1))
 #
 #	Functions
 #
@@ -77,7 +83,7 @@
 		printf "\lf"
 		list="$(ls $devDisk|grep usb|grep -v part[0-9])"
 	done
-	
+
 	# Is there more than 1 entry?
 	if [ ! "$list" = "$(echo $list)" ]
 	then	# yes, more than one
@@ -93,9 +99,13 @@
 				tui-conf-set $CONF_APP usbAsk true
 			source $CONF_APP
 		fi
+
+		$AUTO && usbAsk=false
 		if $usbAsk
 		then	# Select
-			select targetUsb in $list;do break;done
+			tui-select $list 
+				## targetUsb in $list;do break;done
+			exit 0
 		else	# Auto-return
 			targetUsb=$(echo $list)
 		fi
