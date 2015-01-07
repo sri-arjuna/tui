@@ -24,6 +24,7 @@
 #	Variable defaults
 #
 	script_version=0.6.2
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	ME="$(basename $0)"
 	[[ -z $TUI_TEMP_FILE ]] && source /etc/tui/tui.conf
 	help_text="\r$ME ($script_version)
@@ -72,7 +73,7 @@
 	while ps |$GREP -q $PID
 	do
 		if [[ true = $CHECKFILE ]]
-		then 	FS=$(ls -lh "$FILECHECK"|awk '{print $5}')
+		then 	FS=$(ls -lh "$FILECHECK"|$$AWK '{print $5}')
 			tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi

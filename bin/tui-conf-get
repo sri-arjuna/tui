@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
+source /etc/tui/commands.conf	# Like AWK, GREP, SED
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -58,7 +59,7 @@ Where options are:
 	do 	case $name in
 		i)	OPT="-i"
 			;;
-		l)	$GREP -v ^# "$2"|$GREP "="|sed s,"="," ",g|awk '{print $1}'
+		l)	$GREP -v ^# "$2"|$GREP "="|$SEDs,"="," ",g|$AWK '{print $1}'
 			exit 0
 			;;
 		h)	printf "$help_text"
@@ -73,6 +74,6 @@ Where options are:
 #
 #	Display & Action
 #
-	VALUE=$($GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#|sed s,'"','',g|sed s,'=',' ',g) > /dev/zero
+	VALUE=$($GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#|$SEDs,'"','',g|$SEDs,'=',' ',g) > /dev/zero
 	VALUE="${VALUE:${#VARNAME}+1}"
 	printf "$VALUE"

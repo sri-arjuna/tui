@@ -37,6 +37,7 @@
 #
 #	Load own/users TUI configuration?
 #
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	source /etc/tui/tui.conf
 	source /etc/tui/apps.conf
 	if [[ root = $(whoami) ]]

@@ -23,6 +23,7 @@
 	script_version=0.1
 	username=""
 	ME="$(basename $0)"
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	help_text="$ME ($script_version)
 Usage: $ME [USERNAME]
 Exit codes:

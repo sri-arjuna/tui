@@ -61,7 +61,7 @@
 		K=1024
 	
 		while [[ ! "" = "$(ps|$GREP wget)" ]] #|| [[ ! "" = "$(ps $!)" ]]
-		do	tmp_size="$(ls -hl |$GREP $THIS |awk '{print $5}')"
+		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			tui-printf "Downloading..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
 			sleep 1
 		done

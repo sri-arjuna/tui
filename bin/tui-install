@@ -27,6 +27,7 @@
 #	Changed:	2014.12.18
 	script_version=0.4
 	TITLE="Install packages"
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
 #
@@ -79,7 +80,7 @@ Where options are:
 			    	[[ ! "" = "$strcat" ]] && output="$strcat"
 			fi
 		done
-		printf "$(printf $strcat|awk {'printf $1'})"
+		printf "$(printf $strcat|$AWK {'printf $1'})"
 	}
 	based() { #
 	# Returns arch, debian, redhat or unkown

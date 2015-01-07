@@ -109,7 +109,7 @@ Where options are:
 			len=$(( $length / 100 * $procent  ))
 			
 			bars=$(printf '%*s' $len)
-			bars=$(echo "$bars"|sed s," ","$BAR",g)
+			bars=$(echo "$bars"|$SEDs," ","$BAR",g)
 			#EMPTY="$(printf '%*s' $WIDTH)"	
 			
 			PROGRESS="$bars"

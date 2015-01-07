@@ -37,6 +37,7 @@
 	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
 	FILE_CMD="$TUI_TEMP_DIR/bgjob"
 	TMP=$TUI_TEMP_FILE
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	#[[ -z "$TMP" ]] && TMP=$HOME/.config/tui/tmp.tmp
 	touch $TMP
 	umask 022 $FILE_CMD $FILE_TEMP
@@ -69,7 +70,7 @@
 		sleep 0.5
 		while [[ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]]
 		do	[[ -f "$DEST" ]] && \
-				tmp_size="$(ls -hl $DEST |awk '{print $5}')" || \
+				tmp_size="$(ls -hl $DEST |$AWK '{print $5}')" || \
 				tmp_size="0 btytes"
 			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
 			sleep 0.7

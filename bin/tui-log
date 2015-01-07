@@ -36,6 +36,7 @@
 	D="$(date +%F)"
 	T="$(date +%T)"
 	daily_date_str="#### $(date +'%F') ####"	# Only used if log dont uses the date otherwise
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	SEP="\t"
 	beVerbose=false
 #

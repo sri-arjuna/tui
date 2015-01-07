@@ -94,7 +94,7 @@ Where options are:
 			out="/" || \
 			out="${str:1}"
 		# Replace the slashes with something else  (space-slash-space)
-		printf " $out"|sed s\\"/"\\" / "\\g
+		printf " $out"|$SEDs\\"/"\\" / "\\g
 	}
 	GetStringDirs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
@@ -286,7 +286,7 @@ Where options are:
 	is_less_kb() { # FILE NUM
 	# Returns successfully if FILE-size is lower than NUM
 	# Fails otherwise
-		size=$(ls -l "$1" | awk '{print $5}')
+		size=$(ls -l "$1" | $AWK '{print $5}')
 		[ $size -lt $2 ] && \
 			return 0 || return 1
 	}
