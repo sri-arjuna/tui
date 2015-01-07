@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.5
-Release:     14%{?dist}
+Version:     0.6.6
+Release:     0%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -132,11 +132,19 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-8
+- Added tui-bol-sudo
+- Optimized tui-dd, if configuration or option is set, 
+-     autoselect only entry
+- Changed all files to it should become Solaris compatible
+-     when commands.conf is changed properly, see commend
+
+* Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-8
 - tui-status can now 'stay on line' with '-r'
 - removed unrequired calls of printf in status.conf
 
 * Fri Dec 26 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-1
-- Update for tui-read, accidently prints newline char to output, rather than screen.
+- Update for tui-read, accidently prints newline char to output, 
+-      rather than screen.
 - Updated tui-yesno
 - Added commands.conf to prepare compatiblity for solaris users
 
@@ -144,7 +152,8 @@ rm -rf %{buildroot}
 - Updated version number
 - Fixed 'endless loop' issue with tui-status with 3 arguments,
 -    in terminals smaller than 80 columns, still needs optimal finetuning.
-- Fixed tui-list, didnt display items properly, therefor tui-select couldnt select right.
+- Fixed tui-list, didnt display items properly, 
+-    therefor tui-select couldnt select right.
 
 * Thu Dec 18 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.4-0
 - tui-read: Works on more systems now, and hopefully fixed display issue
