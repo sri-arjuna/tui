@@ -20,13 +20,14 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options]
 		\rSelect usb device if more than one is found
 		\rWhere options are:
 		\r\t-h\tThis screen
+		\r\t-a\tAutoselect entry if only one was found
 		\r"
 	ARGS=(${@})
 	ARGS_COUNT=$#
@@ -57,7 +58,8 @@
 		a)	AUTO=true
 			;;
 	esac
-	shift $(($OPTINT - 1))
+	done
+	shift $(($OPTIND -1))
 #
 #	Functions
 #
@@ -88,7 +90,7 @@
 	# Is there more than 1 entry?
 	if [ ! "$list" = "$(echo $list)" ]
 	then	# yes, more than one
-		select targetUsb in $list ; do break; done
+		targetUsb=$(tui-select $list) # ; do break; done
 	else	# Just this one
 		# Check if only item should be reported without interaction.
 		usbAsk=$(tui-conf-get $CONF_APP usbAsk)

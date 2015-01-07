@@ -136,7 +136,7 @@ Log:		$LOG
 					
 					tui-status $RET "$msg" && \
 						doLog "Setup: $msg" || \
-						doLog "Setup: Failed to c$(printf ${msg:1}|$SEDs,ged,ge,g)"
+						doLog "Setup: Failed to c$(printf ${msg:1}|$SED s,ged,ge,g)"
 				fi
 				;;
 			esac

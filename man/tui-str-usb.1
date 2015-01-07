@@ -4,13 +4,16 @@
 tui-str-usb (0.2)
 
 .SH SYNOPSIS
-\fBtui-str-usb\fP
+\fBtui-str-usb\fP [-a]
 .br
 
 Example: 
 .br
 		DEVICE=$(\fBtui-str-usb\fP)
 
+.SH OPTIONS
+.OP -a
+Autoselect if only 1 entry found
 
 .SH DESCRIPTION
 Returns /dev/sd[a-z]

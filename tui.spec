@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.6
-Release:     1%{?dist}
+Release:     3%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,7 +131,7 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-8
+* Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-2
 - Added tui-bol-sudo
 - Optimized tui-dd, if configuration or option is set, 
 -     autoselect only entry

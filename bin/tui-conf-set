@@ -71,7 +71,7 @@ Where options are:
 			;;
 		i)	OPT="-i"
 			;;
-		l)	$GREP -v ^# "$2"|$GREP "="|$SEDs,"="," ",g|$AWK '{print $1}'
+		l)	$GREP -v ^# "$2"|$GREP "="|$SED s,"="," ",g|$AWK '{print $1}'
 			exit 0
 			;;
 		h)	printf "$help_text"
@@ -115,8 +115,8 @@ Where options are:
 	# Troubles with VARIABLES due to chars that need to be escaped
 	if echo "$REPLACE$SEARCH" | $GREP  -q '[%$+\@/]'
 	then	hadDollar=true
-		REPLACE=$(echo "$REPLACE"|$SED's|[%"$/\|\@]|\\&|g')
-		SEARCH=$(echo "$SEARCH"|$SED's|[%"$/\|\@]|\\&|g')
+		REPLACE=$(echo "$REPLACE"|$SED 's|[%"$/\|\@]|\\&|g')
+		SEARCH=$(echo "$SEARCH"|$SED 's|[%"$/\|\@]|\\&|g')
 	fi
 #
 #	Display & Action

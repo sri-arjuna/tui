@@ -94,7 +94,7 @@ Where options are:
 			out="/" || \
 			out="${str:1}"
 		# Replace the slashes with something else  (space-slash-space)
-		printf " $out"|$SEDs\\"/"\\" / "\\g
+		printf " $out"|$SED s\\"/"\\" / "\\g
 	}
 	GetStringDirs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
