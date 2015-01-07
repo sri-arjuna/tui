@@ -28,7 +28,7 @@
 #
 #	Variables
 #
-	TUI_VERSION=0.6.5
+	TUI_VERSION=0.6.6
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME=${0##*/}
 	[[ 0 -eq $UID ]] && \
