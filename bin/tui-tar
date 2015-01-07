@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -67,7 +67,7 @@
 		chmod +x $FILE_CMD
 		$FILE_CMD &
 		sleep 0.5
-		while [[ ! "" = "$(ps|grep -v tui|grep tar)" ]]
+		while [[ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]]
 		do	[[ -f "$DEST" ]] && \
 				tmp_size="$(ls -hl $DEST |awk '{print $5}')" || \
 				tmp_size="0 btytes"

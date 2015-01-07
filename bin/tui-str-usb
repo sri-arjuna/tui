@@ -72,7 +72,7 @@
 #
 	# Prepare selection
 	
-	list="$(ls $devDisk|grep usb|grep -v part)"
+	list="$(ls $devDisk|$GREP usb|$GREP -v part)"
 	left="$BORDER_LEFT Please connect an USB device..."
 			
 	# Make sure there is something available
@@ -81,7 +81,7 @@
 		printf "\r"
 		read -t 1 -p "$left$(getspace $[ $COLUMNS - ${#left} - ${#right} ] )$right"  buffer
 		printf "\lf"
-		list="$(ls $devDisk|grep usb|grep -v part[0-9])"
+		list="$(ls $devDisk|$GREP usb|$GREP -v part[0-9])"
 	done
 
 	# Is there more than 1 entry?

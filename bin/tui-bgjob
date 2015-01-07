@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -69,7 +69,7 @@
 #
 	tui-printf -rS 2 "Starting job..." #"$TUI_WORK"
 	sleep 2
-	while ps |grep -q $PID
+	while ps |$GREP -q $PID
 	do
 		if [[ true = $CHECKFILE ]]
 		then 	FS=$(ls -lh "$FILECHECK"|awk '{print $5}')

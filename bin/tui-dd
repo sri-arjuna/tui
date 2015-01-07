@@ -59,10 +59,10 @@ SOURCE and TARGET can be, a partition, disk, directory, file
 	tui-printf "Starting job, please wait..." "$WORK"
 	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_TEMP_FILE" ; printf $? > "$TUI_TEMP_FILE")   &
 	sleep 0.7
-	PID=$(ps|grep -v tui|grep dd|awk '{print $1}')
-	while [[ ! "" = "$(ps|grep -v tui|grep dd|awk '{print $1}')" ]]
+	PID=$(ps|$GREP -v tui|$GREP dd|awk '{print $1}')
+	while [[ ! "" = "$(ps|$GREP -v tui|$GREP dd|awk '{print $1}')" ]]
 	do 	kill -USR1 $PID 2>&1
-		SIZE=($(grep "," "$TUI_TEMP_FILE"|awk '{print $3$4}'))
+		SIZE=($($GREP "," "$TUI_TEMP_FILE"|awk '{print $3$4}'))
 		[[ ${#SIZE[@]} -lt 1 ]] && max=0 || max=$[ ${#SIZE[@]} - 1 ]
 		tui-printf "Writing $(basename $SOURCE) to $TARGET..." "${SIZE[$max]}" "[  $(tui-indi)   ]"
 		sleep 0.7

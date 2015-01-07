@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -97,8 +97,8 @@ Where options are:
 		#D=$(date +'%F')
 		# If PRE doesnt not contain today's date, see if the log contains,
 		# if its missing there too, add today's date first
-		printf "${PRE}${MSG}" | grep -q "$D" || \
-			( grep -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
+		printf "${PRE}${MSG}" | $GREP -q "$D" || \
+			( $GREP -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
 	fi
 	while [[ " " = "${PRE:0:1}" ]] ;do PRE="${PRE:1}";done	# Remove leading spaces
 	$beVerbose && tui-echo "$MSG"

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -280,7 +280,7 @@ Where options are:
 	has_shebang() { # FILE
 	# Returns successfully if file begins with '#/bin' or '#!/bin'
 	# Fails otherwise
-		head "$1" -n1 | grep ^"#[!]/bin" && \
+		head "$1" -n1 | $GREP ^"#[!]/bin" && \
 			return 0 || return 1
 	}
 	is_less_kb() { # FILE NUM
@@ -479,7 +479,7 @@ Where options are:
 		#
 		# MENU :: NUM
 		#
-			select e in $(ls|grep -v $SPECIAL_NAME. ) Back Quit;do 
+			select e in $(ls|$GREP -v $SPECIAL_NAME. ) Back Quit;do 
 				case "$e" in
 				Back)	menu="back"
 					break	;;

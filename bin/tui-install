@@ -1,7 +1,7 @@
 #!/bin/bash 
 # ------------------------------------------------------------------------
 #
-# Copyright (c) 2014 by Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 by Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -69,7 +69,7 @@ Where options are:
         	e=/etc
 		SF="release version"    # Search For
         
-        	results=$(for a in $SF;do ls $e|grep $a;done)
+        	results=$(for a in $SF;do ls $e|$GREP $a;done)
 		resultsFiles=$(for each in $results;do [[ -f "$e/$each" ]] && printf "$each ";done)
         
 		for each in $resultsFiles

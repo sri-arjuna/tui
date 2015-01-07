@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -41,7 +41,7 @@ Exit codes:
 	fi
 	
 	# Check if sudo is installed
-	which sudo 1</dev/zero 2>/dev/zero || exit -1
+	which sudo 1>/dev/zero 2>/dev/zero || exit -1
 	
 	# Set username to argument
 	[[ -z $1 ]] && \

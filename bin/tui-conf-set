@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -71,7 +71,7 @@ Where options are:
 			;;
 		i)	OPT="-i"
 			;;
-		l)	grep -v ^# "$2"|grep "="|sed s,"="," ",g|awk '{print $1}'
+		l)	$GREP -v ^# "$2"|$GREP "="|sed s,"="," ",g|awk '{print $1}'
 			exit 0
 			;;
 		h)	printf "$help_text"
@@ -92,28 +92,28 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$( echo $(grep $OPT ${VARNAME}= "$CONFFILE"|grep -v ^#))" #|tr -d [:space:])"
+	SEARCH="$( echo $($GREP $OPT ${VARNAME}= "$CONFFILE"|$GREP -v ^#))" #|tr -d [:space:])"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
 	$CAPS  && VARNAME="${VARNAME^^}"
 	
 	# Check for quotes
-	printf  "$VALUE"|grep -q " " && \
+	printf  "$VALUE"|$GREP -q " " && \
 		REPLACE="$VARNAME=\"$VALUE\"" || \
 		REPLACE="$VARNAME=$VALUE"
 	
 	# Set proper SED 'divider'
-	if echo "$SEARCH$REPLACE"|grep -q "$SD"
+	if echo "$SEARCH$REPLACE"|$GREP -q "$SD"
 	then 	# Coma was found
 		SD="/"
-		printf "$REPLACE"|grep "$SD"|grep -q '\\' && SD="\\"	# backslash was found
+		printf "$REPLACE"|$GREP "$SD"|$GREP -q '\\' && SD="\\"	# backslash was found
 		[[ ! "$SD" = "/" ]] && \
-			printf "$REPLACE"|grep ","|grep "$SD"|grep -q "/" && SD="|"	# Forward slash was found
+			printf "$REPLACE"|$GREP ","|$GREP "$SD"|$GREP -q "/" && SD="|"	# Forward slash was found
 	fi
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
-	if echo "$REPLACE$SEARCH" | grep  -q '[%$+\@/]'
+	if echo "$REPLACE$SEARCH" | $GREP  -q '[%$+\@/]'
 	then	hadDollar=true
 		REPLACE=$(echo "$REPLACE"|sed 's|[%"$/\|\@]|\\&|g')
 		SEARCH=$(echo "$SEARCH"|sed 's|[%"$/\|\@]|\\&|g')
@@ -126,7 +126,7 @@ Where options are:
 	#printf "\n\n\n\t\t$cmd\n\n\n\n"
 	
 	# Save changes
-	if ! grep -q "$VARNAME" "$CONFFILE"
+	if ! $GREP -q "$VARNAME" "$CONFFILE"
 	then	# Its not there yet, just append it
 		$hadDollar && \
 			printf "$(eval $REPLACE)\n" >> "$CONFFILE" || \
@@ -140,4 +140,4 @@ Where options are:
 	fi
 	
 	# Return true if replaced string was found
-	grep -q "$REPLACE" "$CONFFILE"
+	$GREP -q "$REPLACE" "$CONFFILE"
