@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.6
-Release:     3%{?dist}
+Release:     6%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,12 +131,16 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-2
+* Thu Jan 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-6
+- Hotfix for: tui-conf-{g|s}et
+- Hotfix for: tui-bol-sudo
+
+* Wed Jan 07 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-0
 - Added tui-bol-sudo
-- Optimized tui-dd, if configuration or option is set, 
--     autoselect only entry
+- Optimized tui-dd, if not TARGET is provided, to use USB devices
 - Changed all files to it should become Solaris compatible
--     when commands.conf is changed properly, see commend
+-     when commands.conf is changed properly, see commands.conf
+- Optimized tui-str-usb, to autoselect if only 1 entry was found
 
 * Tue Dec 30 2014 - Simon A. Erat - erat.simon@gmail.com - 0.6.5-8
 - tui-status can now 'stay on line' with '-r'

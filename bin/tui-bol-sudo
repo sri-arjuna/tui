@@ -36,7 +36,7 @@ Exit codes:
 #	Display
 #
 	# Print help if required
-	if [[ -z $1 ]] || [[ "-h" = "$1" ]] || [[ "--help" = "$1" ]]
+	if [[ "-h" = "$1" ]] || [[ "--help" = "$1" ]]
 	then	echo -e "$help_text"
 		exit 99
 	fi
