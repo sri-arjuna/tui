@@ -73,7 +73,7 @@
 	while ps |$GREP -q $PID
 	do
 		if [[ true = $CHECKFILE ]]
-		then 	FS=$(ls -lh "$FILECHECK"|$$AWK '{print $5}')
+		then 	FS=$(ls -lh "$FILECHECK"|$AWK '{print $5}')
 			tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi

@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.6
-Release:     6%{?dist}
+Release:     7%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -134,6 +134,7 @@ rm -rf %{buildroot}
 * Thu Jan 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-6
 - Hotfix for: tui-conf-{g|s}et
 - Hotfix for: tui-bol-sudo
+- Hotfix for: tui-str-usb
 
 * Wed Jan 07 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-0
 - Added tui-bol-sudo
