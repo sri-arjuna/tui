@@ -28,7 +28,7 @@
 	#[[ -z "$THEME" ]] && THEME=default
 	. /usr/share/tui/themes/$TUI_THEME
 	
-	script_version=0.9.7
+	script_version=0.9.8
 	ME="$(basename $0)"
 	help_text="
 $ME ($script_version)
@@ -62,8 +62,9 @@ Examples:	$ME \"What is your favorite color?\"
 	read ${doPassword} INPUT
 	
 	# Seems this doesnt work here, as one presses enter and gets a linebreak from that.
-#	[[ -z "$doPassword" ]] || INPUT="${$INPUT/\<password\>}"	
-	printf "\n\n" > /dev/stderr
+	#[[ -z "$doPassword" ]] || INPUT="${$INPUT/\<password\>}"	
+	#printf "\n\n" > /dev/stderr
 #	tui-echo "$txt" "$INPUT" > /dev/stderr
 	
 	printf '%s' "$INPUT"  > /dev/stdout
+	[[ -z "$doPassword" ]] || printf "\n" > /dev/stderr

@@ -28,7 +28,7 @@
 Usage: $ME [USERNAME]
 Exit codes:
 	-1 	No sudo was found \$PATH
-	0	Current User or USERNAME has sudo, as long sudo is installed, root always returns true (0).
+	0	Current User or USERNAME has sudo, root always returns true (0), as long sudo is installed.
 	1	Sudo is installed but user has no access
 
 "
