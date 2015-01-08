@@ -3,18 +3,6 @@
 .SH NAME
 tui-str-usb (0.2)
 
-.SH SYNOPSIS
-\fBtui-str-usb\fP [-a]
-.br
-
-Example: 
-.br
-		DEVICE=$(\fBtui-str-usb\fP)
-
-.SH OPTIONS
-.OP -a
-Autoselect if only 1 entry found
-
 .SH DESCRIPTION
 Returns /dev/sd[a-z]
 .br
@@ -25,6 +13,21 @@ If no device is found, asks the user to plug in one.
 When one is found, lets the user select among available.
 .br
 Does return first found automaticly if only one available.
+
+
+.SH SYNOPSIS
+\fBtui-str-usb\fP [-a]
+.br
+
+Example: 
+.br
+		DEVICE=$(\fBtui-str-usb\fP)
+
+.SH OPTIONS
+.OP -a
+.br
+Autoselect if only 1 entry found
+
 
 .SH SEE ALSO
 ls(1), readlink(1), bash(1)

@@ -3,6 +3,9 @@
 .SH NAME
 tui-select (0.1)
 
+.SH DESCRIPTION
+Tries to simulate regular select behaviour for TUI.
+
 .SH SYNOPSIS
 \fBtui-select\fP [options] LIST ARRAY[@] ...
 .br
@@ -12,8 +15,11 @@ Examples:
 .IP "selected=$(tui-select *)"
 .RE
 
-.SH DESCRIPTION
-Tries to simulate regular select behaviour for TUI.
+.SH OPTIONS
+.OP -a
+.br
+Autoselect if only 1 entry found
+
 
 .SH LICENSE
 GNU General Public License (GPL)

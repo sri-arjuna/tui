@@ -38,23 +38,39 @@
 	
 	script_version=0.6
 	counter=0
+	AUTO=false
 	COLUMNS=$(tput cols)
 	help_text="
 $ME ($script_version)
-Usage: 		$ME LIST 'of items' ..
+Usage: 		$ME [options] LIST 'of items' ..
 Examples:	ret=\$($ME one two three)
 		$ME *
-		
+Where options are:
+		-a	Autoselect if only one entry was found
 "
 #
 #	Action
 #
-	[[ -z "$1" ]] && printf "$help_text" && exit 99
-	[[ "-h" = "$1" ]] && printf "$help_text" && exit 99
+	#[[ -z "$1" ]] && printf "$help_text" && exit 99
+	while getopts ha opt
+	do	case $opt in
+		h|"")	printf "$help_text"
+			exit 99
+			;;
+		a)	AUTO=true
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
 	
 	# This many digits to read at max
 	ARGS=("${@}")
 	len=${#ARGS[@]}
+	#echo $len
+	$AUTO && \
+		[[ $len -eq 1 ]] && \
+		printf '%s\n' "$ARGS" > /dev/stdout && \
+		exit 0
 	
 	# Show the options
 	tui-list "${ARGS[@]}" > /dev/stderr
