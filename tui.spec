@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.6
-Release:     10%{?dist}
+Version:     0.6.7
+Release:     0%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Fri Jan 09 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-0
+- Hopefully fixed the splitting issue of tui-printf
+-  This was roadmap + hotfix at the same time.
+
 * Thu Jan 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.6-9
 - Hotfix for: tui-read, too many empty lines
 - Added another sample script in /usr/share/docs/samples

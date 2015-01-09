@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2014.12.20
-	script_version=1.0
+#	Changed:	2015.01.09
+	script_version=1.2
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -112,8 +112,8 @@ Options are:
 	shift $(($OPTIND - 1))
 	ARGS_COUNT=0
 	
-	# tui-status needs special treatment
-	if $doStatus ; then
+	if $doStatus
+	then	# It is tui-status which needs special treatment
 	#
 	#	Fill array according to return value
 	#
@@ -121,7 +121,7 @@ Options are:
 		[[ ! "" = "$(echo $1|tr -d [:digit:])" ]] && tui-printf -S 1 "$ME: For option '-S'(tui-status) the first argument needs to be numeric only!" && exit 1
 		NUM_ID="$1" && shift
 		
-		# get tĥe vars
+		# get the vars
 		source /etc/tui/status.conf
 		unset retvalue[@]
 		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
@@ -152,6 +152,7 @@ Options are:
 			exit 1
 			;;
 		esac
+		# For tui-status always use '3' strings
 		ARGS_COUNT=3
 		THIRD="${retvalue[$NUM_ID]}"
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
@@ -168,12 +169,21 @@ Options are:
 #
 #	Verify all fit on 1 line
 #
+#	TODO FIXME: 
+#		* $doStatus
+#		* regular output with 3 strings and middle too long
+#
+	if [[ 50 -gt $WIDTH ]]
+	then	# Screen is too small
+		for S in "$FIRST" "$SECOND" "$THIRD"
+		do 	[[ -z "$S" ]] || echo "$S"
+		done
+		exit 0
+	fi
+	
 	if [[ $len_strings -gt $WIDTH ]]
 	then 	# All vars are larger than the line supports
 		# Splitting required
-	#	echo "
-	#		TOO LONG
-	#		"
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
 			half=$[ ${#FIRST} / 2 ]
@@ -208,11 +218,51 @@ Options are:
 			fi
 			;;
 		3)	# Print only 2 on the first line
+			#  TODO FIXME -- ERORR MUST BE HERE
 			if $doStatus
 			then	tui-printf $optStyleTMP "$FIRST" 
+				#echo "$FIRST"
+				#echo "$optStyle"
+				#echo $NUM_ID
+				#echo "$SECOND"
+				#exit
 				tui-printf $optStyle "$NUM_ID" " " "$SECOND" #"$THIRD"
-			else	tui-printf $optStyleTMP "$FIRST" "$SECOND"
-				tui-printf $optStyle "$THIRD"
+			else	# Regular output, header, title, echo, printf
+				# Treat each argument by itself - lengthness
+			#	echo DEBUG
+			#	set -x
+				if [[ ${#FIRST} -gt $WIDTH ]]
+				then	# The first one is too long
+					#echo "DEBUG - 1"
+					tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
+					tui-printf $optStyleTMP " " "${FIRST:($WIDTH - 2)}" #"$SECOND"
+					tui-printf $optStyle $NUM_ID "$SECOND"
+					#tui-printf $optStyle $NUM_ID #"$THIRD" ""
+				elif [[ ${#SECOND} -gt $WIDTH ]]
+				then	# The second one is too long
+					#echo "DEBUG - 2"
+					[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "$FIRST" 
+					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 2)}"
+					tui-printf $optStyle " " "${SECOND:($WIDTH - 2)}" "$THIRD"
+					#tui-printf $optStyle " " "$THIRD" " "
+				elif [[ ${#THIRD} -gt $WIDTH ]]
+				then	# The third one is too long
+					#echo "DEBUG - 3"
+					tui-printf $optStyleTMP "$FIRST" "$SECOND"
+					tui-printf $optStyle " " "$THIRD" ""
+				else	# Regular output, just re-arange strings
+					#echo "DEBUG THIS:"
+					# check diffrent scenarios
+					if [[ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]]
+					then	tui-printf $optStyleTMP "$FIRST" "$SECOND" " "
+						tui-printf $optStyle 	" " 	"$THIRD"
+					else	tui-printf $optStyleTMP "$FIRST" 
+						tui-printf $optStyleTMP " " 	"$SECOND"
+						tui-printf $optStyle 	" " 	"$THIRD"
+					
+					fi
+				fi
+			#	set +x
 			fi
 			;;
 		esac
@@ -248,7 +298,9 @@ Options are:
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="${TUI_COLOR_RESET}"
 	fi
-	
+#
+#	Arrange strings in order, with border and colors
+#
 	case $ARGS_COUNT in
 	0)	FIRST="${EMPTY:2}"
 		SECOND=" "

@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.0
+	script_version=1.2
 	# higher number, and more and more in another script..lol
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
@@ -66,7 +66,9 @@ Where options are:
 	-r	Return on line, dont do a newline.
 "
 		exit $RET_HELP
-	else	R=""
+	else	# The actual action ;)
+		#set -x
+		R=""
 		while getopts r opt
 		do	case $opt in	
 			r)	R="r"	;;
@@ -75,6 +77,18 @@ Where options are:
 		shift $(($OPTIND - 1))
 		
 		# TODO : i could do a check, so TUI_WORK (4) would automaticly have a 'return line'
+		if [[ -z "$1" ]]
+		then	printf "$help_text"
+			exit $RET_HELP
+		fi
+		
+		check=$(echo "$1" | tr -d [:digit:])
+		if [[ -z "$check" ]] && echo $check | grep -q [0-9]
+		then	echo "all numbers" > /dev/zero
+		else	echo "First argument $1 is not numeric!"
+			exit 1
+		fi
+		
 		tui-printf -${R}S "${@}"
 	fi
 	exit $1
