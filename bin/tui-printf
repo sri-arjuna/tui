@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.01.09
-	script_version=1.2
+#	Changed:	2015.01.10
+	script_version=1.3
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -220,13 +220,17 @@ Options are:
 		3)	# Print only 2 on the first line
 			#  TODO FIXME -- ERORR MUST BE HERE
 			if $doStatus
-			then	tui-printf $optStyleTMP "$FIRST" 
+			then	[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "$FIRST" 
 				#echo "$FIRST"
 				#echo "$optStyle"
 				#echo $NUM_ID
 				#echo "$SECOND"
 				#exit
-				tui-printf $optStyle "$NUM_ID" " " "$SECOND" #"$THIRD"
+				[[ ${#SECOND} -gt $WIDTH ]]
+					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
+					tui-printf $optStyle "$NUM_ID" " " "${SECOND:($WIDTH - 3)}"|| \
+					tui-printf $optStyle "$NUM_ID" " " "$SECOND" #"$THIRD"
+					
 			else	# Regular output, header, title, echo, printf
 				# Treat each argument by itself - lengthness
 			#	echo DEBUG
@@ -234,16 +238,17 @@ Options are:
 				if [[ ${#FIRST} -gt $WIDTH ]]
 				then	# The first one is too long
 					#echo "DEBUG - 1"
-					tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
-					tui-printf $optStyleTMP " " "${FIRST:($WIDTH - 2)}" #"$SECOND"
-					tui-printf $optStyle $NUM_ID "$SECOND"
+					[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
+					[[ -z "$SECOND" ]] && \
+						tui-printf $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
+						tui-printf $optStyle $NUM_ID "$SECOND"
 					#tui-printf $optStyle $NUM_ID #"$THIRD" ""
 				elif [[ ${#SECOND} -gt $WIDTH ]]
 				then	# The second one is too long
 					#echo "DEBUG - 2"
 					[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "$FIRST" 
-					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 2)}"
-					tui-printf $optStyle " " "${SECOND:($WIDTH - 2)}" "$THIRD"
+					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
+					tui-printf $optStyle " " "${SECOND:($WIDTH - 3)}" "$THIRD"
 					#tui-printf $optStyle " " "$THIRD" " "
 				elif [[ ${#THIRD} -gt $WIDTH ]]
 				then	# The third one is too long
