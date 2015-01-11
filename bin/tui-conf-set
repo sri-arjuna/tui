@@ -22,7 +22,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.01.07
+#	Changed:	2015.01.11
 	script_version=0.8.1
 #	Description:	Set a value in an 'conf/ini' file
 #

@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.01.10
-	script_version=1.3.1
+#	Changed:	2015.01.11
+	script_version=1.4
 #	Description:	The absolute core function for TUI
 #
 #	Variables
