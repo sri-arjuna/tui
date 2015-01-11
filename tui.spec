@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.7
-Release:     2%{?dist}
+Release:     4%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Sun Jan 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-4
+- Fixed the -tr- quoting causing the issue with the string splitting
+- Fixed tui-conf-set, should be the final fix for this, ty Don
+
 * Fri Jan 09 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-0
 - Hopefully fixed the splitting issue of tui-printf
 -  This was roadmap + hotfix at the same time.
