@@ -123,7 +123,7 @@ Where options are:
 #	Display & Action
 #
 	Q="-q"
-	set -x ; Q=""
+	#set -x ; Q=""
 	
 	# Generate the command
 	cmd="$SED s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i \"$CONFFILE\""
