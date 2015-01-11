@@ -93,7 +93,7 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$( $GREP $OPT '^[[:space:]]${VARNAME}=' "$CONFFILE"|$GREP -v ^#)" #|tr -d '[:space:]')"
+	SEARCH="$( $GREP $OPT "^[[:space:]]${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[:space:]')"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
