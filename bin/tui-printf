@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2015.01.10
-	script_version=1.3
+	script_version=1.3.1
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -118,7 +118,9 @@ Options are:
 	#	Fill array according to return value
 	#
 		# Status requires first to be numeric
-		[[ ! "" = "$(echo $1|tr -d [:digit:])" ]] && tui-printf -S 1 "$ME: For option '-S'(tui-status) the first argument needs to be numeric only!" && exit 1
+		[[ ! "" = "$(echo $1|tr -d '[:digit:]')" ]] && \
+			tui-printf -S 1 "$ME: For option '-S' the first argument needs to be numeric only!" && \
+			exit 1
 		NUM_ID="$1" && shift
 		
 		# get the vars
@@ -195,7 +197,7 @@ Options are:
 				tui-printf $optStyle " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
-			if [[ "" = "$(echo $FIRST|tr -d [:space:])" ]]
+			if [[ "" = "$(echo $FIRST|tr -d '[:space:]')" ]]
 			then	# It is left aligned
 				half=$[ ${#SECOND} / 2 ]
 				part1="${SECOND:0:$half}"
@@ -209,6 +211,7 @@ Options are:
 				part1="${FIRST:0:$half}"
 				part2="${FIRST:$half}"
 				tui-printf $optStyleTMP "$part1"
+				# Remains.. still required? -- at least the 'fail' is!
 				$doStatus && \
 					tui-printf $optStyle "$NUM_ID" " " "$part2" || \
 					tui-printf $optStyle " " "$part2"

@@ -23,7 +23,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
 #	Changed:	2015.01.07
-	script_version=0.8
+	script_version=0.8.1
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -93,7 +93,7 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$( echo $($GREP $OPT ^[[:space:]]${VARNAME}= "$CONFFILE"|$GREP -v ^#))" #|tr -d [:space:])"
+	SEARCH="$( $GREP $OPT ^[[:space:]]${VARNAME}= "$CONFFILE"|$GREP -v ^#)" #|tr -d '[:space:]')"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
