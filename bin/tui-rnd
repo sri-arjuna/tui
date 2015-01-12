@@ -1,0 +1,52 @@
+#!/usr/bin/sh
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License 3 (GPLv3)
+#	Created:	2011.07.10
+#	Changed:	2015.01.12
+	script_version=0.5
+#	Description:	Prints a random number between 0 and 100.
+#			Prints a random number up to MAX.
+#			Prints a random bumber between MAX and MIN.
+#
+#	Variables
+#
+	ME="${0##*/}"
+	TITLE="sea's Random Number Display"
+	help_text="
+$TITLE
+$ME ($script_version)
+
+Usage:	$ME [options] [MAX=100] [MIN=0]
+	$ME
+	$ME \$(ls|wc -l)
+	$ME 25000 1000
+
+Note:	MAX is limited to integer size (32767)
+	
+"
+#
+#	Catching Arguments
+#
+	case $1 in
+	-h|--help)
+		printf "$help_text"
+		exit 99
+		;;
+	esac
+	[ -z $1 ] && MAX=100 || MAX=$1
+	[ -z $2 ] && MIN=0 || MIN=$2
+#		;;
+#	esac
+#
+#	Display & Action
+#
+#
+	VAR=$[ $RANDOM % $MAX ]
+	while  [[ $VAR -lt $MIN ]] || [[ $VAR -gt $MAX ]] 
+	do	VAR=$[ $RANDOM % $MAX ]
+		# This is required, otherwise one never gets the 'max' value.
+		VAR=$(( $VAR + 1 ))
+	done
+	printf "$VAR\n"
