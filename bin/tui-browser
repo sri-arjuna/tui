@@ -326,19 +326,29 @@ Where options are:
 	[[ ! "" = "$(echo ${CONFIG[@]})" ]] && LoadFile "${CONFIG[@]}"
 	[[ ! "" = "$(echo ${SOURCE[@]})" ]] && LoadFile "${SOURCE[@]}"
 	
+#set -x
 	# Now load and export all the values:
 	source "$THE_MEGA_CONFIG"
 	# Get the variables
-	BROWSER_LIST_LOADED_VARIABLES=$(tui-conf-get -l "$THE_MEGA_CONFIG")
+	for v in $(tui-conf-set -l "$THE_MEGA_CONFIG");do
+		BROWSER_LIST_LOADED_VARIABLES+=" $v"
+	done
 	# Get the functions
 	oIFS="$IFS" ; IFS="{}()"
 	BROWSER_LIST_LOADED_FUNCTIONS=""
 	$GREP "()[[:space:]]{" "$THE_MEGA_CONFIG" | while read function;do
 		BROWSER_LIST_LOADED_FUNCTIONS+=" $function"
 	done
+	
+	#echo $BROWSER_LIST_LOADED_VARIABLES
 	for entry in $BROWSER_LIST_LOADED_VARIABLES
-	do	export $entry
+	do	#echo $entry
+		#export -p $entry
+		cmd="export -p $entry"
+		eval $cmd
 	done
+	#exit
+	
 	for entry in $BROWSER_LIST_LOADED_FUNCTIONS
 	do	export -f $entry
 	done

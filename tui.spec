@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.7
-Release:     21%{?dist}
+Release:     23%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,11 +131,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-21
+* Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-23
 - Updated: tui-browser, 
 -          '-b WORD' is now counterchecked if it is a bash command
 -          Removed XDG_MIME checks -> KISS, expecting executables only
 -          Its manpages
+-          Config & Source loading, functions
 - Fixed:   tui-browser, Position display was missing leading /
 
 * Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-15
