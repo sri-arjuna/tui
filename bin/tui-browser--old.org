@@ -22,16 +22,16 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.01.12
+#	Changed:	2014.11.27
+	. tui
+	script_version=0.6.9
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
-	. tui
-	script_version=0.7
 #
 #	Variables
 #
-	TITLE="Directory Browser for the console, based on TUI"
+	TITLE="Advanced File Browser for the cli, based on TUI"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	help_text="
@@ -40,74 +40,46 @@ $TITLE
 Usage: 	$ME [options] [arguments]
 Where options are:
 	-h(elp)		This screen
-
-	-T(itle)	STR	Title-label (upper-left) will be labled as STR
-	-U(ser) 	STR	User-label (upper-right) will be labled as STR
-	-L(ocation)  	STR	Location will be labled as STR
-	-P(osition)	STR	Position (/ some / dir) will be overwritten by STR
-	
-	-p(ath)		PATH	Will use ARG as basedir
-	-n(oclear)		Dont clear screen after menu actions
-	-s(ource)	PATH	Sources the file or all files, if its a path, exports its values and prints a dot
-	-m(ode) 		Enables 'text' mode (nice looking)
-				instead of 'numeric' (easy handling, default)
-	
-	-- Text Mode --
-	-D(ir)  	STR	Folders will be labled as ARG
-	-F(ile) 	STR	Files will be labled as ARG
-	
-	-- Advanced --
-	-b(lacklist)	WORD	TODO: Add a WORD to the BLACKLIST of (linux-)commands not to be executed (Textmode only)
-	-c(onfig)	FILE	Full path to configfile of the project
-	-d(efault)	STR	Changes the filename startings from 'default' to 'NAME'
+	-b(lacklist)	ARG	TODO
+	-d(ir)  	STR	Folders will be labled as ARG
+	-C(onfig)	FILE	Full path to configfile of the project
+	-D(efault)	STR	Changes the filename startings from 'default' to 'NAME'
 				These files will be hidden from the menu, and according to their
 				extension be called on diffrent purposes...
 				default.info	- Will be shown upon folder entry
 				default.cmd	- Will be executed upon folder entry
-	-X(eXecute)	SHELL	Which shell to use to execute scripts, default bash
+	-f(ile) 	STR	Files will be labled as ARG
+	-l(ocation)  	STR	Location will be labled as ARG
+	-m(ode) 	MODE	Can be 'text' (nice n' slow, default)
+				or 'num' (functional n' fast)
+	-p(ath)		PATH	Will use ARG as basedir
+	-n(oclear)		Dont clear screen after menu actions
+	-s(ource)	PATH	Sources all files in that dir
+	-t(itle)	STR	Title-label (upper-left) is set to ARG
+	-u(ser) 	STR	User-label (upper-right) is set to ARG
+	
 "
 #
 # 	Default Interface:
 #
-	# All
-	lbl_title="$ME ($script_version) - $TITLE"	# 0 TOP RIGHT
-	lbl_user="$USER_NAME @ $(date +'%F %T')"	# 0 TOP LEFT
-	lbl_location="Location:"			# 1 TOP RIGHT
-	lbl_position=""					# 1 TOP LEFT	-- unused yet
-	# Textmode only
-	lbl_dir="Section:"
-	lbl_file="Task:"
-#
-#	Default Bool's
-#
-	doClear=true		# Wether to clear screen or not
-	doTextmode=false	# false will show the numeric mode
-	doBlacklist=false	# Will be enabled as soon "-b WORD" is passed
-	doCustomPosition=false	# Will be enabled as soon "-P WORD" is passed
-#
-#	Default Strings
-#
-	menu=show
-	PWD_OLD="$(pwd)"	# This is where the user actualy entered the command
-	
-	# Textmode only
-	default_actions="delete edit execute help info new rename quit"
-	
-	# Advanced
-	BLACKLIST=""		# Default entries to ignore when entered in Textmode
-	declare -a CONFIG SOURCE # Configuration files to load (source & export)
-	SPECIAL_NAME="default"	# Default name of the files parsed before displaying any content
-	browser_shell="bash"	# This shell will be used to execute scripts, default bash
+	lbl_title="$ME ($script_version) - $TITLE"
+	lbl_user="$USER_NAME @ $(date +'%F %T')"
+	lbl_dir="Section"
+	lbl_file="Task"
 #
 #	Internal defaults
 #
-	SPECIAL_EXT="info help cmd"	# For these 3 words there will be a handling. 'help' is only textmode!
-	BASE=""				# What is the BASE for the LOCATION_DISPLAY
-	## -- Multi menu
-	#ARGS=""				# These are the arguments to the files and directories passed
-	#OPTS=""				# These are the options to the files passed
-# TODO	
-	BROWSER_LIST_LOADED_VARIABLES=""	# This will contain all the variables that had been exported, to onload them when exiting without ^C.
+	menu=show
+	default_actions="delete edit execute help info new rename quit"
+	PWD_OLD="$(pwd)"
+	BLACKLIST="su sudo"
+	SOURCE=""
+	MENU_MODE=num
+	doClear=true
+	BASE=""
+	SPECIAL_NAME="default"
+	SPECIAL_EXT=(info help cmd )
+	MAIN_CFG=""
 #
 #	Pre-functions
 #
@@ -171,49 +143,67 @@ Where options are:
 #	Catching Arguments
 #
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:X:" name
+	while getopts "m:C:d:D:f:t:b:p:s:u:l:nh" name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
+		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
+		d|dir) 		lbl_dir="$OPTARG"	;;
+		C|config)	MAIN_CFG="$OPTARG"	;;
+		D|default)	SPECIAL_NAME="$OPTARG"	;;
+		f|file) 	lbl_file="$OPTARG"	;;
 		h|help)		printf "$help_text"
 				exit $RET_HELP		;;
-		
-		L|location)	lbl_location="$OPTARG"	;;
-		T|title)	lbl_title="$OPTARG"	;;
-		U|user) 	lbl_user="$OPTARG"	;;
-		P|position)	lbl_position="$OPTARG"
-				doCustomPosition=true	;;
-		
-		p|path) 	BASE="$OPTARG"		;;
+		m|mode)		MENU_MODE="$OPTARG"	;;
 		n|noclear)	doClear=false		;;
-		s|source) 	SOURCE[${#SOURCE[@]}]="$OPTARG"	;;
-		m|mode)		doTextmode=true 	;;
-		
-		# text mode
-		D|dir) 		lbl_dir="$OPTARG"	;;
-		F|file) 	lbl_file="$OPTARG"	;;
-		
-		# Advanced
-		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
-		c|config)	CONFIG[${#CONFIG[@]}]="$OPTARG"	;;
-		d|default)	SPECIAL_NAME="$OPTARG"	;;
-		X|execute)	browser_shell="$OPTARG"
+		p|path) 	BASE="$OPTARG"		;;
+		s|source) 	SOURCE="$OPTARG"	;;
+		t|title)	lbl_title="$OPTARG"	;;
+		u|user) 	lbl_user="$OPTARG"	;;
+	#	l|label)	lbl_job="$OPTARG"	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
-	[[ -z "$BLACKLIST" ]] && \
-		doBlacklist=false || \
-		doBlacklist=true
-	if ! which $browser_shell 1>/dev/zero 2>/dev/zero
-	then	tui-status 1 "Invalid shell supplied or not installed: \"$browser_shell\""
-		exit $?
-	fi
-	# This is recquired to hide these files in the both the numeric and text mode menu
 	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
-	# Go to the Base, or stay where you are when no "-p PATH" was supplied
-	[[ -z $BASE ]] && BASE="$PWD_OLD" || cd "$BASE"
+	# Verify required variables
+	[ -z $BASE ] && BASE="$PWD_OLD"
+	cd "$BASE"
+#	[ -z $lbl_dir ] && tui-echo "Error retrieving 'Folders'-label..." "$FAIL" && exit 1
 #
 #	Functions
 #
+	mnu_Folder() { # ACTION NAME [NEWVAL]
+	# Shows the menu for $default_actions
+	# Folder-sepecific
+		[ -z $2 ] && printf %s "Usage: mnu_Folder ACTION NAME" && exit 1
+		action="$1" ; item="$2" ; newval="$3"
+		case $action in
+		n|new)	mkdir "$item" 		;;
+		d|delete)	tui-yesno "Delete $item and all of its subfolders" && \
+				rm -fr "$item"		;;
+		m|rename)
+				[ -z $newval ] && newval=$(tui-read "What is the new name: ")
+				mv "$item" "$newval"	;;
+		x|execute)	cd "$item"		;;
+		esac
+	}
+	mnu_File() { # ACTION NAME [NEWVAL]
+	# Shows the menu for $default_actions
+	# Folder-sepecific
+		[ -z $2 ] && printf %s "Usage: mnu_File ACTION NAME [NEW_VAL]" && exit 1
+		action="$1" ; item="$2" ; newval="$3"
+		case $action in
+		n|new)	touch "$item"
+				tui-edit "$item"	;;
+		d|delete)	tui-yesno "Delete $item" && \
+					rm -f "$item"	;;
+		e|edit) 	tui-edit "$item"	;;
+		i|info)		stat "$item"		;;
+		m|rename)	[ -z $newval ] && \
+					newval=$(tui-read "What is the new name: ")
+				mv "$item" "$newval"	;;
+		x|execute)	OpenMime "$item"	;;
+		esac
+	}
 	ShowContent() { # ABSOLUTEPATH
 	# Displays the content of a path
 	# 
@@ -287,127 +277,104 @@ Where options are:
 			done
 		fi
 	}
-#
-#	Load Main configuration and SOURCEs
-#
-	THE_MEGA_CONFIG="$TUI_TEMP_DIR/$ME_CONFIGS.cfg.tmp"
-	[[ -f "$THE_MEGA_CONFIG" ]] && rm -f "$THE_MEGA_CONFIG"
-	touch "$THE_MEGA_CONFIG"
-	
-	LoadFile() { # LIST OF FILES OR FOLDERS TO EXPORT
-	# This uses the variable THE_MEGA_CONFIG as a target file to store all configuration in
-	# So outside the function, it is a single source command to get all the values
-		ARRAY="${@}"
-		if [[ ! "" = "$(echo ${ARRAY[@]})" ]]
-		then	# There are config files
-			for conf in "${ARRAY[@]}"
-			do	# Warn the user that no configuration file was found
-				conf="$(echo $conf)"
-				if [[ -d "$conf" ]]
-				then	# its a dir, source and export each of the files there
-					# Supposibly the 'sources'
-					cd "$conf"
-					for f in *
-					do	CONF_LIST=""
-						# Load the values
-						if [[ -f "$f" ]]
-						then	printf "."
-							#f="$(echo $f)"
-							var=$(tui-conf-get -l "$f")
-							cat "$f" >> "$THE_MEGA_CONFIG"
-						fi
-					done
-					cd "$PWD_OLD"
-				elif [[ -f "$conf" ]] 
-				then	# Supposibly the configs
-					printf "."
-					conf="$(echo $conf)"
-					var=$(tui-conf-get -l "$conf")
-					cat "$conf" >> "$THE_MEGA_CONFIG"
-				else	tui-printf -S 111 "Warning! No file to source found (in): $conf"
-					tui-wait 4s "Continue in:"
-				fi
-			done
-		fi
+	has_shebang() { # FILE
+	# Returns successfully if file begins with '#/bin' or '#!/bin'
+	# Fails otherwise
+		head "$1" -n1 | $GREP ^"#[!]/bin" && \
+			return 0 || return 1
 	}
-	# Prepare the configurations
-	[[ ! "" = "$(echo ${CONFIG[@]})" ]] && LoadFile "${CONFIG[@]}"
-	[[ ! "" = "$(echo ${SOURCE[@]})" ]] && LoadFile "${SOURCE[@]}"
-	
-	# Now load and export all the values:
-	source "$THE_MEGA_CONFIG"
-	BROWSER_LIST_LOADED_VARIABLES=$(tui-conf-get -l "$THE_MEGA_CONFIG")
-	for entry in $BROWSER_LIST_LOADED_VARIABLES
-	do	export $entry
-	done
+	is_less_kb() { # FILE NUM
+	# Returns successfully if FILE-size is lower than NUM
+	# Fails otherwise
+		size=$(ls -l "$1" | $AWK '{print $5}')
+		[ $size -lt $2 ] && \
+			return 0 || return 1
+	}
+
+#
+#	Load Main configuration, BLACKLIST & SOURCE
+#
+	[[ -z "$BLACKLIST" ]] && \
+		checkBlacklist=false || \
+		checkBlacklist=true
+	# Main configuration of the script that uses tui-browser
+	if [[ -f $MAIN_CFG ]]
+	then 	source "$MAIN_CFG" && printf "."
+		# Now read the file and export each var
+		for V in $(tui-conf-get -l $MAIN_CFG);do export $V;done
+	fi
+	# Include/Sourced files
+	if [[ ! -z $SOURCE ]]
+	then 	if [[ -d "$SOURCE" ]]
+		then 	cd "$SOURCE"
+			for f in *;do
+				# Source the file, so we get all vars n' vals
+				[[ -f "$f" ]] && source "$f";printf "."
+				# Now read the file and export each var
+				for V in $(tui-conf-get -l $f);do export $V;done
+			done
+			cd "$OLDPWD"
+		elif [ -f "$SOURCE"]
+		then 	source "$SOURCE"
+			# Now read the file and export each var
+			for V in $(tui-conf-get -l $SOURCE);do export $V;done
+		else	tui-status 1 "Error occoured with -s $SOURCE"
+			exit $?
+		fi
+	fi
+	# Update project label to the one matching, if applicable
+	#lbl_title="$ME ($script_version) - $TITLE"
 #
 #	Display & Action
 #
-	sleep 0.03	# This is required for arrangement (in WM cases)
-	len="${#BASE}"
 	cd "$BASE"
-	
-	if $doCustomPosition
-	then	POSITION="$lbl_position"
-	else	CURRENT="$(GetStringDirs "${@}" )"
+	BASE="$(pwd)"
+	len="${#BASE}"
+	# Arguments been passed
+	if [[ ! -z $1 ]]
+	then	# Parse arguments, execute the file or enter the folder
+		[[ -d "$tmp_dir" ]] && cd "$tmp_dir"
+		CURRENT="$(GetStringDirs $@ )"
 		[ "$BASE" = "$CURRENT" ] && \
 			CUR_STR="" || \
-			CUR_STR=$(MakeCurStr "${CURRENT:$len}")
-		POSITION="/$CUR_STR"
-	fi
-	
-	# Arguments been passed
-	if [[ ! -z "$1" ]]
-	then	# Parse arguments, execute the file or enter the folder
-		file=$(GetStringFile "${@}")
-		args=$(GetStringArgs "${@}")
-		
+			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
+	#
+	#	now exeute it
+	#
+		file=$(GetStringFile $@)
+		args=$(GetStringArgs $@)
 		if [[ -f "$CURRENT/$file" ]] && [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
 		then	# Print top header
 			tui-header "$lbl_title" "$lbl_user"
-			tui-title "Location:"  "$POSITION"
+			tui-title "Location:"  "/$CUR_STR"
 			# Execute it
 			
 			out=""
 			for a in "${@:1}";do out+=" $a";done
-			#set -x
-			$browser_shell "$CURRENT/$file" $args
-			tui-status $? "${lbl_title}${out}"
+			sh "$CURRENT/$file" $args
+			tui-status $? "$lbl_title $out"
+			#tui-status $? "$lbl_title $file $args"
 			exit $?
-		else	# There is nothing to execute
-			# Simply change dir and let the menu loop display the heading
-			cd "$CURRENT"
+		else	cd "$CURRENT"
 		fi
 	fi
-
-#
-##
-###
-####
-###
-##
-#
 	while [ ! $menu = "quit-browser" ];do
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
 	#
-		if $doCustomPosition
-		then	POSITION="$lbl_position"
-		else	CURRENT=$(GetStringDirs "${@}" )
-			[ "$BASE" = "$CURRENT" ] && \
-				CUR_STR="" || \
-				CUR_STR=$(MakeCurStr "${CURRENT:$len}")
-			POSITION="/$CUR_STR"
-		fi
+		CURRENT="$(pwd)"
+		[ "$BASE" = "$CURRENT" ] && \
+			CUR_STR="" || \
+			CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
 	#
 	#	Display	- TOP MENU
 	#
 		$doClear && clear
+		sleep 0.01	# This is required for arrangement (in WM cases)
 		tui-header "$lbl_title" "$lbl_user"
-		tui-title "Location:"  "$POSITION"
-		
+		tui-title "Location:"  "/$CUR_STR"
 		# This must be double, since its outside the loop
-		if ! $doTextmode
+		if [[ $MENU_MODE = num ]]
 		then	for T in info help;do
 				case $T in
 				"$SPECIAL_NAME.cmd")
@@ -423,7 +390,7 @@ Where options are:
 	#
 	#	MENU :: TEXT
 	#
-		if $doTextmode ; then
+		if [ $MENU_MODE = text ] ; then
 		#
 		#	DISPLAY - Show content
 		#
@@ -508,7 +475,7 @@ Where options are:
 						fi					;;
 				esac
 			fi
-		elif ! $doTextmode ; then
+		elif [ $MENU_MODE = num ] ; then
 		#
 		# MENU :: NUM
 		#
@@ -536,10 +503,3 @@ Where options are:
 		fi
 	done
 	cd "$PWD_OLD"
-#
-#	Onload 'environment'
-#
-	for var in $BROWSER_LIST_LOADED_VARIABLES ; do
-		cmd="$var=\"\" ; export $var"
-		$cmd
-	done

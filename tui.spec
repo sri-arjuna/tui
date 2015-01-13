@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.7
-Release:     6%{?dist}
+Release:     11%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Mon Jan 12 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-11
+- Added: tui-rnd, to easy get random numbers within range
+- Updated: tui-browser, changed options and the way it loads files
+
 * Sun Jan 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-5
 - Fixed the -tr- quoting causing the issue with the string splitting
 - Fixed tui-conf-set, should be the final fix for this, ty Don
