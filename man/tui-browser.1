@@ -1,7 +1,7 @@
-.TH "tui-browser" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
+.TH "tui-browser" 1 "Simon A. Erat (sea)" "TUI 0.6.7"
 
 .SH NAME
-tui-browser (0.6.8)
+tui-browser (0.7.5)
 
 .SH DESCRIPTION
 This is
@@ -41,15 +41,15 @@ Opens the browser with the current directory as 'root'.
 Opens the browser using provided 
 .B -p /path/to/menu
 path.
-.IP "\fBtui-browser\fP	  -t 'My script manager' \\
+.IP "\fBtui-browser\fP	  -T 'My script manager' \\
 .br
 		-p '/path/to/menu' \\
 .br
-		-u 'Contains $(ls|wc -l) entries' \\
+		-U 'Contains $(ls|wc -l) entries' \\
 .br
-		-C /path/to/config/file.conf \\
+		-c /path/to/config/file.conf \\
 .br
-		${@}"
+		"${@}"
 
 Starts the browser, using
 .B "'My script manager'"
@@ -63,19 +63,19 @@ as base/root directory shown in the
 .B "'Location bar'"
 
 .SH OPTIONS
-.OP -b STRING
+.OP -b WORD
 .br
 Blacklists a certain string from beeing executed (
 .B "text mode only"
 )
 
-.OP -C /path/to/file.conf
+.OP -c /path/to/file.conf
 .br
 Full path to the configuration file of your project.
 .br
 All variables provided with that file, will be exported and are available by all called within the sub dirs of your root.
 
-.OP -d STRING
+.OP -D STRING
 .br
 The 'Directory' section will be labled as 
 .I STRING
@@ -83,8 +83,7 @@ The 'Directory' section will be labled as
 .B "text mode only"
 )
 
-
-.OP -D STRING
+.OP -d STRING
 .br
 For the path based info files,
 .I STRING
@@ -92,7 +91,7 @@ will be used, rather than
 .I default
 (default).
 
-.OP -f STRING
+.OP -F STRING
 .br
 The 'File' section will be labled as 
 .I STRING
@@ -100,20 +99,26 @@ The 'File' section will be labled as
 .B "text mode only"
 )
 
-.OP -l STRING
+.OP -L STRING
 .br
 Renames 
 .B "Location:"
 to 
 .I STRING
-(top left)
+(2nd line upper left)
 
-.OP -m MODE
+.OP -m
 .br
-By default mode 
-.B text
-is used, you can also change this to 
-.B num
+When provided, enables
+.I textmode
+, default is numeric.
+
+.OP -P STRING
+.br
+The 'Position' section will be labled as 
+.I STRING
+(2nd line upper right)
+
 
 .OP -p /path/to/menu/root
 .br
@@ -123,28 +128,71 @@ Pass this if you want a specific path to be the menu-root.
 .br
 Do no clear screen before the menu is shown again.
 
+.OP -S
+.br
+Forces to show the location/position (2nd) line to be shown when executing a script directly.
+.br
+Most likely you want to use this only when you use
+.B -P STRING
+or
+.B -L STRING
+as well.
+
 .OP -s /path/to/files/to/include
 .br
 Sources all files found in 
 .I /path/to/files/to/include
 and 
 .I exports
-all VARIABLES found within the files.
+all VARIABLES and FUNCTIONS found within the files.
 
-.OP -t TITLE
+.OP -T TITLE
 .br
 This 
 .B TITLE
-will be used in the upper left as project title, and also when scripts are executed before the passed arguments.
+will be used in the top left as project title, and also when scripts are executed before the passed arguments.
 
-.OP -u STRING
+.OP -U STRING
 .br
 Changes the default userstring from 
-.I $USER
+.I $USER_NAME
 to 
 .I STRING
 (top right)
 
+
+.SH NUMERIC MODE (default)
+The numeric mode is for easy and quick access and browse through the 'BASE' (-p PATH) and all its subdirectories.
+.br
+If one would 'leave' the BASE directory to a toplevel one, tui-browser will exit.
+While browsing, only numeric inputs within range shown will be accepted, at any (sub-)level, all content of the current location will be displayed.
+With the exception of the 'default.{cmd,info,help}' files, unless changed by
+.B -d STRING
+is provided, in which case it still hides all 'STRING.{cmd,info,help}' files.
+.br
+In both modes, 
+.I default.{str,info}
+will be looked for, and if found, 
+.I default.cmd
+will be sourced, with all variables and functions provided in the files passed with
+.B -c FILE
+and
+.B -s DIR/FILE
+, while
+.I default.info
+will be shown before the directory content.
+
+.SH TEXTMODE
+While the default numeric mode is for quick and easy access, 
+the textmode, enabled with
+.B -m
+gives you a quite diffrent design or layout.
+.br
+The main diffrence is, one doesnt select among numbers, but must enter the name of the item.
+This said, and since one has the ability to write anyway, i also wanted to give you the possibility to block certain words.
+Similar to the numeric mode, at all times you have the option to go back or quit, by entering:
+.B
+b, B, BACK, back, Back or q, Q, quit, QUIT, Quit
 
 
 .SH LICENSE

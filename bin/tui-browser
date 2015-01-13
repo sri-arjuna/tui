@@ -27,7 +27,7 @@
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7.1
+	script_version=0.7.5
 	[[ 0 -eq $UID ]] && \
 		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
 		source /usr/share/tui/themes/$TUI_THEME
@@ -110,10 +110,6 @@ Where options are:
 #
 	SPECIAL_EXT="info help cmd"	# For these 3 words there will be a handling. 'help' is only textmode!
 	BASE=""				# What is the BASE for the LOCATION_DISPLAY
-	## -- Multi menu
-	#ARGS=""				# These are the arguments to the files and directories passed
-	#OPTS=""				# These are the options to the files passed
-# TODO	
 	BROWSER_LIST_LOADED_VARIABLES=""	# This will contain all the variables that had been exported, to onload them when exiting without ^C.
 #
 #	Pre-functions
@@ -124,10 +120,12 @@ Where options are:
 		[ -z "$1" ] && printf "Missing argument" && return 1
 		str="$1"
 		out=""
+		
 		# If PATH is just $BASE it shows a simple /, otherwise removing leading .
 		echo "${str:0:1}" | $GREP -q '\.' && \
 			out="${str:1}" || \
 			out="$str"
+		
 		# Replace the slashes with something else  (space-slash-space)
 		printf " $out"|$SED s\\"/"\\" / "\\g
 	}
@@ -177,10 +175,8 @@ Where options are:
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
 	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:X:S" name
-	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
-		case $name in
+	do 	case $name in
 		h|help)		printf "$help_text"
 				exit $RET_HELP		;;
 		
@@ -208,15 +204,19 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
+	
 	[[ -z "$BLACKLIST" ]] && \
 		doBlacklist=false || \
 		doBlacklist=true
+	
 	if ! which $browser_shell 1>/dev/zero 2>/dev/zero
 	then	tui-status 1 "Invalid shell supplied or not installed: \"$browser_shell\""
 		exit $?
 	fi
+	
 	# This is recquired to hide these files in the both the numeric and text mode menu
 	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
+	
 	# Go to the Base, or stay where you are when no "-p PATH" was supplied
 	[[ -z "$BASE" ]] && BASE="$PWD_OLD" || cd "$BASE"
 #
@@ -255,8 +255,6 @@ Where options are:
 							done < "$e"
 							tui-echo
 							;;
-					# "help")		tui-status 111 "TODO $e - handling"
-					#		;;
 					esac
 				fi
 			done
@@ -277,23 +275,12 @@ Where options are:
 				if [ ! 0 = "${#array[@]}" ]
 				then 	tui-title "${content_title}:"
 					tui-list -n "${array[@]}"
-					# Display array
-				#	while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
-				#		L="${array[$C]}"
-				#		M="${array[$D]}"
-				#		R="${array[$E]}"
-				#		C=$[ $C + 3 ]
-				#		D=$[ $D + 3 ]
-				#		E=$[ $E + 3 ]
-						# Only show lines with content
-				#		[ -z $L ] || tui-echo "$L" "$M" "$R"
-				#	done
 				fi
 			done
 		fi
 	}
 #
-#	Load Main configuration and SOURCEs
+#	Load provided configuration and sources
 #
 	THE_MEGA_CONFIG="$TUI_TEMP_DIR/$ME_CONFIGS.cfg.tmp"
 	[[ -f "$THE_MEGA_CONFIG" ]] && rm -f "$THE_MEGA_CONFIG"
@@ -341,10 +328,21 @@ Where options are:
 	
 	# Now load and export all the values:
 	source "$THE_MEGA_CONFIG"
+	# Get the variables
 	BROWSER_LIST_LOADED_VARIABLES=$(tui-conf-get -l "$THE_MEGA_CONFIG")
+	# Get the functions
+	oIFS="$IFS" ; IFS="{}()"
+	BROWSER_LIST_LOADED_FUNCTIONS=""
+	$GREP "()[[:space:]]{" "$THE_MEGA_CONFIG" | while read function;do
+		BROWSER_LIST_LOADED_FUNCTIONS+=" $function"
+	done
 	for entry in $BROWSER_LIST_LOADED_VARIABLES
 	do	export $entry
 	done
+	for entry in $BROWSER_LIST_LOADED_FUNCTIONS
+	do	export -f $entry
+	done
+	IFS="$oIFS"
 #
 #	Display & Action
 #
@@ -355,7 +353,6 @@ Where options are:
 	# Arguments been passed
 	if [[ ! -z "$1" ]]
 	then	# Change to directory
-		#set -x
 		for d in "${@}";do
 			[[ -d "$d" ]] && cd "$d" && shift
 		done
@@ -373,18 +370,7 @@ Where options are:
 		# Prepare heading string
 		if $doCustomPosition
 		then	POSITION="$lbl_position"
-		else	# Orginal
-		#	if [[ "${BASE:0:(-1)}" = "$CURRENT" ]]
-		#	then	CUR_STR=""
-		#	else	CURRENT=${CURRENT} #:${#BASE}}
-		#		CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
-				#CUR_STR=$(MakeCurStr "${CURRENT}") #|| exit 1
-		#	fi
-			
-			#set +x
-			
-			# Neu
-			if [[ 0 -ne $# ]]
+		else	if [[ 0 -ne $# ]]
 			then	#CURRENT="$(GetStringDirs "${@}" )"
 				[ "$BASE" = "$CURRENT" ] && \
 					CUR_STR="" || \
@@ -400,13 +386,14 @@ Where options are:
 		if [[ ! -z "$file" ]] && [[ -f "$CURRENT/$file" ]]  #&& [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
 		then	# Print top header
 			tui-header "$lbl_title" "$lbl_user"
+			
 			# The title is not required, since a script is executed
 			$showLocationPos_Anyway && tui-title "$lbl_location"  "$POSITION"
-			# Execute it
 			
+			# Execute it
 			out=""
 			for a in "${@:1}";do out+=" $a";done
-			#set -x
+			
 			$browser_shell "$CURRENT/$file" $args
 			tui-status $? "${lbl_title}${out}"
 			exit $?
@@ -416,23 +403,19 @@ Where options are:
 		fi
 	fi
 
-#
-##
-###
-####
-###
-##
-#
-	#$showLocationPos_Anyway_ow && \
-	#		showLocationPos_Anyway=$showLocationPos_Anyway_ow
+#			#####
+##			####
+###			###
+####	MAIN LOOP  	#
+###			###
+##			####
+#			#####
 	while [ ! $menu = "quit-browser" ];do
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
 	#
-		#CURRENT="$(GetStringDirs "$PWD" )"
 		CURRENT="$PWD"
-		#echo $CURRENT/$mode
-		#set -x
+		
 		# Prepare heading string
 		if $doCustomPosition
 		then	POSITION="$lbl_position"
@@ -444,22 +427,13 @@ Where options are:
 			else	#CURRENT=${CURRENT:${#BASE}}
 				CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
 			fi
-			#set +x
-			# Neu
-		#	if [[ 0 -ne $# ]]
-		#	then	CURRENT="$(GetStringDirs "${@}" )"
-		#		[ "$BASE" = "$CURRENT" ] && \
-		#			CUR_STR="" || \
-		#			CUR_STR=$(MakeCurStr "${CURRENT:$len}")
-		#	else	CUR_STR=""
-		#	fi
 			
-			# Beides
+			# Prepare CUR_STR for display
 			CUR_STR="$(echo $CUR_STR|sed s,'/  /','',g)"
+			[[ "/" = "${CUR_STR:0:1}" ]] || \
+				CUR_STR="/$CUR_STR"	# The check above is new !!!
 			POSITION="$CUR_STR"
 		fi
-		#set +x
-		#tui-press
 	#
 	#	Display	- TOP MENU
 	#
@@ -526,7 +500,8 @@ Where options are:
 				fi
 			fi
 			if ! $action_done
-			then	case $action in
+			then	# It has not been executed yet, do so now?
+				case $action in
 				[bB]|[bB][aA][cC][kK])
 					[ "$CURRENT" = "$BASE" ] && \
 						menu="quit-browser" || \
@@ -535,6 +510,7 @@ Where options are:
 				[qQ]|[qQ][uU][iI][tT])
 					menu="quit-browser"
 					;;
+				*)	tui-status 1 "Command ($action) not found!"
 				esac
 			fi
 		elif ! $doTextmode ; then
@@ -567,6 +543,7 @@ Where options are:
 	cd "$PWD_OLD"
 #
 #	Onload 'environment'
+#	Since the heartbleed, i think this is no longer required, but i keep this for security reasons
 #
 	for var in $BROWSER_LIST_LOADED_VARIABLES ; do
 		cmd="$var=\"\" ; export $var"
