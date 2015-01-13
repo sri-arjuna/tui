@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.7
-Release:     11%{?dist}
+Release:     16%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,17 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-15
+- Updated: tui-list, can now also print a list without numbering at all
+- Updated: tui-download, now checks wether curl or wget is available
+- Updated: tui-browser, accepting "-P lbl_position" which overwrites
+-          the display of the current subdir of the projects base dir.
+-          "-S" will force the location/position line to be shown,
+-          when calling scripts directly.
+-          "-X SHELL" will start the scripts with given SHELL
+-          Using now: tui-list
+- Fixed:   tui-browser, textmode input display
+
 * Mon Jan 12 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-11
 - Added: tui-rnd, to easy get random numbers within range
 - Updated: tui-browser, changed options and the way it loads files

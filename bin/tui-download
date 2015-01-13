@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -23,8 +23,9 @@
 #
 #	STABLE: 2013.10.13	--- DONT CHANGE IT ---
 #				unless everything is STABLE & BACKED UP !!
+#	STABLE:	2015.01.13	Updated to check for curl/wget
 	source tui
-	script_version=0.5
+	script_version=0.6
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
@@ -38,6 +39,8 @@
 	DEST=""
 	tui-bol-dir "$TUI_TEMP_DIR" > /dev/zero
 	#tui-echo "Downloading to:"  "$(pwd)"
+	LIST_APPS="wget curl"
+	APP=$(tui-conf-get /etc/tui/commands.conf CURLWGET)
 #
 #	Variable handling
 #
@@ -51,14 +54,36 @@
 #
 #	Display
 #
+	if [[ -z "$CURLWGET" ]]
+	then	# Not set yet.
+		for app in $LIST_APPS;do
+			which $app 1>/dev/zero 2>/dev/zero && \
+				CURLWGET=$app && \
+				break
+		done
+		set -x
+		tui-conf-set $APPS CURLWGET $CURLWGET
+	fi
+	case $CURLWGET in
+	curl)	OPT_O="-o"
+		OPT_Q="-s"
+		OPT_C=""	;;
+	wget)	OPT_O="-O"
+		OPT_Q="-q"
+		OPT_C="-c"	;;
+	esac
+	
 	for URL in "${ARGS[@]}"
 	do 	THIS="$(basename $URL)"
-		tui-printf "Initializing new download..." "$WORK"
-		echo "wget -qc $URL" > $FILE_CMD
+		tui-printf -rS 2 "Initializing new download..." #"$WORK"
+		#echo "wget -qc $URL" > $FILE_CMD
+		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > $FILE_CMD
+		
+		
 		chmod +x $FILE_CMD
 		$FILE_CMD &
-		sleep 1.5
-		K=1024
+		sleep 0.7
+		#K=1024
 	
 		while [[ ! "" = "$(ps|$GREP wget)" ]] #|| [[ ! "" = "$(ps $!)" ]]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"

@@ -24,12 +24,11 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2014.12.21
-	script_version=0.8
+#	Changed:	2015.01.13
+	script_version=0.9
 	TITLE="tui-list"
-#	Description:	Text TODO
-#			...  TODO
-#
+#	Description:	Lists entries of a folder, or passed list
+#			And shows either arabic, roman or no number indexes.
 #
 #	Script Environment
 #
@@ -52,20 +51,23 @@ Where options are:
 	-h(elp) 		This screen
 	-a(lpha)		Use letters instead of numbers
 	-r(oman)		Use roman letters instead of numbers (up to 3000 valid)
+	-n(one)			Dont use any counting, just list each entry
 
 "
 #	-r(oman)		Use roman letters as numbers
 
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
 	# A ':' after a char indicates that this option requires an argument
-	while getopts "ahr" opt
+	SEP=") "
+	while getopts "ahnr" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
 		a)	MODE=alpha 	;;
 		r)	MODE=roman 	;;
-			
+		n)	MODE=none
+			SEP=""		;;
 		# *)	printf "$help_text" ; exit $?	;;
 		esac
 	done
@@ -166,13 +168,13 @@ Where options are:
 	CUR=0
 	DONE=0
 	for OPT in "${ARGS[@]}"
-	do	#echo $CUR$OPT
-		DONE=$((DONE+1))
+	do	DONE=$((DONE+1))
 		# Do the visible counter
 		case $MODE in
-		num)	count=$DONE	;;
+		num)	count=$DONE				;;
 		alpha)	count=$(num2char $[ $DONE - 1 ] )	;;
-		roman)	count=$(num2roman $DONE)	;;
+		roman)	count=$(num2roman $DONE)		;;
+		none)	count=""				;;
 		esac
 		
 		# Add the string to array, or print array
@@ -182,23 +184,21 @@ Where options are:
 			sum=$[ $len + 2  + ( ${#BORDER_LEFT} * 2 ) ]
 			
 			if [[ $sum -lt $COLUMNS ]]
-			then	OUT[$CUR]="$count) $OPT"
+			then	OUT[$CUR]="${count}${SEP}$OPT"
 				shown=false
 				CUR=$(( $CUR + 1 ))
 			else	tui-echo "${OUT[@]}" >> /dev/stderr
 				CUR=0 && unset OUT[@] 
 				[[ -z "$OPT" ]] && shown=true
-				OUT[$CUR]="$count) $OPT"
+				OUT[$CUR]="${count}${SEP}$OPT"
 				CUR=$(( $CUR + 1 ))
 			fi
 		else 	tui-echo "${OUT[@]}" >> /dev/stderr
 			CUR=0 && unset OUT[@] 
 			[[ -z "$OPT" ]] && shown=true
-			OUT[$CUR]="$count) $OPT"
+			OUT[$CUR]="${count}${SEP}$OPT"
 			CUR=$(( $CUR + 1 ))
 		fi
-		#counter=$(( $counter + 1 ))
-		
 	done
 	# Print unprinted
 	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr # && printf "\n"

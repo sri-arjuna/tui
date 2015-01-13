@@ -22,16 +22,20 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.01.12
+#	Changed:	2015.01.13
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7
+	script_version=0.7.1
+	[[ 0 -eq $UID ]] && \
+		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
+		source /usr/share/tui/themes/$TUI_THEME
+
 #
 #	Variables
 #
-	TITLE="Directory Browser for the console, based on TUI"
+	TITLE="Project Browser"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	help_text="
@@ -64,6 +68,7 @@ Where options are:
 				extension be called on diffrent purposes...
 				default.info	- Will be shown upon folder entry
 				default.cmd	- Will be executed upon folder entry
+	-S(show pos-line)	Forces the 'Location/Position' line to be shown when calling scripts
 	-X(eXecute)	SHELL	Which shell to use to execute scripts, default bash
 "
 #
@@ -84,6 +89,7 @@ Where options are:
 	doTextmode=false	# false will show the numeric mode
 	doBlacklist=false	# Will be enabled as soon "-b WORD" is passed
 	doCustomPosition=false	# Will be enabled as soon "-P WORD" is passed
+	showLocationPos_Anyway=false	# While false, this hides the 'Location' title line when calling a script directly
 #
 #	Default Strings
 #
@@ -114,13 +120,13 @@ Where options are:
 	MakeCurStr() { # PATH
 	# Parses PATH and 'make it look nice'
 	# Returns the 'nice looking string'
-		[ -z $1 ] && printf "Missing argument" %s && return 1
+		[ -z "$1" ] && printf "Missing argument" && return 1
 		str="$1"
 		out=""
 		# If PATH is just $BASE it shows a simple /, otherwise removing leading .
-		[ "." = "$str" ] && \
-			out="/" || \
-			out="${str:1}"
+		echo "${str:0:1}" | $GREP -q '\.' && \
+			out="${str:1}" || \
+			out="$str"
 		# Replace the slashes with something else  (space-slash-space)
 		printf " $out"|$SED s\\"/"\\" / "\\g
 	}
@@ -171,7 +177,7 @@ Where options are:
 #	Catching Arguments
 #
 	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
-	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:X:" name
+	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:X:S" name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
 		h|help)		printf "$help_text"
@@ -196,7 +202,8 @@ Where options are:
 		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
 		c|config)	CONFIG[${#CONFIG[@]}]="$OPTARG"	;;
 		d|default)	SPECIAL_NAME="$OPTARG"	;;
-		X|execute)	browser_shell="$OPTARG"
+		X|execute)	browser_shell="$OPTARG"	;;
+		S)		showLocationPos_Anyway=true	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
@@ -210,14 +217,14 @@ Where options are:
 	# This is recquired to hide these files in the both the numeric and text mode menu
 	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
 	# Go to the Base, or stay where you are when no "-p PATH" was supplied
-	[[ -z $BASE ]] && BASE="$PWD_OLD" || cd "$BASE"
+	[[ -z "$BASE" ]] && BASE="$PWD_OLD" || cd "$BASE"
 #
 #	Functions
 #
 	ShowContent() { # ABSOLUTEPATH
 	# Displays the content of a path
 	# 
-		[ -z $1 ] && printf %s "Missing argument" && return 1
+		[ -z "$1" ] && printf "Missing argument" && return 1
 		if [ "" = "$(ls)" ]
 		then 	tui-status 1 "Location is empty"
 			tui-echo
@@ -258,31 +265,28 @@ Where options are:
 				C=0 ; D=1 ; E=2
 				# Show task and create specific array
 				case $task in
-				folder)	[ -z $lbl_dir ] && \
-						content_title="$lbl_dir_default" || \
-						content_title="$lbl_dir"
+				folder)	content_title="$lbl_dir"
 					array=( "${folders[@]}" )
 					;;
-				files)	[ -z $lbl_file ] && \
-						content_title="$lbl_file_default" || \
-						content_title="$lbl_file"
+				files)	content_title="$lbl_file"
 					array=( "${files[@]}" )
 					;;
 				esac
 				# Dont show title if no entries available
 				if [ ! 0 = "${#array[@]}" ]
 				then 	tui-title "${content_title}:"
+					tui-list -n "${array[@]}"
 					# Display array
-					while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
-						L="${array[$C]}"
-						M="${array[$D]}"
-						R="${array[$E]}"
-						C=$[ $C + 3 ]
-						D=$[ $D + 3 ]
-						E=$[ $E + 3 ]
+				#	while [ $E -le $[ ${#array[@]} + 2 ] ] ; do
+				#		L="${array[$C]}"
+				#		M="${array[$D]}"
+				#		R="${array[$E]}"
+				#		C=$[ $C + 3 ]
+				#		D=$[ $D + 3 ]
+				#		E=$[ $E + 3 ]
 						# Only show lines with content
-						[ -z $L ] || tui-echo "$L" "$M" "$R"
-					done
+				#		[ -z $L ] || tui-echo "$L" "$M" "$R"
+				#	done
 				fi
 			done
 		fi
@@ -325,7 +329,7 @@ Where options are:
 					var=$(tui-conf-get -l "$conf")
 					cat "$conf" >> "$THE_MEGA_CONFIG"
 				else	tui-printf -S 111 "Warning! No file to source found (in): $conf"
-					tui-wait 4s "Continue in:"
+					tui-wait 3s "Continue in:"
 				fi
 			done
 		fi
@@ -345,27 +349,53 @@ Where options are:
 #
 	sleep 0.03	# This is required for arrangement (in WM cases)
 	len="${#BASE}"
-	cd "$BASE"
-	
-	if $doCustomPosition
-	then	POSITION="$lbl_position"
-	else	CURRENT="$(GetStringDirs "${@}" )"
-		[ "$BASE" = "$CURRENT" ] && \
-			CUR_STR="" || \
-			CUR_STR=$(MakeCurStr "${CURRENT:$len}")
-		POSITION="/$CUR_STR"
-	fi
+	cd "$BASE"	# Change to BASE before displaying anything
 	
 	# Arguments been passed
 	if [[ ! -z "$1" ]]
-	then	# Parse arguments, execute the file or enter the folder
+	then	# Change to directory
+		#set -x
+		for d in "${@}";do
+			[[ -d "$d" ]] && cd "$d" && shift
+		done
+		CURRENT="$PWD"
+		
+		
+		# Prepare heading string
+		if $doCustomPosition
+		then	POSITION="$lbl_position"
+		else	# Orginal
+		#	if [[ "${BASE:0:(-1)}" = "$CURRENT" ]]
+		#	then	CUR_STR=""
+		#	else	CURRENT=${CURRENT} #:${#BASE}}
+		#		CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
+				#CUR_STR=$(MakeCurStr "${CURRENT}") #|| exit 1
+		#	fi
+			
+			#set +x
+			
+			# Neu
+			if [[ 0 -ne $# ]]
+			then	#CURRENT="$(GetStringDirs "${@}" )"
+				[ "$BASE" = "$CURRENT" ] && \
+					CUR_STR="" || \
+					CUR_STR=$(MakeCurStr "${CURRENT:$len}")
+			else	CUR_STR=""
+			fi
+			
+			# Beides
+			POSITION="/$CUR_STR"
+		fi
+		
+		# Parse arguments, execute the file or enter the folder
 		file=$(GetStringFile "${@}")
 		args=$(GetStringArgs "${@}")
-		
-		if [[ -f "$CURRENT/$file" ]] && [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
+		#set -x
+		if [[ ! -z "$file" ]] && [[ -f "$CURRENT/$file" ]]  #&& [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
 		then	# Print top header
 			tui-header "$lbl_title" "$lbl_user"
-			tui-title "Location:"  "$POSITION"
+			# The title is not required, since a script is executed
+			$showLocationPos_Anyway && tui-title "$lbl_location"  "$POSITION"
 			# Execute it
 			
 			out=""
@@ -391,20 +421,42 @@ Where options are:
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
 	#
+		#CURRENT="$(GetStringDirs "$PWD" )"
+		CURRENT="$PWD"
+		#echo $CURRENT/$mode
+		#set -x
+		# Prepare heading string
 		if $doCustomPosition
 		then	POSITION="$lbl_position"
-		else	CURRENT=$(GetStringDirs "${@}" )
-			[ "$BASE" = "$CURRENT" ] && \
-				CUR_STR="" || \
-				CUR_STR=$(MakeCurStr "${CURRENT:$len}")
-			POSITION="/$CUR_STR"
+		else	# Orginal
+			#set -x
+			CURRENT="$PWD"
+			if [[ "${BASE:0:(-1)}" = "$CURRENT" ]]
+			then	CUR_STR=""
+			else	#CURRENT=${CURRENT:${#BASE}}
+				CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
+			fi
+			#set +x
+			# Neu
+		#	if [[ 0 -ne $# ]]
+		#	then	CURRENT="$(GetStringDirs "${@}" )"
+		#		[ "$BASE" = "$CURRENT" ] && \
+		#			CUR_STR="" || \
+		#			CUR_STR=$(MakeCurStr "${CURRENT:$len}")
+		#	else	CUR_STR=""
+		#	fi
+			
+			# Beides
+			POSITION="$CUR_STR"
 		fi
+		#set +x
+		#tui-press
 	#
 	#	Display	- TOP MENU
 	#
 		$doClear && clear
 		tui-header "$lbl_title" "$lbl_user"
-		tui-title "Location:"  "$POSITION"
+		tui-title "$lbl_location"  "$POSITION"
 		
 		# This must be double, since its outside the loop
 		if ! $doTextmode
@@ -436,12 +488,12 @@ Where options are:
 		#
 		#	Deside action
 		#	
-			if [ ! -z $mode ]; then
+			if [ ! -z "$mode" ]; then
 			# Expect $mode to be either an item of $default_actions
 			# or a file / folder
 				case $mode in
 				n|new)  	menu=new
-						[ -z $item ] && \
+						[ -z "$item" ] && \
 							item=(tui-read "What is the name:")
 						tui-yesno "Will $item be a folder?" && \
 							mnu_Folder c "$item" || \
@@ -453,7 +505,7 @@ Where options are:
 							menu="back"
 						;;
 				d|delete)	menu=del
-						[ -z $item ] && \
+						[ -z "$item" ] && \
 							tui-echo "Please select what you want to delete:" && \
 							select item in "${ARRAY[@]}";do break;done
 						[ -d "$item" ] && \
@@ -462,7 +514,7 @@ Where options are:
 						;;
 				e|edit) 	menu=edit
 						skip=true
-						[ -z $item ] && \
+						[ -z "$item" ] && \
 							tui-echo "Please select a file to edit:" && \
 							select item in "${files[@]}";do break;done
 						[ -d "$item" ] && \
@@ -473,20 +525,20 @@ Where options are:
 							mnu_File  edit "$item"	
 						;;
 				x|execute)	menu=exe
-						if [ -z $item ]
+						if [ -z "$item" ]
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	[ -d "$item" ] && \
 								mnu_Folder x "$item" || \
 								( mnu_File x "$item" ; tui-press)
 						fi					;;
 				i|info) 	menu=info
-						if [ -z $item ]
+						if [ -z "$item" ]
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	stat "$item"
 							tui-press
 						fi					;;
 				r|rename)	menu=rename
-						if [ -z $item ]
+						if [ -z "$item" ]
 						then	ERROR_MSG="Nothing provided to execute!"
 						else	stat "$item"
 							tui-press
@@ -494,7 +546,7 @@ Where options are:
 				[qQ]|[qQ]uit)	menu="quit-browser"			;;
 				*)		# Its not a $default_action
 						menu=diffrent
-						if [ -z $item ]
+						if [ -z "$item" ]
 						then	# No 2nd argument passed
 							if [ -d "$mode" ]
 							then	cd "$mode"
