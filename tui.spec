@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.7
-Release:     16%{?dist}
+Release:     21%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,11 +131,17 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-20
+- Updated: tui-browser, 
+-          '-b WORD' is now counterchecked if it is a bash command
+-          Removed XDG_MIME checks -> KISS, expecting executables only
+- Fixed:   tui-browser, Position display was missing leading /
+
 * Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-15
 - Updated: tui-list, can now also print a list without numbering at all
 - Updated: tui-download, now checks wether curl or wget is available
 - Updated: tui-browser, accepting "-P lbl_position" which overwrites
--          the display of the current subdir of the projects base dir.
+-          the display of the current subdir of the projects menu dir.
 -          "-S" will force the location/position line to be shown,
 -          when calling scripts directly.
 -          "-X SHELL" will start the scripts with given SHELL

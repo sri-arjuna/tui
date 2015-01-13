@@ -61,7 +61,7 @@ Where options are:
 	-F(ile) 	STR	Files will be labled as ARG
 	
 	-- Advanced --
-	-b(lacklist)	WORD	TODO: Add a WORD to the BLACKLIST of (linux-)commands not to be executed (Textmode only)
+	-b(lacklist)	WORD	Add a WORD to the BLACKLIST of (linux-)commands not to be executed (Textmode only)
 	-c(onfig)	FILE	Full path to configfile of the project
 	-d(efault)	STR	Changes the filename startings from 'default' to 'NAME'
 				These files will be hidden from the menu, and according to their
@@ -90,6 +90,7 @@ Where options are:
 	doBlacklist=false	# Will be enabled as soon "-b WORD" is passed
 	doCustomPosition=false	# Will be enabled as soon "-P WORD" is passed
 	showLocationPos_Anyway=false	# While false, this hides the 'Location' title line when calling a script directly
+	showLocationPos_Anyway_ow=false
 #
 #	Default Strings
 #
@@ -203,7 +204,7 @@ Where options are:
 		c|config)	CONFIG[${#CONFIG[@]}]="$OPTARG"	;;
 		d|default)	SPECIAL_NAME="$OPTARG"	;;
 		X|execute)	browser_shell="$OPTARG"	;;
-		S)		showLocationPos_Anyway=true	;;
+		S)		showLocationPos_Anyway_ow=true	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
@@ -360,6 +361,14 @@ Where options are:
 		done
 		CURRENT="$PWD"
 		
+		# Parse arguments, execute the file or enter the folder
+		file=$(GetStringFile "${@}")
+		args=$(GetStringArgs "${@}")
+		
+		if [[ -f "$PWD/$file" ]] && [[ ! -z "$file" ]] 
+		then	$showLocationPos_Anyway_ow && \
+				showLocationPos_Anyway=$showLocationPos_Anyway_ow
+		fi
 		
 		# Prepare heading string
 		if $doCustomPosition
@@ -387,9 +396,6 @@ Where options are:
 			POSITION="/$CUR_STR"
 		fi
 		
-		# Parse arguments, execute the file or enter the folder
-		file=$(GetStringFile "${@}")
-		args=$(GetStringArgs "${@}")
 		#set -x
 		if [[ ! -z "$file" ]] && [[ -f "$CURRENT/$file" ]]  #&& [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
 		then	# Print top header
@@ -417,6 +423,8 @@ Where options are:
 ###
 ##
 #
+	#$showLocationPos_Anyway_ow && \
+	#		showLocationPos_Anyway=$showLocationPos_Anyway_ow
 	while [ ! $menu = "quit-browser" ];do
 	#
 	#	Set vars that must be re-read/set upon reload of current dir
@@ -447,6 +455,7 @@ Where options are:
 		#	fi
 			
 			# Beides
+			CUR_STR="$(echo $CUR_STR|sed s,'/  /','',g)"
 			POSITION="$CUR_STR"
 		fi
 		#set +x
@@ -484,80 +493,48 @@ Where options are:
 		#	Fetch input
 		#
 			tui-echo
-			read -p "$BORDER_LEFT What is your choice: " mode item newval spare
+			#read -p "$BORDER_LEFT What is your choice: " mode item newval spare
+			action=$(tui-read "What is your choice:")
+			action_done=false
 		#
 		#	Deside action
 		#	
-			if [ ! -z "$mode" ]; then
-			# Expect $mode to be either an item of $default_actions
-			# or a file / folder
-				case $mode in
-				n|new)  	menu=new
-						[ -z "$item" ] && \
-							item=(tui-read "What is the name:")
-						tui-yesno "Will $item be a folder?" && \
-							mnu_Folder c "$item" || \
-							mnu_File c "$item"
-						;;
-				[bB]|[bB]ack)	# Exit if 'leaving' base directory
-						[ "$CURRENT" = "$BASE" ] && \
-							menu="quit-browser" || \
-							menu="back"
-						;;
-				d|delete)	menu=del
-						[ -z "$item" ] && \
-							tui-echo "Please select what you want to delete:" && \
-							select item in "${ARRAY[@]}";do break;done
-						[ -d "$item" ] && \
-							mnu_Folder d "$item" || \
-							mnu_File d "$item"
-						;;
-				e|edit) 	menu=edit
-						skip=true
-						[ -z "$item" ] && \
-							tui-echo "Please select a file to edit:" && \
-							select item in "${files[@]}";do break;done
-						[ -d "$item" ] && \
-								ERROR_MSG="Cant edit a folder!" && \
-								skip=true || \
-								( [ -f "$item" ] && skip=false )
-						[ $skip = false ] && \
-							mnu_File  edit "$item"	
-						;;
-				x|execute)	menu=exe
-						if [ -z "$item" ]
-						then	ERROR_MSG="Nothing provided to execute!"
-						else	[ -d "$item" ] && \
-								mnu_Folder x "$item" || \
-								( mnu_File x "$item" ; tui-press)
-						fi					;;
-				i|info) 	menu=info
-						if [ -z "$item" ]
-						then	ERROR_MSG="Nothing provided to execute!"
-						else	stat "$item"
-							tui-press
-						fi					;;
-				r|rename)	menu=rename
-						if [ -z "$item" ]
-						then	ERROR_MSG="Nothing provided to execute!"
-						else	stat "$item"
-							tui-press
-						fi					;;
-				[qQ]|[qQ]uit)	menu="quit-browser"			;;
-				*)		# Its not a $default_action
-						menu=diffrent
-						if [ -z "$item" ]
-						then	# No 2nd argument passed
-							if [ -d "$mode" ]
-							then	cd "$mode"
-							elif [ -f "$mode" ]
-							then	mnu_File "execute" "$mode"
-								tui-press
-							fi
-						else	tui-echo "BETA shell execute?:" "'$mode $item'"
-							$mode $item
-							tui-press
-						fi					;;
+			str="$(echo $action|$AWK '{print $1}')"
+			if [[ -d "$action" ]]
+			then	cd "$action"
+				action_done=true
+			elif [[ -f "$action" ]]
+			then	$browser_shell "$action"
+				action_done=true
+			elif which $str 1>/dev/zero 2>/dev/zero
+			then	# This IS be a BASH command
+				# Check for blacklisted words$action
+				if $doBlacklist
+				then	isBlocked=false
+					for BLOCK in $BLACKLIST
+					do	if echo $str | $GREP -q -i $BLOCK 
+						then	isBlocked=true
+						fi
+					done
+					if $isBlocked
+					then	tui-status 1 "Invalid argument given: $str"
+					else	$action
+						action_done=true
+					fi
+				else	$action
+					action_done=true
+				fi
+			fi
+			if ! $action_done
+			then	case $action in
+				[bB]|[bB][aA][cC][kK])
+					[ "$CURRENT" = "$BASE" ] && \
+						menu="quit-browser" || \
+						menu="back"
+					;;
+				[qQ]|[qQ][uU][iI][tT])
+					menu="quit-browser"
+					;;
 				esac
 			fi
 		elif ! $doTextmode ; then
