@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.7
-Release:     23%{?dist}
+Version:     0.6.8
+Release:     0%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,13 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Thu Jan 15 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-0
+- Added:   Wikipages 'Basic Display' to 'User interaction - scripts'
+- Updated: tui-list, roman numbers use now a dot as seperator
+- Udpated: tui-progress, now shows bar in terminals
+-          smaller than 80 colums, the math was in wrong order
+- Updated: tui-log, muted touch if user has no write access to path
+
 * Tue Jan 13 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.7-23
 - Updated: tui-browser, 
 -          '-b WORD' is now counterchecked if it is a bash command
