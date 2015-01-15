@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.01.13
-	script_version=0.9
+#	Changed:	2015.01.15
+	script_version=1.0
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.
@@ -65,7 +65,8 @@ Where options are:
 			exit $RET_HELP
 			;;
 		a)	MODE=alpha 	;;
-		r)	MODE=roman 	;;
+		r)	MODE=roman
+			SEP="."		;;
 		n)	MODE=none
 			SEP=""		;;
 		# *)	printf "$help_text" ; exit $?	;;
@@ -75,6 +76,7 @@ Where options are:
 	ARGS=("${@}")			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 	COLUMNS=$(tput cols)
+	SEP+=" "
 #
 #	Functions
 #
@@ -128,7 +130,7 @@ Where options are:
 				out+="$ten"
 				;;
 			esac
-			echo $out
+			echo "$out"
 		}
 		while [[ $len -gt 0  ]]
 		do	# There are letters to add
@@ -156,7 +158,7 @@ Where options are:
 			esac
 			input=${input:1} ; len=${#input}
 		done
-		printf "$output "
+		printf "$output"
 	}
 #
 #	Display & Action
@@ -184,7 +186,7 @@ Where options are:
 			sum=$[ $len + 2  + ( ${#BORDER_LEFT} * 2 ) ]
 			
 			if [[ $sum -lt $COLUMNS ]]
-			then	OUT[$CUR]="${count}${SEP}$OPT"
+			then	OUT[$CUR]="${count}${SEP/  / }$OPT"
 				shown=false
 				CUR=$(( $CUR + 1 ))
 			else	tui-echo "${OUT[@]}" >> /dev/stderr
