@@ -31,6 +31,7 @@
 #
 	#source /etc/tui/status.conf
 	source /etc/tui/tui.conf
+	source /etc/tui/commands.conf
 	TITLE="Progress indicator"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
@@ -56,7 +57,7 @@ Where options are:
 	TYPE=dash
 	MAX=1
 	doReset=false
-	BAR="#"
+	BAR='#'
 #
 #	Catching Arguments
 #
@@ -97,31 +98,39 @@ Where options are:
 #
 #	Read initial value from tmpfile
 #
+	[[ -z $LEFT ]] && LEFT=" " 
+	[[ -z $MIDDLE ]] && MIDDLE=" "
 	VAL=$(cat "$TMPFILE")
 	PROGRESS=""
 	case "$TYPE" in
 		dash)	[[ $VAL -gt 3 ]] && VAL=0
 			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
-		num)	PROGRESS="$VAL / $MAX"		;;
-		bar)	procent=0
+		num)	PROGRESS="$VAL / $MAX"
+			[[ $VAL -gt $MAX ]] && exit 1	;;
+		bar)	set -x
+			[[ $VAL -gt $MAX ]] && exit 1
+			procent=0
 			[[ -z "$COLUMS" ]] && COLUMNS=$(tput cols)
 			procent=$(( 100 / $MAX * $VAL ))
-			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 4 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
+			# The length that is available to print bars
+			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
 			
 			[[ $procent -gt 100 ]] && \
 				procent=100
-			len=$(( $length / 100 * $procent  ))
+			
+			len=$(( $length * $procent / 100  ))	# If its once at 0, its never comming up again, since bash is limited to integer math only.
 			
 			bars=$(printf '%*s' $len)
-			bars=$(echo "$bars"|$SED s," ","$BAR",g)
-			#EMPTY="$(printf '%*s' $WIDTH)"	
+			bars=$(echo "$bars"|$SED s," ","\\$BAR",g)
 			
-			PROGRESS="$bars"
+			PROGRESS="\'$bars\'"
 			PROGRESS+=" [ ${procent}%% ]"
+			
+			set +x
 			;;
 		*)	tui-status 1 "Error, type is $TYPE"	;;
 	esac
-	[[ -z $PROGRESS ]] && exit 1
+	[[ -z "$PROGRESS" ]] && exit 1
 #
 #	Update value for next access
 #
