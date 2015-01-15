@@ -20,9 +20,9 @@
 #	Simon Arjuna Erat (sea), erat.simon@gmail.com
 #
 #	File:		tui-log
-#	License:	GNU General Public License (GPL3)
+#	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
-#	Changed:	2014.08.06
+#	Changed:	2015.01.15
 #
 #	Description:	Simply writes a log file
 #
@@ -30,7 +30,7 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.5
+	script_version=0.6
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
@@ -92,7 +92,10 @@ Where options are:
 	if [[ ! -f "$LOG" ]]
 	then 	# Create log file, exit with message on error
 		# Prints basic log header
-		touch "$LOG" || (tui-status 1 "Failed to create $LOG as $USER" ; exit 1)
+		if ! touch "$LOG" 2>/dev/zero
+		then	tui-status 1 "Failed to create $LOG as $USER" 
+			exit 1
+		fi
 		printf "$daily_date_str\n" > "$LOG"
 	else 	# LOG exists
 		#D=$(date +'%F')
