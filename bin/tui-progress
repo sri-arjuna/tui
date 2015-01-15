@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.12.29
-	script_version=0.5
+#	Changed:	2015.01.15
+	script_version=0.6
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -42,10 +42,12 @@ Displays either / - \\ | within [     ] as progress string on the right side.
 
 Where options are:
 	-h(elp) 		This screen
+	-b(ar)			Enables the 'bar' mode
+	-B(ar)	        VAL     Changes the bar-symbol to VAL
 	-m(ax)		VAL	If provided, changes progressstring output to 'calculated-num / VAL '
 	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
 				Should be provided if used with -m
-	-r(eset)		Resets the tempfile, should be used first
+	-r(eset)		Resets the tempfile, should be used before one is passing -
 "
 	ID_CUR=$$
 	ID=default
@@ -85,8 +87,10 @@ Where options are:
 #
 #	Check for all required options
 #
-	if ( [[ bar = $TYPE ]] && [[ $MAX -gt 1 ]] ) || [[ dash = $TYPE ]]
+	if ( [[ bar = $TYPE ]] && [[ $MAX -gt 1 ]] ) || [[ dash = $TYPE ]] 
 	then echo "All good" > /dev/zero
+	elif [[ num = $TYPE ]]
+	then	echo "all good too" > /dev/zero
 	else	tui-status 1 "Displaymode \"$TYPE\" requires '-m <NUM>'"
 		exit $?
 	fi
@@ -96,7 +100,7 @@ Where options are:
 	VAL=$(cat "$TMPFILE")
 	PROGRESS=""
 	case "$TYPE" in
-		dash)	[[ $VAL -gt 3 ]] && VAL=2
+		dash)	[[ $VAL -gt 3 ]] && VAL=0
 			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
 		num)	PROGRESS="$VAL / $MAX"		;;
 		bar)	procent=0
@@ -122,8 +126,8 @@ Where options are:
 #	Update value for next access
 #
 	case "$TYPE" in
-	dash) 	[[ ! $VAL -ge $TOTAL ]] && \
-			( $(($VAL+1)) ; printf $VAL > "$TMPFILE" ) || \
+	dash) 	[[ ! $VAL -ge 3 ]] && \
+			( printf $(($VAL +1 )) > "$TMPFILE" ) || \
 			printf 0 > "$TMPFILE"		;;
 	num|bar)
 		num=$(($VAL+1)) #; num=$VAL
