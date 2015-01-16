@@ -1,5 +1,3 @@
-### tui-yesno
-
 Description:
 ------------
 

@@ -1,5 +1,3 @@
-### tui-select
-
 Description:
 ------------
 

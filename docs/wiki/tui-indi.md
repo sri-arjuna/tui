@@ -1,5 +1,3 @@
-### tui-indi
-
 Description:
 ------------
 

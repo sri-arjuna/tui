@@ -1,5 +1,3 @@
-### tui-wait
-
 Description:
 ------------
 
