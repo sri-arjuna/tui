@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.1
+	script_version=0.2
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"-c 'cmd'\" \"-c 'cmd2'\"
@@ -31,30 +31,39 @@
 #
 #	Check for the environment to load
 #
-	source /etc/tui/apps.conf
-	source /etc/tui/tui.conf
-	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
-	[[ -z "$TERMINAL" ]] && export TERMINAL=xterm
+	#source /etc/tui/apps.conf
+	#source /etc/tui/tui.conf
+	source tui
+	#[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
 #
 #	Variable handling
 #
-	[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
+	#[[ -z "$1" ]] && printf "$help_text" && exit $RET_HELP
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
+		exit $RET_HELP
 		;;
 	esac
 	case $TERMINAL in
-	xterm)			opt=""	;;
-	lxterminal)		opt=""	;;
+	xterm)			opt="-e "	;;
+	lxterminal)		[[ -z "$1" ]] && opt="" || opt="-e "	;;
 	gnomte-terminal)	opt=""	;;
 	konsole)		opt=""	;;
 	esac
 #
 #	Display
 #
+	
 	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
-	then	export TERMINAL #=$(which $BROWSER_GUI)
-		$TERMINAL $opt "${ARGS[@]}"
+	then	[[ -z "$TERMINAL" ]] && \
+			tui-printf -S 1 "No terminal could be identified, please set one manual in $APPS, using default now." && \
+			TERMINAL=xterm
+		
+		export TERMINAL #=$(which $BROWSER_GUI)
+		#for ARG in "${ARGS[@]}"
+		#do 	
+			$TERMINAL $opt "${ARGS[@]}"
+		#done
 	else	tui-status $? "$TERMINAL cannot be executed in VT MODE"
 	fi
 	
