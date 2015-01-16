@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.8
-Release:     1%{?dist}
+Release:     2%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -132,7 +132,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Fri Jan 16 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-1
-- Updated: tui-download, now asks to install curl, if missing
+- Updated: tui-download, now asks to install curl, if missing both
 - Updated: tui-filemgr, had a typo
 - Updated: tui-terminanl, added (automatic)options for 
 -           gnome-terminal (-e CMD) and
@@ -140,7 +140,7 @@ rm -rf %{buildroot}
 - Updated: tui-web, fixed a typo
 - Updated: tui-log, muted touch if user has no write access to path
 - Fixed:   tui-psm, called tui-log without the logfile.
-- 
+- Added:   Another 10 wiki pages
 
 * Thu Jan 15 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-0
 - Added:   Wikipages 'Basic Display' to 'User interaction - scripts'
