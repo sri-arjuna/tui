@@ -54,7 +54,7 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		[[ -z "$1" ]] && echo "GetAvailableEditor requires: gui or cli" && return 1
+		[[ -z "$1" ]] && echo "GetAvailableApp requires: gui or cli" && return 1
 		
 		case $1 in
 		cli)	LIST="w3m lynx elinks"	;;
