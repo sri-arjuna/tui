@@ -23,9 +23,9 @@
 #
 #	STABLE: 2013.10.13	--- DONT CHANGE IT ---
 #				unless everything is STABLE & BACKED UP !!
-#	STABLE:	2015.01.13	Updated to check for curl/wget
+#	STABLE:	2015.01.16	Updated to check for curl/wget
 	source tui
-	script_version=0.6
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
@@ -40,7 +40,7 @@
 	tui-bol-dir "$TUI_TEMP_DIR" > /dev/zero
 	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
-	APP=$(tui-conf-get /etc/tui/commands.conf CURLWGET)
+	CURLWGET=$(tui-conf-get /etc/tui/commands.conf CURLWGET)
 #
 #	Variable handling
 #
@@ -71,6 +71,13 @@
 	wget)	OPT_O="-O"
 		OPT_Q="-q"
 		OPT_C="-c"	;;
+	"")	tui-status 1 "Could find neither curl nor wget!"
+		tui-yesno "Do you want to install curl now?" && \
+			( tui-bol-sudo && sudo tui-install curl || su -c "tui-install curl" ) && \
+			CURLWGET=curl
+		which $CURLWGET 1>/dev/zero 2>/dev/zero && \
+			tui-conf-set $APPS CURLWGET $CURLWGET || \
+			exit 1
 	esac
 	
 	for URL in "${ARGS[@]}"
@@ -82,13 +89,13 @@
 		
 		chmod +x $FILE_CMD
 		$FILE_CMD &
-		sleep 0.7
+		sleep 2
 		#K=1024
 	
-		while [[ ! "" = "$(ps|$GREP wget)" ]] #|| [[ ! "" = "$(ps $!)" ]]
+		while [[ ! "" = "$(ps|$GREP $CURLWGET)" ]] #|| [[ ! "" = "$(ps $!)" ]]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			tui-printf "Downloading..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
 			sleep 1
 		done
-		tui-status $? "Downloaded: $(pwd)/$THIS"
+		tui-status $? "Downloaded: $PWD/$THIS"
 	done 
