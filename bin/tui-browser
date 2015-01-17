@@ -27,7 +27,7 @@
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7.5
+	script_version=0.7.6
 	[[ 0 -eq $UID ]] && \
 		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
 		source /usr/share/tui/themes/$TUI_THEME
@@ -95,7 +95,8 @@ Where options are:
 #	Default Strings
 #
 	menu=show
-	PWD_OLD="$(pwd)"	# This is where the user actualy entered the command
+	PWD_OLD="$PWD"	# This is where the user actualy entered the command
+	CURRENT="$PWD"
 	
 	# Textmode only
 	default_actions="delete edit execute help info new rename quit"
@@ -326,13 +327,14 @@ Where options are:
 	[[ ! "" = "$(echo ${CONFIG[@]})" ]] && LoadFile "${CONFIG[@]}"
 	[[ ! "" = "$(echo ${SOURCE[@]})" ]] && LoadFile "${SOURCE[@]}"
 	
-#set -x
 	# Now load and export all the values:
 	source "$THE_MEGA_CONFIG"
+	
 	# Get the variables
 	for v in $(tui-conf-set -l "$THE_MEGA_CONFIG");do
 		BROWSER_LIST_LOADED_VARIABLES+=" $v"
 	done
+	
 	# Get the functions
 	oIFS="$IFS" ; IFS="{}()"
 	BROWSER_LIST_LOADED_FUNCTIONS=""
@@ -340,15 +342,13 @@ Where options are:
 		BROWSER_LIST_LOADED_FUNCTIONS+=" $function"
 	done
 	
-	#echo $BROWSER_LIST_LOADED_VARIABLES
+	# Export variables
 	for entry in $BROWSER_LIST_LOADED_VARIABLES
-	do	#echo $entry
-		#export -p $entry
-		cmd="export -p $entry"
+	do	cmd="export -p $entry"
 		eval $cmd
 	done
-	#exit
 	
+	# Export functions
 	for entry in $BROWSER_LIST_LOADED_FUNCTIONS
 	do	export -f $entry
 	done
@@ -359,7 +359,7 @@ Where options are:
 	sleep 0.03	# This is required for arrangement (in WM cases)
 	len="${#BASE}"
 	cd "$BASE"	# Change to BASE before displaying anything
-	
+
 	# Arguments been passed
 	if [[ ! -z "$1" ]]
 	then	# Change to directory
@@ -382,9 +382,11 @@ Where options are:
 		then	POSITION="$lbl_position"
 		else	if [[ 0 -ne $# ]]
 			then	#CURRENT="$(GetStringDirs "${@}" )"
-				[ "$BASE" = "$CURRENT" ] && \
-					CUR_STR="" || \
-					CUR_STR=$(MakeCurStr "${CURRENT:$len}")
+				if [ "$BASE" = "$CURRENT" ]
+				then	CUR_STR=""
+				elif [[ ! -z "$CURRENT" ]]
+				then	CUR_STR=$(MakeCurStr "${CURRENT:$len}")
+				fi
 			else	CUR_STR=""
 			fi
 			
@@ -411,8 +413,8 @@ Where options are:
 			# Simply change dir and let the menu loop display the heading
 			cd "$CURRENT"
 		fi
+	#else 	[[ -z "$CURRENT" ]] && CURRENT="$PWD"
 	fi
-
 #			#####
 ##			####
 ###			###
@@ -427,12 +429,13 @@ Where options are:
 		CURRENT="$PWD"
 		
 		# Prepare heading string
+		set -x
 		if $doCustomPosition
 		then	POSITION="$lbl_position"
 		else	# Orginal
 			#set -x
 			CURRENT="$PWD"
-			if [[ "${BASE:0:(-1)}" = "$CURRENT" ]]
+			if [[ "${BASE//$/}" = "$CURRENT" ]]
 			then	CUR_STR=""
 			else	#CURRENT=${CURRENT:${#BASE}}
 				CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
@@ -444,6 +447,7 @@ Where options are:
 				CUR_STR="/$CUR_STR"	# The check above is new !!!
 			POSITION="$CUR_STR"
 		fi
+		set +x
 	#
 	#	Display	- TOP MENU
 	#
@@ -472,6 +476,11 @@ Where options are:
 		#
 		#	DISPLAY - Show content
 		#
+			if [[ -z "$CURRENT" ]]
+			then	[[ ! -z "$BASE" ]] && \
+					CURRENT="$BASE" || \
+					CURRENT="$PWD"
+			fi
 			ShowContent "$CURRENT"
 		#
 		#	Fetch input
