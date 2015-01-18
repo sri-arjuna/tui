@@ -131,6 +131,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Sat Jan 17 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-2
+- Added:   wikipages for tui-new-{browser,manpage,script} and tui-browser
+- Updated: tui-browser, now prints the default.help file if one
+-                    typed 'help' in textmode and the file exists.
+- Fixed:   tui-browser, can start again without arguments required.
+
 * Fri Jan 16 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-1
 - Updated: tui-download, now asks to install curl, if missing both
 - Updated: tui-filemgr, had a typo
