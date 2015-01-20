@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.8
-Release:     2%{?dist}
+Release:     3%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Tue Jan 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-3
+- Fixed:   tui-download still had debug mode on.
+
 * Sat Jan 17 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-2
 - Added:   wikipages for tui-new-{browser,manpage,script} and tui-browser
 - Updated: tui-browser, now prints the default.help file if one
