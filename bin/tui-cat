@@ -1,0 +1,67 @@
+#!/bin/bash
+# File		typewriter
+# Description:	Simply prints a string char by char, waiting a certin delay in between.
+# ------------------------------------------------------
+#
+#	Variables
+#
+	ME="${0##*/}"
+	script_version=0.4
+	DELAY=0.05
+	
+	help_text="$ME ($script_version)
+Usage:	$ME [options] \"STRING\" ...
+
+Example:	$ME \"some string\"
+		$ME -d 0.005 \"\$(cat [/path/to/]file)\"
+"
+#
+#	Getting options
+#
+	while getopts hd: opt
+	do	case $opt in
+		h)	echo "$help_text"
+			exit 1
+			;;
+		d)	DELAY="$OPTARG"
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	
+	[[ -z "$1" ]] && \
+		echo "$help_text" && \
+		exit 1
+	ARGS=("${@}")
+#
+#	Display & Action
+#
+	for arg in "${ARGS[@]}"
+	do	# Pass every argument (each seperate STRING) by its own.
+		[[ -f "$arg" ]] && \
+			STRING="$(cat $arg)" || \
+			STRING="$arg"
+		COUNT=0
+		LEN="${#STRING}"
+		
+		while [[ $COUNT -lt $LEN ]]
+		do 	char="${STRING:$COUNT:1}"
+			double="${STRING:$COUNT:2}"
+			
+			case "$double" in
+			"\n"|"\t"|"\r"|"\\")
+				char="${double/\\/\\\\}"
+				COUNT=$(( $COUNT + 2 ))
+				;;
+			*)	COUNT=$(( $COUNT + 1 ))
+				;; 
+			esac
+		
+			printf "$char"
+			sleep $DELAY
+		done
+		
+		# Close the line
+		printf "\n"
+	done
+	exit 0

@@ -65,6 +65,7 @@ Out of scale
 Basic Display
 -------------
 These tools are the most used to display information to the user
+* [tui-cat](https://github.com/sri-arjuna/tui/wiki/tui-cat)
 * [tui-echo](https://github.com/sri-arjuna/tui/wiki/tui-printf)
 * [tui-header](https://github.com/sri-arjuna/tui/wiki/tui-printf)
 * [tui-printf](https://github.com/sri-arjuna/tui/wiki/tui-printf)

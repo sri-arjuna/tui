@@ -132,6 +132,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Wed Jan 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-4
+- Added:   tui-cat, prints a file, also offers typewriter mode
 - Updated: tui-new-script, renamed medium to default, added 'tool'
 
 * Tue Jan 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-3
