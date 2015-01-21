@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2015.01.11
-	script_version=1.4
+	script_version=1.4.1
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -265,8 +265,9 @@ Options are:
 					then	tui-printf $optStyleTMP "$FIRST" "$SECOND" " "
 						tui-printf $optStyle 	" " 	"$THIRD"
 					else	tui-printf $optStyleTMP "$FIRST" 
-						tui-printf $optStyleTMP " " 	"$SECOND"
-						tui-printf $optStyle 	" " 	"$THIRD"
+						tui-printf $optStyle " " 	"$SECOND" "$THIRD"
+						
+						#tui-printf $optStyle 	" " 	"$THIRD"
 					
 					fi
 				fi
