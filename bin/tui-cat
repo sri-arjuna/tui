@@ -8,6 +8,7 @@
 	ME="${0##*/}"
 	script_version=0.4
 	DELAY=0.05
+	MODE=cat
 	
 	help_text="$ME ($script_version)
 Usage:	$ME [options] \"STRING\" ...
@@ -18,10 +19,12 @@ Example:	$ME \"some string\"
 #
 #	Getting options
 #
-	while getopts hd: opt
+	while getopts hd:t opt
 	do	case $opt in
 		h)	echo "$help_text"
 			exit 1
+			;;
+		t)	MODE=typewriter
 			;;
 		d)	DELAY="$OPTARG"
 			;;
@@ -36,32 +39,47 @@ Example:	$ME \"some string\"
 #
 #	Display & Action
 #
-	for arg in "${ARGS[@]}"
-	do	# Pass every argument (each seperate STRING) by its own.
-		[[ -f "$arg" ]] && \
-			STRING="$(cat $arg)" || \
-			STRING="$arg"
-		COUNT=0
-		LEN="${#STRING}"
-		
-		while [[ $COUNT -lt $LEN ]]
-		do 	char="${STRING:$COUNT:1}"
-			double="${STRING:$COUNT:2}"
-			
-			case "$double" in
-			"\n"|"\t"|"\r"|"\\")
-				char="${double/\\/\\\\}"
-				COUNT=$(( $COUNT + 2 ))
-				;;
-			*)	COUNT=$(( $COUNT + 1 ))
-				;; 
-			esac
-		
-			printf "$char"
-			sleep $DELAY
+	case $MODE in
+	cat)	for arg in "${ARGS[@]}"
+		do 	if [[ -f "$arg" ]]
+			then 	while read line
+				do	line="${line/-/\\-}"
+					#line="$(echo $line|sed s,{},&\,g)"
+					tui-echo "$line"
+				done<"$arg"
+			else	tui-status 1 "File not found: $arg"
+			fi
 		done
-		
-		# Close the line
-		printf "\n"
-	done
+		;;
+	typewriter)
+		for arg in "${ARGS[@]}"
+		do	# Pass every argument (each seperate STRING) by its own.
+			[[ -f "$arg" ]] && \
+				STRING="$(cat $arg)" || \
+				STRING="$arg"
+			COUNT=0
+			LEN="${#STRING}"
+
+			while [[ $COUNT -lt $LEN ]]
+			do 	char="${STRING:$COUNT:1}"
+				double="${STRING:$COUNT:2}"
+
+				case "$double" in
+				"\n"|"\t"|"\r"|"\\")
+					char="${double/\\/\\\\}"
+					COUNT=$(( $COUNT + 2 ))
+					;;
+				*)	COUNT=$(( $COUNT + 1 ))
+					;; 
+				esac
+
+				printf "$char"
+				sleep $DELAY
+			done
+
+			# Close the line
+			printf "\n"
+		done
+		;;
+	esac
 	exit 0
