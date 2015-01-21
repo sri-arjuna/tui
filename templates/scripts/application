@@ -136,7 +136,7 @@ Tempfile:	\$TEMPFILE
 	# Checks if \$LOG exists
 	# If not, create default header
 		# This is optimized for a one-time setup
-		if [[ ! -e "\$LOG" ]] && $beLog
+		if \$beLog && [[ ! -e "\$LOG" ]]
 		then	[[ -d "\$CONFIG_DIR" ]] || mkdir -p "\$CONFIG_DIR"
 			if touch "\$LOG"
 			then	doLog "------------------------------------------" && \\
@@ -149,12 +149,12 @@ Tempfile:	\$TEMPFILE
 			fi
 		fi
 	}
-	if $beLog 
-	then	checkLog || exit $?
-	fi
 #
 #	Environment checks
 #
+	if \$beLog 
+	then	checkLog || exit \$?
+	fi
 	[[ ! -f "\$CONFIG" ]] && \\
 		echo "\$config_template" > "\$CONFIG"
 ## TODO : Remove this 'source block' if you want to read the variables from CONFIG manualy
@@ -177,10 +177,12 @@ Tempfile:	\$TEMPFILE
 			fi
 		done
 	fi
+	R=""
 #
 #	Catching Arguments
 #
 	# A ':' after a char indicates that this option requires an argument
+	# Get access to the passed value of the argument by using \$OPTARG
 	while getopts "ChLqv" opt
 	do 	case \$opt in
 		h)	printf "\$help_text"
@@ -227,4 +229,8 @@ Tempfile:	\$TEMPFILE
 	tui-echo "Logfile:" 		"\$LOG"
 	tui-echo "Configuration:" 	"\$CONFIG"
 	tui-echo "Temp file:"		"\$tempfile"
+#
+# 	Clean up & exit
+#
+	[[ -f "\$TEMPFILE" ]] && rm -fr "\$TEMPFILE"
 EOF

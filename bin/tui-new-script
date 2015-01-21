@@ -21,7 +21,7 @@
 #	Variable defaults
 #
 	source tui
-	script_version=1.0.1
+	script_version=1.1
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -35,12 +35,13 @@ Where options are:
 	-h		This screen
 	-a(pplication)	Create a full application script template
 	-r(egular)	Creates a same as default (no option), but less pre-sets
+	-t(ool)		Creates a template optimized for quiet and verbose mode
 	-m(inimal)	Creates a minimal header
 	
 "
 	DEST=""
 	TITLE="sea's New script script"
-	SHELL_EXT="medium"
+	SHELL_EXT="default"
 #
 #	Variable handling
 #
@@ -50,6 +51,7 @@ Where options are:
 		a)	SHELL_EXT="application"	;;
 		m)	SHELL_EXT="minimal"	;;
 		r)	SHELL_EXT="regular"	;;
+		t)	SHELL_EXT="tool"	;;
 		h)	printf "$help_text"
 			exit $RET_HELP	;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;

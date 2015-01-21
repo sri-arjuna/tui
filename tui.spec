@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.8
-Release:     3%{?dist}
+Release:     4%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Wed Jan 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-4
+- Updated: tui-new-script, renamed medium to default, added 'tool'
+
 * Tue Jan 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-3
 - Fixed:   tui-download still had debug mode on.
 

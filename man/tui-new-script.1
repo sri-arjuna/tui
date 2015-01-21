@@ -1,7 +1,7 @@
-.TH "tui-new-script" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
+.TH "tui-new-script" 1 "Simon A. Erat (sea)" "TUI 0.6.8"
 
 .SH NAME
-tui-newscript (0.9.4)
+tui-newscript (1.1)
 
 .SH DESCRIPTION
 Creates a scriptefile with execution flag set.
@@ -17,17 +17,7 @@ If either one exists and you want the script in current dir to be created, you m
 \fBtui-new-script\fP [options] [/path/to/]SCRIPTNAME
 
 .SH OPTIONS
-.OP -m
-.br
-Creates a minimal script, providing these things:
-.br
-.RS 4
-* shebang
-.br
-* empty 'Variables' & 'Display & Action' sections
-.RE
-
-.OP -p
+.OP -a
 .br
 Create a full program script template, providing these sections:
 .RS 4
@@ -39,11 +29,27 @@ Create a full program script template, providing these sections:
 .br
 * dynamic variables
 .br
+* logfile
+.br
+* tempfile
+.br
+* required applications
+.br
 * helptext
 .br
 * getopts
 .br
 * example 'Display & Action' section
+.RE
+
+.OP -m
+.br
+Creates a minimal script, providing these things:
+.br
+.RS 4
+* shebang
+.br
+* empty 'Variables' & 'Display & Action' sections
 .RE
 
 .OP -r
@@ -60,6 +66,29 @@ Creates a regular script, providing these sections:
 .br
 * empty 'Display & Action' section
 .br
+.RE
+
+.OP -t
+.br
+Creates a script, optimized to be used as tool, with either verbose or quiet output.
+.RS 4
+* shebang
+.br
+* header disclaimer
+.br
+* dynamic variables
+.br
+* logfile
+.br
+* tempfile
+.br
+* required applications
+.br
+* helptext
+.br
+* getopts
+.br
+* example 'Display & Action' section
 .RE
 
 .SH SEE ALSO

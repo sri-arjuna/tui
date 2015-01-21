@@ -3,9 +3,9 @@ source tui
 
 cat > "$DEST" << EOF
 #!/bin/bash
-# ${DEST##*/}
-# $DEFAULT_LICENSE $(date +'%Y') by $USER_NAME ($USER_EMAIL)
+# File: 	${DEST##*/}
 # Description:	
+# $DEFAULT_LICENSE $(date +'%Y') by $USER_NAME ($USER_EMAIL)
 # ------------------------------------------------------
 #
 #	Variables
@@ -16,7 +16,7 @@ cat > "$DEST" << EOF
 #
 	
 #
-#	Display & Action
+#	Action & Display
 #
-		
+	
 EOF
