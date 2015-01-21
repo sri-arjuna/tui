@@ -5,6 +5,14 @@
 #
 #	Variables
 #
+	. tui
+	. /usr/share/tui/themes/$TUI_THEME
+	BORDER_RIGHT=""
+	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
+	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+	WIDTH=$[ $(tput cols) - ( 2 * ${#BORDER_LEFT} ) - 2 ]
+	EMPTY="$(printf '%*s' $WIDTH)"
+	
 	ME="${0##*/}"
 	script_version=0.4
 	DELAY=0.05
@@ -43,8 +51,21 @@ Example:	$ME \"some string\"
 	cat)	for arg in "${ARGS[@]}"
 		do 	if [[ -f "$arg" ]]
 			then 	while read line
-				do	line="${line/-/\\-}"
-					#line="$(echo $line|sed s,{},&\,g)"
+				do	[[ "-" = "${line:0:1}" ]] && \
+						line="${line/-/'\-'}"
+					#line=$(echo "$line"|$SED s,'%','%%',g)
+					#line=$(echo "$line"|$SED s,'%','\%%',g)
+					#line=$(echo "$line"|$SED s,'\%','\%\%',g)
+					#line=$(echo "$line"|$SED s,'\%','\\%',g)
+					line=$(echo "$line"|$SED s,"%","%%",g)
+					
+					#line=$(echo "$line"|$SED s,"\\","\\\\",g)
+					#line=$(echo "$line"|$SED s,'\\','\\\\',g)
+					line=$(echo "$line"|$SED s,'\\\n','\\\\',g)
+					
+					line=$(echo "$line"|$SED s,'{','\{',g)
+					line=$(echo "$line"|$SED s,'}','\}',g)
+					#line=$(echo "$line"|$SED s,'{}','\\&',g)
 					tui-echo "$line"
 				done<"$arg"
 			else	tui-status 1 "File not found: $arg"
@@ -57,28 +78,47 @@ Example:	$ME \"some string\"
 			[[ -f "$arg" ]] && \
 				STRING="$(cat $arg)" || \
 				STRING="$arg"
-			COUNT=0
-			LEN="${#STRING}"
+			
+			echo "$STRING" | while read line
+			do	COUNT=0		# Chars of line
+				PRINTED=0	# Chars printed, to compare with available borders
+				LEN="${#line}"
+			
+			
+				printf "$BORDER_LEFT "
+				while [[ $COUNT -lt $LEN ]]
+				#while [[ $PRINTED -lt $WIDHT ]]
+				do 	char="${line:$COUNT:1}"
+					double="${line:$COUNT:2}"
 
-			while [[ $COUNT -lt $LEN ]]
-			do 	char="${STRING:$COUNT:1}"
-				double="${STRING:$COUNT:2}"
+					case "$double" in
+					"\n"|"\t"|"\r"|"\\")
+						char="${double/\\/\\\\}"
+						COUNT=$(( $COUNT + 2 ))
+						;;
+					*)	case "$char" in
+						"%")	char="%%"	;;
+						'\')	char='\\'	;;
+						#"{")	char="\{"	;;
+						#"}")	char="\}"	;;
+						esac
+						COUNT=$(( $COUNT + 1 ))
+						;; 
+					esac
+					
 
-				case "$double" in
-				"\n"|"\t"|"\r"|"\\")
-					char="${double/\\/\\\\}"
-					COUNT=$(( $COUNT + 2 ))
-					;;
-				*)	COUNT=$(( $COUNT + 1 ))
-					;; 
-				esac
-
-				printf "$char"
-				sleep $DELAY
+					printf "$char"
+					PRINTED=$(( $PRINTED + 1 ))
+					if [[ $PRINTED -eq $WIDTH ]] #|| [[ "$double" = "\r" ]]
+					then	printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n$BORDER_LEFT "
+						PRINTED=0
+					fi
+					sleep $DELAY
+				done
+				
+				# Close the line
+				printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n"
 			done
-
-			# Close the line
-			printf "\n"
 		done
 		;;
 	esac

@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.8
-Release:     5%{?dist}
+Release:     6%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
