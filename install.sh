@@ -48,11 +48,11 @@
 	cp -a uninstall.sh $DIR_APP
 	cp -aR templates/* $DIR_TPL
 	
-	[ -f /etc/freebsd-update.conf ] && \
-		ln -s `which bash` /bin/bash
+#	[ -f /etc/freebsd-update.conf ] && \
+#		ln -sf `which bash` /bin/bash
 	
 	#cp profile.d/* /etc/profile.d
 	RET=$?
 	tui-status $? "Installed $app" && \
-		tui-yesno "Remove these tempfiles here ($pwd)/* ?" && \
+		tui-yesno "Remove these tempfiles here \"$PWD/*\" ?" && \
 		rm -fr ./*
