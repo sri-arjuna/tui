@@ -5,8 +5,8 @@
 #
 	app=tui
 	[ ! -f install.sh ] && cd "$(dirname '$0')"
-	[ -d /usr/bin ] && \
-		DIR_BIN=/usr/bin || \
+	#[ -d /usr/bin ] && \
+	#	DIR_BIN=/usr/bin || \
 		DIR_BIN=/bin
 	[ -d /etc/bash_completion.d ] && \
 		DIR_COMPL="/etc/bash_completion.d" || \
