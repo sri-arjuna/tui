@@ -35,17 +35,17 @@
 	printf "\n\n\tPress enter to install $app OR press 'CTRL+c' to abort"
 	read buffer
 	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 $DIR_TPL #$DIR_MAN8
-	cp README.md $DIR_APP
-	cp tui_compl.bash $DIR_COMPL
-	cp bin/* $DIR_BIN
-	cp conf.etc/* $DIR_CFG
-	cp conf.etc/* $DIR_APP/conf.etc
-	cp conf.home/* $DIR_APP/conf
-	cp -R docs/* $DIR_DOC
+	cp -a README.md $DIR_APP
+	cp -a tui_compl.bash $DIR_COMPL
+	cp -a bin/* $DIR_BIN
+	cp -a conf.etc/* $DIR_CFG
+	cp -a conf.etc/* $DIR_APP/conf.etc
+	cp -a conf.home/* $DIR_APP/conf
+	cp -aR docs/* $DIR_DOC
 	#cp -R docs/[a-z]* $DIR_APP
-	cp man/*1 $DIR_MAN1
-	cp uninstall.sh $DIR_APP
-	cp -R templates/* $DIR_TPL
+	cp -a man/*1 $DIR_MAN1
+	cp -a uninstall.sh $DIR_APP
+	cp -aR templates/* $DIR_TPL
 	#cp profile.d/* /etc/profile.d
 	RET=$?
 	tui-status $? "Installed $app" && \
