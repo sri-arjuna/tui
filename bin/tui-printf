@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2015.01.22
-	script_version=1.4.5
+	script_version=1.4.6
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -60,7 +60,6 @@
 	TITLE="$ME"
 	help_text="
 $ME ($script_version)
-$TITLE
 Usage: 	$ME [options] [arguments]
 	$ME		Prints up to 3 arguments. 
 			1: Left
@@ -75,6 +74,9 @@ Options are:
 	-H(header)	Full line has a blue background and white font as default color
 	-S(tatus)	Does special handling with the first argument
 	-r(eturn)	Optional to '-S', returns to line start, rather than newline.
+
+If you want to pass a string with a leading dash (-) to $ME, please provide '--' as argument as well.
+
 "
 	FIRST=""
 	SECOND=""
@@ -93,8 +95,8 @@ Options are:
 #
 #	Catching Arguments
 #
-	while getopts "EHTSh?r" name
-	do 	case $name in
+	while getopts "EHTShr" name
+	do 	case "$name" in
 		E|echo) 	doEcho=true
 				optStyle="-E"	;;
 		H|header)	doHeader=true
@@ -105,7 +107,7 @@ Options are:
 				optStyle="-S"	;;
 		r|return)	doReturn=true
 				NL="\r" 	;;
-		h|"?"|*)	printf "$help_text"
+		h|*)		printf "$help_text"
 				exit $RET_HELP
 				;;
 		esac

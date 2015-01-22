@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7
+	script_version=0.7.1
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
@@ -36,13 +36,17 @@
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
+	*)	[[ "-" = "${1:0:1}" ]] && \
+			leadingDASHdummy="--" || \
+			leadingDASHdummy=""
+		;;
 	esac
 #
 #	Display
 #
 	case $ARGS_COUNT in
 	0)	tui-printf -E 			;;
-	1)	tui-printf -E "$1"		;;
-	2)	tui-printf -E "$1" "$2" 	;;
-	3)	tui-printf -E "$1" "$2" "$3"	;;
+	1)	tui-printf -E $leadingDASHdummy "$1"		;;
+	2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
+	3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
 	esac

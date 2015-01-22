@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.8
-Release:     38%{?dist}
+Release:     40%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,9 +131,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Jan 22 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-38
+* Thu Jan 22 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-40
 - Updated:  tui-cat, pass -- to tui-echo so it prints leading dashes
 - Updated:  tui-printf, removed sed s,\ -,-*\ ,
+- Updated:  tui-printf, added information on -- option to helptext
+- Updated:  tui-{echo,header,title}, added automatic handling
+-           if strings with a leading dash are submited.
 
 * Thu Jan 22 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-37
 - Updated:  tui-printf, prints %% properly now
