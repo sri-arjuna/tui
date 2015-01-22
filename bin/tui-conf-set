@@ -61,7 +61,7 @@ Where options are:
 #
 #	Catching Arguments
 #
-	[[ -z "$2" ]] && printf "$help_text" && exit 1
+	[ -z "$2" ] && printf "$help_text" && exit 1
 	while getopts "icslh" name
 	do 	case $name in
 		c)	CAPS=true
@@ -86,14 +86,14 @@ Where options are:
 	VALUE="$3"
 	
 	# Exit if it does not exist
-	if [[ ! -f "$CONFFILE" ]]
+	if [ ! -f "$CONFFILE" ]
 	then	tui-status 1 "$CONFFILE does not exist!"
 		exit $?
 	fi
 #
 # 	Preformat strings
 #
-	SEARCH="$( $GREP $OPT "^[[:space:]]${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[:space:]')"
+	SEARCH="$( $GREP $OPT "^[:space:]${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[:space:]')"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
@@ -109,7 +109,7 @@ Where options are:
 	then 	# Coma was found
 		SD="/"
 		printf "$REPLACE"|$GREP "$SD"|$GREP -q '\\' && SD="\\"	# backslash was found
-		[[ ! "$SD" = "/" ]] && \
+		[ ! "$SD" = "/" ] && \
 			printf "$REPLACE"|$GREP ","|$GREP "$SD"|$GREP -q "/" && SD="|"	# Forward slash was found
 	fi
 	

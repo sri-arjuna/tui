@@ -4,8 +4,8 @@
 #	Variables
 #
 	app=tui
-	[[ ! -f install.sh ]] && cd $(dirname $0)
-	[[ -d /usr/bin ]] && \
+	[ ! -f install.sh ] && cd $(dirname $0)
+	[ -d /usr/bin ] && \
 		DIR_BIN=/usr/bin || \
 		DIR_BIN=/bin
 	DIR_APP=/usr/share/$app

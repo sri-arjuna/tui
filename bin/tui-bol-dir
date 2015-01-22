@@ -29,10 +29,10 @@
 #
 #	Display
 #
-	if [[ -z $1 ]] || [[ "-h" = "$1" ]]
+	if [ -z $1 ] || [ "-h" = "$1" ]
 	then	echo -e "$help_text"
 		exit 99
-	elif [[ -d "$1" ]]
+	elif [ -d "$1" ]
 	then	tui-status 0 "Found: $1"
 	else	mkdir -p "$1"
 		tui-status $? "Created: $1"

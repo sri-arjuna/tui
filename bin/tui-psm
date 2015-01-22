@@ -36,7 +36,7 @@
 #
 	ME="${0##*/}"				# Basename of tui-bg-scripts
 	ME="${ME/.sh/}"				# Cut off .sh extension
-	[[ ! "." = "$(dirname $0)" ]] && \
+	[ ! "." = "$(dirname $0)" ] && \
 		ME_DIR="$(dirname $0)" || \
 		ME_DIR="$(pwd)"			# Dirname of tui-bg-scripts
 	CONFIG_DIR="$HOME/.config/$ME"		# Configuration directory
@@ -87,8 +87,8 @@ Tempdir:	$TEMP
 #
 #	Environment checks
 #
-	[[ -d "$TEMP" ]] || mkdir -p "$TEMP"
-	[[ ! -e "$LOG" ]] && \
+	[ -d "$TEMP" ] || mkdir -p "$TEMP"
+	[ ! -e "$LOG" ] && \
 		touch $LOG && \
 		doLog "------------------------------------------" && \
 		doLog "Created logfile of $ME ($script_version)" && \
@@ -143,7 +143,7 @@ Tempdir:	$TEMP
 #
 #	Display & Action
 #
-	while [[ $DONE -lt $MAX ]]
+	while [ $DONE -lt $MAX ]
 	do	# Loop the menu
 		C=0
 		DONE=0			# How many scripts are 'done' (regardless of status)
@@ -154,7 +154,7 @@ Tempdir:	$TEMP
 			tui-title "Status"
 		fi
 		
-		while [[ $C -lt $MAX ]]
+		while [ $C -lt $MAX ]
 		do	# Vars
 			STATUS="${script_status[$C]}"	# Current status
 			RET_FILE="$TEMP/$(basename ${script_name[$C]}).ret"
@@ -163,11 +163,11 @@ Tempdir:	$TEMP
 			case $STATUS in
 			2)	# IS PID still available?
 				pid=${script_pid[$C]} 
-				if [[ ! -z "$(echo $pid)" ]]
+				if [ ! -z "$(echo $pid)" ]
 				then	if ! ps $pid > /dev/zero
 					then	# Its finished
 						read RET < "$RET_FILE"
-						[[ -z "$RET" ]] && RET=1
+						[ -z "$RET" ] && RET=1
 						script_status[$C]=$RET
 						((RUN--))
 						doLog "Finished script: ${script_name[$C]} with $RET"
@@ -177,12 +177,12 @@ Tempdir:	$TEMP
 				fi
 				;;
 			3)	# Its TODO, can we start it?
-				if [[ $RUN -lt $LIMIT ]] || [[ $LIMIT -eq 0 ]]
+				if [ $RUN -lt $LIMIT ] || [ $LIMIT -eq 0 ]
 				then 	script_status[$C]=2
 					STATUS=2
 					((RUN++))
 					script="${script_name[$C]}"
-					[[ [./] = "${script:0:1}" ]] && PRE="" || PRE="./"
+					[ [./] = "${script:0:1}" ] && PRE="" || PRE="./"
 					cmd="\"${PRE}$script\" ; echo \$? > \"$RET_FILE\""
 					touch "$RET_FILE"
 					( eval "$cmd" 1>/dev/zero ) &
@@ -191,7 +191,7 @@ Tempdir:	$TEMP
 				fi
 				;;
 			*)	((DONE++))
-				[[ $STATUS -eq 0 ]] && ((GOOD++))
+				[ $STATUS -eq 0 ] && ((GOOD++))
 				;;
 			esac
 

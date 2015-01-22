@@ -23,7 +23,7 @@
 	script_version=0.6
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
-		\rUsage: $ME [options] [[/path/to/]directory]
+		\rUsage: $ME [options] [/path/to/]directory]
 		\rWhere options are:
 		\r\t-h\tThis screen
 		\r
@@ -31,21 +31,21 @@
 		\r"
 	source /etc/tui/apps.conf
 	source /etc/tui/tui.conf
-	[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
+	[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
 	
 	ARGS=(${@})
 	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
 	FILE_CMD="$TUI_TEMP_DIR/bgjob"
 	TMP=$TUI_TEMP_FILE
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
-	#[[ -z "$TMP" ]] && TMP=$HOME/.config/tui/tmp.tmp
+	#[ -z "$TMP" ] && TMP=$HOME/.config/tui/tmp.tmp
 	touch $TMP
 	umask 022 $FILE_CMD $FILE_TEMP
 	DEST=""
 #
 #	Variable handling
 #
-	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
@@ -68,14 +68,14 @@
 		chmod +x $FILE_CMD
 		$FILE_CMD &
 		sleep 0.5
-		while [[ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]]
-		do	[[ -f "$DEST" ]] && \
+		while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]
+		do	[ -f "$DEST" ] && \
 				tmp_size="$(ls -hl $DEST |$AWK '{print $5}')" || \
 				tmp_size="0 btytes"
 			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
 			sleep 0.7
 		done
 		cd "$PWD_ORG"
-		[[ -f "$DEST" ]]
+		[ -f "$DEST" ]
 		tui-status $? "Compressed: $DEST"
 	done 

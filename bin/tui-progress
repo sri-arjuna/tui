@@ -67,7 +67,7 @@ Where options are:
 		b)	TYPE=bar		;;
 		i)	ID=".$OPTARG"		;;
 		m)	MAX="$OPTARG"
-			[[ dash = $TYPE ]] && TYPE=num		;;
+			[ dash = $TYPE ] && TYPE=num		;;
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
 		r)	doReset=true		;;
@@ -88,9 +88,9 @@ Where options are:
 #
 #	Check for all required options
 #
-	if ( [[ bar = $TYPE ]] && [[ $MAX -gt 1 ]] ) || [[ dash = $TYPE ]] 
+	if ( [ bar = $TYPE ] && [ $MAX -gt 1 ] ) || [ dash = $TYPE ] 
 	then echo "All good" > /dev/zero
-	elif [[ num = $TYPE ]]
+	elif [ num = $TYPE ]
 	then	echo "all good too" > /dev/zero
 	else	tui-status 1 "Displaymode \"$TYPE\" requires '-m <NUM>'"
 		exit $?
@@ -98,24 +98,24 @@ Where options are:
 #
 #	Read initial value from tmpfile
 #
-	[[ -z $LEFT ]] && LEFT=" " 
-	[[ -z $MIDDLE ]] && MIDDLE=" "
+	[ -z $LEFT ] && LEFT=" " 
+	[ -z $MIDDLE ] && MIDDLE=" "
 	VAL=$(cat "$TMPFILE")
 	PROGRESS=""
 	case "$TYPE" in
-		dash)	[[ $VAL -gt 3 ]] && VAL=0
+		dash)	[ $VAL -gt 3 ] && VAL=0
 			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
 		num)	PROGRESS="$VAL / $MAX"
-			[[ $VAL -gt $MAX ]] && exit 1	;;
+			[ $VAL -gt $MAX ] && exit 1	;;
 		bar)	set -x
-			[[ $VAL -gt $MAX ]] && exit 1
+			[ $VAL -gt $MAX ] && exit 1
 			procent=0
-			[[ -z "$COLUMS" ]] && COLUMNS=$(tput cols)
+			[ -z "$COLUMS" ] && COLUMNS=$(tput cols)
 			procent=$(( 100 / $MAX * $VAL ))
 			# The length that is available to print bars
 			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
 			
-			[[ $procent -gt 100 ]] && \
+			[ $procent -gt 100 ] && \
 				procent=100
 			
 			len=$(( $length * $procent / 100  ))	# If its once at 0, its never comming up again, since bash is limited to integer math only.
@@ -130,12 +130,12 @@ Where options are:
 			;;
 		*)	tui-status 1 "Error, type is $TYPE"	;;
 	esac
-	[[ -z "$PROGRESS" ]] && exit 1
+	[ -z "$PROGRESS" ] && exit 1
 #
 #	Update value for next access
 #
 	case "$TYPE" in
-	dash) 	[[ ! $VAL -ge 3 ]] && \
+	dash) 	[ ! $VAL -ge 3 ] && \
 			( printf $(($VAL +1 )) > "$TMPFILE" ) || \
 			printf 0 > "$TMPFILE"		;;
 	num|bar)
@@ -145,7 +145,7 @@ Where options are:
 #
 #	Display & Action
 #
-	[[ -z $LEFT ]] && LEFT=" " 
-	[[ -z $MIDDLE ]] && MIDDLE=" "
+	[ -z $LEFT ] && LEFT=" " 
+	[ -z $MIDDLE ] && MIDDLE=" "
 	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
 	

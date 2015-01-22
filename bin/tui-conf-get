@@ -54,7 +54,7 @@ Where options are:
 #
 #	Catching Arguments
 #
-	[[ -z "$2" ]] && printf "$help_text" && exit $RET_HELP
+	[ -z "$2" ] && printf "$help_text" && exit $RET_HELP
 	while getopts "ilh" name
 	do 	case $name in
 		i)	OPT="-i"
@@ -70,7 +70,7 @@ Where options are:
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
 	VARNAME="$2"
-	[[ ! -f "$CONFFILE" ]]  && tui-echo "$CONFFILE dont exist?" "$TUI_FAIL" && exit 1
+	[ ! -f "$CONFFILE" ]  && tui-echo "$CONFFILE dont exist?" "$TUI_FAIL" && exit 1
 #
 #	Display & Action
 #

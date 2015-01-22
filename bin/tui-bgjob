@@ -26,7 +26,7 @@
 	script_version=0.6.2
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	ME="$(basename $0)"
-	[[ -z $TUI_TEMP_FILE ]] && source /etc/tui/tui.conf
+	[ -z $TUI_TEMP_FILE ] && source /etc/tui/tui.conf
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [-f OUTFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
@@ -41,7 +41,7 @@
 #
 #	Variable handling
 #
-	[[ -z $3 ]] && printf "$help_text" && exit $RET_HELP
+	[ -z $3 ] && printf "$help_text" && exit $RET_HELP
 	BG_RET="-1"
 	while getopts "hf:" opt
 	do 	case $opt in
@@ -58,7 +58,7 @@
 	JOB="$1"
 	TXT_PROGRESS="$2"
 	TXT_EXIT="$3"
-	[[ -z $4 ]] && WAIT=0.7 || WAIT=$4
+	[ -z $4 ] && WAIT=0.7 || WAIT=$4
 #
 #	Send job to bg and get pid
 #
@@ -72,7 +72,7 @@
 	sleep 2
 	while ps |$GREP -q $PID
 	do
-		if [[ true = $CHECKFILE ]]
+		if [ true = $CHECKFILE ]
 		then 	FS=$(ls -lh "$FILECHECK"|$AWK '{print $5}')
 			tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
@@ -83,7 +83,7 @@
 #	Report Return Code of ended bg-job
 #
 	BG_RET=$(cat $TUI_TEMP_FILE)
-	if [[ "$BG_RET" = "-1" ]]
+	if [ "$BG_RET" = "-1" ]
 	then	tui-echo "$TXT_EXIT" "Could not retrieve returnvalue" "$INFO"
 		exit $RET_INFO
 	else	tui-status $BG_RET "$TXT_EXIT"

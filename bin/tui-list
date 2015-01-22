@@ -56,7 +56,7 @@ Where options are:
 "
 #	-r(oman)		Use roman letters as numbers
 
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
+	#[ -z $1 ] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
 	# A ':' after a char indicates that this option requires an argument
 	SEP=") "
 	while getopts "ahnr" opt
@@ -85,7 +85,7 @@ Where options are:
 	# Or: aa-az ba-bz, etc
 		num=$1
 		out=""
-		[[ $num -gt 700 ]] && \
+		[ $num -gt 700 ] && \
 			list=( $(echo {a..z} {a..z}{a..z} {a..z}{a..z}{a..z} ))	|| \
 			list=( $(echo {a..z} {a..z}{a..z} )) 	# Be fast for letters in range..
 		out="${list[$num]}"
@@ -109,7 +109,7 @@ Where options are:
 			out=""
 			case $N in
 			0)	out+=""	;;
-			[123])	while [[ $N -gt 0 ]]
+			[123])	while [ $N -gt 0 ]
 				do	out+="$one"
 					N=$(($N-1))
 				done
@@ -118,12 +118,12 @@ Where options are:
 			5)	out+="$five"	;;
 			[678])	out+="$five"
 				N=$(($N-5))
-				while [[ $N -gt 0 ]]
+				while [ $N -gt 0 ]
 				do	out+="$one"
 					N=$(($N-1))
 				done
 				;;
-			9)	while [[ $N -lt 10 ]]
+			9)	while [ $N -lt 10 ]
 				do	out+="$one"
 					N=$(($N+1))
 				done
@@ -132,7 +132,7 @@ Where options are:
 			esac
 			echo "$out"
 		}
-		while [[ $len -gt 0  ]]
+		while [ $len -gt 0  ]
 		do	# There are letters to add
 			num=${input:0:1}
 			# Do action according position
@@ -147,7 +147,7 @@ Where options are:
 				Tfive=I\)
 				Tten=CCI\)\)
 				DEPTH=$[ $len - 3 ]	# 1 = 1000 = initial template
-				while [[ $DEPTH -gt 1 ]]
+				while [ $DEPTH -gt 1 ]
 				do	Tone="C$Tone)"
 					Tfive="C$Tfive)"
 					Tten="C$Tten)"
@@ -180,24 +180,24 @@ Where options are:
 		esac
 		
 		# Add the string to array, or print array
-		if [[ $CUR -le $MAX ]]
+		if [ $CUR -le $MAX ]
 		then	len=0
 			for O in "${OUT[@]}";do len=$[ $len + ${#O} ];done
 			sum=$[ $len + 2  + ( ${#BORDER_LEFT} * 2 ) ]
 			
-			if [[ $sum -lt $COLUMNS ]]
+			if [ $sum -lt $COLUMNS ]
 			then	OUT[$CUR]="${count}${SEP/  / }$OPT"
 				shown=false
 				CUR=$(( $CUR + 1 ))
 			else	tui-echo "${OUT[@]}" >> /dev/stderr
 				CUR=0 && unset OUT[@] 
-				[[ -z "$OPT" ]] && shown=true
+				[ -z "$OPT" ] && shown=true
 				OUT[$CUR]="${count}${SEP}$OPT"
 				CUR=$(( $CUR + 1 ))
 			fi
 		else 	tui-echo "${OUT[@]}" >> /dev/stderr
 			CUR=0 && unset OUT[@] 
-			[[ -z "$OPT" ]] && shown=true
+			[ -z "$OPT" ] && shown=true
 			OUT[$CUR]="${count}${SEP}$OPT"
 			CUR=$(( $CUR + 1 ))
 		fi

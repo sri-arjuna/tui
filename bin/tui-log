@@ -64,7 +64,7 @@ Where options are:
 #
 #	Catching arguments
 #
-	[[ -z $2 ]] && printf "$help_text" && exit $RET_FAIL
+	[ -z $2 ] && printf "$help_text" && exit $RET_FAIL
 	while getopts "hedtpus:v" opt
 	do 	case $opt in
 		h)	printf "$help_text"
@@ -81,15 +81,15 @@ Where options are:
 	shift $(($OPTIND - 1))
 	LOG="$1"
 	MSG="$2"
-	if [[ $leave_empty = false ]]
-	then 	[[ -z "$PRE" ]] && \
+	if [ $leave_empty = false ]
+	then 	[ -z "$PRE" ] && \
 			PRE="$(date +'%F %T') $SEP " || \
 			PRE="$PRE $SEP "
 	fi
 #
 #	Action
 #
-	if [[ ! -f "$LOG" ]]
+	if [ ! -f "$LOG" ]
 	then 	# Create log file, exit with message on error
 		# Prints basic log header
 		if ! touch "$LOG" 2>/dev/zero
@@ -104,7 +104,7 @@ Where options are:
 		printf "${PRE}${MSG}" | $GREP -q "$D" || \
 			( $GREP -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
 	fi
-	while [[ " " = "${PRE:0:1}" ]] ;do PRE="${PRE:1}";done	# Remove leading spaces
+	while [ " " = "${PRE:0:1}" ] ;do PRE="${PRE:1}";done	# Remove leading spaces
 	$beVerbose && tui-echo "$MSG"
 	printf "${PRE}${MSG}\n" >> "$LOG"
 	

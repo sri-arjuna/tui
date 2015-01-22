@@ -26,9 +26,9 @@
 #	Check for the environment to load
 #
 	source /etc/tui/apps.conf
-	[[ 0 -eq $UID ]] || \
+	[ 0 -eq $UID ] || \
 		CONF="$HOME/.config/tui/apps.conf"
-	[[ -f "$CONF" ]] && source "$CONF"
+	[ -f "$CONF" ] && source "$CONF"
 	
 	help_text="$ME ($script_version)
 		\rUsage: $ME [options] 'URL1' 'URL2' ...
@@ -54,7 +54,7 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		[[ -z "$1" ]] && echo "GetAvailableApp requires: gui or cli" && return 1
+		[ -z "$1" ] && echo "GetAvailableApp requires: gui or cli" && return 1
 		
 		case $1 in
 		cli)	LIST="w3m lynx elinks"	;;
@@ -72,12 +72,12 @@
 #	Display
 #
 	# Get the mode
-	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
+	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
 	then	MODE=gui
 	else	MODE=cli
 	fi
 	
-	if [[ -z "$BROWSER" ]]
+	if [ -z "$BROWSER" ]
 	then	case $MODE in
 		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero)	;;
 		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero)	;;
@@ -88,10 +88,10 @@
 	if ! which $BROWSER 2>/dev/zero
 	then 	# The EDITOR is not available, search for default
 		BROWSER=$(GetAvailableApp $MODE)
-		[[ $MODE = cli ]] && \
+		[ $MODE = cli ] && \
 			var=BROWSER_CLI || \
 			var=BROWSER_GUI
-		[[ -z "$BROWSER" ]] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
+		[ -z "$BROWSER" ] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
 		tui-conf-set "$CONF" $var $BROWSER
 	fi
 	

@@ -30,16 +30,16 @@ Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]"
 #	Diffrent for GUI or CLI
 #
 	source /etc/tui/colors.conf
-	[[ -z "$TUI_DONE" ]] && source /etc/tui/status.conf
+	[ -z "$TUI_DONE" ] && source /etc/tui/status.conf
 	
 	count=${#@}
 #
 #	Display
 #	
-	if [[ -z "$1" ]] 
+	if [ -z "$1" ] 
 	then	tui-status 1 "Usage: tui-status [option] ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]" 
 		exit 1
-	elif [[ "$1" = "-h" ]]
+	elif [ "$1" = "-h" ]
 	then
 	#
 	#	Fill array according to return value
@@ -57,7 +57,7 @@ Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]"
 Interpreted errorlevels:\n"
 		for num in $(seq 0 1 120)
 		do	str="${retvalue[$num]}"
-			[[ ! "" = "$(printf '%s' $str)" ]] && \
+			[ ! "" = "$(printf '%s' $str)" ] && \
 				printf "\t$num \tor \$RET_$(printf ${STATUS_TEXT[$num]})\t = \t$str\t\n"
 		done
 		printf "
@@ -77,14 +77,14 @@ Where options are:
 		shift $(($OPTIND - 1))
 		
 		# TODO : i could do a check, so TUI_WORK (4) would automaticly have a 'return line'
-		if [[ -z "$1" ]]
+		if [ -z "$1" ]
 		then	printf "$help_text"
 			exit $RET_HELP
 		fi
 		
 		#check=$(echo "$1" | tr -d [:digit:])
 		check=$(echo "$1" | tr -d '[:digit:]')
-		if [[ -z "$check" ]] 	# && [[ ! -z "$1" ]] # && echo $1 | grep -q [0-9]
+		if [ -z "$check" ] 	# && [ ! -z "$1" ] # && echo $1 | grep -q [0-9]
 		then	echo "all numbers:: $1" > /dev/zero
 		else	echo "First argument $1 ($check) is not numeric!"
 			exit 1

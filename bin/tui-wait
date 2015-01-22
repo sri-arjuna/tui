@@ -48,9 +48,9 @@ Examples:	$ME 2m
 #
 	TIME="${1/[a-zA-Z]/}"
 	UNIT="$(printf ${1}|tr -d [:digit:])"
-	[[ -z $TIME ]] && printf "$help_text" && exit 1
-	[[ -z $UNIT ]] && UNIT=s
-	[[ -z "$2" ]] && \
+	[ -z $TIME ] && printf "$help_text" && exit 1
+	[ -z $UNIT ] && UNIT=s
+	[ -z "$2" ] && \
 		MSG="Time left:" || \
 		MSG="$2"
 	hours=0
@@ -65,26 +65,26 @@ Examples:	$ME 2m
 #
 #	Action - loop
 #
-	while [[ $seconds -ge 0 ]]
+	while [ $seconds -ge 0 ]
 	do 	# First display current / passed time
 		# Generate string & output to user
 		time_string="$hours:$minutes:$seconds"
 		tui-printf  "$MSG" "$time_string"
 		
 		# Already reached 0
-		[[ "$hours$minutes$seconds" = "000" ]] && \
+		[ "$hours$minutes$seconds" = "000" ] && \
 			tui-echo "$MSG" "$NEXT" && \
 			exit 0
 		
 		# So subtract, its a countdown
 		((seconds--))
-		if [[ $seconds -lt 0 ]]
+		if [ $seconds -lt 0 ]
 		then 	# We have sub zero seconds, fix that
 			seconds=59
 			((minutes--)) 
 			# While minutes changes, check for hour changes
-			[[ $minutes -lt 0 ]] && minutes=59 && ((hours--))
-			[[ $hours -lt 0 ]] && hours=0
+			[ $minutes -lt 0 ] && minutes=59 && ((hours--))
+			[ $hours -lt 0 ] && hours=0
 		fi
 		
 		# Actualy wait a second

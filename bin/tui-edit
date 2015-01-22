@@ -26,16 +26,16 @@
 #	Check for the environment to load
 #
 	source /etc/tui/apps.conf
-	[[ 0 -eq $UID ]] || \
+	[ 0 -eq $UID ] || \
 		CONF="$HOME/.config/tui/apps.conf"
-	[[ -f "$CONF" ]] && source "$CONF"
+	[ -f "$CONF" ] && source "$CONF"
 	
 	help_text="$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
 		\rOpens provided FILE/s in the favorite editor according to environment.
 		\rIn VT it will open \"$EDITOR_CLI\" and in GUI it will open \"$EDITOR_GUI\"
 		\r"
-	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
+	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
 	then	MODE=gui
 	else	MODE=cli
 	fi
@@ -59,7 +59,7 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		[[ -z "$1" ]] && echo "GetAvailableEditor requires: gui or cli" && return 1
+		[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
 		
 		case $1 in
 		cli)	LIST="emacs vim nano vi"	;;
@@ -76,7 +76,7 @@
 #
 #	Display
 #
-	if [[ -z "$EDITOR" ]]
+	if [ -z "$EDITOR" ]
 	then	case $MODE in
 		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero)	;;
 		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero)	;;
@@ -87,15 +87,15 @@
 	if ! which $EDITOR > /dev/zero
 	then 	# The EDITOR is not available, search for default
 		EDITOR=$(GetAvailableApp $MODE)
-		[[ $MODE = cli ]] && \
+		[ $MODE = cli ] && \
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
-		[[ -z "$EDITOR" ]] && tui-echo "No editor for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
+		[ -z "$EDITOR" ] && tui-echo "No editor for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
 		tui-conf-set "$CONF" $var $EDITOR
 	fi
 	
 	for A in "${ARGS[@]}";do
-		[[ ! -z $A ]] && \
+		[ ! -z $A ] && \
 			tui-echo "Opening:" "$A" && \
 			$EDITOR "$A"
 	done

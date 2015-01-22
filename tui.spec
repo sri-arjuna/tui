@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.6.8
-Release:     40%{?dist}
+Version:     0.6.9
+Release:     0%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -10,12 +10,7 @@ Source0:     http://sea.fedorapeople.org/review/%{name}/%{name}-%{version}.tar.g
 
 BuildArch:   noarch
 
-#Requires:    leafpad
-#Requires:    nano
-#Requires:    w3m
 Requires:    coreutils
-Requires:    wget
-#Requires:    xterm
 
 %description
 It is a framework of commands to simply realize a basic TUI with scripts.
@@ -47,7 +42,7 @@ Core Code helpers
 * tui-yesno (Returs TRUE on 'y', and FALSE on 'n')
 
 Core Tools:
-* tui-browser (Browsed given path as 'root')
+* tui-browser (Browsed given path as 'rootfs')
 * tui-conf-editor (Basic wizzard editor)
 * tui-conf-get (Function as script)
 * tui-conf-set (Function as script)
@@ -131,6 +126,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-0
+- Changed:  All commands, replaced [[expr]] by [expr] 
+- Updated:  tui-browser, uses now tui-cat rather than its own code
+
+
 * Thu Jan 22 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-40
 - Updated:  tui-cat, pass -- to tui-echo so it prints leading dashes
 - Updated:  tui-printf, removed sed s,\ -,-*\ ,

@@ -99,24 +99,24 @@ Where options are:
 	GetStringDirs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[[ -z "$BASE" ]] && return 1
-		[[ -z "$1" ]] && return 1
+		[ -z "$BASE" ] && return 1
+		[ -z "$1" ] && return 1
 		out="$BASE/"
 		for a in "${@}";do
-			[[ -d "$out/$a" ]] && out+="$a/"
+			[ -d "$out/$a" ] && out+="$a/"
 		done
 		echo "$out"
 	}
 	GetStringFile() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[[ -z "$BASE" ]] && return 1
-		[[ -z "$1" ]] && return 1
+		[ -z "$BASE" ] && return 1
+		[ -z "$1" ] && return 1
 		dir="$BASE/"
 		for a in "${@}";do
-			if [[ -d "$dir/$a" ]]
+			if [ -d "$dir/$a" ]
 			then	dir+="$a/"
-			elif [[ -f "$dir/$a" ]]
+			elif [ -f "$dir/$a" ]
 			then	file="$a"
 			fi
 		done
@@ -125,14 +125,14 @@ Where options are:
 	GetStringArgs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[[ -z "$BASE" ]] && return 1
-		[[ -z "$1" ]] && return 1
+		[ -z "$BASE" ] && return 1
+		[ -z "$1" ] && return 1
 		dir="$BASE/"
 		for a in "${@}";do
-			if [[ -d "$dir/$a" ]]
+			if [ -d "$dir/$a" ]
 			then	dir+="$a/"
 				shift
-			elif [[ -f "$dir/$a" ]]
+			elif [ -f "$dir/$a" ]
 			then	file="$a"
 				shift
 			else	echo "$@"
@@ -142,7 +142,7 @@ Where options are:
 #
 #	Catching Arguments
 #
-	#[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
+	#[ -z $1 ] && printf "$help_text" && exit $RET_HELP
 	while getopts "m:C:d:D:f:t:b:p:s:u:l:nh" name
 	do 	#echo "$name -- $OPTARG -- $OPTIND"	# DEBUG help	TODO rm when working
 		case $name in
@@ -219,7 +219,7 @@ Where options are:
 			for e in "${ARRAY[@]}";do
 				# verify its not a 'default' file
 				num=
-				if  [[ ! "${e:0:${#SPECIAL_NAME}}." = "${SPECIAL_NAME}." ]] # || [[ ! ${e:0:-${#SPECIAL_EXT}+1} = ".$SPECIAL_EXT" ]]
+				if  [ ! "${e:0:${#SPECIAL_NAME}}." = "${SPECIAL_NAME}." ] # || [ ! ${e:0:-${#SPECIAL_EXT}+1} = ".$SPECIAL_EXT" ]
 				then	# Its not, so split entries to files & folders
 					if [ -d "$e" ]
 					then	folders[$CD]="$e"
@@ -294,22 +294,22 @@ Where options are:
 #
 #	Load Main configuration, BLACKLIST & SOURCE
 #
-	[[ -z "$BLACKLIST" ]] && \
+	[ -z "$BLACKLIST" ] && \
 		checkBlacklist=false || \
 		checkBlacklist=true
 	# Main configuration of the script that uses tui-browser
-	if [[ -f $MAIN_CFG ]]
+	if [ -f $MAIN_CFG ]
 	then 	source "$MAIN_CFG" && printf "."
 		# Now read the file and export each var
 		for V in $(tui-conf-get -l $MAIN_CFG);do export $V;done
 	fi
 	# Include/Sourced files
-	if [[ ! -z $SOURCE ]]
-	then 	if [[ -d "$SOURCE" ]]
+	if [ ! -z $SOURCE ]
+	then 	if [ -d "$SOURCE" ]
 		then 	cd "$SOURCE"
 			for f in *;do
 				# Source the file, so we get all vars n' vals
-				[[ -f "$f" ]] && source "$f";printf "."
+				[ -f "$f" ] && source "$f";printf "."
 				# Now read the file and export each var
 				for V in $(tui-conf-get -l $f);do export $V;done
 			done
@@ -331,9 +331,9 @@ Where options are:
 	BASE="$(pwd)"
 	len="${#BASE}"
 	# Arguments been passed
-	if [[ ! -z $1 ]]
+	if [ ! -z $1 ]
 	then	# Parse arguments, execute the file or enter the folder
-		[[ -d "$tmp_dir" ]] && cd "$tmp_dir"
+		[ -d "$tmp_dir" ] && cd "$tmp_dir"
 		CURRENT="$(GetStringDirs $@ )"
 		[ "$BASE" = "$CURRENT" ] && \
 			CUR_STR="" || \
@@ -343,7 +343,7 @@ Where options are:
 	#
 		file=$(GetStringFile $@)
 		args=$(GetStringArgs $@)
-		if [[ -f "$CURRENT/$file" ]] && [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
+		if [ -f "$CURRENT/$file" ] && [ ! "$CURRENT/" = "$CURRENT/$file" ]
 		then	# Print top header
 			tui-header "$lbl_title" "$lbl_user"
 			tui-title "Location:"  "/$CUR_STR"
@@ -374,14 +374,14 @@ Where options are:
 		tui-header "$lbl_title" "$lbl_user"
 		tui-title "Location:"  "/$CUR_STR"
 		# This must be double, since its outside the loop
-		if [[ $MENU_MODE = num ]]
+		if [ $MENU_MODE = num ]
 		then	for T in info help;do
 				case $T in
 				"$SPECIAL_NAME.cmd")
 					. "$SPECIAL_NAME.cmd"
 					;;
-				help)	[[ -f $SPECIAL_NAME.help ]] && tui-echo "TODO: $(pwd) help" ;;
-				*)	[[ -f $SPECIAL_NAME.$T ]] && \
+				help)	[ -f $SPECIAL_NAME.help ] && tui-echo "TODO: $(pwd) help" ;;
+				*)	[ -f $SPECIAL_NAME.$T ] && \
 						while read line;do tui-echo "$line";done<$SPECIAL_NAME.$T
 					;;
 				esac

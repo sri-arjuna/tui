@@ -27,7 +27,7 @@
 #
 	. $HOME/.config/fas/fas.conf
 	app=tui
-	[[ -z $1 ]] && \
+	[ -z $1 ] && \
 		dir_out="$FAS_REVIEW/$app" || \
 		dir_out="$1"
 	ext=tar.gz
@@ -37,7 +37,7 @@
 	GIT=https://github.com/$HUB_USER/$app.git
 	#build_link=/usr/bin/rpm-build-$app
 	# Get script & spec homedir
-	[[ "." = "$(basename $0)" ]] && \
+	[ "." = "$(basename $0)" ] && \
 		home="$(pwd)" || \
 		home="$(dirname $0)"
 	oPWD=$(pwd)
@@ -45,9 +45,9 @@
 #	Prepare
 #
 	cd "$home"
-	[[ -d $HOME/rpmbuild ]] && rpmdev-wipetree
+	[ -d $HOME/rpmbuild ] && rpmdev-wipetree
 	rpmdev-setuptree
-	[[ -f "$CHECK_FOR" ]] || git clone $GIT ../$app
+	[ -f "$CHECK_FOR" ] || git clone $GIT ../$app
 #
 #	Version & tarball name
 #
@@ -58,7 +58,7 @@
 #	
 	cp $app.spec			$HOME/rpmbuild/SPECS
 	cp $app.spec			"$dir_out"
-	[[ -d ../$app ]] || (mkdir ../$app;cp -r * ../$app )
+	[ -d ../$app ] || (mkdir ../$app;cp -r * ../$app )
 	tar -acf $dir_out/$TARBALL 	../$app
 	ln -sf $dir_out/$TARBALL 	$HOME/rpmbuild/SOURCES/$TARBALL
 #	

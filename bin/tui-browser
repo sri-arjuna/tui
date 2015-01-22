@@ -28,7 +28,7 @@
 #			Highly customable.
 	. tui
 	script_version=0.7.8
-	[[ 0 -eq $UID ]] && \
+	[ 0 -eq $UID ] && \
 		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
 		source /usr/share/tui/themes/$TUI_THEME
 
@@ -133,24 +133,24 @@ Where options are:
 	GetStringDirs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[[ -z "$BASE" ]] && return 1
-		[[ -z "$1" ]] && return 1
+		[ -z "$BASE" ] && return 1
+		[ -z "$1" ] && return 1
 		out="$BASE/"
 		for a in "${@}";do
-			[[ -d "$out/$a" ]] && out+="$a/"
+			[ -d "$out/$a" ] && out+="$a/"
 		done
 		echo "$out"
 	}
 	GetStringFile() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[[ -z "$BASE" ]] && return 1
-		[[ -z "$1" ]] && return 1
+		[ -z "$BASE" ] && return 1
+		[ -z "$1" ] && return 1
 		dir="$BASE/"
 		for a in "${@}";do
-			if [[ -d "$dir/$a" ]]
+			if [ -d "$dir/$a" ]
 			then	dir+="$a/"
-			elif [[ -f "$dir/$a" ]]
+			elif [ -f "$dir/$a" ]
 			then	file="$a"
 			fi
 		done
@@ -159,14 +159,14 @@ Where options are:
 	GetStringArgs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[[ -z "$BASE" ]] && return 1
-		[[ -z "$1" ]] && return 1
+		[ -z "$BASE" ] && return 1
+		[ -z "$1" ] && return 1
 		dir="$BASE/"
 		for a in "${@}";do
-			if [[ -d "$dir/$a" ]]
+			if [ -d "$dir/$a" ]
 			then	dir+="$a/"
 				shift
-			elif [[ -f "$dir/$a" ]]
+			elif [ -f "$dir/$a" ]
 			then	file="$a"
 				shift
 			else	echo "$@"
@@ -206,7 +206,7 @@ Where options are:
 	done
 	shift $(($OPTIND - 1))
 	
-	[[ -z "$BLACKLIST" ]] && \
+	[ -z "$BLACKLIST" ] && \
 		doBlacklist=false || \
 		doBlacklist=true
 	
@@ -219,7 +219,7 @@ Where options are:
 	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
 	
 	# Go to the Base, or stay where you are when no "-p PATH" was supplied
-	[[ -z "$BASE" ]] && BASE="$PWD_OLD" || cd "$BASE"
+	[ -z "$BASE" ] && BASE="$PWD_OLD" || cd "$BASE"
 #
 #	Functions
 #
@@ -238,7 +238,7 @@ Where options are:
 			for e in "${ARRAY[@]}";do
 				# verify its not a 'default' file
 				num=
-				if  [[ ! "${e:0:${#SPECIAL_NAME}}." = "${SPECIAL_NAME}." ]] # || [[ ! ${e:0:-${#SPECIAL_EXT}+1} = ".$SPECIAL_EXT" ]]
+				if  [ ! "${e:0:${#SPECIAL_NAME}}." = "${SPECIAL_NAME}." ] # || [ ! ${e:0:-${#SPECIAL_EXT}+1} = ".$SPECIAL_EXT" ]
 				then	# Its not, so split entries to files & folders
 					if [ -d "$e" ]
 					then	folders[$CD]="$e"
@@ -282,26 +282,26 @@ Where options are:
 #	Load provided configuration and sources
 #
 	THE_MEGA_CONFIG="$TUI_TEMP_DIR/$ME_CONFIGS.cfg.tmp"
-	[[ -f "$THE_MEGA_CONFIG" ]] && rm -f "$THE_MEGA_CONFIG"
+	[ -f "$THE_MEGA_CONFIG" ] && rm -f "$THE_MEGA_CONFIG"
 	touch "$THE_MEGA_CONFIG"
 	
 	LoadFile() { # LIST OF FILES OR FOLDERS TO EXPORT
 	# This uses the variable THE_MEGA_CONFIG as a target file to store all configuration in
 	# So outside the function, it is a single source command to get all the values
 		ARRAY="${@}"
-		if [[ ! "" = "$(echo ${ARRAY[@]})" ]]
+		if [ ! "" = "$(echo ${ARRAY[@]})" ]
 		then	# There are config files
 			for conf in "${ARRAY[@]}"
 			do	# Warn the user that no configuration file was found
 				conf="$(echo $conf)"
-				if [[ -d "$conf" ]]
+				if [ -d "$conf" ]
 				then	# its a dir, source and export each of the files there
 					# Supposibly the 'sources'
 					cd "$conf"
 					for f in *
 					do	CONF_LIST=""
 						# Load the values
-						if [[ -f "$f" ]]
+						if [ -f "$f" ]
 						then	printf "."
 							#f="$(echo $f)"
 							var=$(tui-conf-get -l "$f")
@@ -309,7 +309,7 @@ Where options are:
 						fi
 					done
 					cd "$PWD_OLD"
-				elif [[ -f "$conf" ]] 
+				elif [ -f "$conf" ] 
 				then	# Supposibly the configs
 					printf "."
 					conf="$(echo $conf)"
@@ -322,8 +322,8 @@ Where options are:
 		fi
 	}
 	# Prepare the configurations
-	[[ ! "" = "$(echo ${CONFIG[@]})" ]] && LoadFile "${CONFIG[@]}"
-	[[ ! "" = "$(echo ${SOURCE[@]})" ]] && LoadFile "${SOURCE[@]}"
+	[ ! "" = "$(echo ${CONFIG[@]})" ] && LoadFile "${CONFIG[@]}"
+	[ ! "" = "$(echo ${SOURCE[@]})" ] && LoadFile "${SOURCE[@]}"
 	
 	# Now load and export all the values:
 	source "$THE_MEGA_CONFIG"
@@ -336,7 +336,7 @@ Where options are:
 	# Get the functions
 	oIFS="$IFS" ; IFS="{}()"
 	BROWSER_LIST_LOADED_FUNCTIONS=""
-	$GREP "()[[:space:]]{" "$THE_MEGA_CONFIG" | while read function;do
+	$GREP "()[:space:]{" "$THE_MEGA_CONFIG" | while read function;do
 		BROWSER_LIST_LOADED_FUNCTIONS+=" $function"
 	done
 	
@@ -359,10 +359,10 @@ Where options are:
 	cd "$BASE"	# Change to BASE before displaying anything
 
 	# Arguments been passed
-	if [[ ! -z "$1" ]]
+	if [ ! -z "$1" ]
 	then	# Change to directory
 		for d in "${@}";do
-			[[ -d "$d" ]] && cd "$d" && shift
+			[ -d "$d" ] && cd "$d" && shift
 		done
 		CURRENT="$PWD"
 		
@@ -370,7 +370,7 @@ Where options are:
 		file=$(GetStringFile "${@}")
 		args=$(GetStringArgs "${@}")
 		
-		if [[ -f "$PWD/$file" ]] && [[ ! -z "$file" ]] 
+		if [ -f "$PWD/$file" ] && [ ! -z "$file" ] 
 		then	$showLocationPos_Anyway_ow && \
 				showLocationPos_Anyway=$showLocationPos_Anyway_ow
 		fi
@@ -378,11 +378,11 @@ Where options are:
 		# Prepare heading string
 		if $doCustomPosition
 		then	POSITION="$lbl_position"
-		else	if [[ 0 -ne $# ]]
+		else	if [ 0 -ne $# ]
 			then	#CURRENT="$(GetStringDirs "${@}" )"
 				if [ "$BASE" = "$CURRENT" ]
 				then	CUR_STR=""
-				elif [[ ! -z "$CURRENT" ]]
+				elif [ ! -z "$CURRENT" ]
 				then	CUR_STR=$(MakeCurStr "${CURRENT:$len}")
 				fi
 			else	CUR_STR=""
@@ -393,7 +393,7 @@ Where options are:
 		fi
 		
 		#set -x
-		if [[ ! -z "$file" ]] && [[ -f "$CURRENT/$file" ]]  #&& [[ ! "$CURRENT/" = "$CURRENT/$file" ]]
+		if [ ! -z "$file" ] && [ -f "$CURRENT/$file" ]  #&& [ ! "$CURRENT/" = "$CURRENT/$file" ]
 		then	# Print top header
 			tui-header "$lbl_title" "$lbl_user"
 			
@@ -411,7 +411,7 @@ Where options are:
 			# Simply change dir and let the menu loop display the heading
 			cd "$CURRENT"
 		fi
-	#else 	[[ -z "$CURRENT" ]] && CURRENT="$PWD"
+	#else 	[ -z "$CURRENT" ] && CURRENT="$PWD"
 	fi
 #			#####
 ##			####
@@ -431,14 +431,14 @@ Where options are:
 		then	POSITION="$lbl_position"
 		else	# Orginal
 			CURRENT="$PWD"
-			if [[ "${BASE//$/}" = "$CURRENT" ]]
+			if [ "${BASE//$/}" = "$CURRENT" ]
 			then	CUR_STR=""
 			else	CUR_STR=$(MakeCurStr "${CURRENT:$len}") || exit 1
 			fi
 			
 			# Prepare CUR_STR for display
 			CUR_STR="$(echo $CUR_STR|sed s,'/  /','',g)"
-			[[ "/" = "${CUR_STR:0:1}" ]] || \
+			[ "/" = "${CUR_STR:0:1}" ] || \
 				CUR_STR="/$CUR_STR"	# The check above is new !!!
 			POSITION="$CUR_STR"
 		fi
@@ -453,13 +453,13 @@ Where options are:
 		if ! $doTextmode
 		then	for T in cmd info ;do
 				case $T in
-				cmd)	[[ -f "$SPECIAL_NAME.cmd" ]] && \
+				cmd)	[ -f "$SPECIAL_NAME.cmd" ] && \
 						source "$SPECIAL_NAME.cmd"
 					;;
-				info)	[[ -f "$SPECIAL_NAME.$T" ]] && \
+				info)	[ -f "$SPECIAL_NAME.$T" ] && \
 						tui-cat "$SPECIAL_NAME.$T"
 					;;
-				#help)	[[ -f $SPECIAL_NAME.help ]] && tui-echo "TODO: $(pwd) help" ;;
+				#help)	[ -f $SPECIAL_NAME.help ] && tui-echo "TODO: $(pwd) help" ;;
 				esac
 			done
 		fi			
@@ -470,8 +470,8 @@ Where options are:
 		#
 		#	DISPLAY - Show content
 		#
-			if [[ -z "$CURRENT" ]]
-			then	[[ ! -z "$BASE" ]] && \
+			if [ -z "$CURRENT" ]
+			then	[ ! -z "$BASE" ] && \
 					CURRENT="$BASE" || \
 					CURRENT="$PWD"
 			fi
@@ -487,10 +487,10 @@ Where options are:
 		#	Deside action
 		#	
 			str="$(echo $action|$AWK '{print $1}')"
-			if [[ -d "$action" ]]
+			if [ -d "$action" ]
 			then	cd "$action"
 				action_done=true
-			elif [[ -f "$action" ]]
+			elif [ -f "$action" ]
 			then	$browser_shell "$action"
 				action_done=true
 			elif which $str 1>/dev/zero 2>/dev/zero
@@ -516,7 +516,7 @@ Where options are:
 			then	# It has not been executed yet, do so now?
 				case $action in
 				help|HELP|h|?)
-					[[ -f "$SPECIAL_NAME.help" ]] && \
+					[ -f "$SPECIAL_NAME.help" ] && \
 						tui-echo && \
 						tui-title "Help" && \
 						tui-cat "$SPECIAL_NAME.help" && \

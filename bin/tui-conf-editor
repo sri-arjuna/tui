@@ -35,7 +35,7 @@
 	ME="${0##*/}"				# Basename of tui-config-editor
 	ME="${ME/.sh/}"				# Cut off .sh extension
 	TITLE="$ME ($script_version)"
-	[[ root = $(whoami) ]] && \
+	[ root = $(whoami) ] && \
 		LOG="/var/log/tui.log" || \
 		LOG="$HOME/.config/tui/tui.log"		# Logfile
 	#. /etc/tui/tui.conf
@@ -76,7 +76,7 @@ Log:		$LOG
 	#
 	#	Check for config file
 		CONFIG="$1"
-		[[ ! -f "$CONFIG" ]] && \
+		[ ! -f "$CONFIG" ] && \
 			tui-echo "$CONFIG: Does not exist." "$TUI_FAIL" && \
 			return 1
 		
@@ -90,7 +90,7 @@ Log:		$LOG
 		# Loop while is not going back
 		VAR=stay
 		
-		while [[ Back != "$VAR" ]];do
+		while [ Back != "$VAR" ];do
 			tui-echo "Please select wich value to change:"
 			VAR=$(tui-select Back Edit $(tui-conf-get -l "$CONFIG"))
 		
@@ -102,7 +102,7 @@ Log:		$LOG
 			Back) 	break				;;
 			Edit)	tui-edit "$CONFIG"		;;
 			*)	VAL=$(tui-conf-get "$CONFIG" "$VAR")
-				[[ " " = "${VAL:0:1}" ]] && VAL="${VAL:1}"
+				[ " " = "${VAL:0:1}" ] && VAL="${VAL:1}"
 				case "$VAL" in
 				true|false)	doSelect=true
 						selection="true false"
@@ -119,9 +119,9 @@ Log:		$LOG
 					else	newval=$(tui-read "Please type the new value:")
 					fi
 					
-					if [[ ! -z "$newval" ]]
-					then	if [[ 0 -eq $UID ]]
-						then	if [[ password = "${VAR,,}" ]] || [[ pw = "${VAR,,}" ]]
+					if [ ! -z "$newval" ]
+					then	if [ 0 -eq $UID ]
+						then	if [ password = "${VAR,,}" ] || [ pw = "${VAR,,}" ]
 							then	msg="Changed \"$VAR\" from \"*******\" to \"*******\"" 
 							else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
 							fi

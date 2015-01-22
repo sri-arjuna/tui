@@ -37,7 +37,7 @@
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
-	*)	[[ "-" = "${1:0:1}" ]] && \
+	*)	[ "-" = "${1:0:1}" ] && \
 		leadingDASHdummy="--" || \
 		leadingDASHdummy=""
 		;;

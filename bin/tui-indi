@@ -32,8 +32,8 @@
 		\rdo\t$ME
 		\rdone
 		\r"
-	[[ "-h" = "$1" ]] && printf "$help_text" && exit 
-	[[ -z $TUI_TEMP_DIR ]] && \
+	[ "-h" = "$1" ] && printf "$help_text" && exit 
+	[ -z $TUI_TEMP_DIR ] && \
 		source /etc/tui/tui.conf && \
 		export TUI_TEMP_DIR tmpfile="$TUI_TEMP_DIR/tui-indi.num"
 	indicator=( "-" "\\" "|" "/" )

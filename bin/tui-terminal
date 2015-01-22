@@ -34,11 +34,11 @@
 	#source /etc/tui/apps.conf
 	#source /etc/tui/tui.conf
 	source tui
-	#[[ -f "$HOME/.config/tui/apps.conf" ]] && source $HOME/.config/tui/apps.conf
+	#[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
 #
 #	Variable handling
 #
-	#[[ -z "$1" ]] && printf "$help_text" && exit $RET_HELP
+	#[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		exit $RET_HELP
@@ -46,7 +46,7 @@
 	esac
 	case $TERMINAL in
 	xterm)			opt="-e "	;;
-	lxterminal)		[[ -z "$1" ]] && opt="" || opt="-e "	;;
+	lxterminal)		[ -z "$1" ] && opt="" || opt="-e "	;;
 	gnomte-terminal)	opt=""	;;
 	konsole)		opt=""	;;
 	esac
@@ -54,8 +54,8 @@
 #	Display
 #
 	
-	if [[ xterm = "$TERM" ]] || [[ ! "" = "$DESKTOP_SESSION" ]] || [[ ! "" = "$XDG_CURRENT_DESKTOP" ]]
-	then	[[ -z "$TERMINAL" ]] && \
+	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
+	then	[ -z "$TERMINAL" ] && \
 			tui-printf -S 1 "No terminal could be identified, please set one manual in $APPS, using default now." && \
 			TERMINAL=xterm
 		

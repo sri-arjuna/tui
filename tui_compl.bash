@@ -332,7 +332,7 @@ _tui_psm_module()
 			return 0
 			;;
 		esac
-		[[ $2 = tui-psm ]]  && \
+		[ $2 = tui-psm ]]  && \
 			COMPREPLY=( $(compgen -W "myScript_s.sh" -- $cur) ) && \
 			return 0
 	}
@@ -364,7 +364,7 @@ _tui_status_module()
 			return 0
 			;;
 		esac
-		[[ $2 = tui-status ]]  && \
+		[ $2 = tui-status ]]  && \
 			COMPREPLY=( $(compgen -W "\"MSG1\" \"MSG2\"" -- $cur) ) && \
 			return 0
 	}
@@ -372,7 +372,7 @@ _tui_tar_module()
 	{
 	COMPREPLY=()
 	prev="${COMP_WORDS[COMP_CWORD-1]}"
-	[[ $prev = tui-tar ]]  && \
+	[ $prev = tui-tar ]]  && \
 		COMPREPLY=( $(compgen -W "myFolder" -- $cur) ) && \
 		return 0
 	}

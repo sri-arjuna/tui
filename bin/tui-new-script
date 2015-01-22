@@ -61,17 +61,17 @@ Where options are:
 #
 #	Display
 #
-	if [[ -z $1 ]]
+	if [ -z $1 ]
 	then	DEST=$(tui-read "Enter the filename:")
-		if [[ "$DEST" = "${DEST##*/}" ]]
-		then	if [[ -d "$HOME/.local/bin" ]]
+		if [ "$DEST" = "${DEST##*/}" ]
+		then	if [ -d "$HOME/.local/bin" ]
 			then	DEST="$HOME/.local/bin/$DEST"
 			else	DEST="$HOME/bin/$DEST"
 				tui-bol-dir "$(dirname $DEST)" # > /dev/zero
 			fi
 		fi
-	else	if [[ "$1" = "$(basename $1)" ]]
-		then	if [[ -d "$HOME/.local/bin" ]]
+	else	if [ "$1" = "$(basename $1)" ]
+		then	if [ -d "$HOME/.local/bin" ]
 			then	DEST="$HOME/.local/bin/$1"
 			else	DEST="$HOME/bin/$1"
 				tui-bol-dir "$(dirname $DEST)" > /dev/zero
@@ -80,7 +80,7 @@ Where options are:
 			DEST="$1"
 		fi
 	fi
-	if [[ -f "$DEST" ]]
+	if [ -f "$DEST" ]
 	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
 		tui-status $? "Overwrite file: $DEST"
 	fi

@@ -31,7 +31,7 @@
 	TUI_VERSION=0.6.6
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME=${0##*/}
-	[[ 0 -eq $UID ]] && \
+	[ 0 -eq $UID ] && \
 		export TUI_LOG="/var/log/tui.log" || \
 		export TUI_LOG="$HOME/.config/tui/tui.log"
 	for cfg in apps colors commands status tui;do source /etc/tui/$cfg.conf;done
@@ -51,7 +51,7 @@
 		MSG_MENU_next=""
 		
 		# Get the proper path
-		if [[ 0 -eq $UID ]] 
+		if [ 0 -eq $UID ] 
 		then 	thisconf=/etc/$ME/
 			MSG_MENU_title="TUI config - System Wide"
 		else	thisconf="$HOME/.config/tui/"
@@ -78,9 +78,9 @@
 			;;
 		esac
 		
-		[[ -d "$CFG_DIR" ]] || mkdir -p "$CFG_DIR"
+		[ -d "$CFG_DIR" ] || mkdir -p "$CFG_DIR"
 		cd "$CFG_DIR"
-		if [[ $? -eq 0 ]]  && $YES
+		if [ $? -eq 0 ]  && $YES
 		then	rm -fr *
 		else	tui-yesno "Are you sure to remove $RANGE?" || return 1
 			rm -fr *
@@ -94,11 +94,11 @@
 #	Action & Display
 #
 	#if [ 0 -eq $UID ]
-	if [[ root = $(whoami) ]]
+	if [ root = $(whoami) ]
 	then	USER_NAME=".: r o o t :."
 		APPS=/etc/tui/apps.conf
 		CONF=/etc/tui/tui.conf
-	else	[[ -d "$HOME/.config/tui/" ]] || ( YES=true ; ResetTUI ) 
+	else	[ -d "$HOME/.config/tui/" ] || ( YES=true ; ResetTUI ) 
 		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
 		APPS=$HOME/.config/tui/apps.conf
 		CONF=$HOME/.config/tui/user.conf
@@ -120,7 +120,7 @@ Where options are:
 #
 #	Catching Arguments
 #
-	if [[ "$ME" = tui ]]
+	if [ "$ME" = tui ]
 	then	while getopts "h" name
 		do 	case "$name" in
 			h|help)
@@ -144,10 +144,10 @@ Where options are:
 		YES=true
 		;;
 	theme)	#set +x
-		[[ 0 -eq $UID ]] && \
+		[ 0 -eq $UID ] && \
 			ITEM=TUI_THEME_ROOT || \
 			ITEM=TUI_THEME
-		if [[ -z $2 ]]
+		if [ -z $2 ]
 		then	#ls /usr/share/tui/themes
 			tui-echo "$ITEM is set to:" "$(tui-conf-get $CONF $ITEM)"
 			exit $?
@@ -159,7 +159,7 @@ Where options are:
 		;;
 	esac
 	
-	if [[ "$MODE" = "reset" ]]
+	if [ "$MODE" = "reset" ]
 	then	ResetTUI
 		# $RANGE should be set within the function 'ResetTUI'
 		tui-status $? "Reset $RANGE"
@@ -168,7 +168,7 @@ Where options are:
 #
 #	Display & Action
 #
-	if [[ "$ME" = tui ]]
+	if [ "$ME" = tui ]
 	then	# Its not sourced, thus show info & config menu
 		tui-printf -H "TUI ($TUI_VERSION) by sea" "$USER_NAME @ $(date +%F) $(date +%T)"
 		tui-printf -T "$TITLE ($script_version)"

@@ -40,7 +40,7 @@ Example:	$ME \"some string\"
 	done
 	shift $(($OPTIND - 1))
 	
-	[[ -z "$1" ]] && \
+	[ -z "$1" ] && \
 		echo "$help_text" && \
 		exit 1
 	ARGS=("${@}")
@@ -49,16 +49,16 @@ Example:	$ME \"some string\"
 #
 	case $MODE in
 	cat)	for arg in "${ARGS[@]}"
-		do 	if [[ -f "$arg" ]]
+		do 	if [ -f "$arg" ]
 			then 	while read content
 				do	# Leading dash
-					[[ "-" = "${content:0:1}" ]] && \
+					[ "-" = "${content:0:1}" ] && \
 						leadingDASHdummy="--" || \
 						leadingDASHdummy=""
 					#	content=" ${content}"
 					# Tailing backslash
-					[[ ! -z "$content" ]] && \
-						[[ "\\" = "${content:0:(-1)}" ]] && \
+					[ ! -z "$content" ] && \
+						[ "\\" = "${content:0:(-1)}" ] && \
 						content="${content}\\\\"
 					
 					tui-echo $leadingDASHdummy "${content}"
@@ -67,7 +67,7 @@ Example:	$ME \"some string\"
 			fi
 			
 			# Thanks Jim
-			#if [[ -f "$arg" ]]
+			#if [ -f "$arg" ]
 			#then 	
 			#	$AWK '{ dash=substr($0,1,1); 
 			#		  if(dash=="-") {$0=substr($0,2)}; print}'  "$arg" |
@@ -83,7 +83,7 @@ Example:	$ME \"some string\"
 	typewriter)
 		for arg in "${ARGS[@]}"
 		do	# Pass every argument (each seperate STRING) by its own.
-			[[ -f "$arg" ]] && \
+			[ -f "$arg" ] && \
 				STRING="$(cat $arg)" || \
 				STRING="$arg"
 			
@@ -94,8 +94,8 @@ Example:	$ME \"some string\"
 			
 			
 				printf "$BORDER_LEFT "
-				while [[ $COUNT -lt $LEN ]]
-				#while [[ $PRINTED -lt $WIDHT ]]
+				while [ $COUNT -lt $LEN ]
+				#while [ $PRINTED -lt $WIDHT ]
 				do 	char="${line:$COUNT:1}"
 					double="${line:$COUNT:2}"
 
@@ -118,7 +118,7 @@ Example:	$ME \"some string\"
 
 					printf "$char"
 					PRINTED=$(( $PRINTED + 1 ))
-					if [[ $PRINTED -eq $WIDTH ]] #|| [[ "$double" = "\r" ]]
+					if [ $PRINTED -eq $WIDTH ] #|| [ "$double" = "\r" ]
 					then	printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n$BORDER_LEFT "
 						PRINTED=0
 					fi

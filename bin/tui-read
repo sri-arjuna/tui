@@ -24,8 +24,8 @@
 #	Variable defaults
 #
 	. /etc/tui/tui.conf
-	[[ 0 -ne $UID ]] && . $HOME/.config/tui/user.conf
-	#[[ -z "$THEME" ]] && THEME=default
+	[ 0 -ne $UID ] && . $HOME/.config/tui/user.conf
+	#[ -z "$THEME" ] && THEME=default
 	. /usr/share/tui/themes/$TUI_THEME
 	
 	script_version=0.9.8
@@ -41,7 +41,7 @@ Examples:	$ME \"What is your favorite color?\"
 #
 #	Variable handling
 #
-	[[ -z $1 ]] && printf "$help_text" && exit $RET_HELP
+	[ -z $1 ] && printf "$help_text" && exit $RET_HELP
 	while getopts "hp" opt;do
 	case "$opt" in
 	"h")	printf "$help_text" ; exit $RET_HELP
@@ -54,7 +54,7 @@ Examples:	$ME \"What is your favorite color?\"
 #
 #	Display
 #
-	[[ -z $1 ]] && \
+	[ -z $1 ] && \
 		txt="Type your input:" || \
 		txt="$1"
 	tui-printf "$txt" > /dev/stderr
@@ -62,9 +62,9 @@ Examples:	$ME \"What is your favorite color?\"
 	read ${doPassword} INPUT
 	
 	# Seems this doesnt work here, as one presses enter and gets a linebreak from that.
-	#[[ -z "$doPassword" ]] || INPUT="${$INPUT/\<password\>}"	
+	#[ -z "$doPassword" ] || INPUT="${$INPUT/\<password\>}"	
 	#printf "\n\n" > /dev/stderr
 #	tui-echo "$txt" "$INPUT" > /dev/stderr
 	
 	printf '%s' "$INPUT"  > /dev/stdout
-	[[ -z "$doPassword" ]] || printf "\n" > /dev/stderr
+	[ -z "$doPassword" ] || printf "\n" > /dev/stderr

@@ -44,7 +44,7 @@
 #
 #	Variable handling
 #
-	#[[ -z $1 ]] && echo -e "$help_text" && exit $RET_HELP
+	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;
@@ -54,7 +54,7 @@
 #
 #	Display
 #
-	if [[ -z "$CURLWGET" ]]
+	if [ -z "$CURLWGET" ]
 	then	# Not set yet.
 		for app in $LIST_APPS;do
 			which $app 1>/dev/zero 2>/dev/zero && \
@@ -92,7 +92,7 @@
 		sleep 2
 		#K=1024
 	
-		while [[ ! "" = "$(ps|$GREP $CURLWGET)" ]] #|| [[ ! "" = "$(ps $!)" ]]
+		while [ ! "" = "$(ps|$GREP $CURLWGET)" ] #|| [ ! "" = "$(ps $!)" ]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			tui-printf "Downloading..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
 			sleep 1

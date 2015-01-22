@@ -31,12 +31,12 @@
 #
 	source /etc/tui/colors.conf
 	source /etc/tui/commands.conf
-	if [[ -z "$TUI_THEME" ]]
-	then	if [[ 0 -eq $UID ]]
+	if [ -z "$TUI_THEME" ]
+	then	if [ 0 -eq $UID ]
 		then	source /etc/tui/tui.conf
 			TUI_THEME=$TUI_THEME_ROOT
 		else	cfg="$HOME/.config/tui/user.conf"
-			[[ ! -f "$cfg" ]] && \
+			[ ! -f "$cfg" ] && \
 				mkdir -p "$(dirname $cfg)" && \
 				cp /usr/share/tui/*conf "$(dirname $cfg)"
 			source "$cfg"
@@ -121,7 +121,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	#	Fill array according to return value
 	#
 		# Status requires first to be numeric
-		[[ ! "" = "$(echo $1|tr -d '[:digit:]')" ]] && \
+		[ ! "" = "$(echo $1|tr -d '[:digit:]')" ] && \
 			tui-printf -S 1 "$ME: For option '-S' the first argument needs to be numeric only!" && \
 			exit 1
 		NUM_ID="$1" && shift
@@ -178,15 +178,15 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #		* $doStatus
 #		* regular output with 3 strings and middle too long
 #
-	if [[ 50 -gt $WIDTH ]]
+	if [ 50 -gt $WIDTH ]
 	then	# Screen is too small
 		for S in "$FIRST" "$SECOND" "$THIRD"
-		do 	[[ -z "$S" ]] || echo "$S"
+		do 	[ -z "$S" ] || echo "$S"
 		done
 		exit 0
 	fi
 	
-	if [[ $len_strings -gt $WIDTH ]]
+	if [ $len_strings -gt $WIDTH ]
 	then 	# All vars are larger than the line supports
 		# Splitting required
 		case $ARGS_COUNT in
@@ -200,7 +200,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				tui-printf $optStyle " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
-			if [[ "" = "$(echo $FIRST|tr -d '[:space:]')" ]]
+			if [ "" = "$(echo $FIRST|tr -d '[:space:]')" ]
 			then	# It is left aligned
 				half=$[ ${#SECOND} / 2 ]
 				part1="${SECOND:0:$half}"
@@ -209,7 +209,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				$doStatus && \
 					tui-printf $optStyle "$NUM_ID" " " "$part2" || \
 					tui-printf $optStyle " " "$part2"
-			elif [[ $WIDTH -lt ${#FIRST} ]]
+			elif [ $WIDTH -lt ${#FIRST} ]
 			then	half=$[ ${#FIRST} / 2 ]
 				part1="${FIRST:0:$half}"
 				part2="${FIRST:$half}"
@@ -226,13 +226,13 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		3)	# Print only 2 on the first line
 			#  TODO FIXME -- ERORR MUST BE HERE
 			if $doStatus
-			then	[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "$FIRST" 
+			then	[ -z "$FIRST" ] || tui-printf $optStyleTMP "$FIRST" 
 				#echo "$FIRST"
 				#echo "$optStyle"
 				#echo $NUM_ID
 				#echo "$SECOND"
 				#exit
-				[[ ${#SECOND} -gt $WIDTH ]]
+				[ ${#SECOND} -gt $WIDTH ]
 					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
 					tui-printf $optStyle "$NUM_ID" " " "${SECOND:($WIDTH - 3)}"|| \
 					tui-printf $optStyle "$NUM_ID" " " "$SECOND" #"$THIRD"
@@ -241,22 +241,22 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				# Treat each argument by itself - lengthness
 			#	echo DEBUG
 			#	set -x
-				if [[ ${#FIRST} -gt $WIDTH ]]
+				if [ ${#FIRST} -gt $WIDTH ]
 				then	# The first one is too long
 					#echo "DEBUG - 1"
-					[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
-					[[ -z "$SECOND" ]] && \
+					[ -z "$FIRST" ] || tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
+					[ -z "$SECOND" ] && \
 						tui-printf $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
 						tui-printf $optStyle $NUM_ID "$SECOND"
 					#tui-printf $optStyle $NUM_ID #"$THIRD" ""
-				elif [[ ${#SECOND} -gt $WIDTH ]]
+				elif [ ${#SECOND} -gt $WIDTH ]
 				then	# The second one is too long
 					#echo "DEBUG - 2"
-					[[ -z "$FIRST" ]] || tui-printf $optStyleTMP "$FIRST" 
+					[ -z "$FIRST" ] || tui-printf $optStyleTMP "$FIRST" 
 					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
 					tui-printf $optStyle " " "${SECOND:($WIDTH - 3)}" "$THIRD"
 					#tui-printf $optStyle " " "$THIRD" " "
-				elif [[ ${#THIRD} -gt $WIDTH ]]
+				elif [ ${#THIRD} -gt $WIDTH ]
 				then	# The third one is too long
 					#echo "DEBUG - 3"
 					tui-printf $optStyleTMP "$FIRST" "$SECOND"
@@ -264,7 +264,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				else	# Regular output, just re-arange strings
 					#echo "DEBUG THIS:"
 					# check diffrent scenarios
-					if [[ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]]
+					if [ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]
 					then	tui-printf $optStyleTMP "$FIRST" "$SECOND" " "
 						tui-printf $optStyle 	" " 	"$THIRD"
 					else	tui-printf $optStyleTMP "$FIRST" 
@@ -356,7 +356,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #	Display & Action
 #
 	# Change/switch leading space-dash
-	#[[ " -" = "${FIRST:0:2}" ]] && \
+	#[ " -" = "${FIRST:0:2}" ] && \
 	#	FIRST="${FIRST:1} " # Trailing space is a _MUST_ to keep alignment intact, as it got counted when the space was leading
 	# Escape trailing backslash, from whichever argument passed
 	echo "$FIRST" | grep -q "\\"$ && \

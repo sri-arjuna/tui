@@ -36,7 +36,7 @@ Exit codes:
 #	Display
 #
 	# Print help if required
-	if [[ "-h" = "$1" ]] || [[ "--help" = "$1" ]]
+	if [ "-h" = "$1" ] || [ "--help" = "$1" ]
 	then	echo -e "$help_text"
 		exit 99
 	fi
@@ -45,11 +45,11 @@ Exit codes:
 	which sudo 1>/dev/zero 2>/dev/zero || exit -1
 	
 	# Set username to argument
-	[[ -z $1 ]] && \
+	[ -z $1 ] && \
 		username="$USER"|| username="$1"
 	
 	# Sudo was found, lets check for access
-	[[ root = $username ]] && exit 0
+	[ root = $username ] && exit 0
 	sudo $GREP -q $username /etc/sudoers && \
 		exit 0 || \
 		exit 1
