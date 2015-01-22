@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # File		typewriter
 # Description:	Simply prints a string char by char, waiting a certin delay in between.
 # ------------------------------------------------------
