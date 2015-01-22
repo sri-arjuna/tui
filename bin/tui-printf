@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.01.21
-	script_version=1.4.1
+#	Changed:	2015.01.22
+	script_version=1.4.2
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -352,4 +352,4 @@ Options are:
 #
 #	Display & Action
 #
-	printf "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"
+	printf "%s" "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"
