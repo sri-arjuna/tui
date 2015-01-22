@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # 2014.12.08 by sea
 #
 #	Variables
@@ -47,6 +47,10 @@
 	cp -a themes $DIR_APP/
 	cp -a uninstall.sh $DIR_APP
 	cp -aR templates/* $DIR_TPL
+	
+	[ -f /etc/freebsd-update.conf ] && \
+		ln -s `which bash` /bin/bash
+	
 	#cp profile.d/* /etc/profile.d
 	RET=$?
 	tui-status $? "Installed $app" && \

@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.5
+	script_version=0.6
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"
@@ -45,9 +45,11 @@ Example:
 #
 #	Variable handling
 #
-	[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
+	[ -z "$1" ] && \
+		printf "$help_text" && \
+		exit $RET_HELP
 	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	"-h")	printf "$help_text" ; exit $RET_HELP
 		;;
 	esac
 #
