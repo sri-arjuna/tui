@@ -24,7 +24,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2015.01.22
-	script_version=1.4.4
+	script_version=1.4.5
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -354,8 +354,8 @@ Options are:
 #	Display & Action
 #
 	# Change/switch leading space-dash
-	[[ " -" = "${FIRST:0:2}" ]] && \
-		FIRST="${FIRST:1} " # Trailing space is a _MUST_ to keep alignment intact, as it got counted when the space was leading
+	#[[ " -" = "${FIRST:0:2}" ]] && \
+	#	FIRST="${FIRST:1} " # Trailing space is a _MUST_ to keep alignment intact, as it got counted when the space was leading
 	# Escape trailing backslash, from whichever argument passed
 	echo "$FIRST" | grep -q "\\"$ && \
 		FIRST="${FIRST}\\\\"

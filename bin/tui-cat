@@ -14,7 +14,7 @@
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
 	ME="${0##*/}"
-	script_version=0.5
+	script_version=0.5.1
 	DELAY=0.05
 	MODE=cat
 	
@@ -53,13 +53,15 @@ Example:	$ME \"some string\"
 			then 	while read content
 				do	# Leading dash
 					[[ "-" = "${content:0:1}" ]] && \
-						content=" ${content}"
+						leadingDASHdummy="--" || \
+						leadingDASHdummy=""
+					#	content=" ${content}"
 					# Tailing backslash
 					[[ ! -z "$content" ]] && \
 						[[ "\\" = "${content:0:(-1)}" ]] && \
 						content="${content}\\\\"
 					
-					tui-echo "${content}"
+					tui-echo $leadingDASHdummy "${content}"
 				done<"$arg"
 			else	tui-status 1 "File not found: $arg"
 			fi
@@ -105,6 +107,7 @@ Example:	$ME \"some string\"
 					*)	case "$char" in
 						"%")	char="%%"	;;
 						'\')	char='\\'	;;
+						'$')	char='\$'	;;
 						#"{")	char="\{"	;;
 						#"}")	char="\}"	;;
 						esac
