@@ -14,7 +14,7 @@
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
 	ME="${0##*/}"
-	script_version=0.4
+	script_version=0.5
 	DELAY=0.05
 	MODE=cat
 	
@@ -50,26 +50,32 @@ Example:	$ME \"some string\"
 	case $MODE in
 	cat)	for arg in "${ARGS[@]}"
 		do 	if [[ -f "$arg" ]]
-			then 	while read line
-				do	[[ "-" = "${line:0:1}" ]] && \
-						line="${line/-/'\-'}"
-					#line=$(echo "$line"|$SED s,'%','%%',g)
-					#line=$(echo "$line"|$SED s,'%','\%%',g)
-					#line=$(echo "$line"|$SED s,'\%','\%\%',g)
-					#line=$(echo "$line"|$SED s,'\%','\\%',g)
-					line=$(echo "$line"|$SED s,"%","%%",g)
+			then 	while read content
+				do	# Leading dash
+					[[ "-" = "${content:0:1}" ]] && \
+						content=" ${content}"
+					# Tailing backslash
+					[[ ! -z "$content" ]] && \
+						[[ "\\" = "${content:0:(-1)}" ]] && \
+						content="${content}\\\\"
 					
-					#line=$(echo "$line"|$SED s,"\\","\\\\",g)
-					#line=$(echo "$line"|$SED s,'\\','\\\\',g)
-					line=$(echo "$line"|$SED s,'\\\n','\\\\',g)
-					
-					line=$(echo "$line"|$SED s,'{','\{',g)
-					line=$(echo "$line"|$SED s,'}','\}',g)
-					#line=$(echo "$line"|$SED s,'{}','\\&',g)
-					tui-echo "$line"
+					tui-echo "${content}"
 				done<"$arg"
 			else	tui-status 1 "File not found: $arg"
 			fi
+			
+			# Thanks Jim
+			#if [[ -f "$arg" ]]
+			#then 	
+			#	$AWK '{ dash=substr($0,1,1); 
+			#		  if(dash=="-") {$0=substr($0,2)}; print}'  "$arg" |
+			#	while read line
+			#	do	
+			#	     tui-echo "$line"
+			#	done 
+			#else	tui-status 1 "File not found: $arg"
+			#fi
+			
 		done
 		;;
 	typewriter)

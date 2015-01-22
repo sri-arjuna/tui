@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.8
-Release:     7%{?dist}
+Release:     37%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -131,6 +131,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Thu Jan 22 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-37
+- Updated:  tui-printf, prints %% properly now
+- Fixed:    tui-cat, now prints leading dashes (if reading from file only)
+
 * Wed Jan 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-4
 - Added:   tui-cat, prints a file, also offers typewriter mode
 - Updated: tui-new-script, renamed medium to default, added 'tool'

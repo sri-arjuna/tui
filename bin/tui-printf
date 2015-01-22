@@ -24,12 +24,13 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
 #	Changed:	2015.01.22
-	script_version=1.4.2
+	script_version=1.4.4
 #	Description:	The absolute core function for TUI
 #
 #	Variables
 #
 	source /etc/tui/colors.conf
+	source /etc/tui/commands.conf
 	if [[ -z "$TUI_THEME" ]]
 	then	if [[ 0 -eq $UID ]]
 		then	source /etc/tui/tui.conf
@@ -352,4 +353,19 @@ Options are:
 #
 #	Display & Action
 #
-	printf "%s" "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"
+	# Change/switch leading space-dash
+	[[ " -" = "${FIRST:0:2}" ]] && \
+		FIRST="${FIRST:1} " # Trailing space is a _MUST_ to keep alignment intact, as it got counted when the space was leading
+	# Escape trailing backslash, from whichever argument passed
+	echo "$FIRST" | grep -q "\\"$ && \
+		FIRST="${FIRST}\\\\"
+	echo "$SECOND" | grep -q "\\"$ && \
+		SECOND="${SECOND}\\\\"
+	echo "$THIRD" | grep -q "\\"$ && \
+		THIRD="${THIRD}\\\\"
+	
+	# Escape '%'
+	output=$(echo "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"|$SED s,'%','%%',g)
+	
+	# The actual output
+	printf "$output"
