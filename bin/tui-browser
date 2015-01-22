@@ -22,12 +22,12 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.01.13
+#	Changed:	2015.01.22
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7.7
+	script_version=0.7.8
 	[[ 0 -eq $UID ]] && \
 		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
 		source /usr/share/tui/themes/$TUI_THEME
@@ -251,9 +251,7 @@ Where options are:
 					".cmd")		. "$e"
 							;;
 					info)		#echo "Show the INFO!"
-							while read line;do
-								tui-echo "$line"
-							done < "$e"
+							tui-cat "$e"
 							tui-echo
 							;;
 					esac
@@ -453,13 +451,13 @@ Where options are:
 		
 		# This must be double, since its outside the loop
 		if ! $doTextmode
-		then	for T in cmd info help;do
+		then	for T in cmd info ;do
 				case $T in
 				cmd)	[[ -f "$SPECIAL_NAME.cmd" ]] && \
 						source "$SPECIAL_NAME.cmd"
 					;;
 				info)	[[ -f "$SPECIAL_NAME.$T" ]] && \
-						while read line;do tui-echo "$line";done<"$SPECIAL_NAME.$T"
+						tui-cat "$SPECIAL_NAME.$T"
 					;;
 				#help)	[[ -f $SPECIAL_NAME.help ]] && tui-echo "TODO: $(pwd) help" ;;
 				esac
@@ -521,7 +519,7 @@ Where options are:
 					[[ -f "$SPECIAL_NAME.help" ]] && \
 						tui-echo && \
 						tui-title "Help" && \
-						while read line;do tui-echo "$line";done<"$SPECIAL_NAME.help" && \
+						tui-cat "$SPECIAL_NAME.help" && \
 						tui-echo && \
 						tui-press || \
 						tui-wait 5s "Sorry, no help found."
@@ -566,7 +564,7 @@ Where options are:
 	done
 	cd "$PWD_OLD"
 #
-#	Onload 'environment'
+#	Unload 'environment'
 #	Since the heartbleed, i think this is no longer required, but i keep this for security reasons
 #
 	for var in $BROWSER_LIST_LOADED_VARIABLES ; do
