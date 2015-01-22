@@ -127,7 +127,8 @@ rm -rf %{buildroot}
 
 %changelog
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-0
-- Changed:  All commands, replaced [[expr]] by [expr] 
+- Changed:  All commands, replaced [[expr]] by [expr]
+- Updated:  install.sh should work on freeBSD now
 - Updated:  tui-browser, uses now tui-cat rather than its own code
 
 
