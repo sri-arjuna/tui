@@ -5,8 +5,8 @@
 #
 	app=tui
 	[ ! -f install.sh ] && cd "$(dirname '$0')"
-	#[ -d /usr/bin ] && \
-	#	DIR_BIN=/usr/bin || \
+	[ -d /usr/bin ] && \
+		DIR_BIN=/usr/bin || \
 		DIR_BIN=/bin
 	[ -d /etc/bash_completion.d ] && \
 		DIR_COMPL="/etc/bash_completion.d" || \
@@ -44,6 +44,7 @@
 	cp -aR docs/* $DIR_DOC
 	#cp -R docs/[a-z]* $DIR_APP
 	cp -a man/*1 $DIR_MAN1
+	cp -a themes $DIR_APP/
 	cp -a uninstall.sh $DIR_APP
 	cp -aR templates/* $DIR_TPL
 	#cp profile.d/* /etc/profile.d
