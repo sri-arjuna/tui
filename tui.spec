@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.9
-Release:     1%{?dist}
+Release:     2%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -126,6 +126,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-2
+- Updated:  tui-{broser,conf-set,printf} had a wrong grep space cmd
+
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-1
 - Updated:  install.sh, changed DIR_COMPL for freebsd
 - Updated:  tui-status, changed how it defines wether it a VT or GUI

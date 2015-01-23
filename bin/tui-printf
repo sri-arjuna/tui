@@ -200,7 +200,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				tui-printf $optStyle " " "$part2"
 			;;
 		2)	# Print each of the 2 arguments on a single line...
-			if [ "" = "$(echo $FIRST|tr -d '[:space:]')" ]
+			if [ "" = "$(echo $FIRST|tr -d '[[:space:]]')" ]
 			then	# It is left aligned
 				half=$[ ${#SECOND} / 2 ]
 				part1="${SECOND:0:$half}"

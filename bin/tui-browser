@@ -336,7 +336,7 @@ Where options are:
 	# Get the functions
 	oIFS="$IFS" ; IFS="{}()"
 	BROWSER_LIST_LOADED_FUNCTIONS=""
-	$GREP "()[:space:]{" "$THE_MEGA_CONFIG" | while read function;do
+	$GREP "()[[:space:]]{" "$THE_MEGA_CONFIG" | while read function;do
 		BROWSER_LIST_LOADED_FUNCTIONS+=" $function"
 	done
 	
