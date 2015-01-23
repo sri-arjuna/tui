@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.9
-Release:     2%{?dist}
+Release:     3%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -127,21 +127,16 @@ rm -rf %{buildroot}
 
 %changelog
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-2
+- Updated:  install.sh, changed DIR_COMPL for freebsd
+- Updated:  tui-status, changed how it defines wether it a VT or GUI
+- Changed:  All commands, replaced [[expr]] by [expr]
+- Updated:  install.sh should work on freeBSD now
+- Updated:  tui-browser, uses now tui-cat rather than its own code
 - Updated:  tui-{broser,conf-set,printf} had a wrong grep space cmd
 - Changed:  Many grep commands were missing a bracket, because of the
 -           massive brack removal of if-block
 - Updated:  tui-new-manpage, no longer prints its own name (*.1) when
 -           refering to the application name
-
-* Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-1
-- Updated:  install.sh, changed DIR_COMPL for freebsd
-- Updated:  tui-status, changed how it defines wether it a VT or GUI
-
-* Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-0
-- Changed:  All commands, replaced [[expr]] by [expr]
-- Updated:  install.sh should work on freeBSD now
-- Updated:  tui-browser, uses now tui-cat rather than its own code
-
 
 * Thu Jan 22 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.8-40
 - Updated:  tui-cat, pass -- to tui-echo so it prints leading dashes
