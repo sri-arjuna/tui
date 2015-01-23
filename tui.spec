@@ -128,6 +128,7 @@ rm -rf %{buildroot}
 %changelog
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-1
 - Updated:  install.sh, changed DIR_COMPL for freebsd
+- Updated:  tui-status, changed how it defines wether it a VT or GUI
 
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-0
 - Changed:  All commands, replaced [[expr]] by [expr]
