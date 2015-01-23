@@ -8,14 +8,19 @@
 	[ -d /usr/bin ] && \
 		DIR_BIN=/usr/bin || \
 		DIR_BIN=/bin
-	[ -d /etc/bash_completion.d ] && \
-		DIR_COMPL="/etc/bash_completion.d" || \
-		DIR_COMPL="/etc/bash_completion.d"
+	# Default paths:
+	DIR_COMPL="/etc/bash_completion.d"
 	DIR_APP=/usr/share/$app
 	DIR_CFG=/etc/$app
 	DIR_DOC=/usr/share/doc/$app
 	DIR_MAN1=/usr/share/man/man1
 	DIR_TPL=$DIR_APP/templates
+	
+	if [ -f /etc/freebsd-update.conf ]
+	then	# Its freebsd
+		DIR_COMPL="/usr/local/etc/bash_completion.d"
+	fi
+	
 	
 	# Create the missing paths:
 	for tDir in $DIR_APP \
