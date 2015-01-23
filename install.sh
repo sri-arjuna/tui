@@ -41,7 +41,7 @@
 			$DIR_APP/conf.etc \
 			$DIR_COMPL
 	do	if [ ! -d "$tDir" ]
-		then	if mkdir -p "$tDir" 
+		then	if (set -x ; mkdir -p "$tDir"  )
 			then	printf "*\tCreated missing dir: $tDir\n"
 			else	printf "o\tFAILED creating missing dir: $tDir\n"
 			fi
