@@ -40,8 +40,8 @@
 			$DIR_APP/conf \
 			$DIR_APP/conf.etc \
 			$DIR_COMPL
-	do	[ ! -d $tDir ] && \
-			mkdir -p $tDir && printf "*\tCreated missing dir: $tDir\n"
+	do	[ ! -d "$tDir" ] && \
+			mkdir -p "$tDir" && printf "*\tCreated missing dir: $tDir\n"
 	done
 	
 	printf "\nCopy files..."
@@ -54,7 +54,7 @@
 	cp -a bin/* $DIR_BIN
 	
 	# Copy configs
-	cp -a conf.etc/* $DIR_CFG
+	cp -a conf.etc/* $DIR_CFG/
 	cp -a conf.etc/* $DIR_APP/conf.etc
 	cp -a conf.home/* $DIR_APP/conf
 	
