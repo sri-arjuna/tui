@@ -40,8 +40,12 @@
 			$DIR_APP/conf \
 			$DIR_APP/conf.etc \
 			$DIR_COMPL
-	do	[ ! -d "$tDir" ] && \
-			mkdir -p "$tDir" && printf "*\tCreated missing dir: $tDir\n"
+	do	if [ ! -d "$tDir" ]
+		then	if mkdir -p "$tDir" 
+			then	printf "*\tCreated missing dir: $tDir\n"
+			else	printf "--\tFAILED creating missing dir: $tDir\n"
+			fi
+		fi
 	done
 	
 	printf "\nCopy files..."
