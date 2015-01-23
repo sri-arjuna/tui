@@ -22,16 +22,16 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
-#	Changed:	2014.12.11
-	script_version=1.6
+#	Changed:	2015.01.23
+	script_version=1.6.1
 #	Description:	Tool to configure TUI
 #
 #	Variables
 #
-	TUI_VERSION=0.6.6
+	TUI_VERSION=0.6.9
 	TITLE="Text User Inferface (TUI) - Configuration"
 	ME=${0##*/}
-	[ 0 -eq $UID ] && \
+	[ 0 -eq "$UID" ] && \
 		export TUI_LOG="/var/log/tui.log" || \
 		export TUI_LOG="$HOME/.config/tui/tui.log"
 	for cfg in apps colors commands status tui;do source /etc/tui/$cfg.conf;done
@@ -51,7 +51,7 @@
 		MSG_MENU_next=""
 		
 		# Get the proper path
-		if [ 0 -eq $UID ] 
+		if [ 0 -eq "$UID" ] 
 		then 	thisconf=/etc/$ME/
 			MSG_MENU_title="TUI config - System Wide"
 		else	thisconf="$HOME/.config/tui/"
@@ -132,7 +132,7 @@ Where options are:
 		shift $(($OPTIND - 1))
 	fi
 	
-	MODE=$1
+	MODE="$1"
 	YES=false
 	case $MODE in
 	config)
@@ -147,7 +147,7 @@ Where options are:
 		[ 0 -eq $UID ] && \
 			ITEM=TUI_THEME_ROOT || \
 			ITEM=TUI_THEME
-		if [ -z $2 ]
+		if [ -z "$2" ]
 		then	#ls /usr/share/tui/themes
 			tui-echo "$ITEM is set to:" "$(tui-conf-get $CONF $ITEM)"
 			exit $?

@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.01.22
-	script_version=1.4.6
+#	Changed:	2015.01.23
+	script_version=1.4.7
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -81,7 +81,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	FIRST=""
 	SECOND=""
 	THIRD=""
-	WIDTH=$( [ -z $COLUMNS ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
+	WIDTH=$( [ -z "$COLUMNS" ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
 	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 
 	WIDTH=$[ $WIDTH / 2 * 2 ]					# Make it even 
 	EMPTY="$(printf '%*s' $WIDTH)"					# Get 'width' spaces
@@ -169,7 +169,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	fi
 	
 	[ ! -z "$4" ] && doMore=true || doMore=false
-	[ -z $optStyle ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
+	[ -z "$optStyle" ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
 	$doStatus && optStyleTMP="-E"
 #
 #	Verify all fit on 1 line

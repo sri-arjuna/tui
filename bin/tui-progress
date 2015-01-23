@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.01.15
-	script_version=0.6
+#	Changed:	2015.01.23
+	script_version=0.6.1
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -98,8 +98,8 @@ Where options are:
 #
 #	Read initial value from tmpfile
 #
-	[ -z $LEFT ] && LEFT=" " 
-	[ -z $MIDDLE ] && MIDDLE=" "
+	[ -z "$LEFT" ] && LEFT=" " 
+	[ -z "$MIDDLE" ] && MIDDLE=" "
 	VAL=$(cat "$TMPFILE")
 	PROGRESS=""
 	case "$TYPE" in
@@ -145,7 +145,7 @@ Where options are:
 #
 #	Display & Action
 #
-	[ -z $LEFT ] && LEFT=" " 
-	[ -z $MIDDLE ] && MIDDLE=" "
+	[ -z "$LEFT" ] && LEFT=" " 
+	[ -z "$MIDDLE" ] && MIDDLE=" "
 	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
 	

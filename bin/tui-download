@@ -25,7 +25,7 @@
 #				unless everything is STABLE & BACKED UP !!
 #	STABLE:	2015.01.20	Updated to check for curl/wget
 	source tui
-	script_version=0.7.1
+	script_version=0.7.2
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
@@ -44,7 +44,7 @@
 #
 #	Variable handling
 #
-	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
+	#[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	case "$1" in
 	"-h")	echo -e "$help_text" ; exit $RET_HELP
 		;;

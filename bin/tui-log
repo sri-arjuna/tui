@@ -22,7 +22,7 @@
 #	File:		tui-log
 #	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
-#	Changed:	2015.01.15
+#	Changed:	2015.01.23
 #
 #	Description:	Simply writes a log file
 #
@@ -30,7 +30,7 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.6
+	script_version=0.6.1
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
@@ -64,7 +64,7 @@ Where options are:
 #
 #	Catching arguments
 #
-	[ -z $2 ] && printf "$help_text" && exit $RET_FAIL
+	[ -z "$2" ] && printf "$help_text" && exit $RET_FAIL
 	while getopts "hedtpus:v" opt
 	do 	case $opt in
 		h)	printf "$help_text"

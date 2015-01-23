@@ -128,6 +128,10 @@ rm -rf %{buildroot}
 %changelog
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-2
 - Updated:  tui-{broser,conf-set,printf} had a wrong grep space cmd
+- Changed:  Many grep commands were missing a bracket, because of the
+-           massive brack removal of if-block
+- Updated:  tui-new-manpage, no longer prints its own name (*.1) when
+-           refering to the application name
 
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-1
 - Updated:  install.sh, changed DIR_COMPL for freebsd

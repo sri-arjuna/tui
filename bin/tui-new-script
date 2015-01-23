@@ -21,7 +21,7 @@
 #	Variable defaults
 #
 	source tui
-	script_version=1.1
+	script_version=1.2
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -61,7 +61,7 @@ Where options are:
 #
 #	Display
 #
-	if [ -z $1 ]
+	if [ -z "$1" ]
 	then	DEST=$(tui-read "Enter the filename:")
 		if [ "$DEST" = "${DEST##*/}" ]
 		then	if [ -d "$HOME/.local/bin" ]

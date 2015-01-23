@@ -23,10 +23,10 @@
 #
 #	Variable defaults
 #
-	script_version=0.6.2
+	script_version=0.6.3
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	ME="$(basename $0)"
-	[ -z $TUI_TEMP_FILE ] && source /etc/tui/tui.conf
+	[ -z "$TUI_TEMP_FILE" ] && source /etc/tui/tui.conf
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [-f OUTFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
@@ -41,7 +41,7 @@
 #
 #	Variable handling
 #
-	[ -z $3 ] && printf "$help_text" && exit $RET_HELP
+	[ -z "$3" ] && printf "$help_text" && exit $RET_HELP
 	BG_RET="-1"
 	while getopts "hf:" opt
 	do 	case $opt in
@@ -58,12 +58,12 @@
 	JOB="$1"
 	TXT_PROGRESS="$2"
 	TXT_EXIT="$3"
-	[ -z $4 ] && WAIT=0.7 || WAIT=$4
+	[ -z "$4" ] && WAIT=0.7 || WAIT="$4"
 #
 #	Send job to bg and get pid
 #
-	(sh "$JOB" && printf 0 > /dev/stdout > $TUI_TEMP_FILE || \
-			printf 1 > /dev/stdout > $TUI_TEMP_FILE
+	(sh "$JOB" && printf 0 > /dev/stdout > "$TUI_TEMP_FILE" || \
+			printf 1 > /dev/stdout > "$TUI_TEMP_FILE"
 	)   & PID=$!
 #
 #	While the job is running...

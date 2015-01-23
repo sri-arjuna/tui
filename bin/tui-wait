@@ -23,7 +23,7 @@
 #	Help text
 #
 	ME=tui-wait
-	script_version=0.5
+	script_version=0.5.1
 	beVerbose=false
 	help_text="
 $ME ($script_version)
@@ -48,8 +48,8 @@ Examples:	$ME 2m
 #
 	TIME="${1/[a-zA-Z]/}"
 	UNIT="$(printf ${1}|tr -d [:digit:])"
-	[ -z $TIME ] && printf "$help_text" && exit 1
-	[ -z $UNIT ] && UNIT=s
+	[ -z "$TIME" ] && printf "$help_text" && exit 1
+	[ -z "$UNIT" ] && UNIT=s
 	[ -z "$2" ] && \
 		MSG="Time left:" || \
 		MSG="$2"

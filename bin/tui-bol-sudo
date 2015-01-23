@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.1
+	script_version=0.2
 	username=""
 	ME="$(basename $0)"
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
@@ -45,12 +45,12 @@ Exit codes:
 	which sudo 1>/dev/zero 2>/dev/zero || exit -1
 	
 	# Set username to argument
-	[ -z $1 ] && \
+	[ -z "$1" ] && \
 		username="$USER"|| username="$1"
 	
 	# Sudo was found, lets check for access
 	[ root = $username ] && exit 0
-	sudo $GREP -q $username /etc/sudoers && \
+	sudo $GREP -q "$username" /etc/sudoers && \
 		exit 0 || \
 		exit 1
 	
