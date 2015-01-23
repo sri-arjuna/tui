@@ -43,7 +43,7 @@
 	do	if [ ! -d "$tDir" ]
 		then	if mkdir -p "$tDir" 
 			then	printf "*\tCreated missing dir: $tDir\n"
-			else	printf ".--.\tFAILED creating missing dir: $tDir\n"
+			else	printf "o\tFAILED creating missing dir: $tDir\n"
 			fi
 		fi
 	done
