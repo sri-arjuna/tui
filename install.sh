@@ -19,10 +19,19 @@
 	if [ -f /etc/freebsd-update.conf ]
 	then	# Its freebsd
 		DIR_COMPL="/usr/local/etc/bash_completion.d"
+		TERM=linux
+		export TERM
 	fi
-	
+#
+#	Initall to Environment
+#
+	printf "\n\n\tPress enter to install $app OR press 'CTRL+c' to abort"
+	read buffer
+	echo "To UN-install TUI, please execute: $DIR_APP/uninstall.sh"
+	sleep 2
 	
 	# Create the missing paths:
+	#mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 $DIR_TPL #$DIR_MAN8
 	for tDir in $DIR_APP \
 			$DIR_CFG \
 			$DIR_DOC \
@@ -34,30 +43,30 @@
 	do	[ ! -d $tDir ] && \
 			mkdir -p $tDir && printf "*\tCreated missing dir: $tDir\n"
 	done
-#
-#	Initall to Environment
-#
-	printf "\n\n\tPress enter to install $app OR press 'CTRL+c' to abort"
-	read buffer
-	mkdir -p $DIR_APP $DIR_CFG $DIR_MAN1 $DIR_TPL #$DIR_MAN8
+	
+	printf "\nCopy files..."
+	# Copy docs:
 	cp -a README.md $DIR_APP
-	cp -a tui_compl.bash $DIR_COMPL
+	cp -aR docs/* $DIR_DOC
+	cp -a man/*1 $DIR_MAN1
+	
+	# Copy binaries
 	cp -a bin/* $DIR_BIN
+	
+	# Copy configs
 	cp -a conf.etc/* $DIR_CFG
 	cp -a conf.etc/* $DIR_APP/conf.etc
 	cp -a conf.home/* $DIR_APP/conf
-	cp -aR docs/* $DIR_DOC
-	#cp -R docs/[a-z]* $DIR_APP
-	cp -a man/*1 $DIR_MAN1
-	cp -a themes $DIR_APP/
-	cp -a uninstall.sh $DIR_APP
+	
+	# Themes & Templates
+	cp -aR themes $DIR_APP/
 	cp -aR templates/* $DIR_TPL
 	
-#	[ -f /etc/freebsd-update.conf ] && \
-#		ln -sf `which bash` /bin/bash
+	# Copy application
+	cp -a tui_compl.bash $DIR_COMPL
+	cp -a uninstall.sh $DIR_APP
 	
-	#cp profile.d/* /etc/profile.d
-	RET=$?
 	tui-status $? "Installed $app" && \
 		tui-yesno "Remove these tempfiles here \"$PWD/*\" ?" && \
 		rm -fr ./*
+	
