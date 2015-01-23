@@ -3,15 +3,15 @@
 ME=$(basename "${DEST/.1/}")
 
 cat > "$DEST" << EOF
-.TH "$(basename $DEST)" "1" "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
+.TH "$ME" "1" "$(date +'%F'|sed s/'\.'/' '/g)" "$USER_NAME"
 
 .SH NAME
-$(basename $DEST) (0.1)
+$ME (0.1)
 
 .SH SYNOPSIS
-\fB$(basename $DEST)\fP [options] [arguments]
+\fB$ME\fP [options] [arguments]
 .br
-Example: $(basename $DEST)
+Example: $ME
 .br
 Where options are:
 .IP "\fB-XY\fP"
