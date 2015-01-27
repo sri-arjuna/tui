@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.6.9
-Release:     4%{?dist}
+Release:     5%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -126,6 +126,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-5
+- Updated:  Installation wiki page
+- Updated:  tui-conf-set had to check for required quotes in case of space
+
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-4
 - Updated:  install.sh, final optimization for freebsd
 

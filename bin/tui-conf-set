@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.01.11
-	script_version=0.9.2
+#	Changed:	2015.01.28
+	script_version=0.9.3
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -93,7 +93,8 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$( $GREP $OPT "^[[:space:]]${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[[:space:]]')"
+	SEARCH="$( $GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[[:space:]]')"
+	#SEARCH="${VARNAME}=.\*"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
@@ -114,7 +115,7 @@ Where options are:
 	fi
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
-	if echo "$REPLACE$SEARCH" | $GREP  -q '[%$+\@/]'
+	if echo "$SEARCH$REPLACE" | $GREP  -q '[%$+\@/]'
 	then	hadDollar=true
 		#REPLACE=$(echo "$REPLACE"|$SED 's|[%$/\|\@]|\\&|g')
 		#SEARCH=$(echo "$SEARCH"|$SED 's|[%"$/\|\@]|\\&|g')
@@ -123,11 +124,10 @@ Where options are:
 #	Display & Action
 #
 	Q="-q"
-	#set -x ; Q=""
-	
 	# Generate the command
-	cmd="$SED s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i $CONFFILE"
-	#printf "\n\n\n\t\t$cmd\n\n\n\n"
+	echo "$SEARCH$REPLACE" | $GREP -q " " && \
+		cmd="$SED s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i $CONFFILE" || \
+		cmd="$SED s${SD}${SEARCH}${SD}${REPLACE}${SD}g -i $CONFFILE"
 	
 	# Save changes
 	if ! $GREP $Q "$VARNAME" "$CONFFILE"
