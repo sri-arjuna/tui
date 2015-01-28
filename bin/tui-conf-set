@@ -23,7 +23,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
 #	Changed:	2015.01.28
-	script_version=0.9.3
+	script_version=0.9.5
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -93,8 +93,8 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$( $GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[[:space:]]')"
-	#SEARCH="${VARNAME}=.\*"
+	#SEARCH="$( $GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[[:space:]]')"
+	SEARCH="${VARNAME}=.\*"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
@@ -123,9 +123,10 @@ Where options are:
 #
 #	Display & Action
 #
-	Q="-q"
+	Q="-q"	# Make grep quiet
 	# Generate the command
-	echo "$SEARCH$REPLACE" | $GREP -q " " && \
+	# Use quotes if either one of the strings contains spaces
+	echo "$SEARCH$REPLACE" | $GREP $Q " " && \
 		cmd="$SED s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i $CONFFILE" || \
 		cmd="$SED s${SD}${SEARCH}${SD}${REPLACE}${SD}g -i $CONFFILE"
 	
@@ -135,7 +136,7 @@ Where options are:
 		$hadDollar && \
 			printf "$(eval $REPLACE)\n" >> "$CONFFILE" || \
 			printf "${REPLACE}\n" >> "$CONFFILE"
-	elif $hadDollar
+	elif [ true = $hadDollar ]
 	then	# Remove the escape chars while saving it.
 		#echo "Its already in the file"
 		eval $cmd
