@@ -4,7 +4,7 @@
 #	Variables
 #
 	app=tui
-	[ ! -f install.sh ] && cd "$(dirname '$0')"
+	[ -f install.sh ] || cd "$(dirname "$0")"
 	[ -d /usr/bin ] && \
 		DIR_BIN=/usr/bin || \
 		DIR_BIN=/bin
