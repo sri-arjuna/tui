@@ -126,8 +126,9 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-7
+* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-8
 - Updated:  Installation wiki page, added wget installation, ty glenn
+- Updated:  install.sh, had a quoting issue, ty glenn
 - Updated:  tui-conf-set had to check for required quotes in case of space
 
 * Fri Jan 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-4
