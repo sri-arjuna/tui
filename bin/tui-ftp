@@ -1,0 +1,448 @@
+#!/bin/bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	source tui
+#
+#	File:		tui-ftp
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.01.28
+#	Changed:	2015.01.28
+	script_version=0.3-ALPHA
+	TITLE="TUI handler for FTP tasks"
+#	Description:	A smiple handler for FTP commands.
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-ftp
+	ME="${ME/.sh/}"				# Cut off .sh extension
+	[[ ! "." = "$(dirname $0)" ]] && \
+		ME_DIR="$(dirname $0)" || \
+		ME_DIR="$(pwd)"			# Dirname of tui-ftp
+	CONFIG_DIR="$HOME/.config/tui"		# Configuration directory
+	CONFIG="$CONFIG_DIR/apps.conf"			# Configuration file
+	LOG="$CONFIG_DIR/$ME.log"			# Logfile
+	TEMPFILE="$TUI_TEMP_DIR/$ME.tmp"		# Tempfile
+#
+#	Variable defaults (options)
+#
+	beVerbose=false
+	beLog=true
+	FTP_PORT=22	# Default value
+	force_active=false
+	force_passiv=false
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+${TITLE^}
+Usage: 		$ME [options]
+Examples:	$ME -U myuser -P myPassword -f /local/file -r /remote/path mydomain.com:23
+		$ME -d /remote/file -l /local/path mydomain.com
+Where options are:
+	-h(elp) 		This screen
+	-L(og)			View the logfile
+	-q(uiet)		Mutes all output
+	-v(erbose)		Enables the scripts verbosity
+
+    ----General use----
+	-H(ost)	HOST[:PORT]	Remote host
+	-U(user)	NAME	Remote user
+	-P(assword)	WORD	Remote password
+	-B(atch)	FILE	Script with ftp commands to execute
+	-c(ommand) \"cmd1 ; cmd2 ... \"	List of commands to execute upon successfull login
+
+    ----Modes----
+    	-A(active)		Force active mode
+	-P(assiv)		Force passiv mode
+	
+    ----Upload file----
+	-f(ile) 	FILE	Localfile to upload
+	-r(emote)	PATH	Remote path to upload the file to
+
+    ---Download file----
+	-d(ownload)	FILE	Remotefile to download
+	-l(ocal)	PATH	Localpath to download file to
+
+For each call, you can either only Up- or Download files or execute commands.
+NOTE: I have no idea how those batchfiles should look like, please see the according ftp commands manpage.
+
+"
+#
+#	Functions
+#
+	parse_log() { #
+	# Parses the logfile and tries to make it presentable
+	# ((action_{done,work} are set way below ~ line 300-340))
+		# Make sure we dont loop endless when login fails
+		CON_FAIL_AFTER=20
+		CON_FAIL_CNT=0
+		
+		# Init STRING snippet to work with:
+		STRING=$(tail -n 5 "$LOG")
+		
+		# Before doing extended parsing, lets make sure the user could log in
+		while ! echo "$STRING" | grep -q  ^220
+		do	tui-progress "Connecting to $HOST"
+			STRING=$(tail -n 5 "$LOG")
+			CON_FAIL_CNT=$(( $CON_FAIL_CNT + 1 ))
+			[ $CON_FAIL_AFTER -ge $CON_FAIL_CNT ] && return 1
+		done
+		$beVerbose && tui-status 0 "Connected to $HOST"
+		
+		# Loop until logout num is found
+		while ! echo "$STRING" | grep -q ^221
+		do	STRING=$(tail -n 5 "$LOG")
+			tui-progress "$action_work"
+			sleep 0.5
+			# Is a failsafe exit required?
+		done
+		$beVerbose && tui-status 0 "$action_done"
+		
+		return 0
+	}
+#
+#	Environment checks
+#
+	# Load default values before parsing options
+	if ! source "$CONFIG" 
+	then	# Could not source the configuuration...
+		tui-status 1 "Failed to load: $CONFIG"
+	fi
+	[ -f "$LOG" ] || touch "$LOG"
+#
+#	Catching Arguments
+#
+	declare -a LOC_FILES LOC_PATHS
+	declare -a REM_FILES REM_PATHS
+	declare -a BATCHES
+	MENU=""	# Nothing
+	
+	case "$1" in
+	"-h"|"--help"|"-help"|"")
+		printf "$help_text"
+		exit $RET_HELP
+		;;
+	*)	tui-log -e "$LOG" 
+		tui-log -t "$LOG" "Process ID: $$"
+		tui-log -t "$LOG" "FTP Command: $FTP"
+		;;
+	esac
+	while getopts "APLqvH:U:P:B:c:f:d:l:r:" opt
+	do 	case $opt in
+		L)	less "$LOG"
+			exit $?
+			;;
+		q)	beQuiet=true
+			log_msg="Forced silence"
+			;;
+		v)	beVerbose=true
+			log_msg="Enabled verbosity"
+			;;
+		# -- Active / Passive modes
+		A)	force_aktive=true
+			force_passiv=false
+			log_msg="Force active mode"
+			[ lftp = "$FTP" ] && \
+				tui-status 111 "Please see the manpage of $FTP, section 'Settings' to see how to ${log_msg,,}"
+			[ sftp = "$FTP" ] && \
+				tui-status 111 "$FTP does not support the enforcing of passive mode."
+			[ ftp = "$FTP" ] && ACTPAS="-A"
+			;;
+		P)	force_passiv=true
+			force_aktive=false
+			log_msg="Force passiv mode"
+			[ lftp = "$FTP" ] && \
+				tui-status 111 "Please see the manpage of $FTP, section 'Settings' to see how to ${log_msg,,}"
+			[ sftp = "$FTP" ] && \
+				tui-status 111 "$FTP does not support the enforcing of passive mode."
+			[ ftp = "$FTP" ] && ACTPAS="-p"
+			;;
+		# -- General use
+		U)	USERNAME="$OPTARG"
+			log_msg="Set user to: $USERNAME" 		;;
+		P)	PASSWORD="$OPTARG"
+			log_msg="Set password to: *******" 		;;
+		B)	BATCHES[${#BATCHES[@]}]="$OPTARG"
+			log_msg="Added batchfile to execute: $OPTARG"
+			MENU="cmd"					;;
+		c)	COMMANDS_RAW="$OPTARG"
+			log_msg="Set commands to parse: $OPTARG"
+			MENU="cmd"					;;
+		# -- Upload file
+		f)	LOC_FILES[${#LOC_FILES[@]}]="$OPTARG"
+			log_msg="Added file to upload: $OPTARG"
+			MENU="up"					 		;;
+		l)	LOC_PATHS[${#LOC_PATHS[@]}]="$OPTARG"
+			log_msg="Added path to download: $OPTARG"
+			MENU="down"					 		;;
+		# -- Download file
+		d)	REM_FILES[${#REM_FILES[@]}]="$OPTARG"
+			log_msg="Added file to download: $OPTARG"
+			MENU="down"					 		;;
+		r)	REM_PATHS[${#REM_PATHS[@]}]="$OPTARG"
+			log_msg="Added path to upload: $OPTARG"
+			MENU="up"							;;
+		*)	printf "$help_text" ; exit $?	;;
+		esac
+		log_opt="-t"
+		[ ! -z "$log_msg" ] && $beVerbose && log_opt+="v"
+		[ ! -z "$log_msg" ] && $beLog && tui-log $log_opt "$LOG" "$log_msg"
+	done
+	shift $(($OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
+	HOST="$1" ; shift
+	PORT=${HOST/#*:} ; 
+	[ "$PORT" = "$HOST" ] && PORT=""
+	[ -z "$PORT" ] && PORT="$FTP_PORT"
+	log_msg="Set host to: $HOST"
+	$beLog && tui-log $log_opt "$LOG" "$log_msg"
+	
+#
+#	Make sure FTP is set
+#
+	if [ -z "$FTP" ]
+	then	# No ftp application found yet, set one now!
+		count=0
+		found=""
+		for f in ftp lftp sftp
+		do
+			which $f > /dev/zero && \
+				count=$(( $count + 1 )) && \
+				found+=" $f"
+		done
+		if [ $count -gt 1 ]
+		then	tui-echo "Please select which ftp command you want to use:"
+			FTP=$(tui-select $found)
+			printf "\n"
+		else	FTP=$(echo $found|$AWK '{print $1}')
+		fi
+		tui-log -t "$LOG" "Set ftp command to: $FTP"
+		tui-conf-set "${CONFIG}" FTP $FTP
+		tui-status $? "Saved $FTP as FTP"
+	# -- Not handling ports yet --
+	#	tui-yesno "Change the default ftp port of $FTP_PORT?" && \
+	#		FTP_PORT=$(tui-read "What is the new default port?") && \
+	#		tui-log -t "$LOG" "Set ftp default port to: $FTP_PORT"
+	#
+	#	/home/sea/prjs/tui/bin/tui-conf-set "${CONFIG}" FTP_PORT $FTP_PORT
+	#	tui-status $? "Saved $FTP_PORT as default port number."
+	# ------
+	fi
+#
+#	Prepare commands
+#	
+	# Clear temporary commands file, or create one if missing
+	[ -f "$TEMPFILE" ] && \
+		echo "" > "$TEMPFILE" || \
+		touch "$TEMPFILE"
+	
+	# Set custom commands? -- no sure how much this is required
+	case $FTP in
+	ftp)	# Do ftp settings
+		BLOCKLIST="chgrp rm"
+		RM=delete
+		PUT=put
+		CD=cd
+		LCD=lcd
+		;;
+	lftp)	# Do lftp settings
+		BLOCKLIST="chgrp rm"
+		RM="delete"
+		PUT=put
+		CD=cd
+		LCD=lcd
+		;;
+	sftp)	# Do sftp settings
+		BLOCKLIST="delete "
+		RM="rm"
+		PUT=put
+		CD=cd
+		LCD=lcd
+		;;
+	esac
+	
+	# Fill the command list
+	case "$MENU" in
+	"")	tui-status 1 "There was an error!"
+		exit $?
+		;;
+	cmd)	#tui-echo "TODO Generate command list"
+		oIFS="$IFS"
+		IFS=";"
+		C=0
+		M=${#COMMANDS_RAW}
+		while [ $C -lt $M ]
+		do
+			char="${COMMANDS_RAW:$C:1}"
+			[ "$char" = ";" ] && \
+				printf "\n" >> "$TEMPFILE" || \
+				printf "$char" >> "$TEMPFILE"
+			C=$(( $C + 1 ))
+		done
+		
+		action_work="Executing custom command list"
+		action_done="${action_work/ing/ed}"
+		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
+		;;
+	down)	###
+		### tui-echo "TODO Download file" -- just copy pasted from the upload section
+		###
+		$beVerbose && \
+			tui-printf -rS 2 "Generate download commands..."
+		count=0 ; total=${#REM_FILES[@]}
+		DEFAULT_DIR="${LOC_PATHS[0]}"
+		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
+		
+		while [ $count -lt $total ]
+		do
+			REM="${REM_FILES[$count]}"
+			LOC="${LOC_PATHS[$count]}" 
+			
+			[ -z "$LOC" ] && \
+				LOC="$DEFAULT_DIR" || \
+				DEFAULT_DIR="$LOC"
+			
+			$beVerbose && \
+				tui-printf "Generate downloadlist: $REM to $LOC" "[  $(tui-indi)   ]"
+			
+			echo "$LCD $LOC" >> "$TEMPFILE"
+			echo "$GET $REM" >> "$TEMPFILE"
+			
+			count=$(( $count + 1 ))
+		done
+		tui-status $? "Generated download list."
+		
+		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
+		action_work="Downloading file"
+		action_done="${action_work/ing/ed}"
+		;;
+	up)	$beVerbose && \
+			tui-printf -rS 2 "Generate upload commands..."
+		count=0 ; total=${#LOC_FILES[@]}
+		DEFAULT_DIR="${REM_PATHS[0]}"
+		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
+		
+		while [ $count -lt $total ]
+		do
+			REM="${REM_PATHS[$count]}"
+			LOC="${LOC_FILES[$count]}" 
+			
+			[ -z "$REM" ] && \
+				REM="$DEFAULT_DIR" || \
+				DEFAULT_DIR="$REM"
+			
+			$beVerbose && \
+				tui-printf "Generate uploadlist: $LOC to $REM" "[  $(tui-indi)   ]"
+			
+			echo "$CD $REM" >> "$TEMPFILE"
+			echo "$PUT $LOC" >> "$TEMPFILE"
+			
+			count=$(( $count + 1 ))
+		done
+		tui-status $? "Generated upload list."
+		
+		action_work="Uploading file"
+		action_done="${action_work/ing/ed}"
+		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
+		;;
+	esac
+	
+	#echo ; echo ; cat "$TEMPFILE" ; echo
+#
+#	Display & Action
+#
+	[ -z "$USERNAME" ] && \
+		HOST_STRING="$HOST" || \
+		HOST_STRING="$USERNAME@$HOST"
+	[ -z "$HOST" ] && \
+		tui-printf -S 1 "No host supplied." && \
+		exit 1
+	
+	# Since passed commands are put into a file to be processed
+	# my workaround enables 'ftp' to work with batch files as well
+	# so all the handling is focused on working with them.
+	for BATCH in "${BATCHES[@]}"
+	do	# Execute batchfiles accordingly, 
+		# warn user if there are commands not available to this $FTP
+		for block in $BLOCKLIST;do
+			grep -q $block "$BATCH" && \
+				tui-status 111 "Warning: $BATCH contains invalid command for $FTP: $block"
+		done
+		
+		# Actualy work with each of the batch file/s
+		# Generate commands according to which FTP-command is beeing used.
+		case $FTP in
+		ftp)	# Do ftp settings
+			# There is NO batchfile handling for regular 'ftp' command :(
+			# Found an alternative handling
+			CMD="$(cat $BATCH)"
+			TMP="$TEMPFILE.$$"
+			
+			if ! $GREP -q $HOST ~/.netrc
+			then
+				[ -f "$HOME/.netrc" ] || touch "$HOME/.netrc"
+				if tui-yesno "Add $HOST to $HOME/.netrc for automatic login?"
+				then	echo "machine $HOST login $USERNAME password $PASSWORD" >> "$HOME/.netrc"
+					tui-title "$HOME/.netrc"
+					tui-cat "$HOME/.netrc"
+					tui-echo
+					tui-yesno "Change any loginame / password?" && \
+						tui-edit "$HOME/.netrc"
+				fi
+			fi
+			
+			touch "$TMP"
+printf "$FTP $ACTPAS -v $HOST << EOF >>\"$LOG\"
+$CMD
+bye
+EOF
+" > "$TMP"
+			sh "$TMP" &
+			parse_log
+			tui-status $? "Done job with $FTP"
+			RET=$?
+			;;
+		# TODO everything below :p
+		lftp)	# to Do lftp settings
+			$FTP -f "$BATCH" "$HOST_STRING"
+			
+			RET=$?
+			;;
+		sftp)	# to Do sftp settings
+			$FTP -b "$BATCH" "$HOST_STRING"
+			
+			RET=$?
+		;;
+		esac
+	done
+		
+#
+# 	Clean up & exit
+#
+	[ -f "$TEMPFILE" ] && rm -fr "$TEMPFILE"
+	[ -f "$TEMPFILE.$$" ] && rm -fr "$TEMPFILE.$$"
+	RAN=$($GREP Process $LOG | wc -l )
+	[ $RAN -gt 1000 ] && \
+		tui-yesno "There were $RAN ftp calls, do you want to see the logfile and clear it after?" && \
+		less "$LOG" && echo "" > "$LOG"
+	exit $RET

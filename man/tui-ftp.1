@@ -1,0 +1,95 @@
+.TH "tui-ftp" "1" "2015-01-28" "Simon Arjuna Erat (sea)"
+
+
+.SH NAME
+tui-ftp (0.3)
+
+
+.SH SYNOPSIS
+\fBtui-ftp\fP [options] [arguments]
+.br
+Example: tui-ftp -d /htdocs/form_report.txt -l /mnt/shared/reports/$(date +%F)/
+
+
+.SH DESCRIPTION
+.PP
+tui-ftp is a handler for any of ftp, lftp or sftp.
+.br
+When uploading, and no remote path is provided, it uploads the the remote root/login dir.
+.br
+When downloading, and no local path is provided, it downloads to the current dir.
+.br
+When either down- or uploading files, and only one path is provided, all files will be down-/uploaded to that one.
+.br
+If there are multiple paths provided, but not for all files, the last path provided will be used for the remaining files.
+
+.SH OPTIONS
+.IP "\fB[ -c  'command1 ; command2 ...' ]\fP"
+Execute these commands when login was successfull
+.br
+.IP "\fB[ -U NAME ]\fP"
+Remote user name
+.br
+.IP "\fB[ -P PASSWORD ]\fP"
+Remote password
+.br
+.IP "\fB[ -H HOST[:PORT] ]\fP"
+Remote hostname or the IP (v4) adress.
+.br
+.IP "\fB[ -B BATCHFILE ]\fP"
+File containing a list of ftp commands.
+.br
+
+.IP "\fB[ -A ]\fP"
+Forces ftp (only) to use active mode.
+.br
+.IP "\fB[ -P ]\fP"
+Forces ftp (only) to use passiv mode.
+.br
+
+.IP "\fB[ -r /remote/path ]\fP"
+Change to this remote path
+.br
+.IP "\fB[ -l /local/path ]\fP"
+Change to this local path
+.br
+
+.IP "\fB[ -f /local/path/file ]\fP"
+Upload this local file
+.br
+.IP "\fB[ -d /remote/path/file ]\fP"
+Download this remote file
+.br
+
+
+.SH FILES
+.IP \fB$HOME/.config/tui/apps.conf\fP
+Provides $FTP which must contain either ftp, lftp or sftp.
+.br
+.IP \fB$HOME/.config/tui/tui-ftp.log\fP
+Contains all the ftp actions, passwords are masked!
+.br
+
+
+
+
+.SH SEE ALSO
+.B ftp
+(1),
+.B lftp
+(1),
+.B sftp
+(1)
+
+
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://linux-scripter.blogspot.com
