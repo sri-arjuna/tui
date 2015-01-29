@@ -17,13 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
+.	tui
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.01.28
-	script_version=0.9.5
+#	Changed:	2015.01.29
+	script_version=0.9.7
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -51,13 +52,13 @@ Where options are:
 "
 	OPT=""
 	VALUE=""
-	CONFFILE=""
+	CONFIG="$APPS"
 	VARNAME=""
 	CAPS=false
 	SMALL=false
 	hadDollar=false
 	SD=","
-	source /etc/tui/commands.conf
+	#source /etc/tui/commands.conf
 #
 #	Catching Arguments
 #
@@ -115,7 +116,7 @@ Where options are:
 	fi
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
-	if echo "$SEARCH$REPLACE" | $GREP  -q '[%$+\@/]'
+	if echo "$REPLACE" | $GREP   '[%$+\@/]'
 	then	hadDollar=true
 		#REPLACE=$(echo "$REPLACE"|$SED 's|[%$/\|\@]|\\&|g')
 		#SEARCH=$(echo "$SEARCH"|$SED 's|[%"$/\|\@]|\\&|g')
@@ -131,7 +132,7 @@ Where options are:
 		cmd="$SED s${SD}${SEARCH}${SD}${REPLACE}${SD}g -i $CONFFILE"
 	
 	# Save changes
-	if ! $GREP $Q "$VARNAME" "$CONFFILE"
+	if ! $GREP $Q "${VARNAME}=" "$CONFFILE"
 	then	# Its not there yet, just append it
 		$hadDollar && \
 			printf "$(eval $REPLACE)\n" >> "$CONFFILE" || \
