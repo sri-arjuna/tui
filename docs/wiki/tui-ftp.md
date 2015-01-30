@@ -17,6 +17,74 @@ You can leave out the password, but it will ask you for it each time.
 
 	tui-ftp -U "username" -P "password" -c "cd htdocs ; ls" 123.123.123.123
 
-Could look like this
+So on the first time call, it could look like this:
 
+	# | Please select which ftp command you want to use:                     | #
+	# | 1) ftp                        2) lftp                        3) sftp | #
+	# | > 1
+	# | Saved ftp as FTP                                            [  ✔   ] | #
+	# | Add 123.123.123.123 to /home/sea/.netrc for automatic login? (y/n) y | #
+	# |                           /home/sea/.netrc                           | #
+	# | machine 123.123.123.123 login username password password             | #
+	# |                                                                      | #
+	# | Change any loginame / password? (y/n)                              n | #
+	# | Done job with ftp                                           [  ✔   ] | #
+
+Then, to see what happend, you could call:
+
+	tui-ftp -L
 	
+Which will present the logfile, each ftp call will look similar to this:
+
+	10:11:19 	 Process ID: 23428
+	10:11:19 	 FTP Command: ftp
+	10:11:19 	 Set commands to parse: 
+	10:11:19 	 Set host to: <hostname>
+	Connected to <hostname> (<hostip>).
+	220---------- Welcome Message of the host ----------
+	220-Host info
+	331 User <username> OK. Password required
+	230-This server supports FXP transfers
+	230 OK. Current restricted directory is /
+	Remote system type is UNIX.
+	Using binary mode to transfer files.
+	221-Goodbye. You uploaded 0 and downloaded 0 kbytes.
+	221 Logout.
+	
+However, once you have automatic login, your calls could be simple as: (to download a single file)
+
+	tui-ftp -d /remote/path-to/file -l /local/dest/path
+
+Which then would look like:
+
+	# | Downloaded file/s                                           [  √   ] | #
+
+
+The same command, but beeing 'verbose':
+
+	tui-ftp -vd /remote/path-to/file -l /local/dest/path 123.123.123.123
+	
+Will look like:
+
+	# | Enabled verbosity                                                    | #
+	# | Added file to download: /remote/path-to/file                         | #
+	# | Added path to download: /local/dest/path                             | #
+	# | Set host to: 123.123.123.123                                         | #
+	# | Generated download list.                                    [  √   ] | #
+	# | Downloaded file/s                                           [  √   ] | #
+	
+	
+Or Download multiple files to the same location:
+
+	tui-ftp -vd /remote/path-to/file1 -d /remote/path-to/file2 -d /remote/path-to/file3  -l /local/dest/path 123.123.123.123
+	
+Will look like:
+
+	# | Enabled verbosity                                                    | #
+	# | Added file to download: /remote/path-to/file1                        | #
+	# | Added file to download: /remote/path-to/file2                        | #
+	# | Added file to download: /remote/path-to/file3                        | #
+	# | Added path to download: /local/dest/path                             | #
+	# | Set host to: 123.123.123.123                                         | #
+	# | Generated download list.                                    [  √   ] | #
+	# | Downloaded file/s                                           [  √   ] | #

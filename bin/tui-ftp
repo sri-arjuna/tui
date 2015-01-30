@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#set -x
 # ------------------------------------------------------------------------
 #
 # Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
@@ -73,8 +74,8 @@ Where options are:
 	-c(ommand) \"cmd1 ; cmd2 ... \"	List of commands to execute upon successfull login
 
     ----Modes----
-    	-A(active)		Force active mode
-	-P(assiv)		Force passiv mode
+    	-a(active)		Force active mode
+	-p(assiv)		Force passiv mode
 	
     ----Upload file----
 	-f(ile) 	FILE	Localfile to upload
@@ -148,7 +149,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		tui-log -t "$LOG" "FTP Command: $FTP"
 		;;
 	esac
-	while getopts "APLqvH:U:P:B:c:f:d:l:r:" opt
+	while getopts "apLqvH:U:P:B:c:f:d:l:r:" opt
 	do 	case $opt in
 		L)	less "$LOG"
 			exit $?
@@ -160,7 +161,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			log_msg="Enabled verbosity"
 			;;
 		# -- Active / Passive modes
-		A)	force_aktive=true
+		a)	force_aktive=true
 			force_passiv=false
 			log_msg="Force active mode"
 			[ lftp = "$FTP" ] && \
@@ -169,7 +170,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 				tui-status 111 "$FTP does not support the enforcing of passive mode."
 			[ ftp = "$FTP" ] && ACTPAS="-A"
 			;;
-		P)	force_passiv=true
+		p)	force_passiv=true
 			force_aktive=false
 			log_msg="Force passiv mode"
 			[ lftp = "$FTP" ] && \
@@ -210,7 +211,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		[ ! -z "$log_msg" ] && $beLog && tui-log $log_opt "$LOG" "$log_msg"
 	done
 	shift $(($OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
-	HOST="$1" ; shift
+	HOST="$1" #; shift
 	PORT=${HOST/#*:} ; 
 	[ "$PORT" = "$HOST" ] && PORT=""
 	[ -z "$PORT" ] && PORT="$FTP_PORT"
@@ -283,22 +284,23 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 	
 	# Fill the command list
 	case "$MENU" in
-	"")	tui-status 1 "There was an error!"
-		exit $?
-		;;
 	cmd)	#tui-echo "TODO Generate command list"
 		oIFS="$IFS"
 		IFS=";"
 		C=0
 		M=${#COMMANDS_RAW}
-		while [ $C -lt $M ]
-		do
-			char="${COMMANDS_RAW:$C:1}"
-			[ "$char" = ";" ] && \
-				printf "\n" >> "$TEMPFILE" || \
-				printf "$char" >> "$TEMPFILE"
-			C=$(( $C + 1 ))
-		done
+		if [ $M -gt 2 ]
+		then	while [ $C -lt $M ]
+			do
+				char="${COMMANDS_RAW:$C:1}"
+				[ "$char" = ";" ] && \
+					printf "\n" >> "$TEMPFILE" || \
+					printf "$char" >> "$TEMPFILE"
+				C=$(( $C + 1 ))
+			done
+			$beVerbose && \
+				tui-status 0 "Generated command list..."
+		fi
 		
 		action_work="Executing custom command list"
 		action_done="${action_work/ing/ed}"
@@ -330,7 +332,8 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			
 			count=$(( $count + 1 ))
 		done
-		tui-status $? "Generated download list."
+		$beVerbose && \
+			tui-status $? "Generated download list."
 		
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
 		action_work="Downloading file"
@@ -359,11 +362,15 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			
 			count=$(( $count + 1 ))
 		done
-		tui-status $? "Generated upload list."
+		$beVerbose && \
+			tui-status $? "Generated upload list."
 		
 		action_work="Uploading file"
 		action_done="${action_work/ing/ed}"
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
+		;;
+	"")	tui-status 1 "There was an error!"
+		exit $?
 		;;
 	esac
 	
@@ -377,6 +384,19 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 	[ -z "$HOST" ] && \
 		tui-printf -S 1 "No host supplied." && \
 		exit 1
+	
+	if ! $GREP -q "$HOST" ~/.netrc
+	then
+		[ -f "$HOME/.netrc" ] || touch "$HOME/.netrc"
+		if tui-yesno "Add $HOST to $HOME/.netrc for automatic login?"
+		then	echo "machine $HOST login $USERNAME password $PASSWORD" >> "$HOME/.netrc"
+			tui-title "$HOME/.netrc"
+			tui-cat "$HOME/.netrc"
+			tui-echo
+			tui-yesno "Change any loginame / password?" && \
+				tui-edit "$HOME/.netrc"
+		fi
+	fi
 	
 	# Since passed commands are put into a file to be processed
 	# my workaround enables 'ftp' to work with batch files as well
@@ -398,18 +418,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			CMD="$(cat $BATCH)"
 			TMP="$TEMPFILE.$$"
 			
-			if ! $GREP -q $HOST ~/.netrc
-			then
-				[ -f "$HOME/.netrc" ] || touch "$HOME/.netrc"
-				if tui-yesno "Add $HOST to $HOME/.netrc for automatic login?"
-				then	echo "machine $HOST login $USERNAME password $PASSWORD" >> "$HOME/.netrc"
-					tui-title "$HOME/.netrc"
-					tui-cat "$HOME/.netrc"
-					tui-echo
-					tui-yesno "Change any loginame / password?" && \
-						tui-edit "$HOME/.netrc"
-				fi
-			fi
+			
 			
 			touch "$TMP"
 printf "$FTP $ACTPAS -v $HOST << EOF >>\"$LOG\"
@@ -419,7 +428,7 @@ EOF
 " > "$TMP"
 			sh "$TMP" &
 			parse_log
-			tui-status $? "Done job with $FTP"
+			tui-status $? "$action_done"
 			RET=$?
 			;;
 		# TODO everything below :p
