@@ -127,7 +127,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-1
-- Added:    tui-ftp, handler for [ls]ftp, incl logfile
+- Added:    tui-ftp, handler for [ls]ftp, incl wiki & manpage
 - Updated:  tui-conf-set, improved check if variable exists or not
 - Changed:  templates/scripts/*, changed shebang to "#!/usr/bin/env bash"
 - Changed:  templates/scripts/*, changed the way it sources tui
