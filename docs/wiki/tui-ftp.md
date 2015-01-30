@@ -1,12 +1,19 @@
 Description:
 ------------
 
+
+ALPHA
+=====
+
+
 This command for User interactions : External commands, should help to use File Transfer Protocols (ftp).
 
 Basicly, it tries to summarize one set of available options to be used for either:
 1. ftp
 2. lftp
 3. sftp
+
+Understand that i just started with this tool, using diffrent ftp commands, parsing logs according to work mode and generate a readable and informative text and present it nicely is quite a challenge.
 
 Examples:
 ---------
@@ -74,9 +81,14 @@ Will look like:
 	# | Downloaded file/s                                           [  √   ] | #
 	
 	
-Or Download multiple files to the same location:
+Or download multiple files to the same location:
 
-	tui-ftp -vd /remote/path-to/file1 -d /remote/path-to/file2 -d /remote/path-to/file3  -l /local/dest/path 123.123.123.123
+	tui-ftp -v \
+		-d /remote/path-to/file1 \
+		-d /remote/path-to/file2 \
+		-d /remote/path-to/file3 \
+		-l /local/dest/path \
+		123.123.123.123
 	
 Will look like:
 
@@ -88,3 +100,28 @@ Will look like:
 	# | Set host to: 123.123.123.123                                         | #
 	# | Generated download list.                                    [  √   ] | #
 	# | Downloaded file/s                                           [  √   ] | #
+
+Or upload multiple files to diffrent locations:
+
+	tui-ftp -v \
+		-f /path/to/lcl/file1 \
+		-f /path/of/loc/file2 \
+		-f /path/fr/locl/file3 \
+		-r /remote/dest/path1 \
+		-r /remote/dust/path2 \
+		-r /remote/desk/path3 \
+		123.123.123.123
+	
+This will upload the local file file<N> to remote path</N>.
+And it will look like:
+
+	# | Enabled verbosity                                                    | #
+	# | Added file to upload: /path/to/lcl/file1                             | #
+	# | Added file to upload: /path/of/loc/file2                             | #
+	# | Added file to upload: /path/fr/locl/file3                            | #
+	# | Added path to upload: /remote/dest/path1                             | #
+	# | Added path to upload: /remote/dust/path2                             | #
+	# | Added path to upload: /remote/desk/path3                             | #
+	# | Set host to: 123.123.123.123                                         | #
+	# | Generated upload list.                                      [  √   ] | #
+	# | Uploaded file                                               [  √   ] | #
