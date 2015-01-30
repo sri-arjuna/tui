@@ -107,7 +107,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		do	tui-progress "Connecting to $HOST"
 			STRING=$(tail -n 5 "$LOG")
 			CON_FAIL_CNT=$(( $CON_FAIL_CNT + 1 ))
-			[ $CON_FAIL_AFTER -ge $CON_FAIL_CNT ] && return 1
+			[ $CON_FAIL_CNT -ge $CON_FAIL_AFTER ] && return 1
 		done
 		$beVerbose && tui-status 0 "Connected to $HOST"
 		

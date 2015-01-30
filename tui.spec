@@ -131,7 +131,7 @@ rm -rf %{buildroot}
 - Updated:  tui-conf-set, improved check if variable exists or not
 - Changed:  templates/scripts/*, changed shebang to "#!/usr/bin/env bash"
 - Changed:  templates/scripts/*, changed the way it sources tui
-
+- Changed:  tui-install, was missing -y to continue installation on *bsd
 
 * Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-8
 - Updated:  Installation wiki page, added wget installation, ty glenn

@@ -170,7 +170,7 @@ Where options are:
 	cave)		cmd="resolve -x "	;;
 	emerge)		cmd=""			;;
 	zypper)		cmd="install"		;;
-	pkg)		cmd="install"		;;
+	pkg)		cmd="install -y"	;;
 	esac
 #	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
