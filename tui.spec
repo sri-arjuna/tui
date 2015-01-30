@@ -126,10 +126,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-0
+* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-1
 - Added:    tui-ftp, handler for [ls]ftp, incl logfile
 - Updated:  tui-conf-set, improved check if variable exists or not
 - Changed:  templates/scripts/*, changed shebang to "#!/usr/bin/env bash"
+- Changed:  templates/scripts/*, changed the way it sources tui
 
 
 * Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-8
