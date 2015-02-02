@@ -27,8 +27,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.01.28
-#	Changed:	2015.01.28
-	script_version=0.3-ALPHA
+#	Changed:	2015.01.30
+	script_version=0.3.3-ALPHA
 	TITLE="TUI handler for FTP tasks"
 #	Description:	A smiple handler for FTP commands.
 #
@@ -103,7 +103,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		STRING=$(tail -n 5 "$LOG")
 		
 		# Before doing extended parsing, lets make sure the user could log in
-		while ! echo "$STRING" | grep -q  ^220
+		while ! echo "$STRING" | $GREP -q  ^220
 		do	tui-progress "Connecting to $HOST"
 			STRING=$(tail -n 5 "$LOG")
 			CON_FAIL_CNT=$(( $CON_FAIL_CNT + 1 ))
@@ -112,15 +112,51 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		$beVerbose && tui-status 0 "Connected to $HOST"
 		
 		# Loop until logout num is found
-		while ! echo "$STRING" | grep -q ^221
+		while ! echo "$STRING" | $GREP -q ^221
 		do	STRING=$(tail -n 5 "$LOG")
-			tui-progress "$action_work"
+			action_work_out=""
+			
+			# Generate output string, parse for filenames
+			case $MENU in
+			up)	for LF in "${LOC_FILES[@]}"
+				do 	echo "$STRING" | $GREP -q "$LF" && \
+						LFF="$(basename $LF)" && \
+						action_work_out="$action_work $LFF" && \
+						break
+				done
+				last_found="$LFF"
+				;;
+			down)	for RF in "${REM_FILES[@]}"
+				do 	echo "$STRING" | $GREP -q "$RF" && \
+						RFF="$(basename $RF)" && \
+						action_work_out="$action_work $RFF" && \
+						break
+				done
+				last_found="$RFF"
+				;;
+			cmd)	for CC in $($GREP put "$TEMPFILE"|$AWK '{print $2}')
+				do 	echo "$STRING" | $GREP -q "$CC" && \
+						CCF="$(basename $CC)" && \
+						action_work_out="$action_work $CCF" && \
+						break
+				done
+				last_found="$CCF"
+				;;
+			*)	if [ ! "$STRING" = "$(tail -n5 $LOG)" ]
+				then	tui-log -tv "$LOG" "Error parsing:"
+					tui-log -v "$LOG" "$STRING"
+				fi
+				;;
+			esac
+			
+			
+			[ -z "$action_work_out" ] && action_work_out="Parsing log..."
+			tui-progress "$action_work_out" ; printf "\r"
 			sleep 0.5
 			# Is a failsafe exit required?
 		done
-		$beVerbose && tui-status 0 "$action_done"
 		
-		return 0
+		tui-status 0 "$action_done $last_found"
 	}
 #
 #	Environment checks
@@ -195,14 +231,14 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			log_msg="Added file to upload: $OPTARG"
 			MENU="up"					 		;;
 		l)	LOC_PATHS[${#LOC_PATHS[@]}]="$OPTARG"
-			log_msg="Added path to download: $OPTARG"
+			log_msg="Added download target: $OPTARG"
 			MENU="down"					 		;;
 		# -- Download file
 		d)	REM_FILES[${#REM_FILES[@]}]="$OPTARG"
 			log_msg="Added file to download: $OPTARG"
 			MENU="down"					 		;;
 		r)	REM_PATHS[${#REM_PATHS[@]}]="$OPTARG"
-			log_msg="Added path to upload: $OPTARG"
+			log_msg="Added upload target: $OPTARG"
 			MENU="up"							;;
 		*)	printf "$help_text" ; exit $?	;;
 		esac
@@ -211,7 +247,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		[ ! -z "$log_msg" ] && $beLog && tui-log $log_opt "$LOG" "$log_msg"
 	done
 	shift $(($OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
-	HOST="$1" #; shift
+	HOST="$1" ; shift
 	PORT=${HOST/#*:} ; 
 	[ "$PORT" = "$HOST" ] && PORT=""
 	[ -z "$PORT" ] && PORT="$FTP_PORT"
@@ -358,7 +394,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 				tui-printf "Generate uploadlist: $LOC to $REM" "[  $(tui-indi)   ]"
 			
 			echo "$CD $REM" >> "$TEMPFILE"
-			echo "$PUT $LOC" >> "$TEMPFILE"
+			echo "$PUT $LOC $REM/$(basename $LOC)" >> "$TEMPFILE"
 			
 			count=$(( $count + 1 ))
 		done
@@ -421,14 +457,16 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			
 			
 			touch "$TMP"
+			cat "$TMP" >> "$LOG"
 printf "$FTP $ACTPAS -v $HOST << EOF >>\"$LOG\"
 $CMD
 bye
 EOF
 " > "$TMP"
 			sh "$TMP" &
+			#tui-title "M$MODE ; m$mode" ; tui-press
 			parse_log
-			tui-status $? "$action_done"
+			#tui-status $? "$action_done $LFF"
 			RET=$?
 			;;
 		# TODO everything below :p
