@@ -24,6 +24,8 @@
 #	STABLE: 2013.10.13	--- DONT CHANGE IT ---
 #				unless everything is STABLE & BACKED UP !!
 #	STABLE:	2015.01.20	Updated to check for curl/wget
+#	Unstable: 2015.01.31    Doh, you changed it!
+#
 	source tui
 	script_version=0.7.2
 	ME="$(basename $0)"
@@ -32,7 +34,7 @@
 		\rWhere options are:
 		\r\t-h\tThis screen
 		\r"
-	ARGS=(${@})
+	ARGS=( "${@}" )
 	FILE_TEMP="$TUI_TEMP_DIR/tui-download.status"
 	FILE_CMD="$TUI_TEMP_DIR/bgjob"
 	umask 022 $FILE_CMD $FILE_TEMP
@@ -62,9 +64,9 @@
 				break
 		done
 		#set -x
-		tui-conf-set $APPS CURLWGET $CURLWGET
+		tui-conf-set "$APPS" CURLWGET "$CURLWGET"
 	fi
-	case $CURLWGET in
+	case "$CURLWGET" in
 	curl)	OPT_O="-o"
 		OPT_Q="-s"
 		OPT_C=""	;;
@@ -72,30 +74,60 @@
 		OPT_Q="-q"
 		OPT_C="-c"	;;
 	"")	tui-status 1 "Could find neither curl nor wget!"
-		tui-yesno "Do you want to install curl now?" && \
-			( tui-bol-sudo && sudo tui-install curl || su -c "tui-install curl" ) && \
-			CURLWGET=curl
-		which $CURLWGET 1>/dev/zero 2>/dev/zero && \
-			tui-conf-set $APPS CURLWGET $CURLWGET || \
+		tui-echo "Which one to install?"
+		CURLWGET=$(tui-select curl wget)
+		which $CURLWGET 1>/dev/zero && \
+			tui-conf-set "$APPS" CURLWGET $CURLWGET || \
 			exit 1
+		tui-bol-sudo && \
+			sudo tui-install $CURLWGET || \
+			su -c "tui-install $CURLWGET" 
 	esac
 	
 	for URL in "${ARGS[@]}"
 	do 	THIS="$(basename $URL)"
+		out_string="./$THIS"
 		tui-printf -rS 2 "Initializing new download..." #"$WORK"
 		#echo "wget -qc $URL" > $FILE_CMD
 		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > $FILE_CMD
 		
-		
 		chmod +x $FILE_CMD
 		$FILE_CMD &
-		sleep 2
+		sleep 1.5
 		#K=1024
-	
+		
+		str_left="Downloading..."
+		str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
+		str_right="[  $(tui-indi)   ]"
+		str_len=$(( ${#str_left} + ${#str_middle} + ${#str_right} + 2 ))
+		
+		#set -x
 		while [ ! "" = "$(ps|$GREP $CURLWGET)" ] #|| [ ! "" = "$(ps $!)" ]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
-			tui-printf "Downloading..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
+			COLUMNS=$(tput cols)
+			str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
+			#echo "$COLUMNS == $str_len"
+		set +x		
+			if [ $str_len -gt $COLUMNS ]
+			then	# Needs string cutting
+				diffr=$(( $COLUMNS - $str_len  ))
+				
+			#	echo "----"
+			#	echo " $diffr"
+			#	echo "----"
+				
+				if [ $diffr -lt $len ]
+				then	# It makes sense to cut off pieces
+					str_middle_corrected="${str_middle:0:( -$diffr )}"
+				else	# No change required / reset to original
+					str_middle_corrected="${str_middle}"
+				fi
+			else	#tui-echo "All good"
+				str_middle_corrected="${str_middle}"
+			fi
+			
+			tui-printf "$str_left" "${str_middle_corrected}" "[  $(tui-indi)   ]"
 			sleep 1
 		done
-		tui-status $? "Downloaded: $PWD/$THIS"
+		tui-status $? "Downloaded: $out_string"
 	done 
