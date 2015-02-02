@@ -131,6 +131,7 @@ rm -rf %{buildroot}
 - Changed:  tui-download, message display should be handled better now
 - Updated:  README.md, "Also, a big **thank you** goes 
 -                    to the forummembers of unix.com."
+- Updated:  tui-ftp, added basic logfile parsing for display
 
 * Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-2
 - Added:    tui-ftp, log parsing to generate output
