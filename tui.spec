@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.0
-Release:     1%{?dist}
+Release:     4%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -126,6 +126,15 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Mon Feb 02 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-4
+- Changed:  tui-yesno, no longer makes an empty line
+- Changed:  tui-download, message display should be handled better now
+- Updated:  README.md, "Also, a big **thank you** goes 
+-                    to the forummembers of unix.com."
+
+* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-2
+- Added:    tui-ftp, log parsing to generate output
+
 * Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-1
 - Added:    tui-ftp, handler for [ls]ftp, incl wiki & manpage
 - Updated:  tui-conf-set, improved check if variable exists or not

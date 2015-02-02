@@ -17,6 +17,7 @@ some of the commands will use diffrent applications (tui-{edit,filemgr,terminal,
 
 It is designed to be working during all stages, from init 1 to init 5.
 
+Also, a big **thank you** goes to the forummembers of unix.com.
 
 
 Core Functions / Purpose:
