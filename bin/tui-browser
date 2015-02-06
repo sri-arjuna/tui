@@ -22,15 +22,15 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.01.22
+#	Changed:	2015.02.05
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7.8
-	[ 0 -eq $UID ] && \
-		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
-		source /usr/share/tui/themes/$TUI_THEME
+	script_version=0.7.9
+#	[ 0 -eq $UID ] && \
+#		source /usr/share/tui/themes/$TUI_THEME_ROOT || \
+#		source /usr/share/tui/themes/$TUI_THEME
 
 #
 #	Variables
@@ -285,13 +285,13 @@ Where options are:
 	[ -f "$THE_MEGA_CONFIG" ] && rm -f "$THE_MEGA_CONFIG"
 	touch "$THE_MEGA_CONFIG"
 	
-	LoadFile() { # LIST OF FILES OR FOLDERS TO EXPORT
+	#LoadFile() { # LIST OF FILES OR FOLDERS TO EXPORT
 	# This uses the variable THE_MEGA_CONFIG as a target file to store all configuration in
 	# So outside the function, it is a single source command to get all the values
-		ARRAY="${@}"
-		if [ ! "" = "$(echo ${ARRAY[@]})" ]
-		then	# There are config files
-			for conf in "${ARRAY[@]}"
+		#ARRAY="${@}"
+		#if [ ! "" = "$(echo ${ARRAY[@]})" ]
+		#then	# There are config files
+			for conf in "${CONFIG[@]}" "${SOURCE[@]}" #"${ARRAY[@]}"
 			do	# Warn the user that no configuration file was found
 				conf="$(echo $conf)"
 				if [ -d "$conf" ]
@@ -305,7 +305,9 @@ Where options are:
 						then	printf "."
 							#f="$(echo $f)"
 							var=$(tui-conf-get -l "$f")
+							printf "\n" >> "$THE_MEGA_CONFIG"
 							cat "$f" >> "$THE_MEGA_CONFIG"
+							printf "\n" >> "$THE_MEGA_CONFIG"
 						fi
 					done
 					cd "$PWD_OLD"
@@ -319,11 +321,12 @@ Where options are:
 					tui-wait 3s "Continue in:"
 				fi
 			done
-		fi
-	}
+		#fi
+		printf "\n" >> "$THE_MEGA_CONFIG"
+	#}
 	# Prepare the configurations
-	[ ! "" = "$(echo ${CONFIG[@]})" ] && LoadFile "${CONFIG[@]}"
-	[ ! "" = "$(echo ${SOURCE[@]})" ] && LoadFile "${SOURCE[@]}"
+	#[ ! "" = "$(echo ${CONFIG[@]})" ] && LoadFile "${CONFIG[@]}" 
+	#[ ! "" = "$(echo ${SOURCE[@]})" ] && LoadFile "${SOURCE[@]}"
 	
 	# Now load and export all the values:
 	source "$THE_MEGA_CONFIG"
