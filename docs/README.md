@@ -6,18 +6,38 @@ TUI - a (line based) Text User Interface framework
 ---------------------------------
 
 
-Description:
-------------
-TUI is an abrevihation for "Text User Interface".
-It provies you with commands named similar to their GNU originals, but enables you to wrap your output into a TUI.
+Description / What is it?:
+--------------------------
 
-Eventhough ther are only 4 core commands for display use, there are 29 additional assistant commands for many tasks a scripter comes by daily (tui-{list,read,select,yesno)).
-Furthermore, it provides diffrent 'interactions' according to the mode the user is in, wether a VT or any GUI, 
-some of the commands will use diffrent applications (tui-{edit,filemgr,terminal,web}), or display its output in a slight other way (tui-status).
+As an application/package it is a dependency, not a standalone application, it also requires bash to be installed, however your script could be _anyhting_ from bash to zsh.
 
-It is designed to be working during all stages, from init 1 to init 5.
+It is not ment that 'endusers' (have to) care about TUI, its ment that a scripter uses tui as his library (-functions).
 
-Also, a big **thank you** goes to the forummembers of unix.com.
+It provides you with commands named similar to their GNU originals or by its task and warps its output with TUI.
+
+_Either think of TUI as a simpler zenity/curses, or as a metapher: If your script is a php-website then tui is html._
+
+
+Description / Helpers:
+----------------------
+
+Also it aims to simplify the functionality among diffrent distros, in the special means of, 
+if your requires additional dependencies, as the author of the script, 
+you can just use **tui-install $REQUIRED\_PACKAGES** and do not need to care wether to use whatever from apt-get to yum...
+
+And tools like tui-edit, tui-web, tui-filemgr also help with other interactions on 'foreign' systems to the script author.
+
+They simply check a list of (to me) known applications specifily in gui or cli mode, and starts it then accordingly.
+
+The priority of the internaly used lists are that first non-default editors are checked (such as: emacs, eclipse, nano) and the least 'modern' tools (such as: leafpad, ed/vi) as the last fall back.
+
+If you should ever experience that no propper application should be started, please let me know your installed appllication its name and raise a [issue](https://github.com/sri-arjuna/tui/issues)
+
+Eventhough ther are only 4 core commands for display use, there are 29 additional assistant commands for many tasks a scripter comes by daily (tui-{list,read,select,status,yesno)).
+
+
+
+-----------
 
 
 Core Functions / Purpose:
@@ -32,6 +52,8 @@ For all, but without tui-title, the alignemt goes:
 	1 String  = 1) left
 	2 Strings = 1) left 2) right
 	3 Strings = 1) left 2) center 3) right
+
+See [this preview]()
 
 For tui-title it is:
 1 String = 1) center
@@ -49,6 +71,7 @@ Configuration Files:
 **/etc/tui/**
 	apps.conf
 	colors.conf
+	commands.conf
 	status.conf
 	tui.conf
 	
@@ -57,6 +80,8 @@ Configuration Files:
 	user.conf
 
 apps.conf stores the variables for your default applications used by their specific tui-APP command (tui-edit).
+
+commands.conf stores which awk, grep or sed is used tui - internaly and systemwide only.
 
 
 
@@ -88,3 +113,5 @@ same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL w
 
 Now in the combination with tui-edit, you dont even need to source tui
 to have tui-edit open the given filename with your favorite editor.
+
+
