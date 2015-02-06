@@ -144,34 +144,38 @@ Where options are:
 	GetStringFile() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[ -z "$BASE" ] && return 1
+		#[ -z "$BASE" ] && return 1
 		[ -z "$1" ] && return 1
-		dir="$BASE/"
+		dir="$PWD/"
 		for a in "${@}";do
 			if [ -d "$dir/$a" ]
 			then	dir+="$a/"
+				shift
 			elif [ -f "$dir/$a" ]
-			then	file="$a"
+			then	echo "$a"
+				return 0
 			fi
 		done
-		echo "$file"
+		return 1
 	}
 	GetStringArgs() { # ARGS[@]
 	# Parses ARGS[@] and prints a 'path-string'
 	#
-		[ -z "$BASE" ] && return 1
+		#[ -z "$BASE" ] && return 1
 		[ -z "$1" ] && return 1
-		dir="$BASE/"
+		dir="$PWD/"
 		for a in "${@}";do
 			if [ -d "$dir/$a" ]
 			then	dir+="$a/"
 				shift
 			elif [ -f "$dir/$a" ]
-			then	file="$a"
-				shift
-			else	echo "$@"
+			then	shift
+				echo "$@"
+				return 0
+			else	echo "$a"
 			fi
 		done
+		return 0
 	}
 #
 #	Catching Arguments
@@ -366,12 +370,24 @@ Where options are:
 	then	# Change to directory
 		for d in "${@}";do
 			[ -d "$d" ] && cd "$d" && shift
+		#	if [ -f "$d" ]
+		#	then	shift
+		#		args=$(GetStringArgs "${@}")
+		#		./"$d" $args
+		#		exit $?
+		#	fi
 		done
 		CURRENT="$PWD"
 		
 		# Parse arguments, execute the file or enter the folder
+	#	set -x
 		file=$(GetStringFile "${@}")
 		args=$(GetStringArgs "${@}")
+		
+	#	echo
+	#	echo file: $file
+	#	echo args: $args
+	#	exit
 		
 		if [ -f "$PWD/$file" ] && [ ! -z "$file" ] 
 		then	$showLocationPos_Anyway_ow && \
