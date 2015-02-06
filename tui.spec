@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.0
-Release:     6%{?dist}
+Release:     8%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -126,7 +126,7 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Feb 05 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-5
+* Thu Feb 05 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-7
 - Updated:   tui-browser, appends now a newline to avoid sourcing error
 
 * Mon Feb 02 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-4

@@ -96,6 +96,7 @@ Where options are:
 #
 	menu=show
 	PWD_OLD="$PWD"	# This is where the user actualy entered the command
+	export PWD_OLD	# Make sure one can access this from within the scripts called by tui-browser
 	CURRENT="$PWD"
 	
 	# Textmode only
