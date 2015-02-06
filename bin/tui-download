@@ -102,32 +102,51 @@
 		str_len=$(( ${#str_left} + ${#str_middle} + ${#str_right} + 2 ))
 		
 		#set -x
+		# While its found, assume its till downloading...
 		while [ ! "" = "$(ps|$GREP $CURLWGET)" ] #|| [ ! "" = "$(ps $!)" ]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			COLUMNS=$(tput cols)
-			str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
+			str_middle="$THIS ($tmp_size)"
+			len=${#str_middle}
 			#echo "$COLUMNS == $str_len"
-		set +x		
-			if [ $str_len -gt $COLUMNS ]
-			then	# Needs string cutting
-				diffr=$(( $COLUMNS - $str_len  ))
+			diffr=$(( $(( $COLUMNS - $str_len  )) + 15 ))
+			cut=$(($len - $diffr))
 				
+		#set -x
+			
+			# If length of middle string to display is larger than colums to display it
+			# then cut of the trail of the display string
+			
+		#	echo "DIFFRENCE:: $diffr"
+			#if [ $str_len -gt $COLUMNS ]
+			if [ $diffr -ge 1 ]
+			then	# Needs string cutting
+				# Cut off this amount of strings. (+3 for the dots)
+			#	echo "DIFFRENCE:: "$diffr
 			#	echo "----"
 			#	echo " $diffr"
 			#	echo "----"
 				
-				if [ $diffr -lt $len ]
+				if [ $diffr -gt $len ]
 				then	# It makes sense to cut off pieces
-					str_middle_corrected="${str_middle:0:( -$diffr )}"
+					#str_middle_corrected="${str_middle:0:( -$diffr )}"
+					str_middle_corrected="${str_middle:0:$diffr}"
+					#str_middle_corrected="${str_middle:0:($len - $diffr)}"
 				else	# No change required / reset to original
 					str_middle_corrected="${str_middle}"
 				fi
-			else	#tui-echo "All good"
+		#	elif [ $diffr -le -1 ]
+		#	then	# Needs string cutting
+		#		# Cut off this amount of strings. (+3 for the dots)
+		#		echo " asd ---- awd"
+		#		str_middle_corrected="${str_middle:0:$diffr}"
+			else	# No change required / reset to original
 				str_middle_corrected="${str_middle}"
+				echo re
 			fi
 			
 			tui-printf "$str_left" "${str_middle_corrected}" "[  $(tui-indi)   ]"
 			sleep 1
 		done
-		tui-status $? "Downloaded: $out_string"
+		tui-status $? "Downloaded: ${out_string:0:$tlen}"
 	done 
