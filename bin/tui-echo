@@ -44,14 +44,14 @@
 #
 #	Display
 #
-	while [ $# -gt 3 ]
-        do
+	#while [ $# -gt 3 ]
+        #do
                 case $ARGS_COUNT in
                 0)	tui-printf -E 			;;
                 1)	tui-printf -E $leadingDASHdummy "$1"		;;
                 2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
                 3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
                 esac
-                shift 3
-        done
+        #        shift 3
+        #done
         
