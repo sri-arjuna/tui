@@ -84,12 +84,14 @@ Where options are:
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
 	VARNAME="$2"
-	VALUE="$3"
-	
+	VALUE="$3" #; echo "$LINENO VALUE=\$3 -- $VALUE" > /dev/zero
+	 
 	# Exit if it does not exist
 	if [ ! -f "$CONFFILE" ]
-	then	tui-status 1 "$CONFFILE does not exist!"
-		exit $?
+	then	#tui-status 1 "$CONFFILE does not exist!"
+		#exit $?
+                tui-bol-dir "$(dirname $CONFFILE)"
+                touch "$CONFFILE"
 	fi
 #
 # 	Preformat strings
@@ -116,11 +118,13 @@ Where options are:
 	fi
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
-	if echo "$REPLACE" | $GREP   '[%$+\@/]'
+	#set -x
+        if echo "$REPLACE" | $GREP '[%$+@\]'
 	then	hadDollar=true
 		#REPLACE=$(echo "$REPLACE"|$SED 's|[%$/\|\@]|\\&|g')
 		#SEARCH=$(echo "$SEARCH"|$SED 's|[%"$/\|\@]|\\&|g')
 	fi
+       # set +x
 #
 #	Display & Action
 #
@@ -134,13 +138,17 @@ Where options are:
 	# Save changes
 	if ! $GREP $Q "${VARNAME}=" "$CONFFILE"
 	then	# Its not there yet, just append it
-		$hadDollar && \
-			printf "$(eval $REPLACE)\n" >> "$CONFFILE" || \
+		set -x
+                echo $LINENO > /dev/zero
+                $hadDollar && \
+			printf '%s\n' "$(eval $REPLACE)" >> "$CONFFILE" || \
 			printf "${REPLACE}\n" >> "$CONFFILE"
+                set +x
 	elif [ true = $hadDollar ]
 	then	# Remove the escape chars while saving it.
 		#echo "Its already in the file"
-		eval $cmd
+		echo $LINENO > /dev/zero
+                eval $cmd
 		#$cmd
 	else	#printf "\n\n\n\t\t$cmd\n\n\n\n"
 		$cmd
