@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------
 #
-# Copyright (c) 2014-2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# Copyright (c) 2014-2015 by Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.01.15
-	script_version=1.0
+#	Changed:	2015.02.10
+	script_version=1.1
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.
@@ -59,24 +59,26 @@ Where options are:
 	#[ -z $1 ] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
 	# A ':' after a char indicates that this option requires an argument
 	SEP=") "
-	while getopts "ahnr" opt
+        ROWS=3
+	while getopts "ahnr12" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
-		a)	MODE=alpha 	;;
+		1|2)    ROWS=$OPTARG    ;;
+                a)	MODE=alpha 	;;
 		r)	MODE=roman
-			SEP="."		;;
+			SEP=". "	;;
 		n)	MODE=none
 			SEP=""		;;
 		# *)	printf "$help_text" ; exit $?	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=("${@}")			# Remaining arguments
+	ARGS=( $(echo "${@}") )			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 	COLUMNS=$(tput cols)
-	SEP+=" "
+	#SEP+=" "
 #
 #	Functions
 #
@@ -166,15 +168,15 @@ Where options are:
 	unset OUT[@]
 	OUT[0]=""
 	shown=false
-	MAX=2
+	MAX=$(( $ROWS - 1 ))
 	CUR=0
 	DONE=0
 	for OPT in "${ARGS[@]}"
-	do	DONE=$((DONE+1))
+	do	DONE=$(( $DONE + 1))
 		# Do the visible counter
 		case $MODE in
 		num)	count=$DONE				;;
-		alpha)	count=$(num2char $[ $DONE - 1 ] )	;;
+		alpha)	count=$(num2char $(( $DONE - 1 )) )	;;
 		roman)	count=$(num2roman $DONE)		;;
 		none)	count=""				;;
 		esac
@@ -186,7 +188,7 @@ Where options are:
 			sum=$[ $len + 2  + ( ${#BORDER_LEFT} * 2 ) ]
 			
 			if [ $sum -lt $COLUMNS ]
-			then	OUT[$CUR]="${count}${SEP/  / }$OPT"
+			then	OUT[$CUR]="${count}${SEP}${OPT}"
 				shown=false
 				CUR=$(( $CUR + 1 ))
 			else	tui-echo "${OUT[@]}" >> /dev/stderr
