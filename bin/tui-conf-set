@@ -17,14 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-.	tui
+        source /etc/tui/commands.conf   # Like AWK, GREP, SED
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.01.29
-	script_version=0.9.7
+#	Changed:	2015.02.10
+	script_version=0.9.8
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables

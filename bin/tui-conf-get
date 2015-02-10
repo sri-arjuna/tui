@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-source /etc/tui/commands.conf	# Like AWK, GREP, SED
+        source /etc/tui/commands.conf	# Like AWK, GREP, SED
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
