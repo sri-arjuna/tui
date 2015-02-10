@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.1
+	script_version=0.7.2
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
@@ -44,9 +44,14 @@
 #
 #	Display
 #
-	case $ARGS_COUNT in
-	0)	tui-printf -E 			;;
-	1)	tui-printf -E $leadingDASHdummy "$1"		;;
-	2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
-	3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
-	esac
+	while [ $# -gt 3 ]
+        do
+                case $ARGS_COUNT in
+                0)	tui-printf -E 			;;
+                1)	tui-printf -E $leadingDASHdummy "$1"		;;
+                2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
+                3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
+                esac
+                shift 3
+        done
+        
