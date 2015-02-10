@@ -30,7 +30,7 @@
 	. /etc/tui/tui.conf
 	[ 0 -ne $UID ] && . $HOME/.config/tui/user.conf
 	[ -z "$TUI_THEME" ] && TUI_THEME=default
-	. /usr/share/tui/themes/$TUI_THEME
+	. /usr/share/tui/themes/"$TUI_THEME"
 	#. /etc/tui/themes/$TUI_THEME
 
 	#source /etc/tui/themes/$TUI_THEME
@@ -79,7 +79,9 @@ Where options are:
 	invalid=true
 	while $invalid
 	do	# Get input
-		read -n ${#len} -p "$BORDER_LEFT > " NUM
+		tui-printf ">" > /dev/stderr
+                printf "\r$BORDER_LEFT > " > /dev/stderr
+                read -n ${#len} NUM
 		
 		if [ -z "$NUM" ]
 		then	printf "\r" > /dev/stderr
