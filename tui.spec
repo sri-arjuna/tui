@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.0
-Release:     25%{?dist}
+Release:     26%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -129,6 +129,7 @@ rm -rf %{buildroot}
 * Wed Feb 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-25
 - Fixed:     tui-list, items with space are properly shown now
 - Updated:   tui-conf-set, removed debug output
+- Added:     some wiki pages
 
 * Thu Feb 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-23
 - Updated:   tui-select, new attempt to keep the input line minimal
