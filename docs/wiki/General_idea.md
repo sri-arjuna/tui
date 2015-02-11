@@ -1,7 +1,7 @@
 TUI - The general idea
 ======================
 
-TUI is ment as a framework to easier share scripts with each other. _(for all the commands, see [Commands: Methodology](https://github.com/sri-arjuna/tui/wiki/Commands:-Methodology))_
+TUI is ment as a framework to easier share scripts with each other. _(for all the commands, see [Commands: Methodology](https://github.com/sri-arjuna/tui/wiki/Commands:-Methodology-order))_
 
 Something similar to rather than everyone is using their own functions to display/report and simplify interactions, one shares a common library.
 
