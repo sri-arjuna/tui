@@ -138,12 +138,12 @@ Where options are:
 	# Save changes
 	if ! $GREP $Q "${VARNAME}=" "$CONFFILE"
 	then	# Its not there yet, just append it
-		set -x
+		#set -x
                 echo $LINENO > /dev/zero
                 $hadDollar && \
 			printf '%s\n' "$(eval $REPLACE)" >> "$CONFFILE" || \
 			printf "${REPLACE}\n" >> "$CONFFILE"
-                set +x
+                #set +x
 	elif [ true = $hadDollar ]
 	then	# Remove the escape chars while saving it.
 		#echo "Its already in the file"

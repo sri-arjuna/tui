@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.02.10
-	script_version=1.1
+#	Changed:	2015.02.11
+	script_version=1.2
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.
@@ -75,7 +75,7 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	ARGS=( $(echo "${@}") )			# Remaining arguments
+	ARGS=( "${@}")			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 	COLUMNS=$(tput cols)
 	#SEP+=" "
