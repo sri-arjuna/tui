@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+source tui
+
+cat > "$DEST" << EOF
+#!/usr/bin/env bash
+# File: 	${DEST##*/}
+# Description:	
+# $DEFAULT_LICENSE $(date +'%Y') by $USER_NAME ($USER_EMAIL)
+# ------------------------------------------------------
+#
+#	Variables
+#
+	
+#
+#	Functions
+#
+	
+#
+#	Action & Display
+#
+	
+EOF

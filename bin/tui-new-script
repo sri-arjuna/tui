@@ -29,11 +29,11 @@ Creates a new script in $HOME/bin, if $HOME/.local/bin doesnt exists.
 Also asks to create a basic manpage template in the same location.
 
 Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
-Examples:	$ME fileA.sh			# Creates a script in $HOME/bin
-		$ME -a /opt/bin/fileB.sh	# Creates a full application script in /opt/bin
+Examples:	$ME fileA.sh			# Creates a script in ~/bin or ~/.local/bin if existing
+		$ME -s /opt/bin/fileB.sh	# Creates a standalone application script in /opt/bin
 Where options are:
 	-h		This screen
-	-a(pplication)	Create a full application script template
+	-s(tandalone)	Create a standalone application script template
 	-r(egular)	Creates a same as default (no option), but less pre-sets
 	-t(ool)		Creates a template optimized for quiet and verbose mode
 	-m(inimal)	Creates a minimal header
@@ -41,19 +41,19 @@ Where options are:
 "
 	DEST=""
 	TITLE="sea's New script script"
-	SHELL_EXT="default"
+	SCRIPT="modul" # The default
 #
 #	Variable handling
 #
 	tui-title "$TITLE ($script_version)"
-	while getopts "hamr" name
+	while getopts "hsrtm" name
 	do 	case $name in
-		a)	SHELL_EXT="application"	;;
-		m)	SHELL_EXT="minimal"	;;
-		r)	SHELL_EXT="regular"	;;
-		t)	SHELL_EXT="tool"	;;
 		h)	printf "$help_text"
 			exit $RET_HELP	;;
+		s)	SCRIPT="standalone"	;;
+		r)	SCRIPT="regular"	;;
+		t)	SCRIPT="tool"	;;
+		m)	SCRIPT="minimal"	;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
 	done
@@ -84,8 +84,8 @@ Where options are:
 	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
 		tui-status $? "Overwrite file: $DEST"
 	fi
-	APP_DIR=/usr/share/tui
-	source $APP_DIR/templates/scripts/$SHELL_EXT
+	APP_DIR=$PREFIX/share/tui
+	source $APP_DIR/templates/scripts/$SCRIPT
 	if tui-status $? "Saved: $(printf $DEST)"
 	then	chmod +x "$DEST"
 	else	exit $?
@@ -95,5 +95,5 @@ Where options are:
 	tui-yesno "Create a manpage too?" && \
 		tui-new-manpage "$DEST"
 	
-	# Open the scriot AFTER the manpage... to encourage the writing of the manpage
+	# Open the scriot AFTER the manpage... to encourage the writing of the manpages ;)
 	tui-edit "$DEST"

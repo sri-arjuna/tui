@@ -46,6 +46,8 @@ cat > "$DEST" << EOF
 		ME_DIR="\$(pwd)"			# Dirname of ${DEST##*/}
 	CONFIG_DIR="\$HOME/.config/\$ME"		# Configuration directory
 	CONFIG="\$CONFIG_DIR/\$ME.conf"		# Configuration file
+## TODO
+## If you need more configuration files, simply add them, within quotes, to the array below
 	LOG="\$CONFIG_DIR/\$ME.log"		# Logfile
 	TEMPFILE="\$CONFIG_DIR/\$ME.tmp"		# Tempfile
 	REQUIRES="tui bash"
@@ -70,9 +72,20 @@ Examples:	\$ME -v
 		\$ME -e optVAL
 Where options are:
 	-h(elp) 		This screen
+	-C(onf			Show the config menu
 	-L(og)			Show the log file (\$LOG)
 	-q(uiet)		Mutes all output
 	-v(erbose)		Enables the scripts verbosity
+	
+
+Files:
+--------------------------------------
+Script:		\$ME
+Script-Dir:	\$ME_DIR
+Config: 	\$CONFIG
+Config_Dir:	\$CONFIG_DIR
+Log:		\$LOG
+Tempfile:	\$TEMPFILE
 "
 #
 #	Configuration file template
@@ -97,15 +110,14 @@ Where options are:
 	doLog() { # "MESSAGE STRING"
 	# Prints: Time & "Message STRING"
 	# See 'tui-log -h' for more info
-		# logVerb is set by the options
-		tui-log \$logVerb -t "\$LOG" "\$1"
+		tui-log -t "\$LOG" "\$1"
 	}
 	checkLog() { #
 	# Checks if \$LOG exists
 	# If not, create default header
 		# This is optimized for a one-time setup
-		if \$beLog && [ ! -e "\$LOG" ]
-		then	[ -d "\$CONFIG_DIR" ] || mkdir -p "\$CONFIG_DIR"
+		if \$beLog && [[ ! -e "\$LOG" ]]
+		then	[[ -d "\$CONFIG_DIR" ]] || mkdir -p "\$CONFIG_DIR"
 			if touch "\$LOG"
 			then	doLog "------------------------------------------" && \\
 				doLog "Created logfile of \$ME (\$script_version)" && \\
@@ -126,7 +138,7 @@ Where options are:
 	fi
 	
 	# Create configuration file from template if not exist yet
-	[ ! -f "\$CONFIG" ] && \\
+	[[ ! -f "\$CONFIG" ]] && \\
 		( tui-bol-dir "\$CONFIG_DIR" && echo "\$config_template" > "\$CONFIG" )
 
 ## TODO : Remove this 'source block' if you want to read the variables from CONFIG manualy
@@ -140,16 +152,14 @@ Where options are:
 #	Install missing packages
 #
 	R=\$(tui-conf-get \"\$CONFIG\" reqs_installed)
-	if [ ! true = "\$R" ]
+	if [[ ! true = "\$R" ]]
 	then	for req in \$REQUIRES;do
 			tui-printf "Verifying: \$req..." "\$(tui-indi)"
 			if ! which \$req 2>/dev/zero 
-			then	reqs+" \$req"
+			then	\$beLog && doLog -v "Installing: $req"
+				tui-install \$req
 			fi
 		done
-		\$beLog && doLog "Installing: $reqs"
-		tui-install \$req && \\
-			tui-conf-get \"\$CONFIG\" reqs_installed true
 	fi
 #
 #	Catching Arguments
@@ -175,12 +185,13 @@ Where options are:
 			;;
 		v)	beVerbose=true
 			log_msg="Enabled verbosity"
-			logVerb="-v"
 			;;
 		*)	printf "\$help_text" ; exit \$?	;;
 		esac
 		\$beLog && \\
 			doLog "Options: \$log_msg"
+		\$beVerbose && \\
+			tui-echo "\$log_msg"
 	done
 	shift \$((\$OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
 	ARGS=("\${*}")			# Remaining arguments
@@ -202,10 +213,10 @@ Where options are:
 	then	tui-echo "This is some sample test" \\
 			"with a centre" \\
 			"and right alignment"
+		
 	fi
 #
 # 	Clean up & exit
 #
-	[ -f "\$TEMPFILE" ] && rm -fr "\$TEMPFILE"
-	exit 0
+	[[ -f "\$TEMPFILE" ]] && rm -fr "\$TEMPFILE"
 EOF

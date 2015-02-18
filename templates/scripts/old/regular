@@ -34,13 +34,14 @@ cat > "$DEST" << EOF
 	script_version=0.0.1
 	TITLE="${DEST##*/}"
 #	Description:	Text TODO
+#			...  TODO
 #
 #
 #	Script Environment
 #
 	ME="\${0##*/}"				# Basename of ${DEST##*/}
 	ME="\${ME/.sh/}"				# Cut off .sh extension
-	[ ! "." = "\$(dirname \$0)" ] && \\
+	[[ ! "." = "\$(dirname \$0)" ]] && \\
 		ME_DIR="\$(dirname \$0)" || \\
 		ME_DIR="\$(pwd)"			# Dirname of ${DEST##*/}
 	CONFIG_DIR="\$HOME/.config/\$ME"		# Configuration directory
@@ -63,6 +64,13 @@ Where options are:
 	-h(elp) 		This screen
 	
 
+Files:
+--------------------------------------
+Script:		\$ME
+Script-Dir:	\$ME_DIR
+Config: 	\$CONFIG
+Config_Dir:	\$CONFIG_DIR
+Tempfile:	\$TEMPFILE
 "
 #
 #	Functions
@@ -79,7 +87,7 @@ Where options are:
 			exit \$RET_HELP
 			;;
 		*)	printf "\$help_text" 
-			exit 1
+			exit \$?
 			;;
 		esac
 	done
@@ -91,10 +99,10 @@ Where options are:
 #
 	tui-header "\$ME (\$script_version)" "\$(date +'%F %T')"
 	tui-title "\$TITLE"
+
 	
 #
 # 	Clean up & exit
 #
-	[ -f "\$TEMPFILE" ] && rm -fr "\$TEMPFILE"
-	exit 0
+	[[ -f "\$TEMPFILE" ]] && rm -fr "\$TEMPFILE"	
 EOF
