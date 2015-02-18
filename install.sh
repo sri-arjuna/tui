@@ -102,10 +102,11 @@
 	cp -a uninstall.sh $DIR_APP/
 	
 	# Final display
+	CONF="/etc/$app/$app.conf"
 	if tui-status $? "Installed $app"
 	then	# Neither tui-conf-set nor sed seems to be working properly
-		tui-conf-set "/etc/$app/$app.conf" PREFIX "$PREFIX"
-		sed s,"PREFIX=/usr","PREFIX=$PREFIX",g -i "/etc/$app/$app.conf"
+		tui-conf-set "$CONF" PREFIX "$PREFIX" >&2 2&>/dev/zero  || echo "Failed to change CONF to PREFIX=$PREFIX..."
+		sed s,"PREFIX=/usr","PREFIX=$PREFIX", -i "/etc/$app/$app.conf" >&2 2&>/dev/zero 
 		
 		tui-yesno "Remove these tempfiles here \"$PWD/*\" ?" && \
 			rm -fr ./* && rm -fr ./.[a-zA-Z]*
