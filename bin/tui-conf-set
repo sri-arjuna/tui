@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.02.10
-	script_version=0.9.8
+#	Changed:	2015.02.18
+	script_version=0.9.9
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -97,7 +97,8 @@ Where options are:
 # 	Preformat strings
 #
 	#SEARCH="$( $GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[[:space:]]')"
-	SEARCH="${VARNAME}=.\*"
+	#SEARCH="${VARNAME}=.\*"
+	SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=")" #|tr -d '[[:space:]]')"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
