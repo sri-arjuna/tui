@@ -103,7 +103,7 @@
 	
 	# Final display
 	if tui-status $? "Installed $app"
-	then	tui-conf-set "/etc/$app/$app.conf" PREFIX "$PREFIX"
+	then	sed s,"PREFIX=/usr","PREFIX=$PREFIX",g -i "/etc/$app/$app.conf"
 		tui-yesno "Remove these tempfiles here \"$PWD/*\" ?" && \
 			rm -fr ./* && rm -fr ./.[a-zA-Z]*
 		exit 0
