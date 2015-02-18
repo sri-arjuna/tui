@@ -22,7 +22,7 @@
 #	File:		tui-log
 #	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
-#	Changed:	2015.01.23
+#	Changed:	2015.02.18
 #
 #	Description:	Simply writes a log file
 #
@@ -30,7 +30,7 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.6.1
+	script_version=0.6.2
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
@@ -92,8 +92,9 @@ Where options are:
 	if [ ! -f "$LOG" ]
 	then 	# Create log file, exit with message on error
 		# Prints basic log header
+		tui-bol-dir "$(dirname $LOG)" 1>/dev/zero 2>/dev/zero || tui-status 1 "Failed to create $(dirname $LOG)"
 		if ! touch "$LOG" 2>/dev/zero
-		then	tui-status 1 "Failed to create $LOG as $USER" 
+		then	tui-status 1 "Failed to create $LOG" 
 			exit 1
 		fi
 		printf "$daily_date_str\n" > "$LOG"
@@ -102,7 +103,7 @@ Where options are:
 		# If PRE doesnt not contain today's date, see if the log contains,
 		# if its missing there too, add today's date first
 		printf "${PRE}${MSG}" | $GREP -q "$D" || \
-			( $GREP -q $D "$LOG" || tui-log -e "$LOG" "\n$daily_date_str" )
+			( $GREP -q $D "$LOG" || tui-log -e "$LOG" "$daily_date_str" )
 	fi
 	while [ " " = "${PRE:0:1}" ] ;do PRE="${PRE:1}";done	# Remove leading spaces
 	$beVerbose && tui-echo "$MSG"
