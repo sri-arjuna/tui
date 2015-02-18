@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7
+	script_version=0.7.1
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"
@@ -32,14 +32,16 @@
 #
 	source /etc/tui/tui.conf
 	[ -f "$HOME/.config/tui/user.conf" ] && source $HOME/.config/tui/user.conf
-	source /usr/share/tui/themes/$TUI_THEME
+	source $PREFIX/share/tui/themes/$TUI_THEME
 	help_text="
 $ME ($script_version)
 Usage: 	$ME \"Question\"
 
 Example:
 	if $ME 'Do you want to do this?'
-	then ...
+	then echo yes
+	else echo no
+	fi
 
 "
 #

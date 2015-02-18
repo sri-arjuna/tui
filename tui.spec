@@ -128,6 +128,8 @@ rm -rf %{buildroot}
 %changelog
 * Wed Feb 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-27
 - Updated:   tui-log, better handling on creating initial logfile
+- Updated:   install.sh, using PREFIX to custom target installations
+-            Some commands, so they now also use PREFIX when installed
 
 * Wed Feb 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-25
 - Fixed:     tui-list, items with space are properly shown now

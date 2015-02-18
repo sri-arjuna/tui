@@ -23,12 +23,13 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.01.23
-	script_version=1.4.7
+#	Changed:	2015.02.18
+	script_version=1.4.8
 #	Description:	The absolute core function for TUI
 #
 #	Variables
 #
+	source /etc/tui/tui.conf
 	source /etc/tui/colors.conf
 	source /etc/tui/commands.conf
 	if [ -z "$TUI_THEME" ]
@@ -38,11 +39,11 @@
 		else	cfg="$HOME/.config/tui/user.conf"
 			[ ! -f "$cfg" ] && \
 				mkdir -p "$(dirname $cfg)" && \
-				cp /usr/share/tui/*conf "$(dirname $cfg)"
+				cp $PREFIX/share/tui/*conf "$(dirname $cfg)"
 			source "$cfg"
 		fi
 	fi
-	source "/usr/share/tui/themes/$TUI_THEME"
+	source "$PREFIX/share/tui/themes/$TUI_THEME"
 
 	# Prepare for output:
 	BORDER_RIGHT=""

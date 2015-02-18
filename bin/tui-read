@@ -26,9 +26,9 @@
 	. /etc/tui/tui.conf
 	[ 0 -ne $UID ] && . $HOME/.config/tui/user.conf
 	#[ -z "$THEME" ] && THEME=default
-	. /usr/share/tui/themes/$TUI_THEME
+	. $PREFIX/share/tui/themes/$TUI_THEME
 	
-	script_version=0.9.9
+	script_version=1.0
 	ME="$(basename $0)"
 	help_text="
 $ME ($script_version)

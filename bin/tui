@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
-#	Changed:	2015.01.29
-	script_version=1.6.1
+#	Changed:	2015.02.18
+	script_version=1.6.2
 #	Description:	Tool to configure TUI
 #
 #	Variables
@@ -69,12 +69,12 @@
 		0)	# ROOT, system wide
 			RANGE="System defaults"
 			CFG_DIR=/etc/tui
-			SRC_DIR=/usr/share/tui/conf.etc
+			SRC_DIR=$PREFIX/share/tui/conf.etc
 			;;
 		*)	# USER, personal only
 			RANGE="Personal settings"
 			CFG_DIR=$HOME/.config/tui
-			SRC_DIR=/usr/share/tui
+			SRC_DIR=$PREFIX/share/tui
 			;;
 		esac
 		

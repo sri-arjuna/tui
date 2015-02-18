@@ -30,13 +30,13 @@
 	. /etc/tui/tui.conf
 	[ 0 -ne $UID ] && . $HOME/.config/tui/user.conf
 	[ -z "$TUI_THEME" ] && TUI_THEME=default
-	. /usr/share/tui/themes/"$TUI_THEME"
+	. $PREFIX/share/tui/themes/"$TUI_THEME"
 	#. /etc/tui/themes/$TUI_THEME
 
 	#source /etc/tui/themes/$TUI_THEME
 	ME=${0##*/}
 	
-	script_version=0.6
+	script_version=0.6.1
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)

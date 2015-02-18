@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2014.12.11
-	script_version=0.4
+#	Changed:	2015.02.18
+	script_version=0.4.1
 #	Description:	Descriptional text goes here
 #
 #	Variables
@@ -87,5 +87,5 @@ Where options are:
 		#APP_TITLE=$(tui-read "What is the frameworks's title: ")
 	fi
 	tui-bol-dir "$APP_TITLE/$APP_DATA"
-	source "/usr/share/tui/templates/browser" > "$APP_TITLE/$APP_FILE"
+	source "$PREFIX/share/tui/templates/browser" > "$APP_TITLE/$APP_FILE"
 	tui-filemgr "$APP_TITLE"
