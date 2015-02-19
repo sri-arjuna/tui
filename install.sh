@@ -81,7 +81,7 @@
 	
 	printf "\nCopy files...\n"
 	# Copy docs:
-	cp -a README.md $DIR_APP/
+	#cp -a README.md $DIR_APP/	# Its just a symlink
 	cp -aR docs/* $DIR_DOC/
 	cp -a man/*1 $DIR_MAN1/
 	
@@ -104,8 +104,10 @@
 	# Save the PREFIX for internal use
 	# Currently, neither of which methods saves the value :(
 	CONF="/etc/$app/$app.conf"
-	tui-conf-set "$CONF" PREFIX "$PREFIX" >&2 2&>/dev/zero  || echo "Failed to change CONF to PREFIX=$PREFIX..."
-	sed s,"PREFIX=/usr","PREFIX=$PREFIX", -i "/etc/$app/$app.conf" >&2 2&>/dev/zero 
+	#tui-conf-set "$CONF" PREFIX "$PREFIX" >&2 2&>/dev/zero  || echo "Failed to change CONF to PREFIX=$PREFIX..."
+	#sed s,"PREFIX=/usr","PREFIX=$PREFIX", -i "/etc/$app/$app.conf" >&2 2&>/dev/zero 
+	#echo "# Custom installation
+	echo "PREFIX=$PREFIX" >> "$CONF"
 	
 	# Final display
 	if tui-status $? "Installed $app"

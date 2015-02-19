@@ -92,6 +92,7 @@ rm -fr %{name}/screenshots
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
 mv %{name}/%{name}_compl.bash %{buildroot}%{_sysconfdir}/bash_completion.d/
 # Copy system defaults to system
+echo "PREFIX=/usr" >> %{name}/conf.etc/tui.conf
 cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
 # Move system defaults to app dir
 mv %{name}/conf.etc    %{buildroot}%{_datarootdir}/%{name}/
