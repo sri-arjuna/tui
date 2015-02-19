@@ -26,7 +26,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
 #	Changed:	2015.02.18
-	script_version=0.8.1
+	script_version=0.8.2
 	TITLE="Paralell Script Manager"
 #	Description:	Executes all scripts in paralell, unless LIMIT says diffrent, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
@@ -143,6 +143,7 @@ Tempdir:	$TEMP
 #
 #	Display & Action
 #
+	DONE=0
 	while [ $DONE -lt $MAX ]
 	do	# Loop the menu
 		C=0

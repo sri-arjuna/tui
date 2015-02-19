@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.0
-Release:     27%{?dist}
+Release:     28%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -127,10 +127,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Wed Feb 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-27
+* Wed Feb 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-28
 - Updated:   tui-log, better handling on creating initial logfile
 - Updated:   install.sh, using PREFIX to custom target installations
 -            Some commands, so they now also use PREFIX when installed
+- Updated:   tui-new-script, modified templates a bit
+- Updated:   tui-psm, needed to set a variable earlier
 
 * Wed Feb 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-25
 - Fixed:     tui-list, items with space are properly shown now
