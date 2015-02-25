@@ -99,11 +99,11 @@ Where options are:
 		fi
 		printf "$daily_date_str\n" > "$LOG"
 	else 	# LOG exists
-		#D=$(date +'%F')
+		D=$(date +'%F')
 		# If PRE doesnt not contain today's date, see if the log contains,
 		# if its missing there too, add today's date first
 		printf "${PRE}${MSG}" | $GREP -q "$D" || \
-			( $GREP -q $D "$LOG" || tui-log -e "$LOG" "$daily_date_str" )
+			( $GREP -q "$D" "$LOG" || tui-log -e "$LOG" "$daily_date_str" )
 	fi
 	while [ " " = "${PRE:0:1}" ] ;do PRE="${PRE:1}";done	# Remove leading spaces
 	$beVerbose && tui-echo "$MSG"
