@@ -22,12 +22,12 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.02.18
+#	Changed:	2015.02.25
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7.10
+	script_version=0.7.11
 #	[ 0 -eq $UID ] && \
 #		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \
 #		source $PREFIX/share/tui/themes/$TUI_THEME
@@ -559,15 +559,35 @@ Where options are:
 		#
 		# MENU :: NUM
 		#
-			select e in $(ls|$GREP -v $SPECIAL_NAME. ) Back Quit;do 
-				case "$e" in
+			# OLD -- Working
+			#select e in $(ls|$GREP -v $SPECIAL_NAME. ) Back Quit;do 
+			#	case "$e" in
+			#	Back)	menu="back"
+			#		break	;;
+			#	Quit)	menu="quit-browser"
+			#		exit 0	;;
+			#	*)	menu=up
+			#		[ -f "$e" ] &&  ./"$e"
+			#		[ -d "$e" ] && cd "$e"
+			#		break
+			#		;;
+			#	esac
+			#done
+			
+			# NEW -- Experimental
+			menu="show"
+			
+			while [ "$menu" = show ]
+			do 
+				selected=$(tui-select $(ls|$GREP -v $SPECIAL_NAME. ) Back Quit)
+				case "$selected" in
 				Back)	menu="back"
 					break	;;
 				Quit)	menu="quit-browser"
 					exit 0	;;
-				*)	menu=up
-					[ -f "$e" ] &&  ./"$e"
-					[ -d "$e" ] && cd "$e"
+				*)	menu=nolonger
+					[ -f "$selected" ] &&  ./"$selected"
+					[ -d "$selected" ] && cd "$selected"
 					break
 					;;
 				esac
