@@ -93,7 +93,7 @@ Where options are:
 			
 			[ $NUM -gt $[ $len - 1 ] ] && \
 				invalid=true && \
-				printf "\r$BORDER_LEFT >   \r" || \
+				printf "\r$BORDER_LEFT >   \r" >> /dev/stderr || \
 				invalid=false
 			
 			# Array starts at 0
