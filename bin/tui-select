@@ -35,7 +35,7 @@
 	#source /etc/tui/themes/$TUI_THEME
 	ME=${0##*/}
 	
-	script_version=0.6.2
+	script_version=0.6.3
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -102,12 +102,14 @@ Where options are:
 	done
 	
 	# Make 'nice to have' linebreak when read automaticly stops reading
-	if [ 1 -eq $len ]
-	then	printf "\n" > /dev/stderr
-	elif [ ${#NUM} -eq $len ] 
+	#if [ 1 -eq $len ]
+	#then	printf "\n" > /dev/stderr
+	#el
+	if [ ${#NUM} -eq $len ] 
 	then	printf "\n" > /dev/stderr
 	else	# Maybe here will be required further testing
-		printf "\n" > /dev/stderr
+		#printf "\n" > /dev/stderr
+		# Lets see if toggle it off solves the empty line
 	fi
 	
 	# This is the output
