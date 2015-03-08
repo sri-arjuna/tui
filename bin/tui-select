@@ -25,16 +25,12 @@
 #
 #	Variables
 #
-	#source tui
 	. /etc/tui/tui.conf
 	[ 0 -ne $UID ] && . $HOME/.config/tui/user.conf
 	[ -z "$TUI_THEME" ] && TUI_THEME=default
-	. $PREFIX/share/tui/themes/"$TUI_THEME"
-	#. /etc/tui/themes/$TUI_THEME
-
-	#source /etc/tui/themes/$TUI_THEME
-	ME=${0##*/}
+	source $PREFIX/share/tui/themes/"$TUI_THEME"
 	
+	ME=${0##*/}
 	script_version=0.6.3
 	counter=0
 	AUTO=false
@@ -50,7 +46,6 @@ Where options are:
 #
 #	Action
 #
-	#[ -z "$1" ] && printf "$help_text" && exit 99
 	while getopts "ha" opt
 	do	case "$opt" in
 		h|"")	printf "$help_text"
@@ -65,7 +60,6 @@ Where options are:
 	# This many digits to read at max
 	ARGS=("${@}")
 	len=${#ARGS[@]}
-	#echo $len
 	$AUTO && \
 		[ $len -eq 1 ] && \
 		printf '%s\n' "$ARGS" > /dev/stdout && \
@@ -87,8 +81,6 @@ Where options are:
 		elif [ "" = "$(echo $NUM|tr -d [:digit:])" ] && [ $NUM -ne 0 ]
 		then	# It is a number in range?
 			[ $NUM -eq ${#ARGS[@]} ] && NUM=0
-			#	invalid=false || \
-			#	invalid=true
 			
 			[ $NUM -gt $[ $len - 1 ] ] && \
 				invalid=true && \
@@ -102,14 +94,9 @@ Where options are:
 	done
 	
 	# Make 'nice to have' linebreak when read automaticly stops reading
-	#if [ 1 -eq $len ]
-	#then	printf "\n" > /dev/stderr
-	#el
 	if [ ${#NUM} -eq $len ] 
-	then	printf "\n" > /dev/stderr
-	#else	# Maybe here will be required further testing
-		#printf "\n" > /dev/stderr
-		# Lets see if toggle it off solves the empty line
+	then	# Only print newline character if the entered number as the longest number
+		printf "\n" > /dev/stderr
 	fi
 	
 	# This is the output
