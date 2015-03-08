@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2014.12.18
-	script_version=0.4
+#	Changed:	2015.02.26
+	script_version=0.5
 	TITLE="Install packages"
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 #	Description:	Install provided packages, using the 'default' package manager
@@ -184,23 +184,27 @@ Where options are:
 		tui-progress -r
 		for app in ${ARGS[*]};do
 			cmd_all="$APP $cmd $app"
+			app_name=$(basename $app)
 			$doLog && tui-log "$LOG" "Execute: $cmd_all"
 			
-			tui-progress -m $# "Installing: $app"
+			tui-progress -m $# "Installing: $app_name" > /dev/zero
+			tui-printf -rS 2 "Installing $all_name"
 			$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
 			
-			tui-status $RET "Installed package: $app" && \
+			tui-status $RET "Installed package: $app_name" && \
 				( $doLog && tui-log "$LOG" "Successfully installed: $app" ) || \
 				( $doLog && tui-log "$LOG" "Failed to install: $app" )
 			[ 0 -eq $RET ] && \
-				good_ones+=" $app" && ((count_good++)) || \
-				bad_ones+=" $app"
+				good_ones+=" $app_name" && ((count_good++)) || \
+				bad_ones+=" $app_name"
 			((count_total++))
 		done
 		[ -z "$bad_ones" ] && \
 			tui-echo "There were $[ $count_total - $count_good ] errors, namely these:" "$bad_ones"
-	else	# Do all in one bunch
-		tui-echo "Installing $@"
+	else	# Do all in one bunch, but shorten the names to display
+		all_pkgs=""
+		for a in "${@}";do all_pkgs+=" $(basename $a)";done
+		tui-printf -rS 2 "Installing $all_pkgs"
 		cmd_all="$APP $cmd $@"
 		$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
 		

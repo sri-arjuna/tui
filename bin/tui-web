@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.4.1
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -56,13 +56,13 @@
 	#
 		[ -z "$1" ] && echo "GetAvailableApp requires: gui or cli" && return 1
 		
-		case $1 in
+		case "$1" in
 		cli)	LIST="w3m lynx elinks"	;;
 		gui)	LIST="firefox chrome chromium epiphany midori opera seamonkey safari "	;;
 		esac
 		
 		for L in $LIST;do
-			which $L 2>/dev/zero && \
+			which $L 2>/dev/zero 1>/dev/zero && \
 				echo "$L" && \
 				return 0
 		done
@@ -79,20 +79,20 @@
 	
 	if [ -z "$BROWSER" ]
 	then	case $MODE in
-		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero)	;;
-		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero)	;;
+		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero 1>/dev/zero)	;;
+		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero 1>/dev/zero)	;;
 		esac
 		export BROWSER
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $BROWSER 2>/dev/zero
+	if ! which $BROWSER 2>/dev/zero 1>/dev/zero
 	then 	# The EDITOR is not available, search for default
 		BROWSER=$(GetAvailableApp $MODE)
 		[ $MODE = cli ] && \
 			var=BROWSER_CLI || \
 			var=BROWSER_GUI
 		[ -z "$BROWSER" ] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
-		tui-conf-set "$CONF" $var $BROWSER
+		tui-conf-set "$CONF" "$var" "$BROWSER"
 	fi
 	
 	for A in "${ARGS[@]}";do

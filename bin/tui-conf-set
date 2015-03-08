@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.02.18
-	script_version=0.9.9
+#	Changed:	2015.03.07
+	script_version=1.0
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -58,7 +58,6 @@ Where options are:
 	SMALL=false
 	hadDollar=false
 	SD=","
-	#source /etc/tui/commands.conf
 #
 #	Catching Arguments
 #
@@ -73,7 +72,7 @@ Where options are:
 			;;
 		i)	OPT="-i"
 			;;
-		l)	$GREP -v ^# "$2"|$GREP "="|$SED s,"="," ",g|$AWK '{print $1}'
+		l)	$GREP -v ^"#" "$2"|$GREP "="|$SED s,"="," ",g|$AWK '{print $1}'
 			exit 0
 			;;
 		h)	printf "$help_text"
@@ -84,21 +83,18 @@ Where options are:
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
 	VARNAME="$2"
-	VALUE="$3" #; echo "$LINENO VALUE=\$3 -- $VALUE" > /dev/zero
+	VALUE="$3"
 	 
 	# Exit if it does not exist
 	if [ ! -f "$CONFFILE" ]
-	then	#tui-status 1 "$CONFFILE does not exist!"
-		#exit $?
-                tui-bol-dir "$(dirname $CONFFILE)"
+	then	 tui-bol-dir "$(dirname $CONFFILE)"
                 touch "$CONFFILE"
 	fi
 #
 # 	Preformat strings
 #
-	#SEARCH="$( $GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#)" #|tr -d '[[:space:]]')"
-	#SEARCH="${VARNAME}=.\*"
 	SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=")" #|tr -d '[[:space:]]')"
+	SEARCH="$(echo $SEARCH|$SED -e 's/^[[:space:]]*//')"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}"
@@ -119,13 +115,9 @@ Where options are:
 	fi
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
-	#set -x
         if echo "$REPLACE" | $GREP '[%$+@\]'
 	then	hadDollar=true
-		#REPLACE=$(echo "$REPLACE"|$SED 's|[%$/\|\@]|\\&|g')
-		#SEARCH=$(echo "$SEARCH"|$SED 's|[%"$/\|\@]|\\&|g')
 	fi
-       # set +x
 #
 #	Display & Action
 #
@@ -139,19 +131,13 @@ Where options are:
 	# Save changes
 	if ! $GREP $Q "${VARNAME}=" "$CONFFILE"
 	then	# Its not there yet, just append it
-		#set -x
-                echo $LINENO > /dev/zero
-                $hadDollar && \
+		$hadDollar && \
 			printf '%s\n' "$(eval $REPLACE)" >> "$CONFFILE" || \
 			printf "${REPLACE}\n" >> "$CONFFILE"
-                #set +x
 	elif [ true = $hadDollar ]
 	then	# Remove the escape chars while saving it.
-		#echo "Its already in the file"
-		echo $LINENO > /dev/zero
-                eval $cmd
-		#$cmd
-	else	#printf "\n\n\n\t\t$cmd\n\n\n\n"
+		eval $cmd
+	else	#echo " CHECK THIS --- line :: $LINENO" > /dev/zero
 		$cmd
 	fi
 	

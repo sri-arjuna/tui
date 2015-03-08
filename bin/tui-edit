@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.0
+	script_version=1.2
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -61,14 +61,13 @@
 	#
 		[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
 		
-		case $1 in
+		case "$1" in
 		cli)	LIST="emacs vim nano vi"	;;
 		gui)	LIST="emacs notepadqq code-editor brackets geany pluma gedit leafpad kedit notepad editplus nedit"	;;
 		esac
 		
 		for L in $LIST;do
 			which $L 2>/dev/zero && \
-				echo "$L" && \
 				return 0
 		done
 		return 1
@@ -78,13 +77,13 @@
 #
 	if [ -z "$EDITOR" ]
 	then	case $MODE in
-		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero)	;;
-		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero)	;;
+		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero 1>/dev/zero)	;;
+		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero 1>/dev/zero)	;;
 		esac
 		export EDITOR
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $EDITOR > /dev/zero
+	if ! which $EDITOR > /dev/zero  1>/dev/zero 2>/dev/zero
 	then 	# The EDITOR is not available, search for default
 		EDITOR=$(GetAvailableApp $MODE)
 		[ $MODE = cli ] && \
@@ -95,7 +94,7 @@
 	fi
 	
 	for A in "${ARGS[@]}";do
-		[ ! -z $A ] && \
+		[ ! -z "$A" ] && \
 			tui-echo "Opening:" "$A" && \
 			$EDITOR "$A"
 	done
