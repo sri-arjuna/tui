@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.7.0
-Release:     41%{?dist}
+Version:     0.7.1
+Release:     0%{?dist}
 Summary:     A line based Text User Interface framework for scripts
 
 License:     GPLv3
@@ -127,10 +127,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-34
+* Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
 - Updated:   tui-edit, now saves the full application path.
 - Updated:   tui-conf-set, there was an issue if vars were indented.
-- Updated:   tui-select, hopefully fixed empty line if user pressed enter
+- Updated:   tui-select, actualy fixed empty line if user pressed enter
 
 * Wed Feb 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-32
 - Updated:   tui-browser now uses tui-select in numeric (default) mode
