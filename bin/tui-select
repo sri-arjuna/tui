@@ -107,7 +107,7 @@ Where options are:
 	#el
 	if [ ${#NUM} -eq $len ] 
 	then	printf "\n" > /dev/stderr
-	else	# Maybe here will be required further testing
+	#else	# Maybe here will be required further testing
 		#printf "\n" > /dev/stderr
 		# Lets see if toggle it off solves the empty line
 	fi
