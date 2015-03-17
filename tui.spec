@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.1
-Release:     2%{?dist}
+Release:     3%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -12,6 +12,45 @@ BuildArch:   noarch
 
 Requires:    bash
 Requires:    coreutils
+
+Provides:    tui
+Provides:    tui-bgjob
+Provides:    tui-bol-dir
+Provides:    tui-bol-sudo
+Provides:    tui-browser
+Provides:    tui-cat
+Provides:    tui-conf-editor
+Provides:    tui-conf-get
+Provides:    tui-conf-set
+Provides:    tui-dd
+Provides:    tui-download
+Provides:    tui-echo
+Provides:    tui-edit
+Provides:    tui-filemgr
+Provides:    tui-ftp
+Provides:    tui-header
+Provides:    tui-indi
+Provides:    tui-install
+Provides:    tui-list
+Provides:    tui-log
+Provides:    tui-new-browser
+Provides:    tui-new-manpage
+Provides:    tui-new-script
+Provides:    tui-press
+Provides:    tui-printf
+Provides:    tui-progress
+Provides:    tui-psm
+Provides:    tui-read
+Provides:    tui-rnd
+Provides:    tui-select
+Provides:    tui-status
+Provides:    tui-str-usb
+Provides:    tui-tar
+Provides:    tui-terminal
+Provides:    tui-title
+Provides:    tui-wait
+Provides:    tui-web
+Provides:    tui-yesno
 
 
 %description
@@ -126,6 +165,8 @@ rm -rf %{buildroot}
 %changelog
 * Tue Mar 17 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
 - Updated:   tui-list, now accepts -1 or -2 to define output rows
+- Updated:   tui, no longer shows config screen when passing
+-            'config' to certain tui-<command>'s
 
 * Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
 - Updated:   tui-edit, now saves the full application path.

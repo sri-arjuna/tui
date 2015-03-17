@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.05.06
-#	Changed:	2015.02.18
-	script_version=1.6.2
+#	Changed:	2015.03.17
+	script_version=1.6.3
 #	Description:	Tool to configure TUI
 #
 #	Variables
@@ -60,7 +60,7 @@
 		cd "$thisconf"
 		
 		# Show & Edit files
-		tui-conf-editor *conf
+		tui-conf-editor -t "Text User Interface" *conf
 	}
 	ResetTUI() { #
 	#
@@ -130,46 +130,46 @@ Where options are:
 			esac
 		done
 		shift $(($OPTIND - 1))
-	fi
 	
-	MODE="$1"
-	YES=false
-	case $MODE in
-	config)
-		ConfigTUI
-		exit $?
-		;;
-	reset-yes)
-		MODE=reset
-		YES=true
-		;;
-	theme)	#set +x
-		[ 0 -eq $UID ] && \
-			ITEM=TUI_THEME_ROOT || \
-			ITEM=TUI_THEME
-		if [ -z "$2" ]
-		then	#ls /usr/share/tui/themes
-			tui-echo "$ITEM is set to:" "$(tui-conf-get $CONF $ITEM)"
+	
+		MODE="$1"
+		YES=false
+		case $MODE in
+		config)
+			ConfigTUI
 			exit $?
-		else	#sh -x /home/sea/prjs/tui/bin/
-			tui-conf-set $CONF $ITEM $2
-			tui-status $? "Changed $ITEM in $CONF to $2"
+			;;
+		reset-yes)
+			MODE=reset
+			YES=true
+			;;
+		theme)	#set +x
+			[ 0 -eq $UID ] && \
+				ITEM=TUI_THEME_ROOT || \
+				ITEM=TUI_THEME
+			if [ -z "$2" ]
+			then	#ls /usr/share/tui/themes
+				tui-echo "$ITEM is set to:" "$(tui-conf-get $CONF $ITEM)"
+				exit $?
+			else	#sh -x /home/sea/prjs/tui/bin/
+				tui-conf-set $CONF $ITEM $2
+				tui-status $? "Changed $ITEM in $CONF to $2"
+				exit $?
+			fi
+			;;
+		esac
+	
+		if [ "$MODE" = "reset" ]
+		then	ResetTUI
+			# $RANGE should be set within the function 'ResetTUI'
+			tui-status $? "Reset $RANGE"
 			exit $?
 		fi
-		;;
-	esac
-	
-	if [ "$MODE" = "reset" ]
-	then	ResetTUI
-		# $RANGE should be set within the function 'ResetTUI'
-		tui-status $? "Reset $RANGE"
-		exit $?
-	fi
 #
 #	Display & Action
 #
-	if [ "$ME" = tui ]
-	then	# Its not sourced, thus show info & config menu
+	#if [ "$ME" = tui ]
+	#then	# Its not sourced, thus show info & config menu
 		tui-printf -H "TUI ($TUI_VERSION) by sea" "$USER_NAME @ $(date +%F) $(date +%T)"
 		tui-printf -T "$TITLE ($script_version)"
 		tui-printf -E "Calling $ME like this gives you an impression how it may look like."
