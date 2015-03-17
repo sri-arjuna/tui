@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.02.11
-	script_version=1.2
+#	Changed:	2015.03.17
+	script_version=1.3
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.
@@ -65,7 +65,7 @@ Where options are:
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
-		1|2)    ROWS=$OPTARG    ;;
+		1|2)    ROWS=$opt	;;
                 a)	MODE=alpha 	;;
 		r)	MODE=roman
 			SEP=". "	;;

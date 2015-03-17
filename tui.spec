@@ -1,7 +1,7 @@
 Name:        tui
 Version:     0.7.1
-Release:     0%{?dist}
-Summary:     A line based Text User Interface framework for scripts
+Release:     2%{?dist}
+Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -10,7 +10,9 @@ Source0:     http://sea.fedorapeople.org/review/%{name}/%{name}-%{version}.tar.g
 
 BuildArch:   noarch
 
+Requires:    bash
 Requires:    coreutils
+
 
 %description
 It is a framework of commands to simply realize a basic TUI with scripts.
@@ -102,11 +104,6 @@ mv %{name}/themes       %{buildroot}%{_datarootdir}/%{name}/
 mv %{name}/docs/*       %{buildroot}%{_docdir}/%{name}
 mv %{name}/man/*.1      %{buildroot}%{_mandir}/man1
 
-# Lets try once again without this...
-rm -fr  %{name}/profile.d/tui.sh
-#mv %{name}/profile.d/tui.sh	%{buildroot}%{_sysconfdir}/profile.d/tui.sh
-# Keep for compatiblity
-touch %{buildroot}%{_sysconfdir}/profile.d/tui.sh
 
 %clean
 rm -rf %{buildroot}
@@ -123,10 +120,13 @@ rm -rf %{buildroot}
 
 %config
 %{_sysconfdir}/%{name}/
-%{_sysconfdir}/profile.d/%{name}.sh
+#%{_sysconfdir}/profile.d/%{name}.sh
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Tue Mar 17 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
+- Updated:   tui-list, now accepts -1 or -2 to define output rows
+
 * Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
 - Updated:   tui-edit, now saves the full application path.
 - Updated:   tui-conf-set, there was an issue if vars were indented.
@@ -148,7 +148,7 @@ rm -rf %{buildroot}
 - Updated:   tui-conf-set, removed debug output
 - Added:     some wiki pages
 
-* Thu Feb 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-23
+* Tue Feb 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-23
 - Updated:   tui-select, new attempt to keep the input line minimal
 - Updated:   tui-conf-[gs]et, decreased overhead, fixed space issue
 - Updated:   tui-list, fixed seperator space issue
@@ -163,17 +163,17 @@ rm -rf %{buildroot}
 -                    to the forummembers of unix.com."
 - Updated:  tui-ftp, added basic logfile parsing for display
 
-* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-2
+* Tue Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-2
 - Added:    tui-ftp, log parsing to generate output
 
-* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-1
+* Tue Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.0-1
 - Added:    tui-ftp, handler for [ls]ftp, incl wiki & manpage
 - Updated:  tui-conf-set, improved check if variable exists or not
 - Changed:  templates/scripts/*, changed shebang to "#!/usr/bin/env bash"
 - Changed:  templates/scripts/*, changed the way it sources tui
 - Changed:  tui-install, was missing -y to continue installation on *bsd
 
-* Thu Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-8
+* Tue Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.6.9-8
 - Updated:  Installation wiki page, added wget installation, ty glenn
 - Updated:  install.sh, had a quoting issue, ty glenn
 - Updated:  tui-conf-set had to check for required quotes in case of space
