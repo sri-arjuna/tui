@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.7.1
-Release:     3%{?dist}
+Version:     0.7.2
+Release:     0%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -163,10 +163,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Tue Mar 17 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
+* Tue Mar 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.2
 - Updated:   tui-list, now accepts -1 or -2 to define output rows
 - Updated:   tui, no longer shows config screen when passing
 -            'config' to certain tui-<command>'s
+- Updated:   tui-browser can be silent now (no header,title,footer)
 
 * Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
 - Updated:   tui-edit, now saves the full application path.

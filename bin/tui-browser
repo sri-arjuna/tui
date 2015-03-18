@@ -22,12 +22,12 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.02.25
+#	Changed:	2015.03.18
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.7.11
+	script_version=0.8
 #	[ 0 -eq $UID ] && \
 #		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \
 #		source $PREFIX/share/tui/themes/$TUI_THEME
@@ -68,6 +68,7 @@ Where options are:
 				extension be called on diffrent purposes...
 				default.info	- Will be shown upon folder entry
 				default.cmd	- Will be executed upon folder entry
+	-q(uiet)		Does not show header, title, footer
 	-S(show pos-line)	Forces the 'Location/Position' line to be shown when calling scripts
 	-X(eXecute)	SHELL	Which shell to use to execute scripts, default bash
 "
@@ -91,6 +92,7 @@ Where options are:
 	doCustomPosition=false	# Will be enabled as soon "-P WORD" is passed
 	showLocationPos_Anyway=false	# While false, this hides the 'Location' title line when calling a script directly
 	showLocationPos_Anyway_ow=false
+	beQuiet=false		# Will be enabled by "-q"
 #
 #	Default Strings
 #
@@ -181,7 +183,7 @@ Where options are:
 #
 #	Catching Arguments
 #
-	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:X:S" name
+	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:qX:S" name
 	do 	case $name in
 		h|help)		printf "$help_text"
 				exit $RET_HELP		;;
@@ -205,6 +207,7 @@ Where options are:
 		b|blacklist) 	BLACKLIST+=" $OPTARG"	;;
 		c|config)	CONFIG[${#CONFIG[@]}]="$OPTARG"	;;
 		d|default)	SPECIAL_NAME="$OPTARG"	;;
+		q|quiet)	beQuiet=true		;;
 		X|execute)	browser_shell="$OPTARG"	;;
 		S)		showLocationPos_Anyway_ow=true	;;
 		esac
@@ -415,17 +418,18 @@ Where options are:
 		#set -x
 		if [ ! -z "$file" ] && [ -f "$CURRENT/$file" ]  #&& [ ! "$CURRENT/" = "$CURRENT/$file" ]
 		then	# Print top header
-			tui-header "$lbl_title" "$lbl_user"
+			$beQuiet || tui-header "$lbl_title" "$lbl_user"
 			
 			# The title is not required, since a script is executed
-			$showLocationPos_Anyway && tui-title "$lbl_location"  "$POSITION"
+			! $beQuiet && $showLocationPos_Anyway && tui-title "$lbl_location"  "$POSITION"
 			
 			# Execute it
 			out=""
 			for a in "${@:1}";do out+=" $a";done
 			
 			$browser_shell "$CURRENT/$file" $args
-			tui-status $? "${lbl_title}${out}"
+			RET=$?
+			$beQuiet || tui-status $RET "${lbl_title}${out}"
 			exit $?
 		else	# There is nothing to execute
 			# Simply change dir and let the menu loop display the heading
