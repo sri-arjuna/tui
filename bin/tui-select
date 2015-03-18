@@ -71,33 +71,37 @@ Where options are:
 	# Repeat input while invalid
 	invalid=true
 	while $invalid
-	do	# Get input
+	do	# Reset input line
 		tui-printf ">" > /dev/stderr
                 printf "\r$BORDER_LEFT > " > /dev/stderr
-                read -n ${#len} NUM
+		invalid=false
 		
-		if [ -z "$NUM" ]
-		then	printf "\r" > /dev/stderr
-		elif [ "" = "$(echo $NUM|tr -d [:digit:])" ] && [ $NUM -ne 0 ]
-		then	# It is a number in range?
+		# Get input
+		read -n ${#len} NUM
+		NUM=$(echo $NUM)
+		
+		# It is a number in range?
+		if [ "" = "$(echo "$NUM"|tr -d [:digit:])" ] && [ $NUM -ne 0 ]
+		then	# This some solves the selection of the last item....
 			[ $NUM -eq ${#ARGS[@]} ] && NUM=0
 			
+			# Clear input if NUM is too high
 			[ $NUM -gt $[ $len - 1 ] ] && \
 				invalid=true && \
-				printf "\r$BORDER_LEFT >   \r" >> /dev/stderr || \
-				invalid=false
+				printf "\r$BORDER_LEFT >   \r" >> /dev/stderr
 			
 			# Array starts at 0
 			NUM=$(( $NUM - 1 ))
-		else 	printf "\r" > /dev/stderr
+		else 	# Clear input if NUM is NOT numeric
+			printf "\r$BORDER_LEFT >   \r" >> /dev/stderr 
 		fi
 	done
 	
 	# Make 'nice to have' linebreak when read automaticly stops reading
-	if [ ${#NUM} -eq $len ] 
+	if [ ${#NUM} -eq ${#len} ] 
 	then	# Only print newline character if the entered number as the longest number
 		printf "\n" > /dev/stderr
 	fi
 	
 	# This is the output
-	printf '%s' "${ARGS[$NUM]}" > /dev/stdout
+	printf '%s\n' "${ARGS[$NUM]}" > /dev/stdout

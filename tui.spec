@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.2
-Release:     0%{?dist}
+Release:     1%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -54,58 +54,8 @@ Provides:    tui-yesno
 
 
 %description
-It is a framework of commands to simply realize a basic TUI with scripts.
-All the commands, but not tui-browser or tui-psm, are optimized to 
-generaly be a one-line output. If not possible, it automaticly splits
-up the output, and prints on a new line the remainings.
-
-Also, creating a TUI, one wants to have some commands to run in
-background and just report basic info to the console, 
-for just that reason tui-bgjob is there, which also can report
-the current filesize.
-
-If you are looking for those init-stlye status messages,
-you will love tui-status! 
-Supporting, but not limited to: DONE, FAIL, WORK, TODO, ON, OFF, SKIP...
-
-Core Interface Commands:
-* tui-echo (Prints up to 3 strings, newline)
-* tui-header (Shows ForeGround color as font, and BG as BG)
-* tui-printf (Prints up to 3 strings, stays_on_current_line)
-* tui-title (Shows BG color as font, and FG color as BG)
-
-Core Code helpers
-* tui-bgjob (Executes script in the background,
-             showing an animation while working...)
-* tui-progress (Showing the next animation step per call)
-* tui-read
-* tui-status (Prints another message according to exit code) 
-* tui-yesno (Returs TRUE on 'y', and FALSE on 'n')
-
-Core Tools:
-* tui-browser (Browsed given path as 'rootfs')
-* tui-conf-editor (Basic wizzard editor)
-* tui-conf-get (Function as script)
-* tui-conf-set (Function as script)
-* tui-log (Helps you manage log file/s(-entries) and print to screen)
-* tui-new-browser
-* tui-new-script
-* tui-psm (Paralell Script Manager)
-
-The assistant commands are:
-* tui-bol-dir
-* tui-dd
-* tui-download
-* tui-edit
-* tui-indi
-* tui-install
-* tui-list
-* tui-press
-* tui-str-usb
-* tui-tar
-* tui-terminal
-* tui-wait
-* tui-web
+Create a Text User Interface for your script!
+Providing 'coding helpers' as well.
 
 %prep
 %setup -q -c %{name}-%{version}
@@ -168,6 +118,7 @@ rm -rf %{buildroot}
 - Updated:   tui, no longer shows config screen when passing
 -            'config' to certain tui-<command>'s
 - Updated:   tui-browser can be silent now (no header,title,footer)
+- Updated:   tui-select, output optimized
 
 * Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
 - Updated:   tui-edit, now saves the full application path.
