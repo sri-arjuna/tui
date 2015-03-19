@@ -23,7 +23,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.02.18
+#	Changed:	2015.03.18
 	script_version=1.4.8
 #	Description:	The absolute core function for TUI
 #
@@ -35,7 +35,7 @@
 	if [ -z "$TUI_THEME" ]
 	then	if [ 0 -eq $UID ]
 		then	source /etc/tui/tui.conf
-			TUI_THEME=$TUI_THEME_ROOT
+			TUI_THEME="$TUI_THEME_ROOT"
 		else	cfg="$HOME/.config/tui/user.conf"
 			[ ! -f "$cfg" ] && \
 				mkdir -p "$(dirname $cfg)" && \
@@ -51,8 +51,8 @@
 	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 	HEAD_BG="$TUI_BACKGROUND"
 	HEAD_FG="$TUI_FOREGROUND"
-	TITLE_BG="$TUI_FONT_INVERT$TUI_BACKGROUND"
-	TITLE_FG="$TUI_FONT_INVERT$TUI_FOREGROUND"
+	TITLE_BG="$TUI_COLOR_INVERT$TUI_BACKGROUND"
+	TITLE_FG="$TUI_COLOR_INVERT$TUI_FOREGROUND"
 #
 #	Regular data
 #	
@@ -74,7 +74,7 @@ Options are:
 			The inner background is colored white with blue font by default
 	-H(header)	Full line has a blue background and white font as default color
 	-S(tatus)	Does special handling with the first argument
-	-r(eturn)	Optional to '-S', returns to line start, rather than newline.
+	-r(eturn)	Optional to '-S', returns to line start, rather than newline where used.
 
 If you want to pass a string with a leading dash (-) to $ME, please provide '--' as argument as well.
 
@@ -144,14 +144,8 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			;;
 		1)	FIRST="$1"
 			SECOND=" "
-			#echo "
-			#PASS 1
-			#"
 			;;
-		2)	#echo "
-			#PASS 2
-			#"
-			FIRST="$1"
+		2)	FIRST="$1"
 			SECOND="$2"
 			;;
 		*)	tui-printf -S 1 "Too many arguments ($#)!"
@@ -240,11 +234,8 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 					
 			else	# Regular output, header, title, echo, printf
 				# Treat each argument by itself - lengthness
-			#	echo DEBUG
-			#	set -x
 				if [ ${#FIRST} -gt $WIDTH ]
 				then	# The first one is too long
-					#echo "DEBUG - 1"
 					[ -z "$FIRST" ] || tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
 					[ -z "$SECOND" ] && \
 						tui-printf $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
@@ -252,30 +243,21 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 					#tui-printf $optStyle $NUM_ID #"$THIRD" ""
 				elif [ ${#SECOND} -gt $WIDTH ]
 				then	# The second one is too long
-					#echo "DEBUG - 2"
 					[ -z "$FIRST" ] || tui-printf $optStyleTMP "$FIRST" 
 					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
 					tui-printf $optStyle " " "${SECOND:($WIDTH - 3)}" "$THIRD"
-					#tui-printf $optStyle " " "$THIRD" " "
 				elif [ ${#THIRD} -gt $WIDTH ]
 				then	# The third one is too long
-					#echo "DEBUG - 3"
 					tui-printf $optStyleTMP "$FIRST" "$SECOND"
 					tui-printf $optStyle " " "$THIRD" ""
 				else	# Regular output, just re-arange strings
-					#echo "DEBUG THIS:"
-					# check diffrent scenarios
 					if [ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]
 					then	tui-printf $optStyleTMP "$FIRST" "$SECOND" " "
 						tui-printf $optStyle 	" " 	"$THIRD"
 					else	tui-printf $optStyleTMP "$FIRST" 
 						tui-printf $optStyle " " 	"$SECOND" "$THIRD"
-						
-						#tui-printf $optStyle 	" " 	"$THIRD"
-					
 					fi
 				fi
-			#	set +x
 			fi
 			;;
 		esac
@@ -344,7 +326,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		adder=$((len_strings % 2))
 		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
 		;;
-	*)	# 3 (BETA - and more - handler)
+	*)	# 4+ (BETA - and more - handler)
 		$doStatus && \
 			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+8}" || \
 			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
@@ -356,9 +338,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Display & Action
 #
-	# Change/switch leading space-dash
-	#[ " -" = "${FIRST:0:2}" ] && \
-	#	FIRST="${FIRST:1} " # Trailing space is a _MUST_ to keep alignment intact, as it got counted when the space was leading
 	# Escape trailing backslash, from whichever argument passed
 	echo "$FIRST" | grep -q "\\"$ && \
 		FIRST="${FIRST}\\\\"
