@@ -1,7 +1,7 @@
-.TH "tui-progress" 1 "Simon A. Erat (sea)" "TUI 0.6.0"
+.TH "tui-progress" 1 "Simon A. Erat (sea)" "TUI 0.7.3"
 
 .SH NAME
-tui-progress (0.3)
+tui-progress (0.7)
 
 .SH SYNOPSIS
 \fBtui-progress\fP [options] [MESSAGE]
@@ -15,6 +15,23 @@ Example:
 .br
 
 .SH OPTIONS
+.OP -b
+.RS 4
+Enables bar-mode
+.RE
+
+.OP -B "STRING"
+.RS 4
+Uses STRING as symbol for the bar.
+.RE
+
+.OP -c NUM
+.RS 4
+Requires for bar-mode.
+.br
+Uses NUM for the current value.
+.RE
+
 .OP -i WORD
 .RS 4
 Uses WORD as describor and tempfile name for the progress index.
@@ -51,6 +68,7 @@ is the current number of the invoke of
 .B "tui-progress -i APPNAME 'Text of Task: $FILENAME'"
 which is saved and increased from the tempfile 'APPNAME'.
 .RE
+
 
 .OP -v
 .RS 4

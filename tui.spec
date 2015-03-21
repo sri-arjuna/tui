@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.7.2
-Release:     2%{?dist}
+Version:     0.7.3
+Release:     0%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -113,10 +113,13 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Mar 19 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.2
+* Thu Mar 19 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.3
 - Updated:   man tui-printf, 0.9.7 -> 1.4.8
 - Changed:   $TUI_FONT_INVERT became corrected to $TUI_COLOR_INVERT
 - Added:     New README - project info
+- Added:     tui-str-genfilename
+- Updated:   tui-progress, bar mode is working now.
+- Updated:   man tui-tar|progress
 
 * Wed Mar 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.2
 - Updated:   tui-list, now accepts -1 or -2 to define output rows

@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.01.23
-	script_version=0.6.1
+#	Changed:	2015.03.21
+	script_version=0.7
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -38,7 +38,7 @@
 	help_text="
 $ME ($script_version)
 $TITLE
-Usage: 	$ME [options] [arguments]
+Usage: 	$ME [options] ['Message']
 Displays either / - \\ | within [     ] as progress string on the right side.
 
 Where options are:
@@ -46,6 +46,7 @@ Where options are:
 	-b(ar)			Enables the 'bar' mode
 	-B(ar)	        VAL     Changes the bar-symbol to VAL
 	-m(ax)		VAL	If provided, changes progressstring output to 'calculated-num / VAL '
+	-c(urrent)	VAL	Required für bar-mode
 	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
 				Should be provided if used with -m
 	-r(eset)		Resets the tempfile, should be used before one is passing -
@@ -58,13 +59,16 @@ Where options are:
 	MAX=1
 	doReset=false
 	BAR='#'
+	CURRENT=$MAX ; valPassed=false
 #
 #	Catching Arguments
 #
-	while getopts "B:bi:m:rh" name
+	while getopts "c:B:bi:m:rh" name
 	do 	case $name in
 		B)	BAR="$OPTARG"		;;
 		b)	TYPE=bar		;;
+		c)	CURRENT="$OPTARG"
+			valPassed=true		;;
 		i)	ID=".$OPTARG"		;;
 		m)	MAX="$OPTARG"
 			[ dash = $TYPE ] && TYPE=num		;;
@@ -80,10 +84,10 @@ Where options are:
 #
 #	 Create initial tempfile if none exists
 #
-	TMPFILE="$TUI_TEMP_DIR/tui-progress$ID.tmp"
+	TMPFILE="$TUI_TEMP_DIR/tui-progress_$ID.tmp"
 	[ ! -f "$TMPFILE" ] && \
 		touch "$TMPFILE" && \
-		printf 1 > "$TMPFILE"
+		printf $MAX > "$TMPFILE"
 	$doReset && printf 1 > "$TMPFILE" && exit 0
 #
 #	Check for all required options
@@ -100,33 +104,41 @@ Where options are:
 #
 	[ -z "$LEFT" ] && LEFT=" " 
 	[ -z "$MIDDLE" ] && MIDDLE=" "
-	VAL=$(cat "$TMPFILE")
+	$valPassed && \
+		VAL="$CURRENT" || \
+		VAL=$(cat "$TMPFILE")
+	[ -z "$VAL" ] && VAL=$MAX
 	PROGRESS=""
 	case "$TYPE" in
 		dash)	[ $VAL -gt 3 ] && VAL=0
 			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
 		num)	PROGRESS="$VAL / $MAX"
 			[ $VAL -gt $MAX ] && exit 1	;;
-		bar)	set -x
+		bar)	#set -x
 			[ $VAL -gt $MAX ] && exit 1
 			procent=0
 			[ -z "$COLUMS" ] && COLUMNS=$(tput cols)
-			procent=$(( 100 / $MAX * $VAL ))
+			#procent=$(( 100 / $MAX * $VAL ))
+			procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
 			# The length that is available to print bars
 			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
 			
-			[ $procent -gt 100 ] && \
+			pro=${procent/.*}
+			cent=${procent/*.}
+			cent=${cent:0:2}
+			[ $pro -gt 100 ] && \
 				procent=100
 			
-			len=$(( $length * $procent / 100  ))	# If its once at 0, its never comming up again, since bash is limited to integer math only.
+			#len=$(( $length * $pro / 100  ))	# If its once at 0, its never comming up again, since bash is limited to integer math only.
+			len=$( echo $length $procent | $AWK '{print ($1/100*$2/2.2) }' )
 			
-			bars=$(printf '%*s' $len)
+			bars=$(printf '%*s' ${len/.*})
 			bars=$(echo "$bars"|$SED s," ","\\$BAR",g)
 			
-			PROGRESS="\'$bars\'"
-			PROGRESS+=" [ ${procent}%% ]"
+			PROGRESS="$bars"
+			PROGRESS+=" [ ${pro}.${cent}% ]"
 			
-			set +x
+		#	set +x
 			;;
 		*)	tui-status 1 "Error, type is $TYPE"	;;
 	esac

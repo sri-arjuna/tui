@@ -20,12 +20,13 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]directory]
 		\rWhere options are:
 		\r\t-h\tThis screen
+		\r\t-b\tSwitch to bar mode
 		\r
 		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
 		\r"
@@ -33,7 +34,6 @@
 	source /etc/tui/tui.conf
 	[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
 	
-	ARGS=(${@})
 	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
 	FILE_CMD="$TUI_TEMP_DIR/bgjob"
 	TMP=$TUI_TEMP_FILE
@@ -42,37 +42,60 @@
 	touch $TMP
 	umask 022 $FILE_CMD $FILE_TEMP
 	DEST=""
+	showBar=false
 #
 #	Variable handling
 #
 	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
-	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
-		;;
-	"")	unset ARGS[@]
-		ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
-		;;
-	esac
+	while getopts hb opt
+	do	case "$opt" in
+		h)	echo -e "$help_text" ; exit $RET_HELP
+			;;
+		b)	showBar=true
+			;;
+		"")	unset ARGS[@]
+			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS=(${@})
+	
 #
 #	Display
 #
+	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
 	do 	tui-printf -rS 2 "Initializing $FOLDER..." ## "$WORK"
 		printf "\r"
 		THIS="$(basename $FOLDER)"
-		DEST="$(pwd)/$THIS.$TAR_EXT"
+		DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT" "$TAR_EXT")
 		PWD_ORG="$(pwd)"
+		
 		#echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero ; echo \$? > $TMP" > $FILE_CMD
 		echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 		cd "$(dirname $FOLDER)"
-		chmod +x $FILE_CMD
+		chmod +x "$FILE_CMD"
+		
+		# What is the org file size?
+		if [ -d "$FOLDER" ]
+		then	org_size=$(du "$FOLDER")000
+		else	org_size=$(/bin/ls -l "$FOLDER"|$AWK '{print $5}')
+		fi
+		
+		$showBar && tui-progress -rbm $org_size -i $$
+		
 		$FILE_CMD &
 		sleep 0.5
 		while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]
 		do	[ -f "$DEST" ] && \
-				tmp_size="$(ls -hl $DEST |$AWK '{print $5}')" || \
+				tmp_display_size="$(/bin/ls -hl $DEST |$AWK '{print $5}')" && \
+				tmp_size="$(/bin/ls -l $DEST |$AWK '{print $5}')"|| \
 				tmp_size="0 btytes"
-			tui-printf "Compressing..." "$THIS ($tmp_size)" "[  $(tui-indi)   ]"
+			if $showBar
+			then	tui-progress -bm $org_size -i $$ -c $tmp_size "Compressing $THIS ($tmp_display_size)"
+			else	tui-printf "Compressing..." "$THIS ($tmp_display_size)" "[  $(tui-indi)   ]"
+			fi
 			sleep 0.7
 		done
 		cd "$PWD_ORG"
