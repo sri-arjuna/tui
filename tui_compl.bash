@@ -20,7 +20,7 @@ _tui_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -37,7 +37,7 @@ _tui_module()
 		# This list is dynamicly (automaticly) updated
 		case $prev in
 		theme)
-			case $cur in
+			case "$cur" in
 			[a-zA-Z]*)	COMPREPLY=( $( compgen -W "$(cd $DIR 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
 					return 0
 					;;
@@ -68,7 +68,7 @@ _tui_browser_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -119,7 +119,7 @@ _tui_conf_editor_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -152,7 +152,7 @@ _tui_conf_get_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -180,7 +180,7 @@ _tui_conf_set_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -208,7 +208,7 @@ _tui_install_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -239,7 +239,7 @@ _tui_new_script_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -267,7 +267,7 @@ _tui_printf_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -293,14 +293,14 @@ _tui_progress_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
 		-m)	COMPREPLY=( $(compgen -W "my_MAX_VALUE" -- $cur) )
 			return 0
 			;;
-		-i)	COMPREPLY=( $(compgen -W "my_MAXVAL_IDENTIFICATION" -- $cur) )
+		-i)	COMPREPLY=( $(compgen -W "my_ID" -- $cur) )
 			return 0
 			;;
 		esac
@@ -321,7 +321,7 @@ _tui_psm_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -332,7 +332,7 @@ _tui_psm_module()
 			return 0
 			;;
 		esac
-		[ $2 = tui-psm ]]  && \
+		[ "$2" = tui-psm ]  && \
 			COMPREPLY=( $(compgen -W "myScript_s.sh" -- $cur) ) && \
 			return 0
 	}
@@ -352,7 +352,7 @@ _tui_status_module()
 	#
 		# This completes the word you are currently writing
 		# These need manual maintainance
-		case $cur in
+		case "$cur" in
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
@@ -364,7 +364,7 @@ _tui_status_module()
 			return 0
 			;;
 		esac
-		[ $2 = tui-status ]]  && \
+		[ $2 = tui-status ]  && \
 			COMPREPLY=( $(compgen -W "\"MSG1\" \"MSG2\"" -- $cur) ) && \
 			return 0
 	}
@@ -372,7 +372,7 @@ _tui_tar_module()
 	{
 	COMPREPLY=()
 	prev="${COMP_WORDS[COMP_CWORD-1]}"
-	[ $prev = tui-tar ]]  && \
+	[ $prev = tui-tar ]  && \
 		COMPREPLY=( $(compgen -W "myFolder" -- $cur) ) && \
 		return 0
 	}
