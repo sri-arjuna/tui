@@ -1,0 +1,39 @@
+.TH "tui-mv" 1 "Simon A. Erat (sea)" "TUI 0.7.4"
+
+.SH NAME
+tui-mv (0.3)
+
+.SH SYNOPSIS
+\fBtui-mv\fP [options] source1 [source2 ...] target
+.br
+Example: tui-mv /path/of/dir file2 ../newdir
+.br
+Where options are:
+.IP "\fB-d\fP"
+Use 'animated dash' instead of the  progress bar.
+.IP "\fB-h\fP"
+Help screen, similar to this.
+.IP "\fB-q\fP"
+Uses quiet mode, experimental
+
+.SH DESCRIPTION
+.PP
+It is a simple wrapper for the command 
+.B cp
+.br
+By default it will show progress bar of the current file, and prints a status message for each file on the screen.
+.br
+The 'dash'-mode an animated dash, and print a status message for each file on the screen.
+
+.br
+Quiet mode attempts to use only 1 line for the output, regardless of how many files are copied/passed.
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://linux-scripter.blogspot.com

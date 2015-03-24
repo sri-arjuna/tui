@@ -1,0 +1,235 @@
+#!/usr/bin/env bash
+#
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	Variable defaults
+#
+	script_version=0.3
+	ME="$(basename $0)"
+	help_text="\r$ME ($script_version)
+		\rUsage: $ME [options] file1 file2 ... ... target_directory
+		\rWhere options are:
+		\r\t-h\tThis screen
+		\r\t-d\tSwitch to (animated) dash-mode
+		\r\t-f\tForce to overwrite if target exists
+		\r\t-q\tBe quiet, as in: print all on one line.
+		\r
+		\r"
+	source /etc/tui/commands.conf	# Like AWK, GREP, SED
+	source /etc/tui/apps.conf
+	source /etc/tui/tui.conf
+	[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
+	
+	FILE_TEMP="$TUI_TEMP_DIR/$ME.status"
+	FILE_CMD="$TUI_TEMP_DIR/bgjob"
+	TMP=$TUI_TEMP_FILE
+	touch $TMP
+	umask 022 $FILE_CMD $FILE_TEMP
+	DEST=""
+	showBar=true
+	doExtract=false
+	doForce=false
+	showRegular=false
+	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
+	COUNTER=0
+	tui-progress -r
+	
+#
+#	Variable handling
+#
+	opts=""
+	while getopts hfdq opt
+	do	case "$opt" in
+		d)	showBar=false
+			showRegular=true
+			;;
+		f)	doForce=true
+			;;
+		q|v)	showRegular=false
+			showBar=false
+			;;
+		"")	unset ARGS[@]
+			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
+			;;
+		h|*)	echo -e "$help_text" ; exit $RET_HELP
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS=(${@})
+	case $# in
+	0|1)	echo -e "$help_text"
+		exit $RET_HELP
+		;;
+	2)	SOURCE="$1"
+		TARGET="$2"
+		;;
+	*)	last=$[${#ARGS[@]}-1]
+		TARGET=${ARGS[$last]}
+		unset ARGS[$last]
+		SOURCE=("${ARGS[@]}")
+		;;
+	esac
+#
+#	Functions
+#
+	FileSize() { # FILE
+	# Returns the filesize in bytes
+	#
+		$LS -l "$1" | $AWK '{print $5}'
+	}
+	tui_bol_runpid() { # PID
+	# Returns true if ps finds the PID
+	#
+		[ -z "$1" ] && return 1
+		ps | $GREP -v $GREP | $GREP -q "$1"
+		return $?
+	}
+	get_waiting() { # KILOBYTES
+	# Returns the amount of seconds to wait
+	#
+		if [ $ORG -lt 1000100 ]
+		then	# Its less than 1 mb
+			waiting=0.1
+		elif [ $ORG -lt 100100100 ]
+		then	# Its less than 100 mb
+			waiting=0.3
+		elif [ $ORG -lt 1000100100 ]
+		then	# Its less than 1 gb
+			waiting=0.4
+		elif [ $ORG -lt 10100100100 ]
+		then	# Its less than 10 gb
+			waiting=0.5
+		else	# for everything higher
+			waiting=0.9
+		fi
+		echo $waiting
+	}
+	ask_overwrite() { # TARGET
+	# Returns true if either target does NOT exist
+	# or user agrees to overwrite or force is enabled
+		[ -z "$1" ] && return 1
+		if [ -e "$1" ] && [ "$doForce" = "false" ]
+		then	tui-yesno "\"$1\" exists, overwrite?"
+			return $?
+		else	return 0
+		fi
+	}
+#
+#	Display
+#
+	if $showRegular
+	then	# Default
+		for thisFile in "${SOURCE[@]}"
+		do
+			tui-status -r  2 "Initialize $trgt..."
+			ORG=$(FileSize "$thisFile")
+			waiting=$(get_waiting $ORG)
+			
+			if ! ask_overwrite "$TARGET"
+			then	# User does not want to overwrite, so we have to skip
+				COUNTER=$(( $COUNTER + 1 ))
+				TOTAL=$(( $TOTAL + 1 ))
+				continue	# Does this work?
+			fi
+			
+			#echo "todo failsafe"
+			#set -x
+			#cal=$(caller $$ 1>/dev/stdout 2>/dev/stdout); ps | $GREP $cal ; exit
+			
+			( mv "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
+			pid=$!
+			
+			sleep $waiting
+			
+			while tui_bol_runpid $pid
+			do	tui-progress "Moving $thisFile..."
+				# Since there is no visual progress, this 'waiting' is hardcoded
+				sleep $waiting
+			done
+			tui-status $(cat $TUI_TEMP_FILE) "Moved to $trgt"
+		done
+	elif $showBar
+	then	# Show progress bar for each file
+		# print also wether it was Moved successfully or not.
+		MAX=${#SOURCE[@]} 
+		for thisFile in "${SOURCE[@]}"
+		do
+			tui-status -r  2 "Initialize $trgt..."
+			ORG=$(FileSize "$thisFile")
+			waiting=$(get_waiting $ORG)
+			trgt="$TARGET/${thisFile##*/}"
+			
+			if ! ask_overwrite "$TARGET"
+			then	# User does not want to overwrite, so we have to skip
+				COUNTER=$(( $COUNTER + 1 ))
+				TOTAL=$(( $TOTAL + 1 ))
+				continue	# Does this work?
+			fi
+			
+			( mv "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
+			PID=$!
+			
+			sleep $waiting
+
+			while tui_bol_runpid $PID 
+			do
+				DEST=$(FileSize "$trgt")
+				tui-progress -b -m $ORG -c $DEST "Moving $thisFile.."
+				sleep $waiting
+			done
+			tui-status $(cat $TUI_TEMP_FILE) "Moved to $trgt"	
+		done
+	else	# Show quiet output
+		# Output is one line, with a counter showing how many files have been Moved
+		MAX=${#SOURCE[@]} 
+		TOTAL=0
+		for thisFile in "${SOURCE[@]}"
+		do
+			tui-status -r  2 "Initialize $trgt..."
+			ORG=$(FileSize "$thisFile")
+			waiting=$(get_waiting $ORG)
+			
+			if ! ask_overwrite "$TARGET"
+			then	# User does not want to overwrite, so we have to skip
+				COUNTER=$(( $COUNTER + 1 ))
+				TOTAL=$(( $TOTAL + 1 ))
+				continue	# Does this work?
+			fi
+			
+			( mv "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
+			pid=$!
+			
+			sleep $waiting
+			
+			while tui_bol_runpid $pid
+			do	tui-progress "Moving $thisFile ($COUNTER/$MAX)..."
+				# Since there is no visual progress, this 'waiting' is hardcoded
+				sleep $waiting
+			done
+			COUNTER=$(( $COUNTER + 1 ))
+			# This actualy represents the failures, TODO Error '127,130'
+			TOTAL=$(( $TOTAL + $(cat $TUI_TEMP_FILE) ))
+		done
+		# Subtract the failures from the max, to get what actualy was done successfull
+		TOTAL=$(( $MAX - $TOTAL ))
+		# Show the final info
+		tui-status $(cat $TUI_TEMP_FILE) "Moved $TOTAL of $MAX files to $TARGET"
+	fi
+	exit 0

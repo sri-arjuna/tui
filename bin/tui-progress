@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.03.21
-	script_version=0.7
+#	Changed:	2015.03.24
+	script_version=0.7.2
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -123,14 +123,17 @@ Where options are:
 			# The length that is available to print bars
 			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
 			
-			pro=${procent/.*}
-			cent=${procent/*.}
-			cent=${cent:0:2}
+			pro=${procent/.*/}
 			[ $pro -gt 100 ] && \
-				procent=100
+				procent=100 && \
+				pro=100
+			[ $pro -ne 100 ] && \
+				cent=${procent/*.} && \
+				cent=${cent:0:2} || \
+				cent=00
 			
 			#len=$(( $length * $pro / 100  ))	# If its once at 0, its never comming up again, since bash is limited to integer math only.
-			len=$( echo $length $procent | $AWK '{print ($1/100*$2/2.2) }' )
+			len=$( echo $length $procent | $AWK '{print ($1/100*$2/3*2) }' )
 			
 			bars=$(printf '%*s' ${len/.*})
 			bars=$(echo "$bars"|$SED s," ","\\$BAR",g)

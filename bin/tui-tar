@@ -20,13 +20,14 @@
 #
 #	Variable defaults
 #
-	script_version=0.7
+	script_version=0.7.1
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]directory]
 		\rWhere options are:
 		\r\t-h\tThis screen
-		\r\t-b\tSwitch to bar mode
+		\r\t-b\tShow progressbar
+		\r\t-x\tExtract tarball
 		\r
 		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
 		\r"
@@ -43,15 +44,22 @@
 	umask 022 $FILE_CMD $FILE_TEMP
 	DEST=""
 	showBar=false
+	doExtract=false
+	beVerbose=false
+	LS=$(locate "ls"|$GREP /ls$ | head -n 1)
 #
 #	Variable handling
 #
 	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
-	while getopts hb opt
+	while getopts hbx opt
 	do	case "$opt" in
 		h)	echo -e "$help_text" ; exit $RET_HELP
 			;;
 		b)	showBar=true
+			;;
+		x)	doExtract=true
+			;;
+		v)	beVerbose=true
 			;;
 		"")	unset ARGS[@]
 			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
@@ -66,39 +74,105 @@
 #
 	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
-	do 	tui-printf -rS 2 "Initializing $FOLDER..." ## "$WORK"
+	do 	#tui-printf -rS 2 "Initializing $FOLDER..." ## "$WORK"
 		printf "\r"
 		THIS="$(basename $FOLDER)"
 		DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT" "$TAR_EXT")
 		PWD_ORG="$(pwd)"
 		
-		#echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero ; echo \$? > $TMP" > $FILE_CMD
-		echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
-		cd "$(dirname $FOLDER)"
-		chmod +x "$FILE_CMD"
-		
-		# What is the org file size?
-		if [ -d "$FOLDER" ]
-		then	org_size=$(du "$FOLDER")000
-		else	org_size=$(/bin/ls -l "$FOLDER"|$AWK '{print $5}')
-		fi
-		
-		$showBar && tui-progress -rbm $org_size -i $$
-		
-		$FILE_CMD &
-		sleep 0.5
-		while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]
-		do	[ -f "$DEST" ] && \
-				tmp_display_size="$(/bin/ls -hl $DEST |$AWK '{print $5}')" && \
-				tmp_size="$(/bin/ls -l $DEST |$AWK '{print $5}')"|| \
-				tmp_size="0 btytes"
-			if $showBar
-			then	tui-progress -bm $org_size -i $$ -c $tmp_size "Compressing $THIS ($tmp_display_size)"
-			else	tui-printf "Compressing..." "$THIS ($tmp_display_size)" "[  $(tui-indi)   ]"
+		#set -x
+		if $doExtract
+		then	if [ -f "$FOLDER" ]
+			then	size_tarball=$($LS -l "$FOLDER"|$AWK '{print $5}')
+				[ -z "$size_tarball" ] && tui-echo "Failure reading $FOLDER!" && exit
+				
+				#list_tarball=($(tar tf "$FOLDER"))
+				touch "$TUI_TEMP_FILE".2
+				echo "tar tf \"$FOLDER\" > \"$TUI_TEMP_FILE\".2" > "$TUI_TEMP_FILE"
+				$SHELL "$TUI_TEMP_FILE" &
+				while ps | $GREP -q tar
+				do	tui-printf "Reading $FOLDER..." "[  $(tui-indi)   ]"
+					sleep 0.3
+				done
+				list_tarball=( $(cat "$TUI_TEMP_FILE.2") )
+				#echo ".. -- ${list_tarball[@]} -- .."; exit
+				LAST=""
+				CURRENT=""
+				$showBar && tui-progress -rbm $size_tarball -i $$
+				RET=0
+				
+				#echo "${list_tarball[@]}"
+				if $beVerbose
+				then	tar axf "$FOLDER"
+					RET=$?
+				else	(tar axf "$FOLDER" ; echo $? > $TUI_TEMP_FILE) &
+					PID=$!
+					COUNT=0
+					while ps | $GREP -q $PID
+					do	# Parse list for current output file
+						for entry in "${list_tarball[@]}"
+						do	if [ -e "$entry" ]
+							then	[ -z "$CURRENT" ] && \
+									CURRENT="$entry"
+								[ ! -z "$LAST" ] && \
+									[ ! "$LAST" = "$CURRENT" ] && \
+									COUNT=$(( $COUNT + 1 ))
+								break
+							fi
+						done
+						
+						#set -x
+						[ -e "$CURRENT" ] && \
+							size_output=$($LS -l "$CURRENT"|$AWK '{print $5}') || \
+							size_output=0
+						#set +x
+						#echo $CURRENT $size_output
+						#exit
+						if $showBar
+						then	tui-progress -bi $$ -m $size_tarball -c $size_output "Extracting \"$CURRENT\"..."
+						else	tui-progress -i $$ -m ${#list_tarball[@]} -c $COUNT "Extracting \"$FOLDER\"..."
+						fi
+						sleep 0.7
+					done
+					RET=$(cat $TUI_TEMP_FILE)
+				fi
+			else	tui-echo "$FOLDER is not a file or could not be found!"
 			fi
-			sleep 0.7
-		done
-		cd "$PWD_ORG"
-		[ -f "$DEST" ]
-		tui-status $? "Compressed: $DEST"
+
+			tui-status $RET "Extracted: $FOLDER"
+			RET=$?
+		else	#echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero ; echo \$? > $TMP" > $FILE_CMD
+			tui-printf -rS 2 "Initializing $FOLDER..."
+			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
+			cd "$(dirname $FOLDER)"
+			chmod +x "$FILE_CMD"
+
+			# What is the org file size?
+			if [ -d "$FOLDER" ]
+			then	org_size=$(du "$FOLDER")000
+			else	org_size=$($LS -l "$FOLDER"|$AWK '{print $5}')
+			fi
+
+			$showBar && tui-progress -rbm $org_size -i $$
+
+			$FILE_CMD &
+			sleep 0.5
+			while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]
+			do	[ -f "$DEST" ] && \
+					tmp_display_size="$($LS -hl $DEST |$AWK '{print $5}')" && \
+					tmp_size="$($LS -l $DEST |$AWK '{print $5}')"|| \
+					tmp_size="0 btytes"
+				if $showBar
+				then	tui-progress -bm $org_size -i $$ -c $tmp_size "Compressing $THIS ($tmp_display_size)"
+				else	tui-printf "Compressing..." "$THIS ($tmp_display_size)" "[  $(tui-indi)   ]"
+				fi
+				sleep 0.7
+			done
+			cd "$PWD_ORG"
+			[ -f "$DEST" ]
+			tui-status $? "Compressed: $DEST"
+			RET=$?
+		fi
 	done 
+	exit $RET
+	

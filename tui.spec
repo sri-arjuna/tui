@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.3
-Release:     0%{?dist}
+Release:     10%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -113,6 +113,10 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Tue Mar 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
+- Added:     tui-cp, tui-mv
+- Updated:   tui-progress, a few code optimizations
+
 * Thu Mar 19 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.3
 - Updated:   man tui-printf, 0.9.7 -> 1.4.8
 - Changed:   $TUI_FONT_INVERT became corrected to $TUI_COLOR_INVERT
