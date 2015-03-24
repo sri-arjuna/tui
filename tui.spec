@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.3
-Release:     10%{?dist}
+Release:     36%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3

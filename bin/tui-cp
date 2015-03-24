@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.3
+	script_version=0.4
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] file1 file2 ... ... target_directory
@@ -32,7 +32,7 @@
 		\r
 		\r"
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
-	source /etc/tui/apps.conf
+	#source /etc/tui/apps.conf
 	source /etc/tui/tui.conf
 	[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
 	
@@ -49,7 +49,7 @@
 	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	COUNTER=0
 	tui-progress -r
-	
+	showtotal=false
 #
 #	Variable handling
 #
@@ -63,6 +63,7 @@
 			;;
 		q|v)	showRegular=false
 			showBar=false
+			showtotal=true
 			;;
 		"")	unset ARGS[@]
 			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
@@ -86,6 +87,7 @@
 		SOURCE=("${ARGS[@]}")
 		;;
 	esac
+	MAX=${#SOURCE[@]}
 #
 #	Functions
 #
@@ -93,6 +95,11 @@
 	# Returns the filesize in bytes
 	#
 		$LS -l "$1" | $AWK '{print $5}'
+	}
+	FolderSize() { # FILE
+	# Returns the filesize in bytes
+	#
+		du "$1"|$AWK '{print $1}'
 	}
 	tui_bol_runpid() { # PID
 	# Returns true if ps finds the PID
@@ -104,16 +111,17 @@
 	get_waiting() { # KILOBYTES
 	# Returns the amount of seconds to wait
 	#
-		if [ $ORG -lt 1000100 ]
+		[ -z "$1" ] && echo 0.3 && return
+		if [ $1 -lt 1000100 ]
 		then	# Its less than 1 mb
 			waiting=0.1
-		elif [ $ORG -lt 100100100 ]
+		elif [ $1 -lt 100100100 ]
 		then	# Its less than 100 mb
 			waiting=0.3
-		elif [ $ORG -lt 1000100100 ]
+		elif [ $1 -lt 1000100100 ]
 		then	# Its less than 1 gb
 			waiting=0.4
-		elif [ $ORG -lt 10100100100 ]
+		elif [ $1 -lt 10100100100 ]
 		then	# Its less than 10 gb
 			waiting=0.5
 		else	# for everything higher
@@ -125,7 +133,7 @@
 	# Returns true if either target does NOT exist
 	# or user agrees to overwrite or force is enabled
 		[ -z "$1" ] && return 1
-		if [ -e "$1" ] && [ "$doForce" = "false" ]
+		if [ -f "$1" ] && [ "$doForce" = "false" ]
 		then	tui-yesno "\"$1\" exists, overwrite?"
 			return $?
 		else	return 0
@@ -134,102 +142,62 @@
 #
 #	Display
 #
-	if $showRegular
-	then	# Default
-		for thisFile in "${SOURCE[@]}"
-		do
-			tui-status -r  2 "Initialize $trgt..."
+	for thisFile in "${SOURCE[@]}"
+	do
+		tui-status -r  2 "Initialize $thisFile..."
+		if [ -f "$thisFile" ] 
+		then	c_opt=""
 			ORG=$(FileSize "$thisFile")
-			waiting=$(get_waiting $ORG)
-			
-			if ! ask_overwrite "$TARGET"
-			then	# User does not want to overwrite, so we have to skip
-				COUNTER=$(( $COUNTER + 1 ))
-				TOTAL=$(( $TOTAL + 1 ))
-				continue	# Does this work?
+		elif [ -d "$thisFile" ]
+		then	c_opt="-r"
+			ORG=$(FolderSize "$thisFile")
+		else	# Skipping
+			if $showBar || $showRegular
+			then	tui-status 4 "Skiped $thisFile."
 			fi
-			
-			#echo "todo failsafe"
-			#set -x
-			#cal=$(caller $$ 1>/dev/stdout 2>/dev/stdout); ps | $GREP $cal ; exit
-			
-			( cp "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
-			pid=$!
-			
-			sleep $waiting
-			
-			while tui_bol_runpid $pid
-			do	tui-progress "Copying $thisFile..."
-				# Since there is no visual progress, this 'waiting' is hardcoded
-				sleep $waiting
-			done
-			tui-status $(cat $TUI_TEMP_FILE) "Copied to $trgt"
-		done
-	elif $showBar
-	then	# Show progress bar for each file
-		# print also wether it was copied successfully or not.
-		MAX=${#SOURCE[@]} 
-		for thisFile in "${SOURCE[@]}"
-		do
-			tui-status -r  2 "Initialize $trgt..."
-			ORG=$(FileSize "$thisFile")
-			waiting=$(get_waiting $ORG)
-			trgt="$TARGET/${thisFile##*/}"
-			
-			if ! ask_overwrite "$TARGET"
-			then	# User does not want to overwrite, so we have to skip
-				COUNTER=$(( $COUNTER + 1 ))
-				TOTAL=$(( $TOTAL + 1 ))
-				continue	# Does this work?
-			fi
-			
-			( cp "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
-			PID=$!
-			
-			sleep $waiting
-
-			while tui_bol_runpid $PID 
-			do
-				DEST=$(FileSize "$trgt")
-				tui-progress -b -m $ORG -c $DEST "Copying $thisFile.."
-				sleep $waiting
-			done
-			tui-status $(cat $TUI_TEMP_FILE) "Copied to $trgt"	
-		done
-	else	# Show quiet output
-		# Output is one line, with a counter showing how many files have been copied
-		MAX=${#SOURCE[@]} 
-		TOTAL=0
-		for thisFile in "${SOURCE[@]}"
-		do
-			tui-status -r  2 "Initialize $trgt..."
-			ORG=$(FileSize "$thisFile")
-			waiting=$(get_waiting $ORG)
-			
-			if ! ask_overwrite "$TARGET"
-			then	# User does not want to overwrite, so we have to skip
-				COUNTER=$(( $COUNTER + 1 ))
-				TOTAL=$(( $TOTAL + 1 ))
-				continue	# Does this work?
-			fi
-			
-			( cp "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
-			pid=$!
-			
-			sleep $waiting
-			
-			while tui_bol_runpid $pid
-			do	tui-progress "Copying $thisFile ($COUNTER/$MAX)..."
-				# Since there is no visual progress, this 'waiting' is hardcoded
-				sleep $waiting
-			done
 			COUNTER=$(( $COUNTER + 1 ))
-			# This actualy represents the failures, TODO Error '127,130'
-			TOTAL=$(( $TOTAL + $(cat $TUI_TEMP_FILE) ))
+			TOTAL=$(( $TOTAL + 1 ))
+			continue
+		fi
+
+		if ! ask_overwrite "$TARGET"
+		then	# User does not want to overwrite, so we have to skip
+			COUNTER=$(( $COUNTER + 1 ))
+			TOTAL=$(( $TOTAL + 1 ))
+			continue
+		fi
+		waiting=$(get_waiting $ORG)
+		trgt="$TARGET/${thisFile##*/}"
+		
+		( cp $c_opt "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
+		pid=$!
+
+		sleep $waiting
+
+		while tui_bol_runpid $pid
+		do	if $showRegular
+			then	tui-progress "Copying $thisFile..."
+			elif $showBar
+			then	[ -f "$trgt" ] && \
+					DEST=$(FileSize "$trgt") || \
+					DEST=$(FolderSize "$trgt")
+				tui-progress -b -m $ORG -c $DEST "Copying $thisFile.."
+			else	tui-progress "Copying $thisFile ($COUNTER/$MAX)..."
+				COUNTER=$(( $COUNTER + 1 ))
+				# This actualy represents the failures, TODO Error '127,130'
+				TOTAL=$(( $TOTAL + $(cat $TUI_TEMP_FILE) ))
+			fi
+			# Dont overheat the cpu for nothing
+			sleep $waiting
 		done
-		# Subtract the failures from the max, to get what actualy was done successfull
-		TOTAL=$(( $MAX - $TOTAL ))
-		# Show the final info
-		tui-status $(cat $TUI_TEMP_FILE) "Copied $TOTAL of $MAX files to $TARGET"
-	fi
-	exit 0
+
+		# Final Message
+		if $showRegular
+		then	tui-status $(cat $TUI_TEMP_FILE) "Copied to $trgt"
+		elif $showBar
+		then	tui-status $(cat $TUI_TEMP_FILE) "Copied to $trgt"
+		else	tui-status -r $(cat $TUI_TEMP_FILE) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+		fi
+	done
+	$showtotal && tui-status  $(cat $TUI_TEMP_FILE) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+	
