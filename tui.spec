@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.4
-Release:     17%{?dist}
+Release:     18%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -114,12 +114,10 @@ rm -rf %{buildroot}
 
 %changelog
 * Wed Mar 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
-- Updated:   tui-bgjob uses now a progress bar if both
--                original and target file are provided
-
-* Tue Mar 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
 - Added:     tui-cp, tui-mv
 - Updated:   tui-progress, a few code optimizations
+- Updated:   tui-bgjob uses now a progress bar if both options 
+-                   'source' and 'file'  file are provided.
 
 * Thu Mar 19 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.3
 - Updated:   man tui-printf, 0.9.7 -> 1.4.8
