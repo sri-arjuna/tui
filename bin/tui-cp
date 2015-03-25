@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] file1 file2 ... ... target_directory
@@ -28,6 +28,7 @@
 		\r\t-h\tThis screen
 		\r\t-d\tSwitch to (animated) dash-mode
 		\r\t-f\tForce to overwrite if target exists
+		\r\t-l\tShow long names (full passed target path)
 		\r\t-q\tBe quiet, as in: print all on one line.
 		\r
 		\r"
@@ -46,6 +47,8 @@
 	doExtract=false
 	doForce=false
 	showRegular=false
+	showLong=false
+	# Just in case user has an alias for ls
 	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	COUNTER=0
 	tui-progress -r
@@ -54,14 +57,16 @@
 #	Variable handling
 #
 	opts=""
-	while getopts hfdq opt
+	while getopts hfdlq opt
 	do	case "$opt" in
 		d)	showBar=false
 			showRegular=true
 			;;
 		f)	doForce=true
 			;;
-		q|v)	showRegular=false
+		l)	showLong=true
+			;;
+		q)	showRegular=false
 			showBar=false
 			showtotal=true
 			;;
@@ -97,7 +102,7 @@
 		$LS -l "$1" | $AWK '{print $5}'
 	}
 	FolderSize() { # FILE
-	# Returns the filesize in bytes
+	# Returns the foldersize in kilobytes
 	#
 		du "$1"|$AWK '{print $1}'
 	}
@@ -168,6 +173,14 @@
 		fi
 		waiting=$(get_waiting $ORG)
 		trgt="$TARGET/${thisFile##*/}"
+		if $showLong
+		then	[ -d "$TARGET" ] && \
+				display_trgt="to ${trgt}" || \
+				display_trgt="to ${TARGET}"
+		else	[ -d "$TARGET" ] && \
+				display_trgt="${trgt##*/}" || \
+				display_trgt="${TARGET##*/}"
+		fi
 		
 		( cp $c_opt "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
 		pid=$!
@@ -176,28 +189,32 @@
 
 		while tui_bol_runpid $pid
 		do	if $showRegular
-			then	tui-progress "Copying $thisFile..."
+			then	tui-progress "Copying $display_trgt..."
 			elif $showBar
 			then	[ -f "$trgt" ] && \
 					DEST=$(FileSize "$trgt") || \
 					DEST=$(FolderSize "$trgt")
-				tui-progress -b -m $ORG -c $DEST "Copying $thisFile.."
-			else	tui-progress "Copying $thisFile ($COUNTER/$MAX)..."
+				tui-progress -b -m $ORG -c $DEST "Copying $display_trgt..."
+			else	tui-progress "Copying $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actualy represents the failures, TODO Error '127,130'
 				TOTAL=$(( $TOTAL + $(cat $TUI_TEMP_FILE) ))
 			fi
-			# Dont overheat the cpu for nothing
+			# Since there is no visual progress, this 'waiting' is hardcoded
 			sleep $waiting
 		done
 
 		# Final Message
 		if $showRegular
-		then	tui-status $(cat $TUI_TEMP_FILE) "Copied to $trgt"
+		then	tui-status $(cat $TUI_TEMP_FILE) "Copied $display_trgt"
 		elif $showBar
-		then	tui-status $(cat $TUI_TEMP_FILE) "Copied to $trgt"
-		else	tui-status -r $(cat $TUI_TEMP_FILE) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+		then	tui-status $(cat $TUI_TEMP_FILE) "Copied $display_trgt"
+		#else
+		elif $showtotal
+		then	tui-status -r $(cat $TUI_TEMP_FILE) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+			#showtotal=true
 		fi
 	done
 	$showtotal && tui-status  $(cat $TUI_TEMP_FILE) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+	exit $(cat $TUI_TEMP_FILE)
 	

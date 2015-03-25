@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.3
+	script_version=0.4
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] file1 file2 ... ... target_directory
@@ -28,6 +28,7 @@
 		\r\t-h\tThis screen
 		\r\t-d\tSwitch to (animated) dash-mode
 		\r\t-f\tForce to overwrite if target exists
+		\r\t-l\tShow long names (full passed target path)
 		\r\t-q\tBe quiet, as in: print all on one line.
 		\r
 		\r"
@@ -46,6 +47,8 @@
 	doExtract=false
 	doForce=false
 	showRegular=false
+	showLong=false
+	showtotal=false
 	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	COUNTER=0
 	tui-progress -r
@@ -54,15 +57,18 @@
 #	Variable handling
 #
 	opts=""
-	while getopts hfdq opt
+	while getopts hfdlq opt
 	do	case "$opt" in
 		d)	showBar=false
 			showRegular=true
 			;;
 		f)	doForce=true
 			;;
-		q|v)	showRegular=false
+		l)	showLong=true
+			;;
+		q)	showRegular=false
 			showBar=false
+			showtotal=true
 			;;
 		"")	unset ARGS[@]
 			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
@@ -96,7 +102,7 @@
 		$LS -l "$1" | $AWK '{print $5}'
 	}
 	FolderSize() { # FILE
-	# Returns the filesize in bytes
+	# Returns the foldersize in kilobytes
 	#
 		du "$1"|$AWK '{print $1}'
 	}
@@ -165,19 +171,29 @@
 		fi
 		waiting=$(get_waiting $ORG)
 		trgt="$TARGET/${thisFile##*/}"
+		if $showLong
+		then	[ -d "$TARGET" ] && \
+				display_trgt="to ${trgt}" || \
+				display_trgt="to ${TARGET}"
+		else	[ -d "$TARGET" ] && \
+				display_trgt="${trgt##*/}" || \
+				display_trgt="${TARGET##*/}"
+		fi
 		
-		( cp "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
+		( mv "$thisFile" "$TARGET" ; echo $? > $TUI_TEMP_FILE ) &
 		pid=$!
 
 		sleep $waiting
 
 		while tui_bol_runpid $pid
 		do	if $showRegular
-			then	tui-progress "Moving $thisFile..."
+			then	tui-progress "Moving to $display_trgt..."
 			elif $showBar
-			then	DEST=$(FileSize "$trgt")
-				tui-progress -b -m $ORG -c $DEST "Moving $thisFile.."
-			else	tui-progress "Moving $thisFile ($COUNTER/$MAX)..."
+			then	[ -f "$trgt" ] && \
+					DEST=$(FileSize "$trgt") || \
+					DEST=$(FolderSize "$trgt")
+				tui-progress -b -m $ORG -c $DEST "Moving to $display_trgt.."
+			else	tui-progress "Moving $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actualy represents the failures, TODO Error '127,130'
 				TOTAL=$(( $TOTAL + $(cat $TUI_TEMP_FILE) ))
@@ -189,12 +205,15 @@
 		# Final Message
 		showtotal=false
 		if $showRegular
-		then	tui-status $(cat $TUI_TEMP_FILE) "Moved to $trgt"
+		then	tui-status $(cat $TUI_TEMP_FILE) "Moved $display_trgt"
 		elif $showBar
-		then	tui-status $(cat $TUI_TEMP_FILE) "Moved to $trgt"
-		else	tui-status -r $(cat $TUI_TEMP_FILE) "Moved $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
-			showtotal=true
+		then	tui-status $(cat $TUI_TEMP_FILE) "Moved $display_trgt"
+		#else
+		elif $showtotal
+		then	tui-status -r $(cat $TUI_TEMP_FILE) "Moved $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+			#showtotal=true
 		fi
 	done
 	$showtotal && tui-status  $(cat $TUI_TEMP_FILE) "Moved $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+	exit $(cat $TUI_TEMP_FILE)
 	
