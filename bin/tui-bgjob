@@ -23,33 +23,42 @@
 #
 #	Variable defaults
 #
-	script_version=0.6.3
+	script_version=0.7
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	ME="$(basename $0)"
 	[ -z "$TUI_TEMP_FILE" ] && source /etc/tui/tui.conf
 	help_text="\r$ME ($script_version)
-		\rUsage: $ME [-f OUTFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
+		\rUsage: $ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
 		\r
-		\r\t-f /path/to/file\tPrint the filesize of passed file
+		\r\t-f [/path/to/]file\tPrint the filesize of passed file
+		\r\t-s [/path/to/]orgfile\tSwitches to progressbar if $TUI_FONT_BOLD-f file$TUI_RESET is passed too
 		\r
 		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
-		\rPrints 'Exit String' when done, regardless of exit code (0,1,?).
-		\rWAIT is optinal wait time between updates, default is 0.7 (seconds).
+		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) ir uses.
+		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
 		\r"
+	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	CHECKFILE=false
+	SIZE_ORG=0
 #
 #	Variable handling
 #
 	[ -z "$3" ] && printf "$help_text" && exit $RET_HELP
 	BG_RET="-1"
-	while getopts "hf:" opt
+	while getopts "hf:s:" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
 		f)	FILECHECK="$OPTARG"
 			CHECKFILE=true
+			;;
+		s)	if [ -f "$OPTARG" ]
+			then	SIZE_ORG=$($LS -l "$OPTARG"|$AWK '{print $5}')
+			else	tui-status 1 "$ME: File \"$OPTARG\" could not be found!"
+				exit $?
+			fi
 			;;
 		esac
 	done
@@ -62,7 +71,7 @@
 #
 #	Send job to bg and get pid
 #
-	(sh "$JOB" && printf 0 > /dev/stdout > "$TUI_TEMP_FILE" || \
+	(bash "$JOB" && printf 0 > /dev/stdout > "$TUI_TEMP_FILE" || \
 			printf 1 > /dev/stdout > "$TUI_TEMP_FILE"
 	)   & PID=$!
 #
@@ -72,9 +81,16 @@
 	sleep 2
 	while ps |$GREP -q $PID
 	do
-		if [ true = $CHECKFILE ]
-		then 	FS=$(ls -lh "$FILECHECK"|$AWK '{print $5}')
-			tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
+		#set -x
+		if $CHECKFILE
+		then 	if [ $SIZE_ORG -eq 0 ]
+			then	FS=$($LS -lh "$FILECHECK"|$AWK '{print $5}')
+				tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
+			else	#
+				FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
+				tui-progress -bm $SIZE_ORG -c $FS "$TXT_PROGRESS"
+				#set +x
+			fi
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi
 		sleep $WAIT
