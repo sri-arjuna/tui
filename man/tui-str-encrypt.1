@@ -1,0 +1,45 @@
+.TH "tui-str-encrypt" "1" "2015-03-26" "Simon Arjuna Erat (sea)"
+
+.SH NAME
+tui-str-encrypt (0.2)
+
+.SH SYNOPSIS
+\fBtui-str-encrypt\fP [options] STRING "STRING 2" ...
+.br
+Example: tui-str-encrypt
+.br
+Where options are:
+.IP "\fB-h\fP"
+This screen
+.IP "\fB-t TYPE\fP"
+Prints the encrypted string using TYPE encryption.
+.br
+TYPE can be:
+.br
+md5, md5sum, default
+.br
+1, sha1sum
+.br
+224, sha224sum
+.br
+256, sha256sum
+.br
+384, sha384sum
+.br
+512, sha512sum
+.IP "\fB-v\fP"
+Be verbose, rather than usefull.
+
+.SH DESCRIPTION
+.PP
+Encrypts passed STRINGs using TYPE encryption and prints them out.
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://linux-scripter.blogspot.com

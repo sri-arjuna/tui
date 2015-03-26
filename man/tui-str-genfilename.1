@@ -6,13 +6,21 @@ tui-str-genfilename (0.2)
 .SH SYNOPSIS
 \fBtui-str-genfilename\fP [options] [/path/to/]filename [new_ext]
 .br
-Example: tui-str-genfilename tempfile \$\$
+Example:	tui-str-genfilename outfile $$
+.br
+	If this file does not exist yet, it returns:
+.br
+		outfile.10310
+.br
+	If this file does exist already, it returns:
+.br
+		outfile.0.10310
+.br
+
 .br
 Where options are:
 .IP "\fB-h\fP"
 Shows the help screen
-.IP "\fB-v\fP"
-Be verbose
 
 .SH DESCRIPTION
 .PP

@@ -49,7 +49,7 @@ Like the 'max' number indication, it requires a maximum value, and upon each new
 	count=${#list[@]}
 	tui-progress -r	
 	msg="Updating the file its timestamp"
-	while [[ 0 -eq $? ]]
+	while [ 0 -eq $? ]
 	do 	# fetch here wether or not the script shall continue
 		# TODO
 		./tui-progress -bm $count  "$msg"

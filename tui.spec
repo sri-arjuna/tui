@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.4
-Release:     18%{?dist}
+Release:     19%{?dist}
 Summary:     TUI :: Why code and compile when you can script and run.
 
 License:     GPLv3
@@ -113,6 +113,11 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Thu Mar 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
+- Removed:   Old and no longer used templates
+- Added:     Create fun stats for project
+- Added:     tui-str-encrypt, encrypt strings
+
 * Wed Mar 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
 - Added:     tui-cp, tui-mv
 - Updated:   tui-progress, a few code optimizations

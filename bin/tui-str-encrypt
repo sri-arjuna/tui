@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	#source tui
+	source /etc/tui/commands.conf
+#
+#	File:		tui-str-encrypt
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.03.26
+#	Changed:	2015.03.26
+	script_version=0.2
+	TITLE="tui-str-encrypt"
+#	Description:	Encrypting text on the fly
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-str-encrypt
+	ME="${ME/.sh/}"				# Cut off .sh extension
+#
+#	Variable defaults (options)
+#
+	beVerbose=false
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+${TITLE^}
+Usage: 		$ME [options] arguments
+Examples:	$ME 'teststring'
+		$ME -t 384 'teststring'
+Where options are:
+	-h(elp) 		This screen
+	-t(ype)		TYPE	Pass wich type of encryption you want, default/fallback: md5sum
+
+"
+#
+#	Catching Arguments
+#
+	while getopts "hvt:" opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		t)	TYPES+=" $OPTARG"
+			;;
+		v)	beVerbose=true
+			;;
+		*)	printf "$help_text" ; exit $?	;;
+		esac
+	done
+	shift $(($OPTIND - 1))	# All options and they (if applicable) mandatory argument are removed
+	for T in $TYPES;do 
+		case $T in
+		md5*)	TOOLS+=" md5sum"	;;
+		*224*)	TOOLS+=" sha224sum"	;;
+		*256*)	TOOLS+=" sha256sum"	;;
+		*384*)	TOOLS+=" sha384sum"	;;
+		*512*)	TOOLS+=" sha512sum"	;;
+		*1*)	TOOLS+=" sha1sum"	;;
+		esac
+	done
+	[ -z "$TOOLS" ] && TOOLS=md5sum
+#
+#	Display & Action
+#
+	for A in "${@}"
+	do	$beVerbose && tui-title "Encrypting: \"$A\""
+		for T in $TOOLS
+		do	str=$(echo -e "$A" | $T | $AWK '{print $1}')
+			$beVerbose && \
+				tui-echo "$T:" "$str" || \
+				echo "$str"
+		done
+	done
