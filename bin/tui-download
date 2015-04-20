@@ -27,7 +27,7 @@
 #	Unstable: 2015.01.31    Doh, you changed it!
 #
 	source tui
-	script_version=0.7.2
+	script_version=0.7.3
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
@@ -148,5 +148,5 @@
 			tui-printf "$str_left" "${str_middle_corrected}" "[  $(tui-indi)   ]"
 			sleep 1
 		done
-		tui-status $? "Downloaded: ${out_string:0:$tlen}"
+		tui-status $? "Downloaded: ${THIS}"
 	done 

@@ -23,7 +23,7 @@
 #	Variables
 #
 	ME=${0##*/}
-	script_version=0.2
+	script_version=0.3
 	beVerbose=false
 #
 #	Functions
@@ -64,7 +64,25 @@
 		esac
 	done
 	shift $(($OPTIND - 1))
-	BASE="${1/.*/}"
+	set -x 
+	#BASE="${1/.*/}"
+	VAR=$(echo "$1") #|sed s,'\.',' ',g)
+	ARGS=( $VAR )
+	#BASE=""
+	M=$(( ${#ARGS[@]} )) #- 1 ))
+	C=0
+	CUR=""
+	while [ $C -lt $M ]
+	do 	BASE+="$CUR"
+		CUR="${ARGS[$C]} "
+		C=$(( $C + 1 ))
+	done
+	echo $CUR
+	BASE+="${CUR/.*}"
+	[ "${BASE:0:(-1)}" = " " ] && BASE="${BASE:0:(-1)}"
+	set +x 
+	#BASE="${ARGS[${#ARGS[@]}]}"
+	echo $BASE
 	LOC=$(dirname "$BASE")
 	EXT_OLD="${1/*./}"
 	EXTENSION="$2"

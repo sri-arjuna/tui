@@ -3,6 +3,8 @@ Description:
 
 This little coding helper helps to generate filenames which have an increasing number, and become a possible new file extension.
 
+Important note, it does not create a file, it just returns the first string that was not found as file.
+
 Examples:
 ---------
 Create a simple temp file:

@@ -1,7 +1,7 @@
 Name:        tui
-Version:     0.7.4
-Release:     19%{?dist}
-Summary:     TUI :: Why code and compile when you can script and run.
+Version:     0.7.5
+Release:     1%{?dist}
+Summary:     for scripters made easy
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -113,7 +113,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
-* Thu Mar 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
+* Mon Apr 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.5
+- Updated:   tui-progress, bar now has a border and optimizied alignment
+- Fixed:     tui-select, empty selection should no longer raise an error message.
+- Fixed:     tui-str-genfilename, no longer cuts of filenames after first dot, only last dot.
+
+* Thu Mar 26 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
 - Removed:   Old and no longer used templates
 - Added:     Create fun stats for project
 - Added:     tui-str-encrypt, encrypt strings

@@ -78,13 +78,15 @@
 #	While the job is running...
 #
 	tui-printf -rS 2 "Starting job..." #"$TUI_WORK"
-	sleep 2
+	sleep 1
 	while ps |$GREP -q $PID
 	do
 		#set -x
 		if $CHECKFILE
 		then 	if [ $SIZE_ORG -eq 0 ]
-			then	FS=$($LS -lh "$FILECHECK"|$AWK '{print $5}')
+			then	[ -e "$FILECHECK" ] && \
+					FS=$($LS -lh "$FILECHECK"|$AWK '{print $5}') || \
+					FS=0
 				tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
 			else	#
 				FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')

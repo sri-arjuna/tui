@@ -27,7 +27,7 @@
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.8
+	script_version=0.8.1
 #	[ 0 -eq $UID ] && \
 #		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \
 #		source $PREFIX/share/tui/themes/$TUI_THEME
@@ -213,7 +213,7 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	
+	export browser_shell
 	[ -z "$BLACKLIST" ] && \
 		doBlacklist=false || \
 		doBlacklist=true
@@ -529,10 +529,10 @@ Where options are:
 					done
 					if $isBlocked
 					then	tui-status 1 "Invalid argument given: $str"
-					else	$action
+					else	$browser_shell $action
 						action_done=true
 					fi
-				else	$action
+				else	$browser_action $action
 					action_done=true
 				fi
 			fi
@@ -590,7 +590,7 @@ Where options are:
 				Quit)	menu="quit-browser"
 					exit 0	;;
 				*)	menu=nolonger
-					[ -f "$selected" ] &&  ./"$selected"
+					[ -f "$selected" ] && $browser_shell ./"$selected"
 					[ -d "$selected" ] && cd "$selected"
 					break
 					;;
@@ -613,5 +613,5 @@ Where options are:
 #
 	for var in $BROWSER_LIST_LOADED_VARIABLES ; do
 		cmd="$var=\"\" ; export $var"
-		$cmd
+		eval $cmd
 	done

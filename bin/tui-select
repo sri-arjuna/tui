@@ -31,7 +31,7 @@
 	source $PREFIX/share/tui/themes/"$TUI_THEME"
 	
 	ME=${0##*/}
-	script_version=0.6.3
+	script_version=0.6.4
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -78,22 +78,23 @@ Where options are:
 		
 		# Get input
 		read -n ${#len} NUM
-		NUM=$(echo $NUM)
+		[ -z "$NUM" ] && invalid=true && continue
+		NUM=$(echo "$NUM")
 		
 		# It is a number in range?
-		if [ "" = "$(echo "$NUM"|tr -d [:digit:])" ] && [ $NUM -ne 0 ]
+		if [ "" = "$(echo "$NUM"|tr -d [:digit:])" ] && [ ${#NUM} -ne 0 ]
 		then	# This some solves the selection of the last item....
 			[ $NUM -eq ${#ARGS[@]} ] && NUM=0
 			
 			# Clear input if NUM is too high
 			[ $NUM -gt $[ $len - 1 ] ] && \
 				invalid=true && \
-				printf "\r$BORDER_LEFT >   \r" >> /dev/stderr
+				printf "\r$BORDER_LEFT >   \r$BORDER_LEFT >" >> /dev/stderr
 			
 			# Array starts at 0
 			NUM=$(( $NUM - 1 ))
 		else 	# Clear input if NUM is NOT numeric
-			printf "\r$BORDER_LEFT >   \r" >> /dev/stderr 
+			printf "\r$BORDER_LEFT >   \r$BORDER_LEFT >" >> /dev/stderr 
 		fi
 	done
 	

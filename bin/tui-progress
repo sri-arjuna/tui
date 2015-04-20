@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.03.24
-	script_version=0.7.2
+#	Changed:	2015.04.04
+	script_version=0.7.3
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -104,6 +104,8 @@ Where options are:
 #
 	[ -z "$LEFT" ] && LEFT=" " 
 	[ -z "$MIDDLE" ] && MIDDLE=" "
+	[ -z "$VAL" ] && VAL=0
+	[ -z "$MAX" ] && MAX=0
 	$valPassed && \
 		VAL="$CURRENT" || \
 		VAL=$(cat "$TMPFILE")
@@ -111,9 +113,11 @@ Where options are:
 	PROGRESS=""
 	case "$TYPE" in
 		dash)	[ $VAL -gt 3 ] && VAL=0
-			PROGRESS="[  ${INDI[$VAL]}   ]"	;;
+			PROGRESS="[  ${INDI[$VAL]}   ]"
+			;;
 		num)	PROGRESS="$VAL / $MAX"
-			[ $VAL -gt $MAX ] && exit 1	;;
+			[ $VAL -gt $MAX ] && exit 1
+			;;
 		bar)	#set -x
 			[ $VAL -gt $MAX ] && exit 1
 			procent=0
@@ -121,7 +125,7 @@ Where options are:
 			#procent=$(( 100 / $MAX * $VAL ))
 			procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
 			# The length that is available to print bars
-			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 3  ))
+			length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#LEFT} - ${#MIDDLE} - ${#procent} - 22  ))
 			
 			pro=${procent/.*/}
 			[ $pro -gt 100 ] && \
@@ -133,13 +137,18 @@ Where options are:
 				cent=00
 			
 			#len=$(( $length * $pro / 100  ))	# If its once at 0, its never comming up again, since bash is limited to integer math only.
-			len=$( echo $length $procent | $AWK '{print ($1/100*$2/3*2) }' )
+			len=$( echo $length $procent | $AWK '{print ($1/100*$2) }' )
 			
 			bars=$(printf '%*s' ${len/.*})
 			bars=$(echo "$bars"|$SED s," ","\\$BAR",g)
-			
-			PROGRESS="$bars"
-			PROGRESS+=" [ ${pro}.${cent}% ]"
+
+			#length_total=$(( $length - 10 ))
+			bar_total="$(printf '%*s' ${length/.*})"
+			#echo ${#bar_total}
+			bar_total="[ ${bars}${bar_total:${#bars}} ]"
+			PROGRESS=" $bar_total"
+			STATUS=" [ ${pro}.${cent}% ]"
+			#PROGRESS+=" $STATUS"
 			
 		#	set +x
 			;;
@@ -160,7 +169,11 @@ Where options are:
 #
 #	Display & Action
 #
+	if [ -z "$(echo $LEFT$RIGHT)" ]
+	then	tui-printf "${PROGRESS}" "${STATUS:1}"
+		exit 0
+	fi
 	[ -z "$LEFT" ] && LEFT=" " 
 	[ -z "$MIDDLE" ] && MIDDLE=" "
-	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS"
+	tui-printf "$LEFT" "$MIDDLE" "$PROGRESS$STATUS"
 	
