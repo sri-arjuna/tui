@@ -23,7 +23,7 @@
 #	Variables
 #
 	ME=${0##*/}
-	script_version=0.3
+	script_version=0.4
 	beVerbose=false
 #
 #	Functions
@@ -47,7 +47,6 @@
 			If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will become its extension.
 			The number will be increased until the generated filename does not exist yet.
 			
-			
 		EOF
 	}
 	[ -z "$1" ] && showHelp && exit
@@ -64,58 +63,55 @@
 		esac
 	done
 	shift $(($OPTIND - 1))
-	set -x 
-	#BASE="${1/.*/}"
-	VAR=$(echo "$1") #|sed s,'\.',' ',g)
-	ARGS=( $VAR )
-	#BASE=""
-	M=$(( ${#ARGS[@]} )) #- 1 ))
-	C=0
-	CUR=""
-	while [ $C -lt $M ]
-	do 	BASE+="$CUR"
-		CUR="${ARGS[$C]} "
-		C=$(( $C + 1 ))
-	done
-	echo $CUR
-	BASE+="${CUR/.*}"
-	[ "${BASE:0:(-1)}" = " " ] && BASE="${BASE:0:(-1)}"
-	set +x 
-	#BASE="${ARGS[${#ARGS[@]}]}"
-	echo $BASE
-	LOC=$(dirname "$BASE")
-	EXT_OLD="${1/*./}"
-	EXTENSION="$2"
+	
+	
+	this="${1/$2/}"	# File without EXT?
+	ext="$2"	# NEW
+	EXT="$ext"	# OLD
+	
+	
+	if [ -z "$ext" ] || [ ! "$1" = "$this$EXT" ]
+	then	# No extension has been added, subtract it now
+		# Or passed extension is not identical to existing one
+		VAR=$(echo "$1"|sed s,'\.',' ',g)
+		ARGS=( $VAR )
+		M=$(( ${#ARGS[@]} )) #- 1 ))
+		C=0
+		CUR=""
+		while [ $C -lt $M ]
+		do 	BASE+="$CUR" ; LAST="$CUR"
+			CUR="${ARGS[$C]} " ; C=$(( $C + 1 ))
+		done
+	#set -x
+		if [ "tar" = "${LAST:0:3}" ]
+		then	ext="tar${this/*\.tar}"
+		elif [ -z "$2" ]
+		then	ext="$CUR"
+		else ext="${CUR/*./}"
+		fi
+		BASE="${this/$ext/}"
+	else	BASE="$this"
+	fi
 #
 #	Action & Display
 #
-	# Setting new extension
-	[ -z "$EXTENSION" ] && \
-		EXTENSION="$EXT_OLD"
-	[ "$EXTENSION" = "$BASE" ] && \
-		EXTENSION="" || \
-		BASE=${BASE/.$EXT_OLD/}
-	
 	# Set init name check according to presets:
-	[ -z "$EXTENSION" ] && \
-		EXT="" || \
-		EXT=".$EXTENSION"
-	NAME_INIT="$BASE$EXT"
+	NAME_INIT="$BASE${EXT/\ /}"
 	
 	if [ -f "$NAME_INIT" ]
 	then	$beVerbose && \
 			echo "$NAME_INIT exists, appending/increasing number." > /dev/stderr
 		
 		C=0		# Counter
-		NAME_CHECK="$BASE.$C$EXT"
+		NAME_CHECK="$BASE$C.$ext"
 		
 		while [ -f "$NAME_CHECK" ]
 		do	C=$(( $C + 1 ))
-			NAME_CHECK="$BASE.$C$EXT"
+			NAME_CHECK="$BASE$C.$ext"
 			$beVerbose && printf "\r%s" "Checking for $NAME_CHECK" > /dev/stderr
 		done
-		$beVerbose && [ $C -gt 0 ] && printf "\n" > /dev/stderr
-		$beVerbose && echo "$NAME_CHECK is available" > /dev/stderr
+		$beVerbose && [ $C -gt 0 ] && \
+			printf "\n%s\n" "$NAME_CHECK is available" > /dev/stderr
 		
 		# Finaly a file that does not exist yet
 		echo "$NAME_CHECK" > /dev/stdout

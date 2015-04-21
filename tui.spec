@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.5
-Release:     1%{?dist}
+Release:     2%{?dist}
 Summary:     for scripters made easy
 
 License:     GPLv3

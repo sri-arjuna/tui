@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.1
+	script_version=0.7.2
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]directory]
@@ -77,7 +77,6 @@
 	do 	#tui-printf -rS 2 "Initializing $FOLDER..." ## "$WORK"
 		printf "\r"
 		THIS="$(basename $FOLDER)"
-		DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT" "$TAR_EXT")
 		PWD_ORG="$(pwd)"
 		
 		#set -x
@@ -142,6 +141,7 @@
 			tui-status $RET "Extracted: $FOLDER"
 			RET=$?
 		else	#echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero ; echo \$? > $TMP" > $FILE_CMD
+			DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT" "$TAR_EXT")
 			tui-printf -rS 2 "Initializing $FOLDER..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 			cd "$(dirname $FOLDER)"
