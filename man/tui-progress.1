@@ -1,7 +1,11 @@
 .TH "tui-progress" 1 "Simon A. Erat (sea)" "TUI 0.7.3"
 
+
+
 .SH NAME
 tui-progress (0.7)
+
+
 
 .SH SYNOPSIS
 \fBtui-progress\fP [options] [MESSAGE]
@@ -13,6 +17,20 @@ Example:
 .br
 		tui-progress -m 104 "Count up to 104"
 .br
+
+
+
+.SH DESCRIPTION
+.PP
+Provies three different styles of progress, according to the options passed.
+.br
+.RS 4
+* A rotation line/dash (- / | \)
+* Counting up, on one line
+* Counting up, one line per entry/call
+* A Progressbar
+
+
 
 .SH OPTIONS
 .OP -b
@@ -77,9 +95,6 @@ Will enable verbose mode, but only applies when
 is inovked.
 .RE
 
-.SH DESCRIPTION
-.PP
-Is used to indicate progress, while keeping the output to a single line.
 
 .SH LICENSE
 GNU General Public License (GPL)

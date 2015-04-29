@@ -51,23 +51,6 @@ cat > "$DEST" << EOF
 #
 	beVerbose=false
 #
-#	Help text
-#
-	help_text="
-\$ME (\$script_version)
-\${TITLE^}
-Usage: 		\$ME [options] arguments
-Examples:	\$ME 
-		\$ME -a
-		\$ME -e optVAL
-Where options are:
-	-h(elp) 		This screen
-	-C(onf			Show the config menu
-	-q(uiet)		Mutes all output
-	-v(erbose)		Enables the scripts verbosity
-
-"
-#
 #	Configuration file template
 #
 #
@@ -86,7 +69,25 @@ Where options are:
 #
 #	Functions
 #
-	
+	function help_screen() {
+	# Simply shows the helpscreen
+	# 
+		cat <<-HELP_SCREEN
+		\$ME (\$script_version)
+		\${TITLE^}
+		Usage: 		\$ME [-hCqv] arguments
+		Examples:	\$ME 
+				\$ME -a
+				\$ME -e optVAL
+		
+		Where options are:
+			-h(elp) 		This screen
+			-C(onf			Show the config menu
+			-q(uiet)		Mutes all output
+			-v(erbose)		Enables the scripts verbosity
+		
+		HELP_SCREEN
+	}
 #
 #	Environment checks
 #
@@ -105,7 +106,7 @@ Where options are:
 	# Get access to the passed value of the argument by using \$OPTARG
 	while getopts "Chqv" opt
 	do 	case \$opt in
-		h)	printf "\$help_text"
+		h)	help_screen
 			exit \$RET_HELP
 			;;
 		C)	tui-conf-editor \\

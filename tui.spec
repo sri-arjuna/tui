@@ -1,7 +1,7 @@
 Name:        tui
-Version:     0.7.5
-Release:     2%{?dist}
-Summary:     for scripters made easy
+Version:     0.7.6
+Release:     0%{?dist}
+Summary:     Tools to write cool looking scripts
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -113,6 +113,14 @@ rm -rf %{buildroot}
 %{_sysconfdir}/bash_completion.d/%{name}_compl.bash
 
 %changelog
+* Wed Apr 29 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6
+- Changed:   tui-printf, no longer adds tailing backslash to strings with escape variables
+- Changed:   tui-conf-set, now prints status message if verbose
+- Changed:   tui-status, added a comment line to code
+- Changed:   templates/scripts/modul, changed helpscreen from string to function
+- Changed:   manpages for tui and tui-progress
+- Changed:   cont.etc/commands.conf, added LS, so it doesnt take alias'
+
 * Mon Apr 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.5
 - Updated:   tui-progress, bar now has a border and optimizied alignment
 - Fixed:     tui-select, empty selection should no longer raise an error message.

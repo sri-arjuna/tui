@@ -86,7 +86,7 @@ Where options are:
 		check=$(echo "$1" | tr -d '[:digit:]')
 		if [ -z "$check" ] 	# && [ ! -z "$1" ] # && echo $1 | grep -q [0-9]
 		then	echo "all numbers:: $1" > /dev/zero
-		else	echo "First argument $1 ($check) is not numeric!"
+		else	echo "First argument $1 ($check) is not numeric!" > /dev/stderr
 			exit 1
 		fi
 		

@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.03.18
-	script_version=1.4.8
+#	Changed:	2015.04.29
+	script_version=1.5
 #	Description:	The absolute core function for TUI
 #
 #	Variables
@@ -339,12 +339,15 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #	Display & Action
 #
 	# Escape trailing backslash, from whichever argument passed
-	echo "$FIRST" | grep -q "\\"$ && \
-		FIRST="${FIRST}\\\\"
-	echo "$SECOND" | grep -q "\\"$ && \
-		SECOND="${SECOND}\\\\"
-	echo "$THIRD" | grep -q "\\"$ && \
-		THIRD="${THIRD}\\\\"
+	# This is supposed to 'keep' artificial linebreaks rather than get them on one line
+        [ "\\" = "${FIRST:0:(-1)}" ] && \
+                FIRST="${FIRST}\\"
+#	echo "$FIRST" | grep -q "\\"$ && \
+#		FIRST="${FIRST}\\\\"
+#	echo "$SECOND" | grep -q "\\"$ && \
+#		SECOND="${SECOND}\\\\"
+#	echo "$THIRD" | grep -q "\\"$ && \
+#		THIRD="${THIRD}\\\\"
 	
 	# Escape '%'
 	output=$(echo "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"|$SED s,'%','%%',g)

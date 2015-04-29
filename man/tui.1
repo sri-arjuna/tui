@@ -2,7 +2,7 @@
 TUI - Text User Interface
 Copyright (C) November 2014 by Simon Arjuna Erat (sea), erat.simon@gmail.com
 .. ....................................................
-.TH "tui" 1 "2014-11-09" "Tui Version 0.6.0"
+.TH "tui" 1 "2014-11-09" "Tui Version 0.7.5"
 
 .SH NAME
 TUI \- Text User Interface
@@ -15,91 +15,91 @@ TUI \- Text User Interface
 ...OP config|reset|reset-yes|theme
 ...RI [ THEMENAME ]
 .br
-source \fBtui\fP | \fBtui\fP config
-
+tui-<tab>
+.br
+source \fBtui\fP
+.br
+\fBtui\fP config
+.br
+\fBtui\fP theme default
+.br
+\fBtui\fP theme floating
 
 
 
 .SH DESCRIPTION
 .PP
-TUI is an abrevihation for "Text User Interface", it is a framework of commands to help you creating a line based text interface.
-
+An easy way to give your scripts some bling bling is to use TUI, which is an abrevihation for "Text User Interface".
+Technicly, it is a framework of commands to help you creating a (due to the limits of scripts) line based text interface.
 .br
-It enables you to write scripts which when using the tui-'simulation a TUI in any terminal window or tty console.
-.br
-Due to the 'limitation's of a VT or a Terminal window, it is a line-based-interface.
-.br
-It is ment for scripts that  want to present themself a little bit more attractive to endusers.
-
-Do not get overhelmed by the many commands provided by TUI.
-.br
-It is just based upon these 4 commands, all other commands are just assistants for specific tasks, to help you match them into TUI, or to ease some very repeative tasks.
-.br
-All of these 4 commands share some behaviour:
-.br
-.B
-1.
-You may pass from none to 3 strings.
-.br
-.B
-2. 
-String alignment:
-.RS 4
-0 strings will print the borders, and colors where applicable, but no strings
-.br
-1 string will be left aligned
-.br
-2 strings will be first on the left, second on the right side aligned.
-.br
-3 strings will be first on the left, second in the middle, third on the right side aligned.
-
-
-.IP "\fBtui-printf\fP"
-The very core of TUI. It works with 'echo-like' syntax, but without ending <newline>.
-.br
-As long it fits on a single line, each additional call of tui-printf will be replacing its previous one.
-.br
-Otherwise it will attemp to print the last available string on a new line, 
-if only one is available, it will split it up equaly.
-
-
-.IP "\fBtui-echo\fP"
-Prints up to three strings on the same line, and an ending <newline>.
-
-.IP "\fBtui-header\fP"
-Prints a blue background with white font, filling complete line.
-
-.IP "\fBtui-title\fP"
-Prints the first string in the middle.
-.br
-Prints a white background with blue font inlined of the borders
+All the commands start with the prefix 
+.I tui-
+followed by either the subsection, like 
+.I bol-, conf-, str-
+or just the command its name/acronym/synonym.
+Their names are chosen to represent either their counterparts or to describe what it does. tui-printf beeing the exception, as its original functionaly is now metaphoricly adapted for TUI.
 .br
 
+It also helps to start the proper application like editor, file manager or web broswer, so it chooses a GUI application if there is a GUI, and a console application if there is none ($DESKTOP_SESSION).
 
 
 
 .SH OPTIONS
-All of the tui-* commands, share a common option trigger, which is:
-.br
-.OP \-h
-	Shows command version and help
-.br
-
 Please see their respective help or manpage information for their options and syntax.
 
 
 
+.SH USAGE
+It is thought for the use via ssh or telnet connections, to provide the enduser an interface.
+Or to style up scripts and make them more pleasent to the eye.
+.br
+While for the basic 'display' task, one only needs one of these four commands:
+.RS 6
+.br
+* tui-header, to make the full line with a blue background and white font (theme:default)
+.br
+* tui-title, to make inner area with a blue background and white font (theme:default)
+.br
+* tui-echo, to make the full line with the terminal default colors.
+.br
+* tui-printf, to make next tui-<command> 'overwrite' the current output.
+.RE
+The biggest part of the TUI package however, are its additional commands.
+.br
+If your shell supports tab-completion, type: 
+.B tui-
+and press tab one or two times to get a list of TUI its commands.
+Otherwise you can see a list of the command by typing:
+.B ls /usr/bin/tui-*
+.br
+Simply said, they should perform their task while producing output with the same output-style as tui-echo.
+.br
+Please see their according helpscreen (tui-<cmd> -h) or its manpage.
 
-.SH TEXT USER INTERFACE
-Sourcing TUI by either
-.B
-.I ". tui"
-or
-.B
-.I "source tui"
-will provide the variables listed in the 
-.B FILES 
-section.
+
+
+.SH USAGE as TOOLS
+The tools can also be used to make your terminal usage safer...
+.br
+	cmd=tui-echo
+.br
+	for f in * ; do $cmd "$f" "${f:5:${#f}-15}" ; done
+.br
+
+then, when i like what i see, i simply type: 
+.br
+	cmd=mv
+.br
+
+press arrow key up twice, and rerun:	
+.br
+	for f in * ; do $cmd "$f" "${f:5:${#f}-15}" ; done
+.br
+
+and have the files renamed as i needed to, with a simple and safe compare of the two values.
+.br	
+
+
 
 .SH FILES
 These files are used as settings and user customization.
@@ -108,12 +108,6 @@ Generaly speaking, these are ment so the user configures the 'endpoints' (theme,
 and the developer can focus on writing functions, and simply use tui-edit instead of looking which text 
 editor is installed, and wether or not the user is in graphical interface.
 .br
-
-If you want to change settings, please use:
-.B
-tui config
-.br
-
 
 .IP \fI/etc/tui/\fP
 System wide defaults
@@ -149,6 +143,29 @@ Bytesize used by
 to read and write per cycle, default: 4M
 .br
 .RE
+
+
+.IP \fBcommands.conf\fP
+(tui*)
+.br
+This stores the variables of AWK, GREP, LS and SED for cross-system use. It is known that
+.B Solaris-Users
+must change the AWK variables.
+.br
+.I Provides:
+.br
+.RS 11
+.IP AWK
+Name or full path to the awk to be used.
+.IP GREP
+Name or full path to the grep to be used.
+.IP LS
+Name or full path to the ls to be used, this is just to bypass any possible aliases.
+.IP SED
+Name or full path to the sed to be used.
+.br
+.RE
+
 
 .IP \fBcolors.conf\fP
 (tui-header, tui-title)
@@ -190,57 +207,65 @@ TUI_COLOR_FG_BLACK
 .br
 Defines how tui-status will report the different statuses
 .br
-Note that (for example): TUI_DONE contains the string, where RET_DONE contains an integer value. 
+Note that (for example): TUI_DONE contains the string, where RET_DONE contains an integer value.
+.br
+They are ment to simplify custom command calls:
+.br
+	source /etc/tui/status.conf
+.br
+	tui-status $RET_ON "Enabled some hw setting"
+.br
+	echo "$TUI_CANC Canceled something"
 .br
 .I
 Provides:
 .br
 .RS 11
-.IP {RET,TUI}-DONE
+.IP {RET,TUI}_DONE
 0
 .br
 [ DONE ]
-.IP {RET,TUI}-FAIL
+.IP {RET,TUI}_FAIL
 1
 .br
 [ FAIL ]
-.IP {RET,TUI}-WORK
+.IP {RET,TUI}_WORK
 2
 .br
 [ WORK ]
-.IP {RET,TUI}-TODO
+.IP {RET,TUI}_TODO
 3
 .br
 [ TODO ]
-.IP {RET,TUI}-SKIP
+.IP {RET,TUI}_SKIP
 4
 .br
 [ SKIP ]
-.IP {RET,TUI}-NEXT
+.IP {RET,TUI}_NEXT
 5
 .br
 [ NEXT ]
-.IP {RET,TUI}-BACK
+.IP {RET,TUI}_BACK
 6
 .br
 [ BACK ]
-.IP {RET,TUI}-CANC
+.IP {RET,TUI}_CANC
 7
 .br
 [ DONE ]
-.IP {RET,TUI}-ON
+.IP {RET,TUI}_ON
 10
 .br
 [  ON  ]
-.IP {RET,TUI}-OFF
+.IP {RET,TUI}_OFF
 11
 .br
 [ OFF  ]
-.IP {RET,TUI}-HELP
+.IP {RET,TUI}_HELP
 99
 .br
 [ HELP ]
-.IP {RET,TUI}-INFO
+.IP {RET,TUI}_INFO
 111
 .br
 [ INFO ]
@@ -311,8 +336,88 @@ Default licensing for tui-new-script, default: "GNU General Public License (GPL)
 .IP DEFAULT_LICENSE_URL
 URL to the license, default: "http://www.gnu.org/licenses/gpl.html"
 .IP TUI_THEME
-The actualy theme name the user uses, default: $TUI_THEME
+The actual theme name the user uses, default: $TUI_THEME
 .RE
+
+
+
+.SH THEME
+The themes define the borders and the color used.
+.br
+Allthough this is a per-user setting, if no configuration was found it uses the system default theme from /etc/tui/tui.conf
+.br
+.IP default
+The default theme.
+.br
+Border:		"'# |'"
+.br
+Background:	red
+Font:		white
+.br
+
+.IP default-red
+The default 'root' theme.
+.br
+Border:		"'# |'"
+.br
+Background:	red
+Font:		white
+.br
+
+.IP dot-blue
+A dotted border with blue-white color
+.br
+Border:		"'::'"
+.br
+Background:	blue
+Font:		white
+.br
+
+.IP dot-red
+A dotted border with red-white color
+.br
+Border:		"'::'"
+.br
+Background:	red
+Font:		white
+.br
+
+.IP floating
+'Empty' theme, no border, no colors
+.br
+Border:		"''"
+.br
+Background:	-
+Font:		-
+.br
+
+.IP mono
+A lined theme with black and white color
+.br
+Border:		"'||'"
+.br
+Background:	black
+Font:		white
+.br
+
+.IP witch-purple
+A colorfulf and disturbing theme
+.br
+Border:		"'\./'"
+.br
+Background:	purple
+Font:		cyan
+.br
+
+.IP witch-yellow
+A colorfulf and disturbing theme
+.br
+Border:		"'\./'"
+.br
+Background:	yellow
+Font:		black
+.br
+
 
 
 .SH SEE ALSO
@@ -376,12 +481,10 @@ The actualy theme name the user uses, default: $TUI_THEME
 
 
 
-
 .SH LICENSE
 GNU General Public License (GPL)
 .br
 http://www.gnu.org/licenses/gpl.html
-
 
 
 
