@@ -1,0 +1,79 @@
+.TH "tui-install" "1" "2015-04-30" "Simon Arjuna Erat (sea)"
+
+.SH NAME
+tui-install (0.5)
+
+.SH SYNOPSIS
+\fBtui-install\fP [options] [arguments]
+.br
+Example: tui-install
+.br
+Where options are:
+.br
+.IP "\fB-b\fP"
+Returns the brand this distro is based on.
+.br
+.IP "\fB-d\fP"
+Returns the name of this distro.
+.br
+.IP "\fB-l [/path/to/]logfile\fP"
+Writes to logfile wether or not the installation was successfull.
+.br
+.IP "\fB-v\fP"
+Verbose mode, prints every single application on its own line, and therefore will write an entry for every application.
+
+.SH DESCRIPTION
+.PP
+Installs passed packages if found.
+.br
+if one package is missing, it will fail, use
+.B -v
+to bypass this.
+
+.SH SUPPORTS
+These Brands/distros (reckognize only)
+.br
+* arch
+.br
+* debian
+.br
+* exherbo
+.br
+* fedora
+.br
+* gentoo
+.br
+* mac
+.br
+* redhat
+.br
+* [free|net]-bsd
+.br
+
+These package managers (install only!)
+.br
+* apt-get
+.br
+* brew/port
+.br
+* cave
+.br
+* emerge
+.br
+* pkg
+.br
+* yum
+.br
+* zypper
+.br
+
+
+.SH LICENSE
+GNU General Public License (GPL)
+.br
+http://www.gnu.org/licenses/gpl.html
+
+.SH CONTACT
+erat.simon@gmail.com
+.br
+http://linux-scripter.blogspot.com

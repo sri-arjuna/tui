@@ -13,44 +13,46 @@ BuildArch:   noarch
 Requires:    bash
 Requires:    coreutils
 
-Provides:    tui
-Provides:    tui-bgjob
-Provides:    tui-bol-dir
-Provides:    tui-bol-sudo
-Provides:    tui-browser
-Provides:    tui-cat
-Provides:    tui-conf-editor
-Provides:    tui-conf-get
-Provides:    tui-conf-set
-Provides:    tui-dd
-Provides:    tui-download
-Provides:    tui-echo
-Provides:    tui-edit
-Provides:    tui-filemgr
-Provides:    tui-ftp
-Provides:    tui-header
-Provides:    tui-indi
-Provides:    tui-install
-Provides:    tui-list
-Provides:    tui-log
-Provides:    tui-new-browser
-Provides:    tui-new-manpage
-Provides:    tui-new-script
-Provides:    tui-press
-Provides:    tui-printf
-Provides:    tui-progress
-Provides:    tui-psm
-Provides:    tui-read
-Provides:    tui-rnd
-Provides:    tui-select
-Provides:    tui-status
-Provides:    tui-str-usb
-Provides:    tui-tar
-Provides:    tui-terminal
-Provides:    tui-title
-Provides:    tui-wait
-Provides:    tui-web
-Provides:    tui-yesno
+# Not the most elegant, but i guess i prefer this to be 'silent'
+#Provides:    tui-bgjob
+#Provides:    tui-bol-dir
+#Provides:    tui-bol-sudo
+#Provides:    tui-browser
+#Provides:    tui-cat
+#Provides:    tui-conf-editor
+#Provides:    tui-conf-get
+#Provides:    tui-conf-set
+#Provides:    tui-cp
+#Provides:    tui-dd
+#Provides:    tui-download
+#Provides:    tui-echo
+#Provides:    tui-edit
+#Provides:    tui-filemgr
+#Provides:    tui-ftp
+#Provides:    tui-header
+#Provides:    tui-indi
+#Provides:    tui-install
+#Provides:    tui-list
+#Provides:    tui-log
+#Provides:    tui-mv
+#Provides:    tui-new-browser
+#Provides:    tui-new-manpage
+#Provides:    tui-new-script
+#Provides:    tui-press
+#Provides:    tui-printf
+#Provides:    tui-progress
+#Provides:    tui-psm
+#Provides:    tui-read
+#Provides:    tui-rnd
+#Provides:    tui-select
+#Provides:    tui-status
+#Provides:    tui-str-usb
+#Provides:    tui-tar
+#Provides:    tui-terminal
+#Provides:    tui-title
+#Provides:    tui-wait
+#Provides:    tui-web
+#Provides:    tui-yesno
 
 
 %description
@@ -77,7 +79,7 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name} \
-		     %{buildroot}%{_sysconfdir}/bash_completion.d/
+                     %{buildroot}%{_sysconfdir}/bash_completion.d/
 # Move the executeables
 rm -fr %{name}/screenshots
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
@@ -104,40 +106,40 @@ rm -rf %{buildroot}
 %{_datarootdir}/%{name}/
 %{_bindir}/%{name}
 %{_bindir}/%{name}-*
-#%{_sysconfdir}/%{name}/
-#%{_sysconfdir}/profile.d/%{name}.sh
 
 %config
 %{_sysconfdir}/%{name}/
-#%{_sysconfdir}/profile.d/%{name}.sh
-%{_sysconfdir}/bash_completion.d/%{name}_compl.bash
+%{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
-* Wed Apr 29 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6
-- Changed:   tui-printf, no longer adds tailing backslash to strings with escape variables
+* Thu Apr 30 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-1
+- Changed:   Specfile for reviewing
+
+* Wed Apr 29 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-0
+- Fixed:     tui-printf, no longer adds tailing backslash to strings with escaped variables
 - Changed:   tui-conf-set, now prints status message if verbose
 - Changed:   tui-status, added a comment line to code
 - Changed:   templates/scripts/modul, changed helpscreen from string to function
 - Changed:   manpages for tui and tui-progress
-- Changed:   cont.etc/commands.conf, added LS, so it doesnt take alias'
+- Added:     conf.etc/commands.conf, added LS, so it doesnt take an alias'
 
-* Mon Apr 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.5
+* Mon Apr 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.5-0
 - Updated:   tui-progress, bar now has a border and optimizied alignment
 - Fixed:     tui-select, empty selection should no longer raise an error message.
 - Fixed:     tui-str-genfilename, no longer cuts of filenames after first dot, only last dot.
 
-* Thu Mar 26 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
+* Thu Mar 26 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4-1
 - Removed:   Old and no longer used templates
 - Added:     Create fun stats for project
 - Added:     tui-str-encrypt, encrypt strings
 
-* Wed Mar 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4
+* Wed Mar 25 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.4-0
 - Added:     tui-cp, tui-mv
 - Updated:   tui-progress, a few code optimizations
 - Updated:   tui-bgjob uses now a progress bar if both options 
 -                   'source' and 'file'  file are provided.
 
-* Thu Mar 19 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.3
+* Thu Mar 19 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.3-0
 - Updated:   man tui-printf, 0.9.7 -> 1.4.8
 - Changed:   $TUI_FONT_INVERT became corrected to $TUI_COLOR_INVERT
 - Added:     New README - project info
@@ -145,14 +147,14 @@ rm -rf %{buildroot}
 - Updated:   tui-progress, bar mode is working now.
 - Updated:   man tui-tar|progress
 
-* Wed Mar 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.2
+* Wed Mar 18 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.2-0
 - Updated:   tui-list, now accepts -1 or -2 to define output rows
 - Updated:   tui, no longer shows config screen when passing
 -            'config' to certain tui-<command>'s
 - Updated:   tui-browser can be silent now (no header,title,footer)
 - Updated:   tui-select, output optimized
 
-* Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1
+* Sun Mar 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.1-0
 - Updated:   tui-edit, now saves the full application path.
 - Updated:   tui-conf-set, there was an issue if vars were indented.
 - Updated:   tui-select, actualy fixed empty line if user pressed enter
