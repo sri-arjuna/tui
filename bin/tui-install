@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.02.26
-	script_version=0.5
+#	Changed:	2015.05.01
+	script_version=0.6
 	TITLE="Install packages"
 	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 #	Description:	Install provided packages, using the 'default' package manager
@@ -146,7 +146,9 @@ Where options are:
 	case $(based) in
 	arch)		APP=pacman	;;
 	debian)		APP=apt-get	;;
-	redhat)		APP=yum		;;
+	redhat)		which dnf 1>/dev/zero 2>/dev/zero && \
+				APP=dnf || \
+				APP=yum		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
 	opensuse)	APP=zypper	;;
 	exherbo)	APP=cave	;;
@@ -162,7 +164,7 @@ Where options are:
 	# Generate commands for the installer
 	cmd=""
 	case $APP in
-	yum)		cmd+=" -q -y install"	;;	
+	yum|dnf)		cmd+=" -q -y install"	;;	
 	apt-get)	cmd="-q -y install"	;;
 	pacman)		cmd="-qIY"		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (379-1056)

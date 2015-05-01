@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     0%{?dist}
+Release:     2%{?dist}
 Summary:     Tools to write cool looking scripts
 
 License:     GPLv3
@@ -79,11 +79,11 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name} \
-                     %{buildroot}%{_sysconfdir}/bash_completion.d/
+                     %{buildroot}%{_datadir}/bash-completion/
 # Move the executeables
 rm -fr %{name}/screenshots
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
-mv %{name}/%{name}_compl.bash %{buildroot}%{_sysconfdir}/bash_completion.d/
+mv %{name}/%{name}_compl.bash %{buildroot}%{_datadir}/bash-completion/
 # Copy system defaults to system
 echo "PREFIX=/usr" >> %{name}/conf.etc/tui.conf
 cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
@@ -112,6 +112,9 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
+* Fri May 01 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-2
+- Updated:   tui-install, now prefers dnf over yum if available
+
 * Thu Apr 30 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-1
 - Changed:   Specfile for reviewing
 
