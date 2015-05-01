@@ -24,9 +24,9 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
-#	Changed:	2014.11.27
+#	Changed:	2015.05.01
 	. tui
-	script_version=0.7
+	script_version=0.8
 #	Description:	Basic configuration file editor
 #
 #
@@ -127,14 +127,14 @@ Log:		$LOG
 							fi
 						else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
 						fi
-						tui-conf-set "$CONFIG" "$VAR" "$newval"
+						tui-conf-set -v "$CONFIG" "$VAR" "$newval"
 						RET=$?
 					else	tui-yesno "This will overwrite \"$VAR\" value ($VAL) with an empty string \"\", continue?" && \
-							tui-conf-set "$CONFIG" "$VAR" "$newval"
+							tui-conf-set -v "$CONFIG" "$VAR" "$newval"
 						RET=$?
 					fi
 					
-					tui-status $RET "$msg" && \
+					[ $RET -eq 0 ] && \
 						doLog "Setup: $msg" || \
 						doLog "Setup: Failed to c$(printf ${msg:1}|$SED s,ged,ge,g)"
 				fi

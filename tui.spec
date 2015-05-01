@@ -114,6 +114,9 @@ rm -rf %{buildroot}
 %changelog
 * Fri May 01 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-2
 - Updated:   tui-install, now prefers dnf over yum if available
+- Changed:   tui-conf-set, leading space handling improvement?
+-            added verbose mode
+- Updated:   tui-conf-editor, now uses the verbose mode of tui-conf-set
 
 * Thu Apr 30 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-1
 - Changed:   Specfile for reviewing

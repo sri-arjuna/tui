@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.03.07
-	script_version=1.0
+#	Changed:	2015.05.01
+	script_version=1.2
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -101,8 +101,12 @@ Where options are:
 #
 # 	Preformat strings
 #
-	SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=")" #|tr -d '[[:space:]]')"
-	SEARCH="$(echo $SEARCH|$SED -e 's/^[[:space:]]*//')"
+	# Full line
+	SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=" | head -n 1)"
+	# Remove leading spaces
+	#SEARCH="$(echo $SEARCH|$SED -e 's/^[[:space:]]*//')"
+	# But above sometimes fails with incomplete sed command...
+	SEARCH="$(echo $SEARCH|$SED -e 's/^[[:space:]]*//g')"
 	
 	# Apply options
 	$SMALL && VARNAME="${VARNAME,,}" && VALUE="${VALUE,,}"
@@ -142,8 +146,6 @@ Where options are:
 			
 		fi
 	else	# Its already there, handling according to special chars
-		#set -x
-		
 		if $hadDollar
 		then	# It needs special treatement
 			SEARCH="$(echo $SEARCH|$SED s,'$','\$',g)"
@@ -153,15 +155,14 @@ Where options are:
 			cmd="$SED s${SD}${SEARCH}${SD}${REPLACE}${SD}g -i $CONFFILE"
 			$cmd
 		fi
-		#set +x
 	fi
 	
 	# Return true if replaced string was found
 	if $GREP $Q "$str_checker" "$CONFFILE"
 	then	# Success, visual-report only if verbose is enabled
-		$beVerbose && tui-status 0 "Saved \"$CONFFILE\"" "$VARNAME=$str_checker"
+		$beVerbose && tui-status 0 "Saved in \"${CONFFILE##*/}\"" "$VARNAME=$str_checker"
 		exit 0
 	else	# It failed, visual-report only if verbose
-		$beVerbose && tui-status 1 "Could not write to \"$CONFFILE\""
+		$beVerbose && tui-status 1 "Could not write to \"${CONFFILE}\""
 		exit 1
 	fi
