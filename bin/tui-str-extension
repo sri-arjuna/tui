@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	source tui
+#
+#	File:		tui-str-extension
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.05.06
+#	Changed:	2015.05.06
+	script_version=0.1
+	TITLE="tui-str-extension"
+#	Description:	Simply returns the extension of passed file
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-str-extension
+	ME="${ME/.sh/}"				# Cut off .sh extension
+#
+#	Functions
+#
+	function showHelp() {
+	# Shows the basic help screen
+	#
+		cat <<-EOF
+			$ME ($script_version)
+			Usage: $ME "File with spaces.some string.txt"
+			
+			Simply returns the string after the last dot.
+			Returns empty string if no dots were found.
+			
+		EOF
+	}
+#
+#	Catching Arguments
+#
+	hadOpts=false
+	while getopts "hv" opt
+	do	case "$opt" in
+		h)	showHelp
+			exit
+			;;
+		v)	beVerbose=true
+			hadOpts=true
+			;;
+		esac
+	done
+	$hadOpts && shift $(($OPTIND - 1))
+	[ -z "$1" ] && showHelp && exit
+#
+#	Action & Display
+#
+	out=""
+	FN=$( echo "$1" | $SED s," ","",g)		# Remove any spaces and make it a single string
+	for chance in $(echo "$FN"|$SED s,"\."," ",g)	# Use dots as string seperators
+	do	out="$chance"
+	done
+	if [ "$out" = "$FN" ]
+	then	echo ""
+	else 	echo "${out%\ /}"	# Remove any tailing spaces
+	fi
