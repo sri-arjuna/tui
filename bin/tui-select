@@ -31,7 +31,7 @@
 	source $PREFIX/share/tui/themes/"$TUI_THEME"
 	
 	ME=${0##*/}
-	script_version=0.6.4
+	script_version=0.7
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -46,6 +46,7 @@ Where options are:
 #
 #	Action
 #
+	ROWS=""
 	while getopts "ha" opt
 	do	case "$opt" in
 		h|"")	printf "$help_text"
@@ -53,9 +54,12 @@ Where options are:
 			;;
 		a)	AUTO=true
 			;;
+		1|2)    ROWS=$opt
+			;;
 		esac
 	done
 	shift $(($OPTIND - 1))
+	[ -z "$ROWS" ] || ROWS="-$ROWS"
 	
 	# This many digits to read at max
 	ARGS=("${@}")
@@ -66,7 +70,7 @@ Where options are:
 		exit 0
 	
 	# Show the options
-	tui-list "${ARGS[@]}" > /dev/stderr
+	tui-list $ROWS "${ARGS[@]}" > /dev/stderr
 	
 	# Repeat input while invalid
 	invalid=true
