@@ -27,7 +27,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.06
 #	Changed:	2015.05.06
-	script_version=0.1
+	script_version=0.2
 	TITLE="tui-str-extension"
 #	Description:	Simply returns the extension of passed file
 #
@@ -66,16 +66,12 @@
 		esac
 	done
 	$hadOpts && shift $(($OPTIND - 1))
-	[ -z "$1" ] && showHelp && exit
+	[ -z "$1" ] && showHelp && exit 99
 #
 #	Action & Display
 #
-	out=""
-	FN=$( echo "$1" | $SED s," ","",g)		# Remove any spaces and make it a single string
-	for chance in $(echo "$FN"|$SED s,"\."," ",g)	# Use dots as string seperators
-	do	out="$chance"
-	done
-	if [ "$out" = "$FN" ]
+	ext="${1##*.}"
+	if [ "$ext" = "$1" ]
 	then	echo ""
-	else 	echo "${out%\ /}"	# Remove any tailing spaces
-	fi
+	else 	echo "$ext"
+	done

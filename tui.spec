@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     4%{?dist}
+Release:     3%{?dist}
 Summary:     Tools to write cool looking scripts
 
 License:     GPLv3
