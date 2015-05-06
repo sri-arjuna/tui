@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     3%{?dist}
+Release:     4%{?dist}
 Summary:     Tools to write cool looking scripts
 
 License:     GPLv3
@@ -113,8 +113,8 @@ rm -rf %{buildroot}
 
 %changelog
 * Fri May 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-3
-- Fixed:     tui-str-genfilename, by exporting functionality to the addition
-- Added:     tui-str-extension, to simplify handling in tui-str-genfilename
+- Fixed:     tui-str-genfilename, by exporting functionality to tui-str-extension
+- Added:     tui-str-extension, to provide a tool for this task
 - Updated:   tui-select, now can also show only 1 or only 2 columns
 
 * Fri May 01 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-2

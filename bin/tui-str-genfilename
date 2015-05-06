@@ -75,7 +75,7 @@
 #	Action & Display
 #
 	# Set init name check according to presets:
-	NAME_INIT="$this$ext"
+	NAME_INIT="${this/\.tar/}$ext"
 	
 	if [ -f "$NAME_INIT" ]
 	then	$beVerbose && \
