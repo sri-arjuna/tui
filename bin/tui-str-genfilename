@@ -53,61 +53,40 @@
 #
 # 	Arguments
 #
+	hadOpts=false
 	while getopts "hv" opt
 	do	case "$opt" in
 		h)	showHelp
 			exit
 			;;
 		v)	beVerbose=true
+			hadOpts=true
 			;;
 		esac
 	done
-	shift $(($OPTIND - 1))
+	$hadOpts && shift $(($OPTIND - 1))
 	
-	
-	this="${1/$2/}"	# File without EXT?
+	this="$1"	# File without EXT?
 	ext="$2"	# NEW
-	EXT="$ext"	# OLD
-	
-	
-	if [ -z "$ext" ] || [ ! "$1" = "$this$EXT" ]
-	then	# No extension has been added, subtract it now
-		# Or passed extension is not identical to existing one
-		VAR=$(echo "$1"|sed s,'\.',' ',g)
-		ARGS=( $VAR )
-		M=$(( ${#ARGS[@]} )) #- 1 ))
-		C=0
-		CUR=""
-		while [ $C -lt $M ]
-		do 	BASE+="$CUR" ; LAST="$CUR"
-			CUR="${ARGS[$C]} " ; C=$(( $C + 1 ))
-		done
-	#set -x
-		if [ "tar" = "${LAST:0:3}" ]
-		then	ext="tar${this/*\.tar}"
-		elif [ -z "$2" ]
-		then	ext="$CUR"
-		else ext="${CUR/*./}"
-		fi
-		BASE="${this/$ext/}"
-	else	BASE="$this"
-	fi
+	EXT=$(tui-str-extension "$this")	# OLD
+	[ -z "$ext" ] && ext="$EXT"
+	this=${this/$EXT}
 #
 #	Action & Display
 #
 	# Set init name check according to presets:
-	NAME_INIT="$BASE${EXT/\ /}"
+	NAME_INIT="$this$ext"
 	
 	if [ -f "$NAME_INIT" ]
 	then	$beVerbose && \
 			echo "$NAME_INIT exists, appending/increasing number." > /dev/stderr
 		
 		C=0		# Counter
-		NAME_CHECK="$BASE$C.$ext"
+		NAME_CHECK="$this$C.$ext"
 		
 		while [ -f "$NAME_CHECK" ]
 		do	C=$(( $C + 1 ))
-			NAME_CHECK="$BASE$C.$ext"
+			NAME_CHECK="$this$C.$ext"
 			$beVerbose && printf "\r%s" "Checking for $NAME_CHECK" > /dev/stderr
 		done
 		$beVerbose && [ $C -gt 0 ] && \
