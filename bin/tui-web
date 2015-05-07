@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.4.1
+	script_version=0.5
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -48,6 +48,10 @@
 	esac
 	done
 	ARGS=($(echo "${@}"))
+	# Get the mode
+	tui-bol-gui && \
+		MODE=gui || \
+		MODE=cli
 #
 #	Functions
 #
@@ -71,16 +75,10 @@
 #
 #	Display
 #
-	# Get the mode
-	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
-	then	MODE=gui
-	else	MODE=cli
-	fi
-	
 	if [ -z "$BROWSER" ]
 	then	case $MODE in
-		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero 1>/dev/zero)	;;
-		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero 1>/dev/zero)	;;
+		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero)	;;
+		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero)	;;
 		esac
 		export BROWSER
 	fi

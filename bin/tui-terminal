@@ -20,50 +20,53 @@
 #
 #	Variable defaults
 #
-	script_version=0.2
+	script_version=0.3
 	ME="$(basename $0)"
-	help_text="$ME ($script_version)
-		\rUsage: $ME \"-c 'cmd'\" \"-c 'cmd2'\"
-		\rWhere either 'c' represents the letter required by your terminal application to start 
-		\rOpens a new \$TERMINAL window with provided commands
-		\r"
-	ARGS=($@)
+	[ -z "$TERMINAL" ] && source tui
 #
 #	Check for the environment to load
 #
-	#source /etc/tui/apps.conf
-	#source /etc/tui/tui.conf
-	source tui
-	#[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
+	! tui-bol-gui && \
+		tui-printf -S 1 "$ME: Requires to be in GUI mode" && \
+		exit 1
+	# List of known but possible unhandled terminals
+	list="caja-open-terminal caja-terminal eterm fbterm fourterm gnome-terminal guake konsole5 konsole lxterminal termit"
+	if ! which $TERMINAL > /dev/zero
+	then	found=false
+		for TERMINAL in $list;do
+			which $TERMINAL > /dev/zero && found=true
+		done
+		$found && tui-conf-set -v ${TUI_USER_CONF/user/apps/} TERMINAL $TERMINAL
+		$found && \
+			tui-printf -S 1 "No terminal could be identified, please set one manual in $APPS, using fallback (xterm) now." && \
+			TERMINAL=xterm
+	fi
 #
 #	Variable handling
 #
 	#[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
 	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	"-h")	echo -e "$ME ($script_version)
+			\rUsage: $ME \"<cmd>\"
+			\rExecutes <cmd> in another terminal ($TERMINAL) window, closes on termination according to your setting with that terminal.
+			\r"
 		exit $RET_HELP
 		;;
 	esac
+	ARGS="${@}"
+	
+	# Fill the fallback, to avoid empty calls
+	TERMINAL="${TERMINAL:-$TERM}"
 	case $TERMINAL in
-	xterm)			opt="-e "	;;
+	xterm)			[ -z "$1" ] && opt="" || opt="-e "	;;
 	lxterminal)		[ -z "$1" ] && opt="" || opt="-e "	;;
-	gnomte-terminal)	opt=""	;;
-	konsole)		opt=""	;;
+	gnomte-terminal)	[ -z "$1" ] && opt="" || opt="-e "	;;
+	*)			[ -z "$1" ] && opt="" || opt="-e "
+		echo "$TERMINAL: Using 'default' option \"$opt\", please report your terminal ($TERMINAL) and its command execution option." > /dev/stderr
+		;;
 	esac
 #
 #	Display
 #
-	
-	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
-	then	[ -z "$TERMINAL" ] && \
-			tui-printf -S 1 "No terminal could be identified, please set one manual in $APPS, using default now." && \
-			TERMINAL=xterm
-		
-		export TERMINAL #=$(which $BROWSER_GUI)
-		#for ARG in "${ARGS[@]}"
-		#do 	
-			$TERMINAL $opt "${ARGS[@]}"
-		#done
-	else	tui-status $? "$TERMINAL cannot be executed in VT MODE"
-	fi
+	$TERMINAL $opt ${ARGS[@]}
 	

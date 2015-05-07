@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.2
+	script_version=1.3
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -35,10 +35,9 @@
 		\rOpens provided FILE/s in the favorite editor according to environment.
 		\rIn VT it will open \"$EDITOR_CLI\" and in GUI it will open \"$EDITOR_GUI\"
 		\r"
-	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
-	then	MODE=gui
-	else	MODE=cli
-	fi
+	tui-bol-gui && \
+		MODE=gui || \
+		MODE=cli
 #
 #	Variable handling
 #
@@ -77,8 +76,8 @@
 #
 	if [ -z "$EDITOR" ]
 	then	case $MODE in
-		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero 1>/dev/zero)	;;
-		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero 1>/dev/zero)	;;
+		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero )	;;
+		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero )	;;
 		esac
 		export EDITOR
 	fi

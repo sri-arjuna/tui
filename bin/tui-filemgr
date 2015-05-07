@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.5.2
+	script_version=0.6
 	ME="$(basename $0)"
 #
 #	Check for the environment to load
@@ -73,15 +73,14 @@
 #	Display
 #
 	# Get the mode
-	if [ xterm = "$TERM" ] || [ ! "" = "$DESKTOP_SESSION" ] || [ ! "" = "$XDG_CURRENT_DESKTOP" ]
-	then	MODE=gui
-	else	MODE=cli
-	fi
+	tui-bol-gui && \
+		MODE=gui || \
+		MODE=cli
 	
 	if [ -z "$FILEMGR" ]
 	then	case $MODE in
-		cli)	FILEMGR=$(which $FILEMGR_CLI 2>/dev/zero 1>/dev/zero)	;;
-		gui)	FILEMGR=$(which $FILEMGR_GUI 2>/dev/zero 1>/dev/zero)	;;
+		cli)	FILEMGR=$(which $FILEMGR_CLI 2>/dev/zero)	;;
+		gui)	FILEMGR=$(which $FILEMGR_GUI 2>/dev/zero )	;;
 		esac
 		export FILEMGR
 	fi
