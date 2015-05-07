@@ -68,20 +68,28 @@ Example:	$ME \"some string\"
 	case $MODE in
 	cat)	for arg in "${ARGS[@]}"
 		do 	if [ -f "$arg" ]
-			then 	while read content
+			then 	while read content #|sed s,"	","    ",g
 				do	# Leading dash
 					[ "-" = "${content:0:1}" ] && \
 						leadingDASHdummy="--" || \
 						leadingDASHdummy=""
-					#	content=" ${content}"
+					content=$(echo "$content"|\
+							sed s,^"\t","    ",g|\
+							sed s,"\t","    ",g|\
+							sed s,"	","    ",g)
 					# Tailing backslash
-					[ ! -z "$content" ] && \
-						[ "\\" = "${content:0:(-1)}" ] && \
-						content="${content}\\\\"
-					
-					tui-echo $leadingDASHdummy "${content}"
+					if echo "$content" | grep [\&\|][\&\|]' \\'
+					then	while printf "$content" | grep "&& \\"
+						do	echo in loop > /dev/stderr
+							content2=$(echo "$content" | sed s,"&& \\","&& \\\\",g)
+							tui-printf -E $leadingDASHdummy"$content2"
+							content="${content/${content2%/}}"
+						done
+					else	tui-printf -E $leadingDASHdummy"${content}"
+					fi
 				done<"$arg"
-			else	tui-status 1 "File not found: $arg"
+			else	RET=1
+				tui-printf -S $RET "File not found: $arg"
 			fi
 			
 			# Thanks Jim
@@ -116,15 +124,21 @@ Example:	$ME \"some string\"
 				#while [ $PRINTED -lt $WIDHT ]
 				do 	char="${line:$COUNT:1}"
 					double="${line:$COUNT:2}"
-
+					#tripple="${line:$COUNT:3}"
 					case "$double" in
-					"\n"|"\t"|"\r"|"\\")
+					"\t"|"	")	char="    "
+						;;
+					"\n"|"\r")	# |"\\"
 						char="${double/\\/\\\\}"
 						COUNT=$(( $COUNT + 2 ))
 						;;
 					*)	case "$char" in
+						"	"|'\t')
+							char="    "	;;
 						"%")	char="%%"	;;
 						'\')	char='\\'	;;
+						'	')
+							char="    "	;;
 						'$')	char='\$'	;;
 						#"{")	char="\{"	;;
 						#"}")	char="\}"	;;
@@ -133,9 +147,10 @@ Example:	$ME \"some string\"
 						;; 
 					esac
 					
-
+					# Add char to line and print if required
+					#char="${char/\\/\\\\}"
 					printf "$char"
-					PRINTED=$(( $PRINTED + 1 ))
+					PRINTED=$(( $PRINTED + ${#char} ))
 					if [ $PRINTED -eq $WIDTH ] #|| [ "$double" = "\r" ]
 					then	printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n$BORDER_LEFT "
 						PRINTED=0
@@ -149,4 +164,5 @@ Example:	$ME \"some string\"
 		done
 		;;
 	esac
-	exit 0
+	#printf "\n"
+	exit $RET

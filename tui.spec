@@ -112,12 +112,16 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
+* Fri May 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-4
+- Fixed:     tui-{edit,filemgr,web,terminal}, stdout was muted
+- Updated:   tui-psm, added verbose mode which executes each script
+-                     in its own terminal, verbose is gui only.
+
 * Fri May 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-3
 - Fixed:     tui-str-genfilename, by exporting functionality to tui-str-extension
 - Added:     tui-str-extension, to provide a tool for this task
 - Updated:   tui-select, now can also show only 1 or only 2 columns
 - Added:     tui-bol-gui, to simple check if one is in gui or cli mode.
-- Fixed:     tui-{edit,filemgr,web,terminal}, stdout was muted
 
 * Fri May 01 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-2
 - Updated:   tui-install, now prefers dnf over yum if available
