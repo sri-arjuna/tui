@@ -32,20 +32,25 @@
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
 	ME="${0##*/}"
-	script_version=0.5.2
+	script_version=0.6
 	DELAY=0.05
+	TITLE=false
 	MODE=cat
 	
 	help_text="$ME ($script_version)
 Usage:	$ME [options] \"STRING\" ...
 
-Example:	$ME \"some string\"
-		$ME -d 0.005 \"\$(cat [/path/to/]file)\"
+Example:	$ME \"/path/to/file1\" \"/path/to/file2\" ...
+		$ME -td 0.005 \"\[/path/to/]file1\" \"string 1\" \"string 2\" \"\[/path/to/]file2\"
+Options:
+		-d(elay) NUM	Sets delay to NUM seconds, enables typewriter automaticly
+		-t(ypewriter	Prints char by char with a default delay of $DELAY
+		-T(itle)	Enables title printing per file output
 "
 #
 #	Getting options
 #
-	while getopts hd:t opt
+	while getopts hd:tT opt
 	do	case $opt in
 		h)	echo "$help_text"
 			exit 1
@@ -53,6 +58,9 @@ Example:	$ME \"some string\"
 		t)	MODE=typewriter
 			;;
 		d)	DELAY="$OPTARG"
+			MODE=typewriter
+			;;
+		T)	TITLE=true
 			;;
 		esac
 	done
@@ -65,55 +73,35 @@ Example:	$ME \"some string\"
 #
 #	Display & Action
 #
+	
 	case $MODE in
 	cat)	for arg in "${ARGS[@]}"
 		do 	if [ -f "$arg" ]
-			then 	while read content #|sed s,"	","    ",g
+			then 	$TITLE && tui-title "File: $arg"
+				while IFS="" read -er content #|sed s,"	","    ",g
 				do	# Leading dash
 					[ "-" = "${content:0:1}" ] && \
 						leadingDASHdummy="--" || \
 						leadingDASHdummy=""
-					content=$(echo "$content"|\
-							sed s,^"\t","    ",g|\
-							sed s,"\t","    ",g|\
-							sed s,"	","    ",g)
-					# Tailing backslash
-					if echo "$content" | grep [\&\|][\&\|]' \\'
-					then	while printf "$content" | grep "&& \\"
-						do	echo in loop > /dev/stderr
-							content2=$(echo "$content" | sed s,"&& \\","&& \\\\",g)
-							tui-printf -E $leadingDASHdummy"$content2"
-							content="${content/${content2%/}}"
-						done
-					else	tui-printf -E $leadingDASHdummy"${content}"
-					fi
+					# Tabs, become 4 spaces
+					content="$(echo "$content"|sed s,'	','    ',g)"
+					# Print content
+					tui-printf -E $leadingDASHdummy "${content}"
 				done<"$arg"
 			else	RET=1
 				tui-printf -S $RET "File not found: $arg"
 			fi
-			
-			# Thanks Jim
-			#if [ -f "$arg" ]
-			#then 	
-			#	$AWK '{ dash=substr($0,1,1); 
-			#		  if(dash=="-") {$0=substr($0,2)}; print}'  "$arg" |
-			#	while read line
-			#	do	
-			#	     tui-echo "$line"
-			#	done 
-			#else	tui-status 1 "File not found: $arg"
-			#fi
-			
 		done
 		;;
 	typewriter)
 		for arg in "${ARGS[@]}"
 		do	# Pass every argument (each seperate STRING) by its own.
 			[ -f "$arg" ] && \
-				STRING="$(cat $arg)" || \
+				STRING="$(cat $arg)" && \
+				($TITLE && tui-title "File: $arg" || exit 0) || \
 				STRING="$arg"
 			
-			echo "$STRING" | while read line
+			echo "$STRING" | while IFS="" read -er  line
 			do	COUNT=0		# Chars of line
 				PRINTED=0	# Chars printed, to compare with available borders
 				LEN="${#line}"
@@ -126,20 +114,20 @@ Example:	$ME \"some string\"
 					double="${line:$COUNT:2}"
 					#tripple="${line:$COUNT:3}"
 					case "$double" in
-					"\t"|"	")	char="    "
-						;;
-					"\n"|"\r")	# |"\\"
-						char="${double/\\/\\\\}"
-						COUNT=$(( $COUNT + 2 ))
-						;;
+#					"\t"|"	")	char="    "
+#						;;
+#					"\n"|"\r")	# |"\\"
+#						char="${double/\\/\\\\}"
+#						COUNT=$(( $COUNT + 2 ))
+#						;;
 					*)	case "$char" in
 						"	"|'\t')
 							char="    "	;;
 						"%")	char="%%"	;;
-						'\')	char='\\'	;;
-						'	')
-							char="    "	;;
-						'$')	char='\$'	;;
+						#'\')	char='\\'	;;
+						#'	')
+						#	char="    "	;;
+						#'$')	char='\$'	;;
 						#"{")	char="\{"	;;
 						#"}")	char="\}"	;;
 						esac

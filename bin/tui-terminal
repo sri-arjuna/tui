@@ -29,12 +29,13 @@
 	! tui-bol-gui && \
 		tui-printf -S 1 "$ME: Requires to be in GUI mode" && \
 		exit 1
-	# List of known but possible unhandled terminals
-	list="caja-open-terminal caja-terminal eterm fbterm fourterm gnome-terminal guake konsole5 konsole lxterminal termit"
+	
 	if ! which $TERMINAL > /dev/zero
-	then	found=false
+	then	# List of known but possible unhandled terminals
+		list="caja-open-terminal caja-terminal eterm fbterm fourterm gnome-terminal guake konsole5 konsole lxterminal mate-terminal mrxvt qterminal termit uxterm vte xfce4-terminal"
+		found=false
 		for TERMINAL in $list;do
-			which $TERMINAL > /dev/zero && found=true
+			which $TERMINAL 1>/dev/zero 2>/dev/zero && found=true && break
 		done
 		$found && tui-conf-set -v ${TUI_USER_CONF/user/apps/} TERMINAL $TERMINAL
 		$found && \

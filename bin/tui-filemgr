@@ -73,7 +73,7 @@
 #	Display
 #
 	# Get the mode
-	tui-bol-gui && \
+	$(which tui-bol-gui) && \
 		MODE=gui || \
 		MODE=cli
 	
