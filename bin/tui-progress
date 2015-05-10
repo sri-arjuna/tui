@@ -169,9 +169,9 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		dash)	[ $VAL -gt 3 ] && VAL=0
 			PROGRESS="[  ${INDI[$VAL]}   ]"
 			;;
-		num)	PROGRESS="[ $VAL / $MAX ]"
-			# Dont show if VAL is higher than MAX
+		num)	# Dont show if VAL is higher than MAX
 			[ $VAL -gt $MAX ] && exit 1
+			PROGRESS="[ $VAL / $MAX ]"
 			;;
 		bar)	# Dont show if VAL is higher than MAX
 			[ $VAL -gt $MAX ] && exit 1
@@ -212,7 +212,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			bar_total="[${bars}${bar_total:${#bars}}]"
 			PROGRESS="$bar_total"
 			;;
-		*)	tui-status 1 "Error, type is $TYPE"	;;
+	#	*)	tui-status 1 "Error, type ($TYPE) is unhandled"	;;
 	esac
 	[ -z "$PROGRESS" ] && tui-printf -S 1 "Something went terrible wrong..." && exit 1
 #
