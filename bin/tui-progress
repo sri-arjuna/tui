@@ -96,7 +96,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	# Returns VAL
 		if $hasID
 		then	tui-conf-get "$TMPFILE" "$ID"
-		else	"$TMPFILE">/dev/stdout
+		else	cat "$TMPFILE"
 		fi
 	}
 #

@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.06
-#	Changed:	2015.05.06
-	script_version=0.2
+#	Changed:	2015.05.10
+	script_version=0.3
 	TITLE="tui-str-extension"
 #	Description:	Simply returns the extension of passed file
 #
