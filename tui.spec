@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     5%{?dist}
+Release:     6%{?dist}
 Summary:     Tools to write cool looking scripts
 
 License:     GPLv3
@@ -112,8 +112,9 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
-* Sub May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
+* Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.
+- Fixed:     tui-str-extension, fixed typo
 
 * Fri May 08 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-4
 - Fixed:     tui-{edit,filemgr,web,terminal}, stdout was muted

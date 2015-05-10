@@ -74,4 +74,4 @@
 	if [ "$ext" = "$1" ]
 	then	echo ""
 	else 	echo "$ext"
-	done
+	fi
