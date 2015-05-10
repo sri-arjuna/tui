@@ -23,27 +23,17 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.04.29
-	script_version=1.5
+#	Changed:	2015.05.10
+	script_version=2.0
 #	Description:	The absolute core function for TUI
 #
 #	Variables
 #
-	source /etc/tui/tui.conf
-	source /etc/tui/colors.conf
-	source /etc/tui/commands.conf
-	if [ -z "$TUI_THEME" ]
-	then	if [ 0 -eq $UID ]
-		then	source /etc/tui/tui.conf
-			TUI_THEME="$TUI_THEME_ROOT"
-		else	cfg="$HOME/.config/tui/user.conf"
-			[ ! -f "$cfg" ] && \
-				mkdir -p "$(dirname $cfg)" && \
-				cp $PREFIX/share/tui/*conf "$(dirname $cfg)"
-			source "$cfg"
-		fi
-	fi
-	source "$PREFIX/share/tui/themes/$TUI_THEME"
+	source "$HOME/.tui_rc" || . tui
+	source "$TUI_DIR_CONF/tui.conf"
+	source "$TUI_DIR_CONF/commands.conf"
+	source "$TUI_DIR_CONF/colors.conf"
+	source "$TUI_DIR_THEMES/$TUI_THEME"
 
 	# Prepare for output:
 	BORDER_RIGHT=""
@@ -128,7 +118,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		NUM_ID="$1" && shift
 		
 		# get the vars
-		source /etc/tui/status.conf
+		source "$TUI_DIR_CONF/status.conf"
 		unset retvalue[@]
 		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
 		retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
@@ -342,13 +332,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	# This is supposed to 'keep' artificial linebreaks rather than get them on one line
         [ "\\" = "${FIRST:0:(-1)}" ] && \
                 FIRST="${FIRST}\\"
-#	echo "$FIRST" | grep -q "\\"$ && \
-#		FIRST="${FIRST}\\\\"
-#	echo "$SECOND" | grep -q "\\"$ && \
-#		SECOND="${SECOND}\\\\"
-#	echo "$THIRD" | grep -q "\\"$ && \
-#		THIRD="${THIRD}\\\\"
-	
 	# Escape '%'
 	output=$(echo "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"|$SED s,'%','%%',g)
 	

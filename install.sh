@@ -29,31 +29,28 @@
 #	Variables
 #
 	app=tui
+	[ -z "$TRC" ] &&  TRC="$HOME/.tui_rc"
 	if [ -z "$PREFIX" ]
-	then
-		echo "You have not specified a PREFIX, so $app will install in /usr/local ." >&2
+	then	PREFIX="/usr/local/"
+		CHROOT=/
+		echo "You have not specified a PREFIX, so $app will install in $PREFIX." >&2
 		echo "This is probably not what you want.  Run PREFIX=/usr $0 to install in standard paths." >&2
-		PREFIX="/usr/local/"
 	fi
+	[ "/usr" = "${PREFIX:0:4}" ] && CHROOT=/
+	TUI_PREFIX=$PREFIX CHROOT=${CHROOT:-$TUI_PREFIX}  source bin/tui 1>/dev/zero
+exit	
 	
 	# Default paths, hardcoded
-	DIR_COMPL="/etc/bash_completion.d"
-	DIR_CFG=/etc/$app
+	DIR_CFG"${TUI_DIR_CONF:-$CHROOT/etc/$app}"
+	DIR_COMPL="${DIR_CFG/tui/bash_completion.d}" #/etc/bash_completion.d"
+	
 	
 	# Default paths, using PREFIX
-	DIR_BIN=$PREFIX/bin
-	DIR_DOC=$PREFIX/share/doc/$app
-	DIR_MAN1=$PREFIX/share/man/man1
-	DIR_APP=$PREFIX/share/$app
-	DIR_TPL=$DIR_APP/templates
-#
-#	Treating known issues for hardcoded paths
-#	which are not solveable by using PREFIX
-#
-	if [ -f /etc/freebsd-update.conf ]
-	then	# Its freebsd
-		DIR_COMPL="/usr/local/etc/bash_completion.d"
-	fi
+	DIR_BIN="$PREFIX/bin"
+	DIR_DOC="$PREFIX/share/doc/$app"
+	DIR_MAN1="${TUI_DIR_USER_MANPAGES:-$PREFIX/share/man/man1}"
+	DIR_APP="${TUI_DIR_SYSTEM:-$PREFIX/share/$app}"
+	DIR_TPL="$DIR_APP/templates"
 #
 #	Install to Environment
 #
@@ -101,19 +98,9 @@
 	cp -a tui_compl.bash $DIR_COMPL/
 	cp -a uninstall.sh $DIR_APP/
 	
-	# Save the PREFIX for internal use
-	# Currently, neither of which methods saves the value :(
-	CONF="/etc/$app/$app.conf"
-	#tui-conf-set "$CONF" PREFIX "$PREFIX" >&2 2&>/dev/zero  || echo "Failed to change CONF to PREFIX=$PREFIX..."
-	#sed s,"PREFIX=/usr","PREFIX=$PREFIX", -i "/etc/$app/$app.conf" >&2 2&>/dev/zero 
-	#echo "# Custom installation
-	echo "PREFIX=$PREFIX" >> "$CONF"
-	
 	# Final display
 	if tui-status $? "Installed $app"
 	then	# Neither tui-conf-set nor sed seems to be working properly
-		
-		
 		tui-yesno "Remove these tempfiles here \"$PWD/*\" ?" && \
 			rm -fr ./* && rm -fr ./.[a-zA-Z]*
 		exit 0

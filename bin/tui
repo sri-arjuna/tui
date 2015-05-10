@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -18,23 +18,25 @@
 #
 # ------------------------------------------------------------------------
 #
+#
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
-#	Created:	2014.05.06
-#	Changed:	2015.03.17
-	script_version=1.6.3
-#	Description:	Tool to configure TUI
+#	Created:	2013.05.03
+#	Changed:	2015.05.10
+	script_version=2.0
+#	Description:	The loader and configurator of TUI
 #
-#	Variables
+#	Variables	:	Default
 #
-	TUI_VERSION=0.7.6
-	TITLE="Text User Inferface (TUI) - Configuration"
-	ME=${0##*/}
-	[ 0 -eq "$UID" ] && \
-		export TUI_LOG="/var/log/tui.log" || \
-		export TUI_LOG="$HOME/.config/tui/tui.log"
-	for cfg in apps colors commands status tui;do source /etc/tui/$cfg.conf;done
+	TUI_VERSION=2.0
+	TRC="$HOME/.tui_rc"
+	DEFAULT="$HOME/.config"
+	XDG_CONFIG_DIR="${XDG_CONFIG_DIR:-$DEFAULT}"
+	beVerbose=false
+	# This is just required for the manual install process
+	TUI_CHROOT="${CHROOT:-/}"
+	TUI_PREFIX="${TUI_PREFIX:-${TUI_CHROOT%/}/usr}"
 #
 #	Functions
 #
@@ -42,6 +44,119 @@
 	# Prints: Time & "Message STRING"
 	# See 'tui-log -h' for more info
 		tui-log -t "$TUI_LOG" "$1"
+	}
+	function help_screen () { #
+	# Prints some basic usage
+	#
+		cat <<-SCREEN
+		$ME $TUI_VERSION (This script: $script_version)
+		$TITLE
+		Usage: 	$ME [config|reset[-yes]|theme] (source tui)
+		Where options are:
+			-h		This screen
+			config		Enters directly into config mode
+			reset		Resets configuration to defaults, root will reset systemwide defaults
+			reset-yes	Doesnt ask for verification
+			theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme to THEME.
+					As root, changes the root theme only.
+		
+		SCREEN
+	}
+	function first_time() { #
+	# Prepare all variables and write conf files
+	#
+		function writeconf_trc() { # PATH
+		# Write initial default paths
+		# 
+			# Check for existing and writable (expected) default dirs
+			for tryout in "$HOME/.local/cache" "$HOME/.cache"
+			do	[ -d "$tryout" ] && TUI_DIR_CACHE="$tryout" && break
+			done
+			for tryout in "$HOME/.local/bin" "$HOME/bin"
+			do	[ -d "$tryout" ] && TUI_DIR_USER_SCRIPTS="$tryout" && break
+			done
+			for tryout in "$HOME/.local/man/man1"
+			do	[ -d "$tryout" ] && TUI_DIR_USER_MANPAGES="$tryout" && break
+			done
+
+			# Since this is used as a fallback dir, its own fallback needs to be set now
+			TUI_DIR_USER_SCRIPTS="${TUI_DIR_USER_SCRIPTS:-\$HOME/bin}"
+			[ -z "$TUI_DIR_USER_MANPAGES" ] && \
+				[  "$HOME/.local/bin" = "$TUI_DIR_USER_SCRIPTS" ] && \
+				TUI_DIR_USER_MANPAGES="$HOME/.local/man/man1"
+			# Set initial default theme
+			[ $UID -eq 0 ] && \
+				THM=default-red || \
+				THM=default
+			cat > "$TRC" <<-TUI_RC
+			#$TRC
+			# This file is not ment to be changed manualy!
+			# Any change of this file may result in an unusable TUI.
+			# Do changes at your own risk!
+			#
+			#	Theme
+			#	Options are: 	default, default-red, dot-blue, dot-red, \\
+			#			floating, mono, witch-purple, witch-yellow
+			#	See $TUI_DIR_SYSTEM/themes
+			#
+			 	TUI_THEME=$THM
+			#
+			#	Paths
+			#
+			[ -z "\$TUI_DIR_INSTALL_ROOT" ] && readonly \\
+			 	TUI_DIR_INSTALL_ROOT="${TUI_CHROOT:-/}"
+			[ -z "\$TUI_PREFIX" ] && readonly \\
+			 	TUI_PREFIX="\$TUI_DIR_INSTALL_ROOT/usr"
+			[ -z "\$TUI_DIR_CONF" ] && readonly \\
+			 	TUI_DIR_CONF="\$TUI_DIR_INSTALL_ROOT/etc/tui"
+			[ -z "\$TUI_DIR_DOCS" ] && readonly \\
+			 	TUI_DIR_DOCS="\$TUI_PREFIX/share/doc/tui"
+			[ -z "\$TUI_DIR_SYSTEM" ] && readonly \\
+			 	TUI_DIR_SYSTEM="\$TUI_PREFIX/share/tui"
+			[ -z "\$TUI_DIR_USER" ] && readonly \\
+			 	TUI_DIR_USER="$XDG_CONFIG_DIR/tui"
+			[ -z "\$TUI_DIR_USER_LOGS" ] && readonly \\
+			 	TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
+			[ -z "\$TUI_DIR_THEMES" ] && readonly \\
+			 	TUI_DIR_THEMES="\$TUI_DIR_SYSTEM/themes"
+			[ -z "\$TUI_DIR_CACHE" ] && readonly \\
+			 	TUI_DIR_CACHE="${TUI_DIR_CACHE:-$TUI_DIR_USER/cache}"
+			[ -z "\$TUI_DIR_USER_SCRIPTS" ] && readonly \\
+			 	TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
+			[ -z "\$TUI_DIR_USER_MANPAGES" ] && readonly \\
+			 	TUI_DIR_USER_MANPAGES="${TUI_DIR_MANPAGES:-$TUI_DIR_USER_MANPAGES}"
+			#
+			#	Files
+			#
+			[ -z "\$TUI_FILE_CONF_APPS" ] && readonly \\
+			 	TUI_FILE_CONF_APPS="${TUI_DIR_USER/\/\//\/}/apps.conf"
+			[ -z "\$TUI_FILE_CONF_USER" ] && readonly \\
+			 	TUI_FILE_CONF_USER="${TUI_DIR_USER/\/\//\/}/user.conf"
+			[ -z "\$TUI_FILE_CONF_LOADLIST" ] && readonly \\
+			 	TUI_FILE_CONF_LOADLIST="${TUI_DIR_USER/\/\//\/}/loadlist.conf"
+			[ -z "\$TUI_FILE_CONF_SETTINGS" ] && readonly \\
+			 	TUI_FILE_CONF_SETTINGS="${TUI_DIR_USER/\/\//\/}/settings.conf"
+			[ -z "\$TUI_FILE_CONF_SYSTEM" ] && readonly \\
+			 	TUI_FILE_CONF_SYSTEM="${TUI_DIR_CONF/\/\//\/}/tui.conf"
+			
+			TUI_RC
+		}
+		function writeconf_loadlist() { #
+		# tui will load the config files according to the order of the loadlist.
+		#
+			# This list defines the loading order do NOT change
+			cat > $TUI_DIR_USER/loadlist.conf <<-LOADLIST
+			user.conf
+			apps.conf
+			
+			LOADLIST
+		}
+		writeconf_trc
+		. "$TRC"
+		writeconf_loadlist
+		
+		# Verify all dirs are created
+		tui-bol-dir $(tui-conf-get -l "$TRC"|grep "_DIR_")
 	}
 	ConfigTUI() { #
 	#
@@ -52,29 +167,31 @@
 		
 		# Get the proper path
 		if [ 0 -eq "$UID" ] 
-		then 	thisconf=/etc/$ME/
+		then 	# thisconf="${TUI_DIR_CONF/\/\//\/}"
+			thisconf="$TUI_DIR_CONF"
 			MSG_MENU_title="TUI config - System Wide"
-		else	thisconf="$HOME/.config/tui/"
-			MSG_MENU_title="TUI config - $USER personal"
+		else	thisconf="$TUI_DIR_USER"
+			MSG_MENU_title="TUI config - Personal for $USER_NAME"
 		fi
-		cd "$thisconf"
 		
 		# Show & Edit files
+		cd "$thisconf"
 		tui-conf-editor -t "Text User Interface" *conf
 	}
 	ResetTUI() { #
-	#
-	#
-		case $UID in
+	# Removes the current configuration according to user level
+	# and replaces them with default configuration.
+		YES=${YES:-false}
+		case "$UID" in
 		0)	# ROOT, system wide
 			RANGE="System defaults"
-			CFG_DIR=/etc/tui
-			SRC_DIR=$PREFIX/share/tui/conf.etc
+			CFG_DIR="$TUI_DIR_CONF"
+			SRC_DIR="$TUI_DIR_SYSTEM/conf.etc"
 			;;
 		*)	# USER, personal only
 			RANGE="Personal settings"
-			CFG_DIR=$HOME/.config/tui
-			SRC_DIR=$PREFIX/share/tui
+			CFG_DIR="$TUI_DIR_USER"
+			SRC_DIR="$TUI_DIR_SYSTEM"
 			;;
 		esac
 		
@@ -82,7 +199,7 @@
 		cd "$CFG_DIR"
 		if [ $? -eq 0 ]  && $YES
 		then	rm -fr *
-		else	tui-yesno "Are you sure to remove $RANGE?" || return 1
+		else	tui-yesno "Are you sure to remove $RANGE in \"$CFG_DIR\"" || return 1
 			rm -fr *
 		fi
 		
@@ -91,50 +208,41 @@
 		return $?
 	}
 #
-#	Action & Display
+#	Figure out about TUI_DIR_* to read or save the variables
 #
-	#if [ 0 -eq $UID ]
-	if [ root = $(whoami) ]
-	then	USER_NAME=".: r o o t :."
-		APPS=/etc/tui/apps.conf
-		CONF=/etc/tui/tui.conf
-	else	[ -d "$HOME/.config/tui/" ] || ( YES=true ; ResetTUI ) 
-		for cfg in apps user;do source "$HOME/.config/tui/$cfg.conf";done
-		APPS=$HOME/.config/tui/apps.conf
-		CONF=$HOME/.config/tui/user.conf
-		
-	fi
-	help_text="
-$ME $TUI_VERSION (This script: $script_version)
-$TITLE
-Usage: 	$ME [config|reset[-yes]|theme] (source tui)
-Where options are:
-	-h		This screen
-	config		Enters directly into config mode
-	reset		Resets configuration to defaults, root will reset systemwide defaults
-	reset-yes	Doesnt ask for verification
-	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme to THEME.
-			As root, changes the root theme only.
-
-"
+	[ ! -f "$TRC" ] && first_time
+	. "$TRC"
 #
-#	Catching Arguments
+#	Load Environment	:	System wide / defaults
 #
-	if [ "$ME" = tui ]
-	then	while getopts "h" name
-		do 	case "$name" in
-			h|help)
-				printf "$help_text"
-				exit $RET_HELP
-				;;
-			esac
-		done
-		shift $(($OPTIND - 1))
-	
-	
+	for f in "$TUI_DIR_CONF"/*.conf
+	do	[ -f "$f" ] && source "$f" && printf "."
+	done
+#
+#	Load Environment	:	User settings
+#
+	[ -f "$TUI_DIR_USER/loadlist.conf" ] || return 99
+	while read f
+	do	[ ! -z "$f" ] && \
+			[ ! paths.conf = "$f" ] && \
+			[ ! files.conf = "$f" ] && \
+			source "$TUI_DIR_USER/$f"  && \
+			printf "."
+	done<"$TUI_DIR_USER/loadlist.conf"
+#
+#	Display ?
+#
+	if [ "${0##*/}" = "tui" ]
+	then	case "$1" in
+		"-h"|"--help"|"help")
+			help_screen
+			hadOpts=true
+			exit $RET_HELP
+			;;
+		esac
 		MODE="$1"
 		YES=false
-		case $MODE in
+		case "$MODE" in
 		config)
 			ConfigTUI
 			exit $?
@@ -143,17 +251,10 @@ Where options are:
 			MODE=reset
 			YES=true
 			;;
-		theme)	#set +x
-			[ 0 -eq $UID ] && \
-				ITEM=TUI_THEME_ROOT || \
-				ITEM=TUI_THEME
-			if [ -z "$2" ]
-			then	#ls /usr/share/tui/themes
-				tui-echo "$ITEM is set to:" "$(tui-conf-get $CONF $ITEM)"
+		theme)	if [ -z "$2" ]
+			then	#tui-echo "TUI_THEME is set to:" "${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
 				exit $?
-			else	#sh -x /home/sea/prjs/tui/bin/
-				tui-conf-set $CONF $ITEM $2
-				tui-status $? "Changed $ITEM in $CONF to $2"
+			else	tui-conf-set -v "$TRC" "$TUI_THEME" "$2"
 				exit $?
 			fi
 			;;
@@ -168,18 +269,16 @@ Where options are:
 #
 #	Display & Action
 #
-	#if [ "$ME" = tui ]
-	#then	# Its not sourced, thus show info & config menu
 		tui-printf -H "TUI ($TUI_VERSION) by sea" "$USER_NAME @ $(date +%F) $(date +%T)"
-		tui-printf -T "$TITLE ($script_version)"
+		tui-printf -T "Text User Interface - Framework for Scripts"
 		tui-printf -E "Calling $ME like this gives you an impression how it may look like."
 		tui-printf -E
 		tui-printf -E "If you are looking for the commands of TUI, try this:" "tui-<hit-tab>"
 		tui-printf -E "If you are a developer, i highly recomand to read:" "man tui"
 		#tui-printf -E "Also you could read:" "the man pages or /usr/share/doc/tui/README.md"
-		tui-printf -E "There are some sample scripts to get you started:" "/usr/share/doc/tui/samples"
-		tui-printf -E "To create a new script in ~/bin or ~/.local/bin, type:" "tui-new-script SCRIPTNAME"
+		tui-printf -E "There are some sample scripts to get you started:" "$TUI_DIR_DOCS/samples"
+		tui-printf -E "To create a new script in $TUI_DIR_SCRIPTS, type:" "tui-new-script SCRIPTNAME"
 		tui-printf -E
 		tui-yesno "Configure it now?" || exit 0
-		ConfigTUI	
+		ConfigTUI
 	fi
