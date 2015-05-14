@@ -1,6 +1,7 @@
 # Simplified design:
 #
 #	BORDER_RIGHT will be mirrored of BORDER_LEFT
+#	Set it manualy if it needs to be escaped.
 #
 	BORDER_LEFT="# |"
 #

@@ -1,8 +1,10 @@
 # Simplified design:
 #
 #	BORDER_RIGHT will be mirrored of BORDER_LEFT
+#	Set it manualy if it needs to be escaped.
 #
 	BORDER_LEFT="\\\./"
+	BORDER_RIGHT="\\\./"
 #
 #	tui-header will use TUI_BACKGROUND as background color,
 #	and TUI_FOREGROUND as font color.
