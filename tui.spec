@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     779%{?dist}
+Release:     786%{?dist}
 Summary:     Tools to write cool looking scripts
 
 License:     GPLv3
@@ -112,6 +112,16 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
+* Mon May 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-777
+- Changed:   tui, now using an RC file to provide internal paths
+-                 required for manual install and some exotic bsd, linux, unix distros
+- Changed:   Preparing themes to 'not' calculate BORDER_RIGHT, if its set in the theme
+- Changed:   Conffiles for both, system and user
+- Split:     Settings.conf, previously part of apps.conf
+- Changed:   path adaption to all the command, part 1
+- Touched:   tui, tui-bgjob, tui-browser, tui-cat, tui-cp, tui-dd, tui-download, tui-ftp, tui-header, tui-indi, tui-mv, 
+             tui-printf, tui-progress, tui-select, tui-str-extension, tui-tar
+
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.
 - Fixed:     tui-str-extension, fixed typo

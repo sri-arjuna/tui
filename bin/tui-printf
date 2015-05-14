@@ -29,16 +29,15 @@
 #
 #	Variables
 #
-	source "$HOME/.tui_rc" || . tui
-	source "$TUI_DIR_CONF/tui.conf"
-	source "$TUI_DIR_CONF/commands.conf"
-	source "$TUI_DIR_CONF/colors.conf"
-	source "$TUI_DIR_THEMES/$TUI_THEME"
-
-	# Prepare for output:
 	BORDER_RIGHT=""
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "${TUI_DIR_THEMES:-/usr/share/tui/themes}/$TUI_THEME"  || . tui	# This first call would create the RC if its missing.
+	#. tui				# So it then can load the proper values
+	# Prepare for output:
 	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
-	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+	[ -z "$BORDER_RIGHT" ] && \
+		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 	HEAD_BG="$TUI_BACKGROUND"
 	HEAD_FG="$TUI_FOREGROUND"
 	TITLE_BG="$TUI_COLOR_INVERT$TUI_BACKGROUND"

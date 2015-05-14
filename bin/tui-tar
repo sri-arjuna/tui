@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.2
+	script_version=0.7.3
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]directory]
@@ -31,26 +31,18 @@
 		\r
 		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
 		\r"
-	source /etc/tui/apps.conf
-	source /etc/tui/tui.conf
-	[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
-	
-	FILE_TEMP="$TUI_TEMP_DIR/tui-tar.status"
-	FILE_CMD="$TUI_TEMP_DIR/bgjob"
-	TMP=$TUI_TEMP_FILE
-	source /etc/tui/commands.conf	# Like AWK, GREP, SED
-	#[ -z "$TMP" ] && TMP=$HOME/.config/tui/tmp.tmp
+	. "$HOME/.tui_rc"
+	FILE_TEMP="$TUI_DIR_CACHE/tui-tar.status"
+	FILE_CMD="$TUI_DIR_CACHE/bgjob"
+	TMP=$TUI_FILE_TEMP
 	touch $TMP
-	umask 022 $FILE_CMD $FILE_TEMP
 	DEST=""
 	showBar=false
 	doExtract=false
 	beVerbose=false
-	LS=$(locate "ls"|$GREP /ls$ | head -n 1)
 #
 #	Variable handling
 #
-	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
 	while getopts hbx opt
 	do	case "$opt" in
 		h)	echo -e "$help_text" ; exit $RET_HELP
@@ -74,9 +66,8 @@
 #
 	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
-	do 	#tui-printf -rS 2 "Initializing $FOLDER..." ## "$WORK"
-		printf "\r"
-		THIS="$(basename $FOLDER)"
+	do 	tui-printf -rS 2 "Initializing $FOLDER..."
+		THIS="${FOLDER##*/}"
 		PWD_ORG="$(pwd)"
 		
 		#set -x
@@ -86,25 +77,23 @@
 				[ -z "$size_tarball" ] && tui-echo "Failure reading $FOLDER!" && exit
 				
 				#list_tarball=($(tar tf "$FOLDER"))
-				touch "$TUI_TEMP_FILE".2
-				echo "tar tf \"$FOLDER\" > \"$TUI_TEMP_FILE\".2" > "$TUI_TEMP_FILE"
-				$SHELL "$TUI_TEMP_FILE" &
+				touch "$TUI_FILE_TEMP".2
+				echo "tar tf \"$FOLDER\" > \"$TUI_FILE_TEMP\".2" > "$TUI_FILE_TEMP"
+				$SHELL "$TUI_FILE_TEMP" &
 				while ps | $GREP -q tar
 				do	tui-printf "Reading $FOLDER..." "[  $(tui-indi)   ]"
 					sleep 0.3
 				done
-				list_tarball=( $(cat "$TUI_TEMP_FILE.2") )
-				#echo ".. -- ${list_tarball[@]} -- .."; exit
+				list_tarball=( $(cat "$TUI_FILE_TEMP.2") )
 				LAST=""
 				CURRENT=""
 				$showBar && tui-progress -rbm $size_tarball -i $$
 				RET=0
 				
-				#echo "${list_tarball[@]}"
 				if $beVerbose
 				then	tar axf "$FOLDER"
 					RET=$?
-				else	(tar axf "$FOLDER" ; echo $? > $TUI_TEMP_FILE) &
+				else	(tar axf "$FOLDER" ; echo $? > $TUI_FILE_TEMP) &
 					PID=$!
 					COUNT=0
 					while ps | $GREP -q $PID
@@ -120,28 +109,23 @@
 							fi
 						done
 						
-						#set -x
 						[ -e "$CURRENT" ] && \
 							size_output=$($LS -l "$CURRENT"|$AWK '{print $5}') || \
 							size_output=0
-						#set +x
-						#echo $CURRENT $size_output
-						#exit
 						if $showBar
 						then	tui-progress -bi $$ -m $size_tarball -c $size_output "Extracting \"$CURRENT\"..."
 						else	tui-progress -i $$ -m ${#list_tarball[@]} -c $COUNT "Extracting \"$FOLDER\"..."
 						fi
 						sleep 0.7
 					done
-					RET=$(cat $TUI_TEMP_FILE)
+					RET=$(cat $TUI_FILE_TEMP)
 				fi
 			else	tui-echo "$FOLDER is not a file or could not be found!"
 			fi
 
 			tui-status $RET "Extracted: $FOLDER"
 			RET=$?
-		else	#echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" |grep -iv tar 2>&1 > /dev/zero ; echo \$? > $TMP" > $FILE_CMD
-			DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT" "$TAR_EXT")
+		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS. $TAR_EXT")
 			tui-printf -rS 2 "Initializing $FOLDER..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 			cd "$(dirname $FOLDER)"
@@ -175,4 +159,3 @@
 		fi
 	done 
 	exit $RET
-	

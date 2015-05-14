@@ -20,8 +20,9 @@
 #
 #	Variable defaults
 #
-	script_version=0.6.1
-	ME="$(basename $0)"
+	. tui
+	script_version=0.6.2
+	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
 		\rEach call it prints the next symbol of this order:
@@ -33,22 +34,19 @@
 		\rdone
 		\r"
 	[ "-h" = "$1" ] && printf "$help_text" && exit 
-	[ -z "$TUI_TEMP_DIR" ] && \
-		source /etc/tui/tui.conf && \
-		export TUI_TEMP_DIR tmpfile="$TUI_TEMP_DIR/tui-indi.num"
 	indicator=( "-" "\\" "|" "/" )
 #
 #	Prepare
 #
-	umask 022 $tmpfile
-	if [ -f $tmpfile ]
-	then	val=$(cat $tmpfile)
+	#umask 022 "$TUI_FILE_TEMP"
+	if [ -f "$TUI_FILE_TEMP" ]
+	then	val=$(<"$TUI_FILE_TEMP")
 	else	val=0
 	fi
 #
 #	Display
 #
 	printf "${indicator[$val]}"
-	let val++
+	val=$(( $var + 1 ))
 	[ $val -gt 3 ] && val=0
-	echo $val > $tmpfile
+	echo $val > "$TUI_FILE_TEMP"

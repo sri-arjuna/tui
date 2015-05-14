@@ -29,14 +29,20 @@
 #
 #	Variables	:	Default
 #
-	TUI_VERSION=2.0
+	TUI_VERSION=0.8
 	TRC="$HOME/.tui_rc"
-	DEFAULT="$HOME/.config"
+	[ -z "$DEFAULT" ] && \
+		DEFAULT="$HOME/.config"
+	[ -z "$XDG_CONFIG_DIR" ] && \
+		[ -d "$DEFAULT/user-dirs.dirs" ] && \
+		source "$DEFAULT/user-dirs.dirs"
 	XDG_CONFIG_DIR="${XDG_CONFIG_DIR:-$DEFAULT}"
 	beVerbose=false
 	# This is just required for the manual install process
-	TUI_CHROOT="${CHROOT:-/}"
-	TUI_PREFIX="${TUI_PREFIX:-${TUI_CHROOT%/}/usr}"
+	[ -z "$TUI_CHROOT" ] && \
+		TUI_CHROOT="${CHROOT:-/}"
+	[ -z "$TUI_PREFIX" ] && \
+		TUI_PREFIX="${TUI_PREFIX:-${TUI_CHROOT%/}/usr}"
 #
 #	Functions
 #
@@ -67,7 +73,7 @@
 	#
 		function writeconf_trc() { # PATH
 		# Write initial default paths
-		# 
+		# But first prepare some variables
 			# Check for existing and writable (expected) default dirs
 			for tryout in "$HOME/.local/cache" "$HOME/.cache"
 			do	[ -d "$tryout" ] && TUI_DIR_CACHE="$tryout" && break
@@ -88,6 +94,8 @@
 			[ $UID -eq 0 ] && \
 				THM=default-red || \
 				THM=default
+			TUI_DIR_SYSTEM=${TUI_PREFIX:-/usr}/share/tui
+			TC="${TUI_CHROOT:-/}"
 			cat > "$TRC" <<-TUI_RC
 			#$TRC
 			# This file is not ment to be changed manualy!
@@ -103,9 +111,9 @@
 			#
 			#	Paths
 			#
-			[ -z "\$TUI_DIR_INSTALL_ROOT" ] && readonly \\
-			 	TUI_DIR_INSTALL_ROOT="${TUI_CHROOT:-/}"
-			[ -z "\$TUI_PREFIX" ] && readonly \\
+			[ -z "\$TUI_DIR_INSTALL_ROOT" ] && \\
+			 	TUI_DIR_INSTALL_ROOT="${TC%/}"
+			[ -z "\$TUI_PREFIX" ] && \\
 			 	TUI_PREFIX="\$TUI_DIR_INSTALL_ROOT/usr"
 			[ -z "\$TUI_DIR_CONF" ] && readonly \\
 			 	TUI_DIR_CONF="\$TUI_DIR_INSTALL_ROOT/etc/tui"
@@ -128,24 +136,26 @@
 			#
 			#	Files
 			#
-			[ -z "\$TUI_FILE_CONF_APPS" ] && readonly \\
-			 	TUI_FILE_CONF_APPS="${TUI_DIR_USER/\/\//\/}/apps.conf"
-			[ -z "\$TUI_FILE_CONF_USER" ] && readonly \\
-			 	TUI_FILE_CONF_USER="${TUI_DIR_USER/\/\//\/}/user.conf"
+			[ -z "\$TUI_FILE_TEMP" ] && readonly \\
+			 	TUI_FILE_TEMP="${TUI_DIR_CACHE:-\$HOME/.cache}/tui.tmp~"
 			[ -z "\$TUI_FILE_CONF_LOADLIST" ] && readonly \\
-			 	TUI_FILE_CONF_LOADLIST="${TUI_DIR_USER/\/\//\/}/loadlist.conf"
+			 	TUI_FILE_CONF_LOADLIST="\$TUI_DIR_USER/loadlist.conf"
+			[ -z "\$TUI_FILE_CONF_APPS" ] && readonly \\
+			 	TUI_FILE_CONF_APPS="\$TUI_DIR_USER/apps.conf"
+			[ -z "\$TUI_FILE_CONF_USER" ] && readonly \\
+			 	TUI_FILE_CONF_USER="\$TUI_DIR_USER/user.conf"
 			[ -z "\$TUI_FILE_CONF_SETTINGS" ] && readonly \\
-			 	TUI_FILE_CONF_SETTINGS="${TUI_DIR_USER/\/\//\/}/settings.conf"
+			 	TUI_FILE_CONF_SETTINGS="\$TUI_DIR_USER/settings.conf"
 			[ -z "\$TUI_FILE_CONF_SYSTEM" ] && readonly \\
-			 	TUI_FILE_CONF_SYSTEM="${TUI_DIR_CONF/\/\//\/}/tui.conf"
+			 	TUI_FILE_CONF_SYSTEM="\$TUI_DIR_CONF/tui.conf"
 			
 			TUI_RC
 		}
 		function writeconf_loadlist() { #
 		# tui will load the config files according to the order of the loadlist.
 		#
-			# This list defines the loading order do NOT change
 			cat > $TUI_DIR_USER/loadlist.conf <<-LOADLIST
+			# This list defines the loading order do NOT change
 			user.conf
 			apps.conf
 			
@@ -155,8 +165,12 @@
 		. "$TRC"
 		writeconf_loadlist
 		
-		# Verify all dirs are created
-		tui-bol-dir $(tui-conf-get -l "$TRC"|grep "_DIR_")
+		# Verify all dirs are created, could be so easy...
+		#tui-bol-dir $(tui-conf-get -l "$TRC"|grep "_DIR_")
+		for item in $TUI_PREFIX $TUI_DIR_CONF $TUI_DIR_DOCS $TUI_DIR_SYSTEM $TUI_DIR_USER_LOGS \
+				$TUI_DIR_THEMES $TUI_DIR_CACHE $TUI_DIR_USER_SCRIPTS $TUI_DIR_USER_MANPAGES
+		do	[ -d "$item" ] ||  ( mkdir -p "$item" ; echo "Created: $item" > /dev/stderr )
+		done
 	}
 	ConfigTUI() { #
 	#
@@ -212,6 +226,7 @@
 #
 	[ ! -f "$TRC" ] && first_time
 	. "$TRC"
+	source "${TUI_DIR_THEMES:-/usr/share/tui/themes}/${TUI_THEME}" && printf "." > /dev/stderr
 #
 #	Load Environment	:	System wide / defaults
 #
@@ -223,12 +238,13 @@
 #
 	[ -f "$TUI_DIR_USER/loadlist.conf" ] || return 99
 	while read f
-	do	[ ! -z "$f" ] && \
+	do	[ ! -z "$f" ] && [ ! "#" = "${f:0:1}" ] && \
 			[ ! paths.conf = "$f" ] && \
 			[ ! files.conf = "$f" ] && \
 			source "$TUI_DIR_USER/$f"  && \
 			printf "."
 	done<"$TUI_DIR_USER/loadlist.conf"
+	
 #
 #	Display ?
 #
@@ -254,7 +270,7 @@
 		theme)	if [ -z "$2" ]
 			then	#tui-echo "TUI_THEME is set to:" "${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
 				exit $?
-			else	tui-conf-set -v "$TRC" "$TUI_THEME" "$2"
+			else	tui-conf-set -v "$TRC" "TUI_THEME" "$2"
 				exit $?
 			fi
 			;;
@@ -269,7 +285,7 @@
 #
 #	Display & Action
 #
-		tui-printf -H "TUI ($TUI_VERSION) by sea" "$USER_NAME @ $(date +%F) $(date +%T)"
+		tui-printf -H "TUI ($TUI_VERSION) by sea" "Hello $USER_NAME, it is $(date +%T) on $(date +%F)"
 		tui-printf -T "Text User Interface - Framework for Scripts"
 		tui-printf -E "Calling $ME like this gives you an impression how it may look like."
 		tui-printf -E

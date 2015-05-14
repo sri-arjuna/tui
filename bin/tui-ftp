@@ -20,7 +20,11 @@
 #
 # ------------------------------------------------------------------------
 #
-	source tui
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/apps.conf" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_CONF/settings.conf" || \
+		. tui	# This first call would create the RC if its missing.
 #
 #	File:		tui-ftp
 #	Author: 	Simon Arjuna Erat (sea)
@@ -42,7 +46,7 @@
 	CONFIG_DIR="$HOME/.config/tui"		# Configuration directory
 	CONFIG="$CONFIG_DIR/apps.conf"			# Configuration file
 	LOG="$CONFIG_DIR/$ME.log"			# Logfile
-	TEMPFILE="$TUI_TEMP_DIR/$ME.tmp"		# Tempfile
+	TEMPFILE="$TUI_DIR_CACHE/$ME.tmp"		# Tempfile
 #
 #	Variable defaults (options)
 #

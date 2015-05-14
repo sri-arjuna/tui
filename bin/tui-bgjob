@@ -23,10 +23,10 @@
 #
 #	Variable defaults
 #
+	source tui
 	script_version=0.7
-	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 	ME="$(basename $0)"
-	[ -z "$TUI_TEMP_FILE" ] && source /etc/tui/tui.conf
+	[ -z "$TUI_FILE_TEMP" ] && source $TUI_DIR_CONF/tui.conf
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
@@ -38,7 +38,6 @@
 		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) ir uses.
 		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
 		\r"
-	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	CHECKFILE=false
 	SIZE_ORG=0
 #
@@ -71,27 +70,23 @@
 #
 #	Send job to bg and get pid
 #
-	(bash "$JOB" && printf 0 > /dev/stdout > "$TUI_TEMP_FILE" || \
-			printf 1 > /dev/stdout > "$TUI_TEMP_FILE"
+	tui-printf -rS 2 "Starting job..."
+	($SHELL "$JOB" && printf 0 > /dev/stdout > "$TUI_FILE_TEMP" || \
+			printf 1 > /dev/stdout > "$TUI_FILE_TEMP"
 	)   & PID=$!
 #
 #	While the job is running...
 #
-	tui-printf -rS 2 "Starting job..." #"$TUI_WORK"
 	sleep 1
 	while ps |$GREP -q $PID
-	do
-		#set -x
-		if $CHECKFILE
+	do	if $CHECKFILE
 		then 	if [ $SIZE_ORG -eq 0 ]
 			then	[ -e "$FILECHECK" ] && \
 					FS=$($LS -lh "$FILECHECK"|$AWK '{print $5}') || \
 					FS=0
 				tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
-			else	#
-				FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
+			else	FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
 				tui-progress -bm $SIZE_ORG -c $FS "$TXT_PROGRESS"
-				#set +x
 			fi
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi
@@ -100,7 +95,7 @@
 #
 #	Report Return Code of ended bg-job
 #
-	BG_RET=$(cat $TUI_TEMP_FILE)
+	BG_RET=$(cat $TUI_FILE_TEMP)
 	if [ "$BG_RET" = "-1" ]
 	then	tui-echo "$TXT_EXIT" "Could not retrieve returnvalue" "$INFO"
 		exit $RET_INFO

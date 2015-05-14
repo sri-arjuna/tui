@@ -26,7 +26,12 @@
 #	STABLE:	2015.01.20	Updated to check for curl/wget
 #	Unstable: 2015.01.31    Doh, you changed it!
 #
-	source tui
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/apps.conf" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_CONF/settings.conf" || \
+		. tui	# This first call would create the RC if its missing.
+	
 	script_version=0.7.3
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
@@ -35,11 +40,10 @@
 		\r\t-h\tThis screen
 		\r"
 	ARGS=( "${@}" )
-	FILE_TEMP="$TUI_TEMP_DIR/tui-download.status"
-	FILE_CMD="$TUI_TEMP_DIR/bgjob"
-	umask 022 $FILE_CMD $FILE_TEMP
+	FILE_TEMP="$TUI_DIR_CACHE/tui-download.status"
+	FILE_CMD="$TUI_DIR_CACHE/bgjob"
 	DEST=""
-	tui-bol-dir "$TUI_TEMP_DIR" > /dev/zero
+	tui-bol-dir "$TUI_DIR_CACHE" > /dev/zero
 	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
 	CURLWGET=$(tui-conf-get /etc/tui/commands.conf CURLWGET)

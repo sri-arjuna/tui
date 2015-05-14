@@ -19,15 +19,17 @@
 #
 # ------------------------------------------------------------------------
 #
-	source tui
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" || \
+		. tui	# This first call would create the RC if its missing.
 #
 #	File:		tui-str-extension
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.06
-#	Changed:	2015.05.10
-	script_version=0.3
+#	Changed:	2015.05.11
+	script_version=0.4
 	TITLE="tui-str-extension"
 #	Description:	Simply returns the extension of passed file
 #
@@ -71,7 +73,12 @@
 #	Action & Display
 #
 	ext="${1##*.}"
+	# Workaround for tarballs...
+	echo "$1" | $GREP -q ".tar" && \
+		TAR="tar." || TAR=""
+	
+	tar="$(echo )"
 	if [ "$ext" = "$1" ]
 	then	echo ""
-	else 	echo "$ext"
+	else 	echo "$TAR$ext"
 	fi

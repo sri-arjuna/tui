@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -20,8 +20,8 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.1
-	ME="$(basename $0)"
+	script_version=0.7.2
+	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
 		\rPrints str1 on the left
@@ -45,7 +45,7 @@
 #	Display
 #
 	case $ARGS_COUNT in
-	0)	tui-printf -H " "		;;
+	0)	tui-printf -H " "				;;
 	1)	tui-printf -H $leadingDASHdummy "$1"		;;
 	2)	tui-printf -H $leadingDASHdummy "$1" "$2" 	;;
 	3)	tui-printf -H $leadingDASHdummy "$1" "$2" "$3"	;;

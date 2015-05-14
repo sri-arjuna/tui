@@ -23,16 +23,17 @@
 #
 #	Variables
 #
-	. tui
-	. $PREFIX/share/tui/themes/$TUI_THEME
 	BORDER_RIGHT=""
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_THEMES/$TUI_THEME"  || . tui	# This first call would create the RC if its missing.
 	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
 	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 	WIDTH=$[ $(tput cols) - ( 2 * ${#BORDER_LEFT} ) - 2 ]
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
 	ME="${0##*/}"
-	script_version=0.6
+	script_version=0.6.5
 	DELAY=0.05
 	TITLE=false
 	MODE=cat

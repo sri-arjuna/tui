@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-. tui
 #
 # Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
@@ -19,6 +18,10 @@
 #
 # ------------------------------------------------------------------------
 #
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" || \
+		. tui	# This first call would create the RC if its missing.
+#
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
@@ -32,7 +35,6 @@
 #
 	TITLE="Progress indicator"
 	ME="${0##*/}"
-	#ME_DIR="${0/${0##/*/}}"
 	help_text="
 $ME ($script_version)
 $TITLE
@@ -131,8 +133,8 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #	Check for all required options
 #	
 	if $hasID
-	then	TMPFILE="$TUI_TEMP_DIR/tui-progress_ids.tmp"
-	else	TMPFILE="$TUI_TEMP_DIR/tui-progress_default.tmp"
+	then	TMPFILE="$TUI_DIR_CACHE/tui-progress_ids.tmp"
+	else	TMPFILE="$TUI_DIR_CACHE/tui-progress_default.tmp"
 	fi
 	$doReset && \
 		reset_temp && \

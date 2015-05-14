@@ -20,7 +20,12 @@
 #
 #	Variable defaults
 #
-	source /etc/tui/commands.conf	# Like AWK, GREP, SED
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/apps.conf" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_CONF/settings.conf" || \
+		. tui	# This first call would create the RC if its missing.
+	
 	script_version=0.6
 	ME="$(basename $0)"
 	help_text="
@@ -32,12 +37,9 @@ Writes SOURCE to TARGET
 
 SOURCE and TARGET can be, a partition, disk, directory, file
 "
-	source /etc/tui/apps.conf
-	source /etc/tui/tui.conf
-	[ -f "$HOME/.config/tui/apps.conf" ] && source $HOME/.config/tui/apps.conf
 	SOURCE="$1"
 	TARGET="$2"
-	printf "" > $TUI_TEMP_FILE
+	printf "" > $TUI_FILE_TEMP
 #
 #	Variable handling
 #
@@ -58,12 +60,12 @@ SOURCE and TARGET can be, a partition, disk, directory, file
 #	Display
 #
 	tui-printf "Starting job, please wait..." "$WORK"
-	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_TEMP_FILE" ; printf $? > "$TUI_TEMP_FILE")   &
+	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP")   &
 	sleep 0.7
 	PID=$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')
 	while [ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
 	do 	kill -USR1 $PID 2>&1
-		SIZE=($($GREP "," "$TUI_TEMP_FILE"|$AWK '{print $3$4}'))
+		SIZE=($($GREP "," "$TUI_FILE_TEMP"|$AWK '{print $3$4}'))
 		[ ${#SIZE[@]} -lt 1 ] && max=0 || max=$[ ${#SIZE[@]} - 1 ]
 		tui-printf "Writing $(basename $SOURCE) to $TARGET..." "${SIZE[$max]}" "[  $(tui-indi)   ]"
 		sleep 0.7

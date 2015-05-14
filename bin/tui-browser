@@ -22,12 +22,12 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.03.18
+#	Changed:	2015.05.11
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
 	. tui
-	script_version=0.8.1
+	script_version=0.9
 #	[ 0 -eq $UID ] && \
 #		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \
 #		source $PREFIX/share/tui/themes/$TUI_THEME
@@ -289,7 +289,7 @@ Where options are:
 #
 #	Load provided configuration and sources
 #
-	THE_MEGA_CONFIG="$TUI_TEMP_DIR/$ME_CONFIGS.cfg.tmp"
+	THE_MEGA_CONFIG="$TUI_DIR_CACHE/$ME_CONFIGS.cfg.tmp"
 	[ -f "$THE_MEGA_CONFIG" ] && rm -f "$THE_MEGA_CONFIG"
 	touch "$THE_MEGA_CONFIG"
 	
