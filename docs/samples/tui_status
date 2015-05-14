@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# File: 	tui_status
+# Description:	Demonstrates some examples with tui-status
+# GNU General Public License (GPL) 2015 by sea (erat.simon@gmail.com)
+# ------------------------------------------------------
+#
+#	Variables
+#
+	
+#
+#	Functions
+#
+	
+#
+#	Action & Display
+#
+	tui-title "Basic code example using: tui-status"
+	
+	# Simple Call : 1
+	# ---------------
+	# Simply check how previous command was executed
+	(set -x;grep SOMETHING /etc/fstab)
+	tui-status $? "Last command exit code was: $(tui-str-bol-conv -d $?)"
+	
+	
+	# Simple Call : 2
+	# ---------------
+	# Same as above, but use the failing exit code to exit the script
+	tui-yesno "Continue with demo?"
+	tui-status $? "Your answer was: $(tui-str-bol-conv $?)" || exit $?
+	
+	
+	# Simple condition
+	# ---------------
+	# Lets define a string and return/exit code according to user choice
+	if tui-yesno "Continue with demo?"
+	then	msg="Lets go on..."
+		RET=0
+	else	msg="Farwell then..."
+		RET=1
+	fi
+	# Then print it and do actions according to RET value
+	if tui-status $RET "$msg"
+	then	tui-echo "Thanks for running this demo!"
+	else	exit $?
+	fi
+	
+	
+	# Complex usages : 1
+	# ------------------
+	# Lets use tui-status within a loop, in two different ways.
+	tui-title "Creating list:"
+	for item in *;do tui-status 4 "* Found: $item" ;done
+	# Minimize line usage
+	tui-title "Staying on one line:"
+	for item in *;do tui-status -r 4 "* Found: $item" ;done ; printf "\n"
+	
+	
+	# Complex usages: 2
+	# -----------------
+	grep TIME /etc/default/grub && \
+		tui-printf -S $? "Found a grub theme!" && \
+		tui-echo "It is: $(tui-conf-get /etc/default/grub GRUB_TIMEOUT)" || \
+		tui-status $? "Could not find THEME in /etc/default/grub"
