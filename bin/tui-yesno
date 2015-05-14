@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.1
+	script_version=0.8
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"
@@ -30,9 +30,10 @@
 #
 #	Check for the environment to load
 #
-	source /etc/tui/tui.conf
-	[ -f "$HOME/.config/tui/user.conf" ] && source $HOME/.config/tui/user.conf
-	source $PREFIX/share/tui/themes/$TUI_THEME
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "${TUI_DIR_THEMES:-/usr/share/tui/themes}/$TUI_THEME"  || . tui	# This first call would create the RC if its missing.
+	
 	help_text="
 $ME ($script_version)
 Usage: 	$ME \"Question\"

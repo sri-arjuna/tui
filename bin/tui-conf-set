@@ -17,13 +17,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-        source /etc/tui/commands.conf   # Like AWK, GREP, SED
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" || \
+		. tui	# This first call would create the RC if its missing.
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.05.01
+#	Changed:	2015.05.15
 	script_version=1.2
 #	Description:	Set a value in an 'conf/ini' file
 #
@@ -53,7 +55,6 @@ Where options are:
 "
 	OPT=""
 	VALUE=""
-	CONFIG="$APPS"
 	VARNAME=""
 	CAPS=false
 	SMALL=false

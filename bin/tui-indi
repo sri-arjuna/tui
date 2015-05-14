@@ -20,8 +20,11 @@
 #
 #	Variable defaults
 #
-	. tui
-	script_version=0.6.2
+	#TUI_FILE_TEMP=$(tui-conf-get $HOME/.tui_rc TUI_FILE_TEMP) || . tui 1>/dev/zero 2>/dev/zero
+	. $HOME/.tui_rc  && \
+		. $TUI_DIR_CONF/commands.conf || \
+		. tui >/dev/zero
+	script_version=0.7
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
@@ -38,15 +41,21 @@
 #
 #	Prepare
 #
-	#umask 022 "$TUI_FILE_TEMP"
-	if [ -f "$TUI_FILE_TEMP" ]
-	then	val=$(<"$TUI_FILE_TEMP")
-	else	val=0
+	# Check file
+	if [ ! -f "$TUI_FILE_TEMP" ]
+	then 	tui-bol-dir "$TUI_DIR_CACHE"
+		touch "$TUI_FILE_TEMP"
+		echo 0 > "$TUI_FILE_TEMP"
 	fi
+	# Check if numeric
+	$GREP -q ^[0-3]$ "$TUI_FILE_TEMP" && \
+		val=$(<"$TUI_FILE_TEMP") || \
+		val=0
 #
 #	Display
 #
 	printf "${indicator[$val]}"
-	val=$(( $var + 1 ))
-	[ $val -gt 3 ] && val=0
+	[ $val -gt 3 ] && \
+		val=0 || \
+		val=$(( $val + 1 ))
 	echo $val > "$TUI_FILE_TEMP"

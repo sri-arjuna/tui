@@ -17,13 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-        source /etc/tui/commands.conf	# Like AWK, GREP, SED
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/commands.conf" || \
+		. tui	# This first call would create the RC if its missing.
+	
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2014.12.11
+#	Changed:	2015.05.14
 	script_version=0.4
 #	Description:	Get a value from an 'conf/ini' file
 #
@@ -74,6 +77,23 @@ Where options are:
 #
 #	Display & Action
 #
+	$AWK	'
+		/^#/  ||
+		/^\[/  ||
+		/!VAR/ { next }
+		{
+			if (VAR = $1) {
+				if ("-z" != $2) {
+					print $2
+				}
+			}
+	}' VAR="${VARNAME}=" FS="=" "$CONFFILE" # | head -n 1
+	exit
+	# Old way
+	
 	VALUE=$($GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#|$SED s,'"','',g|$SED s,'=',' ',g) > /dev/zero
 	VALUE="${VALUE:${#VARNAME}+1}"
-	printf "$VALUE"
+	#VALUE="${VALUE/${VARNAME}/}"
+	#printf "$(echo $VALUE)"
+	#printf "$VALUE"
+	printf "${VALUE}" | $SED s,^[a-zA-Z0-9]\ ,,g
