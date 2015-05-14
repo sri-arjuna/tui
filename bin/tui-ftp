@@ -23,8 +23,11 @@
 	source "$HOME/.tui_rc" && \
 		. "$TUI_DIR_CONF/apps.conf" && \
 		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" || \
+		. "$TUI_DIR_CONF/settings.conf" && \
+		. "$TUI_FILE_CONF_APPS" && \
+		. "$TUI_FILE_CONF_SETTINGS" || \
 		. tui	# This first call would create the RC if its missing.
+	
 #
 #	File:		tui-ftp
 #	Author: 	Simon Arjuna Erat (sea)
@@ -32,7 +35,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.01.28
 #	Changed:	2015.01.30
-	script_version=0.3.3-ALPHA
+	script_version=0.3.4-ALPHA
 	TITLE="TUI handler for FTP tasks"
 #	Description:	A smiple handler for FTP commands.
 #

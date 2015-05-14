@@ -18,11 +18,20 @@
 #
 # ------------------------------------------------------------------------
 #
+#	System defaults
+#
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/apps.conf" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_CONF/settings.conf" && \
+		. "$TUI_FILE_CONF_APPS" && \
+		. "$TUI_FILE_CONF_SETTINGS" || \
+		. tui	# This first call would create the RC if its missing.
+#
 #	Variable defaults
 #
-	script_version=0.3
-	ME="$(basename $0)"
-	[ -z "$TERMINAL" ] && source tui
+	script_version=0.4
+	ME="${0##*/}"
 #
 #	Check for the environment to load
 #

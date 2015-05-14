@@ -18,17 +18,20 @@
 #
 # ------------------------------------------------------------------------
 #
+#	System defaults
+#
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/apps.conf" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_CONF/settings.conf" && \
+		. "$TUI_FILE_CONF_APPS" && \
+		. "$TUI_FILE_CONF_SETTINGS" || \
+		. tui	# This first call would create the RC if its missing, and load all the required variables.
+#
 #	Variable defaults
 #
-	script_version=0.5
-	ME="$(basename $0)"
-#
-#	Check for the environment to load
-#
-	source /etc/tui/apps.conf
-	[ 0 -eq $UID ] || \
-		CONF="$HOME/.config/tui/apps.conf"
-	[ -f "$CONF" ] && source "$CONF"
+	script_version=0.6
+	ME="${0##*/}"
 	
 	help_text="$ME ($script_version)
 		\rUsage: $ME [options] 'URL1' 'URL2' ...

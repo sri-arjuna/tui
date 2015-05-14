@@ -18,6 +18,16 @@
 #
 # ------------------------------------------------------------------------
 #
+#	System defaults
+#
+	source "$HOME/.tui_rc" && \
+		. "$TUI_DIR_CONF/apps.conf" && \
+		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_DIR_CONF/settings.conf" && \
+		. "$TUI_FILE_CONF_APPS" && \
+		. "$TUI_FILE_CONF_SETTINGS" || \
+		. tui	# This first call would create the RC if its missing.
+#
 #	Variable defaults
 #
 	script_version=0.8
@@ -31,8 +41,7 @@
 		\r
 		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
 		\r"
-	source "$HOME/.tui_rc" && \
-		. $TUI_DIR_CONF/commands.conf
+	
 	FILE_TEMP="$TUI_DIR_CACHE/tui-tar.status"
 	FILE_CMD="$TUI_DIR_CACHE/bgjob"
 	TMP=$TUI_FILE_TEMP
