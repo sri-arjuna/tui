@@ -73,27 +73,9 @@ Where options are:
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
 	VARNAME="$2"
-	[ ! -f "$CONFFILE" ]  && tui-echo "$CONFFILE dont exist?" "$TUI_FAIL" && exit 1
+	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$CONFFILE dont exist?" && exit 1
 #
 #	Display & Action
 #
-	$AWK	'
-		/^#/  ||
-		/^\[/  ||
-		/!VAR/ { next }
-		{
-			if (VAR = $1) {
-				if ("-z" != $2) {
-					print $2
-				}
-			}
-	}' VAR="${VARNAME}=" FS="=" "$CONFFILE" # | head -n 1
-	exit
-	# Old way
-	
-	VALUE=$($GREP $OPT "${VARNAME}=" "$CONFFILE"|$GREP -v ^#|$SED s,'"','',g|$SED s,'=',' ',g) > /dev/zero
-	VALUE="${VALUE:${#VARNAME}+1}"
-	#VALUE="${VALUE/${VARNAME}/}"
-	#printf "$(echo $VALUE)"
-	#printf "$VALUE"
-	printf "${VALUE}" | $SED s,^[a-zA-Z0-9]\ ,,g
+	# http://www.unix.com/shell-programming-and-scripting/257841-awk-printing-value-variable-assignment-file.html
+	$AWK -F= -v VAR="$VARNAME" '$1 ~ "^[^#]*" VAR "$"{print $2}' "$CONFFILE"
