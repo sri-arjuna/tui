@@ -302,7 +302,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	POS_CENTER=""
 	POS_THIRD=""
 	
-	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${POS_CLE}"
+	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}$(printf '%*s' $(( $WIDTH - 4)))${POS_CLE}"
 	
 	case $ARGS_COUNT in
 	#0)	echo nothing todo	;;
@@ -332,9 +332,9 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 	# Escape trailing backslash, from whichever argument passed
 	# This is supposed to 'keep' artificial linebreaks rather than get them on one line
-        [ "\\" = "${FIRST:0:(-1)}" ] && \
-                FIRST="${FIRST}\\"
-	# Escape '%'
+        #[ "\\" = "${FIRST:0:(-1)}" ] && \
+        #        FIRST="${FIRST}\\"
+	
 	printf "${START}${IDENT}"
 	printf "${SECOND}"
 	printf "${CLOSE}${END}"
