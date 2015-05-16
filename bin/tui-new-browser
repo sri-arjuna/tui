@@ -87,5 +87,5 @@ Where options are:
 		#APP_TITLE=$(tui-read "What is the frameworks's title: ")
 	fi
 	tui-bol-dir "$APP_TITLE/$APP_DATA"
-	source "$PREFIX/share/tui/templates/browser" > "$APP_TITLE/$APP_FILE"
+	source "$TUI_DIR_TEMPLATES/browser" > "$APP_TITLE/$APP_FILE"
 	tui-filemgr "$APP_TITLE"

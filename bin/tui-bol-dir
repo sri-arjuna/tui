@@ -20,20 +20,27 @@
 #
 #	Variable defaults
 #
-	script_version=0.3
+	script_version=0.4
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
-		\rUsage: $ME /path/to/check
+		\rUsage: $ME [-v] /path/to/check
 		\rReturns 0 if '/path/to/check' was found or could be created
 		\r"
+	[ "-v" = "$1" ] && \
+		beVerbose=true && \
+		shift || \
+		beVerbose=false
 #
 #	Display
 #
 	if [ -z "$1" ] || [ "-h" = "$1" ]
 	then	echo -e "$help_text"
-		exit 99
+		RET=99
 	elif [ -d "$1" ]
-	then	tui-status 0 "Found: $1"
+	then	$beVerbose && tui-status 0 "Found: $1"
+		RET=0
 	else	mkdir -p "$1"
-		tui-status $? "Created: $1"
+		RET=$?
+		$beVerbose && tui-status $RET "Created: $1"
 	fi
+	exit $RET

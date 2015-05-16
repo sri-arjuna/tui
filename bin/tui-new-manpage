@@ -21,7 +21,7 @@
 #	Variable defaults
 #
 	source tui
-	script_version=0.3
+	script_version=0.4
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -62,20 +62,16 @@ Where options are:
 	if [ -z "$1" ]
 	then	DEST=$(tui-read "Enter the filename:")
 		if [ "$DEST" = "${DEST##*/}" ]
-		then	if [ -d "$HOME/.local/bin" ]
-			then	DEST="$HOME/.local/bin/$DEST"
-			else	DEST="$HOME/bin/$DEST"
-				tui-bol-dir "$(dirname $DEST)" # > /dev/zero
-			fi
+		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
+			tui-bol-dir "$(dirname $DEST)"
+		else	DEST="$1"
+			tui-bol-dir -v "$(dirname $DEST)"
 		fi
 	else	if [ "$1" = "$(basename $1)" ]
-		then	if [ -d "$HOME/.local/bin" ]
-			then	DEST="$HOME/.local/bin/$1"
-			else	DEST="$HOME/bin/$1"
-				tui-bol-dir "$(dirname $DEST)" > /dev/zero
-			fi
-		else	tui-bol-dir "$(dirname $DEST)" > /dev/zero
-			DEST="$1"
+		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
+			tui-bol-dir "$(dirname $DEST)"
+		else	DEST="$1"
+			tui-bol-dir -v "$(dirname $DEST)"
 		fi
 	fi
 	
@@ -84,8 +80,7 @@ Where options are:
 	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
 		tui-status $? "Overwrite file: $DEST"
 	fi
-	APP_DIR=$PREFIX/share/tui
-	source $APP_DIR/templates/manpage/$SHELL_EXT > "$DEST"
+	source $TUI_DIR_TEMPLATES/manpage/$SHELL_EXT > "$DEST"
 	tui-status $? "Saved: $(printf $DEST)"
 	# Open the scriot AFTER the manpage... to encourage the writing of the manpage
 	tui-edit "$DEST"
