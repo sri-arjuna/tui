@@ -81,6 +81,7 @@ rm -rf %{buildroot}
 - Touched:   tui, tui-bgjob, tui-browser, tui-cat, tui-cp, tui-dd, tui-download, tui-ftp, tui-header, tui-indi, tui-mv, 
 -            tui-printf, tui-progress, tui-select, tui-str-extension, tui-tar, tui-new-*
 - Added:     tui-bol-root, tui-str-bol-conv
+- Changed:   tui-printf, rework done - seems ok
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.
