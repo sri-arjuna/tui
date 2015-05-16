@@ -1,7 +1,7 @@
 Name:        tui
 Version:     0.7.6
 Release:     801%{?dist}
-Summary:     Tools to write cool looking scripts
+Summary:     A robust I/O toolset for your scripts
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -12,47 +12,6 @@ BuildArch:   noarch
 
 Requires:    bash
 Requires:    coreutils
-
-# Not the most elegant, but i guess i prefer this to be 'silent'
-#Provides:    tui-bgjob
-#Provides:    tui-bol-dir
-#Provides:    tui-bol-sudo
-#Provides:    tui-browser
-#Provides:    tui-cat
-#Provides:    tui-conf-editor
-#Provides:    tui-conf-get
-#Provides:    tui-conf-set
-#Provides:    tui-cp
-#Provides:    tui-dd
-#Provides:    tui-download
-#Provides:    tui-echo
-#Provides:    tui-edit
-#Provides:    tui-filemgr
-#Provides:    tui-ftp
-#Provides:    tui-header
-#Provides:    tui-indi
-#Provides:    tui-install
-#Provides:    tui-list
-#Provides:    tui-log
-#Provides:    tui-mv
-#Provides:    tui-new-browser
-#Provides:    tui-new-manpage
-#Provides:    tui-new-script
-#Provides:    tui-press
-#Provides:    tui-printf
-#Provides:    tui-progress
-#Provides:    tui-psm
-#Provides:    tui-read
-#Provides:    tui-rnd
-#Provides:    tui-select
-#Provides:    tui-status
-#Provides:    tui-str-usb
-#Provides:    tui-tar
-#Provides:    tui-terminal
-#Provides:    tui-title
-#Provides:    tui-wait
-#Provides:    tui-web
-#Provides:    tui-yesno
 
 
 %description
