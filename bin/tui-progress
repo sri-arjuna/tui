@@ -163,7 +163,10 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Read initial value from tmpfile
 #
-	[ -z "$CURRENT" ] && VAL=$(read_tmp) || VAL=$CURRENT
+	#echo $CURRENT
+	#echo $VAL
+	[ -z "$(echo $CURRENT|tr -d [[:alpha:]])" ] && VAL=$(read_tmp) || VAL="$CURRENT"
+	
 #
 #	Generate output string
 #
@@ -176,7 +179,9 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			PROGRESS="[ $VAL / $MAX ]"
 			;;
 		bar)	# Dont show if VAL is higher than MAX
+			#set -x
 			[ $VAL -gt $MAX ] && exit 1
+			#set +x
 			[ -z "$COLUMNS" ] && COLUMNS=$(tput cols)
 			if $longBar
 			then	# Show also procent
