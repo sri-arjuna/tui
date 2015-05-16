@@ -73,10 +73,10 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	FIRST=""
 	SECOND=""
 	THIRD=""
-	WIDTH=$( [ -z "$COLUMNS" ] && tput cols || printf $COLUMNS )	# Retrieve env or calc it new
-	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 
-	WIDTH=$[ $WIDTH / 2 * 2 ]					# Make it even 
-	EMPTY="$(printf '%*s' $WIDTH)"					# Get 'width' spaces
+	COLUMNS=${COLUMNS:-$(tput cols)}
+	WIDTH=$COLUMNS
+	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 	# 2=1 space from left and right border each
+	#WIDTH=$[ $WIDTH / 2 * 2 ]		# Make it even 
 	doEcho=false
 	doHeader=false
 	doStatus=false
@@ -256,7 +256,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		# calling itself with reduced string lengths
 		# so we can exit after this is done
 		exit
-	# else # just continue with the script below
+	# else # just continue with the script below, for regular/final output handline
 	fi
 #
 #	Prepare Colors & Strings
@@ -271,13 +271,13 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
-		COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
+		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
 	elif [ $doTitle = true ]
 	then	# 'Inlay'
 		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
 		COLOR_LINE_CLOSE="${TUI_COLOR_RESET}"
-		COLOR_LINE_END="${TUI_COLOR_RESET}\n${TUI_COLOR_RESET}"
+		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
 	else	# The default
 		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
@@ -287,45 +287,48 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Arrange strings in order, with border and colors
 #
+	# Create POS_ID points, calculated from pos_id_num.
+	# pos_id_NUM's
+	pos_cli_num=$(( 0 + ${#BORDER_LEFT} + 2 ))
+	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 1))
+	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} ))
+	pos_center_num=""
+	pos_third_num=""
+	# POS_ID
+	POS_CLS="\033[0G"	# This is always 0, and therefor doesnt require a pos_id_num calculation
+	POS_CLI="\033[${pos_cli_num}G"
+	POS_CLC="\033[${pos_clc_num}G"
+	POS_CLe="\033[${pos_cle_num}G"
+	POS_CENTER=""
+	POS_THIRD=""
+	
+	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
+	
 	case $ARGS_COUNT in
-	0)	FIRST="${EMPTY:2}"
-		SECOND=" "
-		THIRD=" "
-		;;
-	1)	if [ $doTitle = true ]
-		then 	SECOND="$FIRST"
-			num_o="${#SECOND}"
-			num=$[ $num_o / 2 * 2  ]
-			[ $num_o -gt $num ] && adder=" "||adder="  "
-			EMPTY="${EMPTY:${num}+2}"	# The +2 is a temp bugfix
-			half=$[ ${#EMPTY} / 2  ]
-			FIRST="${EMPTY:$half}"
-			THIRD="$FIRST$adder"
-		else	# Usual arangement
-			SECOND=$"${EMPTY:${#FIRST}}"
-		fi
-		;;
-	2)	# Make the last (2nd) passed argument aligned to right
-		THIRD="$SECOND"
-		SECOND="${EMPTY:${#FIRST}+${#SECOND}}"
-		;;
-	3)	# 3 (BETA - and more - handler)
-		$doStatus && \
-			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+8}" || \
-			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
-		half=$[ ${#EMPTY} / 2 ]
-		adder=$((len_strings % 2))
-		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
-		;;
-	*)	# 4+ (BETA - and more - handler)
-		$doStatus && \
-			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+8}" || \
-			EMPTY="${EMPTY:${#FIRST}+${#SECOND}+${#THIRD}}"
-		half=$[ ${#EMPTY} / 2 ]
-		adder=$((len_strings % 2))
-		SECOND="${EMPTY:$half}$SECOND${EMPTY:$half+$adder}"
+	#0)	echo nothing todo	;;
+	1)	if $doTitle
+		then	SECOND="$FIRST"
+			FIRST=""
+		fi			;;
+	2)	THIRD="$SECOND"
+		SECOND=""		;;
+	3)	#THIRD="$SECOND" ; SECOND=""
+		center=$(( $WIDTH / 2 ))
+		half=$(( ${#SECOND} / 2 ))
+		pos_center_num=$(( $center - $half  ))
+		POS_CENTER="\033[${pos_center_num}G"
+		SECOND="${POS_CENTER}$SECOND"
+		
 		;;
 	esac
+	
+	pos_third_num=$(( $pos_cle_num - 2 - ${#THIRD} ))
+	POS_THIRD="\033[${pos_third_num}G"
+	IDENT="${POS_CLI}$FIRST"
+	CLOSE="${POS_THIRD}$THIRD ${POS_CLC}${COLOR_LINE_CLOSE}"
+	END="${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
+	
+	
 #
 #	Display & Action
 #
@@ -334,7 +337,9 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
         [ "\\" = "${FIRST:0:(-1)}" ] && \
                 FIRST="${FIRST}\\"
 	# Escape '%'
-	output=$(echo "${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${FIRST}${SECOND}${THIRD} ${COLOR_LINE_CLOSE}${BORDER_RIGHT}${COLOR_LINE_END}"|$SED s,'%','%%',g)
+	printf "${START}${IDENT}"
+	printf "${SECOND}"
+	printf "${CLOSE}${END}"
 	
 	# The actual output
 	printf "$output"
