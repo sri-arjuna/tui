@@ -75,7 +75,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	THIRD=""
 	COLUMNS=${COLUMNS:-$(tput cols)}
 	WIDTH=$COLUMNS
-	((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 	# 2=1 space from left and right border each
+	#((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 	# 2=1 space from left and right border each
 	#WIDTH=$[ $WIDTH / 2 * 2 ]		# Make it even 
 	doEcho=false
 	doHeader=false
@@ -290,7 +290,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	# Create POS_ID points, calculated from pos_id_num.
 	# pos_id_NUM's
 	pos_cli_num=$(( 0 + ${#BORDER_LEFT} + 2 ))
-	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 1))
+	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 2))
 	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} ))
 	pos_center_num=""
 	pos_third_num=""
@@ -298,11 +298,11 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	POS_CLS="\033[0G"	# This is always 0, and therefor doesnt require a pos_id_num calculation
 	POS_CLI="\033[${pos_cli_num}G"
 	POS_CLC="\033[${pos_clc_num}G"
-	POS_CLe="\033[${pos_cle_num}G"
+	POS_CLE="\033[${pos_cle_num}G"
 	POS_CENTER=""
 	POS_THIRD=""
 	
-	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
+	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT} ${POS_CLE}"
 	
 	case $ARGS_COUNT in
 	#0)	echo nothing todo	;;
@@ -322,13 +322,11 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		;;
 	esac
 	
-	pos_third_num=$(( $pos_cle_num - 2 - ${#THIRD} ))
+	pos_third_num=$(( $pos_cle_num - 1 - ${#THIRD} ))
 	POS_THIRD="\033[${pos_third_num}G"
 	IDENT="${POS_CLI}$FIRST"
 	CLOSE="${POS_THIRD}$THIRD ${POS_CLC}${COLOR_LINE_CLOSE}"
 	END="${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
-	
-	
 #
 #	Display & Action
 #
