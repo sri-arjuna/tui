@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by sea, sea AT localhost.localdomain
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	source $HOME/.tui_rc
+#
+#	File:		tui-str-bol-conv
+#	Author: 	sea
+#	Contact:	sea AT localhost.localdomain
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.05.14
+#	Changed:	2015.05.14
+	script_version=0.1
+	TITLE="Binary Exit Code Converter to Strings"
+#	Description:	Converts binary exit codes to strings
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-str-bol-conv
+	ME="${ME/.sh/}"				# Cut off .sh extension
+	TEMPFILE="$TUI_TEMP_DIR/$ME.tmp"	# Tempfile
+#
+#	Functions
+#
+	function help_screen() {
+	# Simply shows the helpscreen
+	# 
+		cat <<-HELP_SCREEN
+		$ME ($script_version)
+		${TITLE^}
+		Usage: 		$ME [-hCqv] arguments
+		Examples:	$ME 
+				$ME -a
+				$ME -e optVAL
+		
+		Where options are:
+			-h(elp) 		This screen
+			-c(apital)		Makes first letter capital
+			-C(APITAL)		Makes all letters capital
+			-d(one)			Returns: done/fail
+			-t(rue)			Returns: true/false
+			-y(es)			Returns: yes/no
+		
+		HELP_SCREEN
+	}
+#
+#	Defaults
+#
+	caps=false
+	CAPS=false
+	mode="yes"
+	out=""
+#
+#	Catching Arguments
+#
+	# A ':' after a char indicates that this option requires an argument
+	# Get access to the passed value of the argument by using $OPTARG
+	while getopts "hcCdoty" opt
+	do 	case $opt in
+		h)	help_screen
+			exit 99
+			;;
+		c)	caps=true	;;
+		C)	CAPS=true	;;
+		d)	mode="done"	;;
+		t)	mode="true"	;;
+		y)	mode="yes"	;;
+		o)	mode="on"	;;
+		*)	help_screen ; exit 99	;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+#
+#	Display & Action
+#
+	[ -z "$1" ] && help_screen && exit 1
+	case "$mode" in
+	"done")	case "$1" in
+		0)	out="done"	;;
+		1)	out="fail"	;;
+		esac
+		;;
+	"true")	case "$1" in
+		0)	out="true"	;;
+		1)	out="false"	;;
+		esac
+		;;
+	"yes")	case "$1" in
+		0)	out="yes"	;;
+		1)	out="no"	;;
+		esac
+		;;
+	"on")	case "$1" in
+		0)	out="on"	;;
+		1)	out="off"	;;
+		esac
+		;;
+	esac
+	
+	if $CAPS
+	then	echo "${out^^}"
+	elif $caps
+	then	echo "${out^}"
+	else	echo "$out"
+	fi

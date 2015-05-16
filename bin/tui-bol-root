@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by sea, sea AT localhost.localdomain
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	
+#
+#	File:		tui-bol-root
+#	Author: 	sea
+#	Contact:	sea AT localhost.localdomain
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.05.16
+#	Changed:	2015.05.16
+	script_version=0.1
+	TITLE="tui-bol-root"
+#	Description:	Text TODO
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-bol-root
+	
+#
+#	Functions
+#
+	function help_screen() {
+	# Simply shows the helpscreen
+	# 
+		cat <<-HELP_SCREEN
+		$ME ($script_version)
+		${TITLE^}
+		Usage: 		$ME
+		Examples:	$ME 
+				tui-status \$? \"User is root\"
+		
+		Where options are:
+			-h(elp) 		This screen
+			-C(onf			Show the config menu
+			-q(uiet)		Mutes all output
+			-v(erbose)		Enables the scripts verbosity
+		
+		HELP_SCREEN
+	}
+	case "$1" in
+	"-h"|"--help")	help_screen ; exit 99	;;
+	esac
+#
+#	Action & Display
+#
+	if [ "$(whoami)" = root ] || [ $UID -eq 0 ]
+	then	exit 0
+	else 	exit 1
+	fi
