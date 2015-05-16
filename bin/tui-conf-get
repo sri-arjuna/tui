@@ -78,4 +78,5 @@ Where options are:
 #	Display & Action
 #
 	# http://www.unix.com/shell-programming-and-scripting/257841-awk-printing-value-variable-assignment-file.html
+	#$GREP -e "$VARNAME=" "$CONFFILE" | grep -ve ^"#" -ve ^[[:space:]]"#"|sed s,"$VARNAME=","",g
 	$AWK -F= -v VAR="$VARNAME" '$1 ~ "^[^#]*" VAR "$"{print $2}' "$CONFFILE"
