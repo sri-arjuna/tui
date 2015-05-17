@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	source tui
+#
+#	File:		tui-asroot
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.04.05
+#	Changed:	2015.05.17
+	script_version=0.2
+	TITLE="Run as root"
+#	Description:	Executes passed command as root
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-asroot
+	SUDO=\sudo #$(which sudo)
+#
+#	Variable defaults (options)
+#
+	beVerbose=false
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+${TITLE^}
+Usage: 		$ME 'command'
+Examples:	$ME 'cat /etc/cryptab'
+		$ME 'cat /etc/cryptab'
+Where options are:
+	-h(elp) 		This screen
+	
+"
+
+#
+#	Catching Arguments
+#
+	# A ':' after a char indicates that this option requires an argument
+	# Get access to the passed value of the argument by using $OPTARG
+	while getopts h opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		esac
+	done
+	#shift $(($OPTIND - 1))
+	
+#
+#	Display & Action
+#
+	if tui-bol-root
+	then	"${@}"
+	elif ${useSudo:-false}
+	then	$SUDO -t "Password for $USER" "${@}"
+	else	su -c "${@}"
+	fi
