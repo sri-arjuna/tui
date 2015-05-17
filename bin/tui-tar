@@ -45,7 +45,7 @@
 	FILE_TEMP="$TUI_DIR_CACHE/tui-tar.status"
 	FILE_CMD="$TUI_DIR_CACHE/bgjob"
 	TMP=$TUI_FILE_TEMP
-	touch $TMP
+	touch "$TMP"
 	DEST=""
 	showBar=false
 	doExtract=false
@@ -53,7 +53,7 @@
 #
 #	Variable handling
 #
-	while getopts hbx opt
+	while getopts hbvx opt
 	do	case "$opt" in
 		h)	echo -e "$help_text" ; exit $RET_HELP
 			;;
@@ -70,7 +70,6 @@
 	done
 	shift $(($OPTIND - 1))
 	ARGS=(${@})
-	
 #
 #	Display
 #
@@ -90,7 +89,9 @@
 				touch "$TUI_FILE_TEMP".2
 				echo "tar tf \"$FOLDER\" > \"$TUI_FILE_TEMP\".2" > "$TUI_FILE_TEMP"
 				$SHELL "$TUI_FILE_TEMP" &
-				while ps | $GREP -q tar
+				pid=$!
+				#while ps | $GREP -q tar 
+				while ps | $GREP -q $pid
 				do	tui-printf "Reading $FOLDER..." "[  $(tui-indi)   ]"
 					sleep 0.3
 				done
@@ -135,7 +136,7 @@
 
 			tui-status $RET "Extracted: $FOLDER"
 			RET=$?
-		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS. $TAR_EXT")
+		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
 			tui-printf -rS 2 "Initializing $FOLDER..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 			cd "$(dirname $FOLDER)"
@@ -150,8 +151,10 @@
 			$showBar && tui-progress -rbm $org_size -i $$
 
 			$FILE_CMD &
+			pid=$!
 			sleep 0.5
-			while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]
+			#while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]
+			while [ ! "" = "$(ps|$GREP -v tui|$GREP $pid)" ]
 			do	[ -f "$DEST" ] && \
 					tmp_display_size="$($LS -hl $DEST |$AWK '{print $5}')" && \
 					tmp_size="$($LS -l $DEST |$AWK '{print $5}')"|| \
