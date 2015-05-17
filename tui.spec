@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     801%{?dist}
+Release:     802%{?dist}
 Summary:     A robust I/O toolset for your scripts
 
 License:     GPLv3
@@ -82,6 +82,7 @@ rm -rf %{buildroot}
 -            tui-printf, tui-progress, tui-select, tui-str-extension, tui-tar, tui-new-*
 - Added:     tui-bol-root, tui-str-bol-conv
 - Changed:   tui-printf, rework done - seems ok
+- Added:     tui-asroot, executes command as root, uses sudo if useSudo is true.
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.
