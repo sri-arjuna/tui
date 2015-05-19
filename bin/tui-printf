@@ -328,12 +328,15 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	if $doStatus
 	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
 		case $NUM_ID in
-		4)	pos_three_adder=21	;;
-		*)	pos_three_adder=12	;;
+		0|1|2|3|10|11)	pos_three_adder=21	;;
+		4|5|6|7|99)	pos_three_adder=-1	;;
 		esac
 		pos_third_num=$(( $pos_cle_num + $pos_three_adder - ${#THIRD} ))
 		POS_THIRD="\033[${pos_third_num}G"
 	else	pos_third_num=$(( $pos_cle_num - 1 - ${#THIRD} ))
+		# Fix one position place if there was a %
+		echo "$THIRD" | $GREP '%' && \
+			pos_third_num=$(( $pos_third_num + 1 ))
 		POS_THIRD="\033[${pos_third_num}G"
 	fi
 	IDENT="${POS_CLI}$FIRST"

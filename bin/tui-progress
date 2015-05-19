@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.05.10
-	script_version=0.8
+#	Changed:	2015.05.19
+	script_version=0.8.1
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -185,24 +185,28 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			[ -z "$COLUMNS" ] && COLUMNS=$(tput cols)
 			if $longBar
 			then	# Show also procent
+				#set -x
 				procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
-				if [ ${#procent} -lt 3 ]
-				then	fixer=23
-				else	fixer=22
-				fi
 				[ -z "$MESSAGE" ] && fixer=$(( $fixer - 5 ))
 				# The length that is available to print bars
-				length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - ${#procent} - $fixer  ))
 				
 				pro=${procent/.*/}
 				[ $pro -gt 100 ] && \
-					procent=100 && \
 					pro=100
 				[ $pro -ne 100 ] && \
 					cent=$( while IFS="." read P C;do [ -z "$C" ] && echo 00 || echo $C;done<<<$procent) && \
 					cent=${cent:0:2} || \
 					cent=00
-				STATUS=" [ ${pro}.${cent}% ]"
+				case ${#pro} in
+				#0)	echo impossible	;;
+				1)	[ ${#cent} -eq 1 ] && fixer=7 || fixer=8 	;;
+				2)	[ ${#cent} -eq 1 ] && fixer=9 || fixer=10 	;;
+				3)	fixer=15 	;;
+				esac
+				#set +x
+				
+				length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - ${#procent} - $fixer  ))
+				STATUS="[ ${pro}.${cent}%% ]"
 				len=$( echo $length $procent | $AWK '{print ($1/100*$2) }' )
 			else	# The length that is available to print bars
 				[ -z "$MESSAGE" ] && \
@@ -242,6 +246,6 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #	Display & Action
 #
 	if [ -z "$(echo $MESSAGE)" ]
-	then	tui-printf "${PROGRESS}" "${STATUS:1}"
-	else	tui-printf "$MESSAGE" "$PROGRESS$STATUS"
+	then	tui-printf "${PROGRESS}" "${STATUS}"
+	else	tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
 	fi
