@@ -68,11 +68,11 @@
 	# Fill the fallback, to avoid empty calls
 	TERMINAL="${TERMINAL:-$TERM}"
 	case $TERMINAL in
-	xterm)			[ -z "$1" ] && opt="" || opt="-e "	;;
-	lxterminal)		[ -z "$1" ] && opt="" || opt="-e "	;;
-	gnomte-terminal)	[ -z "$1" ] && opt="" || opt="-e "	;;
+	gnome-terminal|lxterminal|vte|xterm)
+				[ -z "$1" ] && opt="" || opt="-e "	;;
+	termit)			[ -z "$1" ] && opt="" || opt="-c "	;;
 	*)			[ -z "$1" ] && opt="" || opt="-e "
-		echo "$TERMINAL: Using 'default' option \"$opt\", please report your terminal ($TERMINAL) and its command execution option." > /dev/stderr
+		tui-echo "$TERMINAL: Using 'default' option \"$opt\", please report your terminal ($TERMINAL) and its command execution option." > /dev/stderr
 		;;
 	esac
 #
