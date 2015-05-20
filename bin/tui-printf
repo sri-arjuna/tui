@@ -23,21 +23,25 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.05.10
+#	Changed:	2015.05.20
 	script_version=2.0
-#	Description:	The absolute core function for TUI
+#	Description:	The absolute core display function for TUI
 #
 #	Variables
 #
 	BORDER_RIGHT=""
+	# Source only the most required files, 
+	# create the RC and load all variable if RC is not present yet.
 	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/colors.conf" && \
-		. "$TUI_DIR_CONF/tui.conf" && \
-		. "${TUI_DIR_THEMES}/$TUI_THEME"  || . tui	# This first call would create the RC if its missing.
-	#. tui				# So it then can load the proper values
-	# Prepare for output:
-	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
+		. "$TUI_FILE_CONF_COMMANDS" && \
+		. "$TUI_FILE_CONF_COLORS" && \
+		. "$TUI_FILE_CONF_STATUS" && \
+		. "$TUI_FILE_CONF_SYSTEM"  || \
+		. tui
+	# If there is a user theme directory, use that one instead
+	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 	HEAD_BG="$TUI_BACKGROUND"
