@@ -148,6 +148,12 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		ARGS_COUNT=3
 		THIRD="${retvalue[$NUM_ID]}"	#     = 6+2=8
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
+#	elif $doTitle && [ $ARGS_COUNT -eq 1 ]
+#	then	FIRST=" "
+#		SECOND="$1"
+#		THIRD=" "
+#		len_strings=${#SECOND}
+#		echo jup
 	else
 		[ ! -z "$1" ] && FIRST="$1" #&& ((ARGS_COUNT++))
 		[ ! -z "$2" ] && SECOND="$2" # && ((ARGS_COUNT++))
@@ -172,7 +178,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	if [ $len_strings -gt $WIDTH ]
 	then 	# All vars are larger than the line supports
 		# Splitting required
-		echo $ARGS_COUNT
+		#echo $ARGS_COUNT
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
 			half=$[ ${#FIRST} / 2 ]
@@ -306,22 +312,23 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	#0)	echo nothing todo	;;
 	1)	if $doTitle #&& ! $doStatus
 		then	SECOND="$FIRST"
-			FIRST=""
-		fi			;;
-	2)	! $doStatus && \
-			THIRD="$SECOND" && \
-			SECOND=""
-					;;
-	3)	#THIRD="$SECOND" ; SECOND=""
-		#if $doStatus
-		#then	echo hmm
-		#else	# Print everything else
+			FIRST=" "
+			THIRD=" "
 			center=$(( $WIDTH / 2 ))
 			half=$(( ${#SECOND} / 2 ))
 			pos_center_num=$(( $center - $half  ))
 			POS_CENTER="\033[${pos_center_num}G"
 			SECOND="${POS_CENTER}$SECOND"
-		#fi
+		fi			;;
+	2)	! $doStatus && \
+			THIRD="$SECOND" && \
+			SECOND=""
+					;;
+	3)	center=$(( $WIDTH / 2 ))
+		half=$(( ${#SECOND} / 2 ))
+		pos_center_num=$(( $center - $half  ))
+		POS_CENTER="\033[${pos_center_num}G"
+		SECOND="${POS_CENTER}$SECOND"
 		;;
 	esac
 	
@@ -351,11 +358,9 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
         #        FIRST="${FIRST}\\"
 	if $doTitle || $doHeader
 	then	str=$(printf '%*s' $(( $WIDTH - 4)))
+		#str="\e[2K"	# See console_codes, for later improvements
 	else	str=""
 	fi
 	printf "${START}${str}${IDENT}"
 	printf "${SECOND}"
 	printf "${CLOSE}${END}"
-	
-	# The actual output
-	printf "$output"
