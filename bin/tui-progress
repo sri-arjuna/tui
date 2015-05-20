@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.05.19
-	script_version=0.8.1
+#	Changed:	2015.05.20
+	script_version=0.9
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -163,10 +163,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Read initial value from tmpfile
 #
-	#echo $CURRENT
-	#echo $VAL
 	[ -z "$(echo $CURRENT|tr -d [[:alpha:]])" ] && VAL=$(read_tmp) || VAL="$CURRENT"
-	
 #
 #	Generate output string
 #
@@ -179,13 +176,10 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			PROGRESS="[ $VAL / $MAX ]"
 			;;
 		bar)	# Dont show if VAL is higher than MAX
-			#set -x
 			[ $VAL -gt $MAX ] && exit 1
-			#set +x
 			[ -z "$COLUMNS" ] && COLUMNS=$(tput cols)
 			if $longBar
 			then	# Show also procent
-				#set -x
 				procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
 				[ -z "$MESSAGE" ] && fixer=$(( $fixer - 5 ))
 				# The length that is available to print bars
@@ -199,13 +193,12 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 					cent=00
 				case ${#pro} in
 				#0)	echo impossible	;;
-				1)	[ ${#cent} -eq 1 ] && fixer=7 || fixer=8 	;;
-				2)	[ ${#cent} -eq 1 ] && fixer=9 || fixer=10 	;;
-				3)	fixer=15 	;;
+				1)	fixer=13 	;;
+				2)	fixer=14 	;;
+				3)	fixer=15 ;;
 				esac
-				#set +x
 				
-				length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - ${#procent} - $fixer  ))
+				length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - 7 - $fixer  ))
 				STATUS="[ ${pro}.${cent}%% ]"
 				len=$( echo $length $procent | $AWK '{print ($1/100*$2) }' )
 			else	# The length that is available to print bars
@@ -245,7 +238,9 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Display & Action
 #
-	if [ -z "$(echo $MESSAGE)" ]
-	then	tui-printf "${PROGRESS}" "${STATUS}"
-	else	tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
+	if [ -z "$MESSAGE" ]
+	then	[ $pro -ne 100 ]  && PROGRESS+=" "
+		tui-printf "${PROGRESS}" "${STATUS}"
+	else	[ ${pro:-0} -ne 100 ]  && PROGRESS+=" "
+		tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
 	fi

@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.7.6
-Release:     805%{?dist}
+Release:     807%{?dist}
 Summary:     A robust I/O toolset for your scripts
 
 License:     GPLv3

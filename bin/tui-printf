@@ -335,7 +335,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		POS_THIRD="\033[${pos_third_num}G"
 	else	pos_third_num=$(( $pos_cle_num - 1 - ${#THIRD} ))
 		# Fix one position place if there was a %
-		echo "$THIRD" | $GREP '%' && \
+		echo "$THIRD" | $GREP -q '%' && \
 			pos_third_num=$(( $pos_third_num + 1 ))
 		POS_THIRD="\033[${pos_third_num}G"
 	fi
