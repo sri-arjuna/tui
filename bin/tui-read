@@ -21,13 +21,26 @@
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #
+#	Variable environment
+#
+	BORDER_RIGHT=""
+	# Source only the most required files, 
+	# create the RC and load all variable if RC is not present yet.
+	source "$HOME/.tui_rc" && \
+		. "$TUI_FILE_CONF_COMMANDS" && \
+		. "$TUI_FILE_CONF_COLORS" && \
+		. "$TUI_FILE_CONF_STATUS" && \
+		. "$TUI_FILE_CONF_SYSTEM"  || \
+		. tui
+	# If there is a user theme directory, use that one instead
+	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	# Use custom BORDER_RIGHT if it was set
+	[ -z "$BORDER_RIGHT" ] && \
+		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+#
 #	Variable defaults
 #
-	. /etc/tui/tui.conf
-	[ 0 -ne $UID ] && . $HOME/.config/tui/user.conf
-	#[ -z "$THEME" ] && THEME=default
-	. $PREFIX/share/tui/themes/$TUI_THEME
-	
 	script_version=1.0
 	ME="$(basename $0)"
 	help_text="

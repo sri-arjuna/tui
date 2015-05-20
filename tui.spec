@@ -78,12 +78,14 @@ rm -rf %{buildroot}
 - Changed:   Conffiles for both, system and user
 - Split:     Settings.conf, previously part of apps.conf
 - Changed:   path adaption to all the command, part 1
-- Touched:   tui, tui-bgjob, tui-browser, tui-cat, tui-cp, tui-dd, tui-download, tui-ftp, tui-header, tui-indi, tui-mv, 
--            tui-printf, tui-progress, tui-select, tui-str-extension, tui-tar, tui-new-*
+- Touched:   tui, tui-bgjob, tui-browser, tui-cat, tui-cp, tui-dd, tui-download, tui-ftp, 
+-            tui-header, tui-indi, tui-mv, tui-printf, tui-progress, tui-select, 
+-            tui-str-extension, tui-tar, tui-new-*
 - Added:     tui-bol-root, tui-str-bol-conv
 - Changed:   tui-printf, rework done - seems ok
 - Added:     tui-asroot, executes command as root, uses sudo if useSudo is true.
 - Changed:   tui-progress, new arrangements alignments
+- Changed:   tui-str-usb, optimized first usage, autoselection, and cardread ignore
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.
