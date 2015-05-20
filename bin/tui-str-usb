@@ -18,10 +18,30 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Variable environment
+#
+	BORDER_RIGHT=""
+	# Source only the most required files, 
+	# create the RC and load all variable if RC is not present yet.
+	source "$HOME/.tui_rc" && \
+		. "$TUI_FILE_CONF_COMMANDS" && \
+		. "$TUI_FILE_CONF_COLORS" && \
+		. "$TUI_FILE_CONF_STATUS" && \
+		. "$TUI_FILE_CONF_SYSTEM"  && \
+		. "$TUI_FILE_CONF_SETTINGS"  && \
+		. "$TUI_FILE_USER_SETTINGS"  || \
+		. tui
+	# If there is a user theme directory, use that one instead
+	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	# Use custom BORDER_RIGHT if it was set
+	[ -z "$BORDER_RIGHT" ] && \
+		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+#
 #	Variable defaults
 #
-	script_version=0.5
-	ME="$(basename $0)"
+	script_version=0.7
+	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options]
 		\rSelect usb device if more than one is found
@@ -29,23 +49,10 @@
 		\r\t-h\tThis screen
 		\r\t-a\tAutoselect entry if only one was found
 		\r"
-	ARGS=(${@})
-	ARGS_COUNT=$#
 	targetusb=""
 	devDisk=/dev/disk/by-id
 	tDev=""
 	AUTO=false		# Automaticly select only available option
-#
-#	Load own/users TUI configuration?
-#
-	source /etc/tui/commands.conf	# Like AWK, GREP, SED
-	source /etc/tui/tui.conf
-	source /etc/tui/apps.conf
-	if [ root = $(whoami) ]
-	then	CONF_APP=/etc/tui/apps.conf
-	else	CONF_APP=$HOME/.config/tui/apps.conf
-		[ -f "$CONF_APP" ] && source "$CONF_APP"
-	fi
 #
 #	Variable handling
 #
@@ -70,49 +77,62 @@
 		while [ $C -lt $1 ];do out+=" ";let C++;done
 		printf "$out"
 	}
+	getlist() { # 
+	# Lists the contend of $devDisk, limits the output to usb items and removes partition entries
+	# If there is something to ignore, that one will be hidden too
+		if [ -z "$usbIgnore" ] 
+		then	$LS $devDisk | $GREP usb | $GREP -v part
+		else	$LS $devDisk | $GREP usb | $GREP -v part | $GREP -v "$usbIgnore"
+		fi
+	}
 #
 #	Display
 #
-	# Prepare selection
-	
-	list="$(ls $devDisk|$GREP usb|$GREP -v part)"
-	left="$BORDER_LEFT Please connect an USB device..."
-			
 	# Make sure there is something available
-	while [ "" = "$list" ] ; do
-		right="[  $(tui-indi) ] $BORDER_RIGHT"
-		printf "\r"
-		read -t 1 -p "$left$(getspace $[ $COLUMNS - ${#left} - ${#right} ] )$right"  buffer
-		printf "\lf"
-		list="$(ls $devDisk|$GREP usb|$GREP -v part[0-9])"
+	msg="Please connect an USB device..."
+	left="$BORDER_LEFT $msg"
+	list=""
+	sleeper=0.0001
+	# Loop while waiting for --item-list-without-the-ignored-ones--
+	while [ -z "$list" ] ; do
+		tui-progress "$msg" > /dev/stderr
+		list=$(getlist) 2>/dev/zero
+		list="${list/$usbIgnore}"
+		sleep $sleeper
+		[ "$sleeper" = "0.0001" ] && sleeper=1.2
 	done
-
-	# Is there more than 1 entry?
-	if [ ! "$list" = "$(echo $list)" ]
-	then	# yes, more than one
-		targetUsb=$(tui-select $list) # ; do break; done
-	else	# Just this one
-		# Check if only item should be reported without interaction.
-		usbAsk=$(tui-conf-get $CONF_APP usbAsk)
-		if [ -z "$usbAsk" ]
-		then	# There is no setting yet
-			tui-echo "The only device available is:" "$list"
-			tui-yesno "Does this refer to a pluged in storage device?" && \
-				tui-conf-set $CONF_APP usbAsk false || \
-				tui-conf-set $CONF_APP usbAsk true
-			source $CONF_APP
+#
+#	Check for user settings for default behaviour.
+#	This is required so internal cardreaders dont get in the way, 
+#	or so you can select to (not) use it automaticly
+#
+	#echo "if [ "$(echo $list|wc -l)" -eq 1 ] && [ -z "$usbAsk" ] "
+	if [ "$(echo $list|wc -w)" -eq 1 ] && [ -z "$usbAsk" ] 
+	then	# There is no setting yet, first time usage
+		tui-echo "The only device available is:" "${list}" > /dev/stderr
+		if tui-yesno "Is this a cardreader that is always listed?" > /dev/stderr
+		then	if tui-yesno "Ignore this device in future calls?" > /dev/stderr
+			then	# Save the cardreader
+				tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbIgnore "\"$list\""
+				RET=1
+			else	tui-echo "Do you want to be asked to select this device everytime?"
+				tui-yesno "No, might result in that device beeing auto-selected!"
+				RET=$?
+			fi
+		else	RET=1
 		fi
-
-		$AUTO && usbAsk=false
-		if $usbAsk
-		then	# Select
-			tui-select $list 
-				## targetUsb in $list;do break;done
-			exit 0
-		else	# Auto-return
-			targetUsb=$(echo $list)
-		fi
-		
+		tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbAsk $(tui-str-bol-conv -t $RET)  > /dev/stderr
+		source "$TUI_FILE_USER_SETTINGS"
+		[ -z "$usbIgnore" ] || exit 1
+	fi
+#
+#	Ask now or not?
+#
+	if $usbAsk
+	then	$AUTO && \
+			targetUsb=$(tui-select -a $list) || \
+			targetUsb=$(tui-select $list)
+	else	targetUsb=$(tui-select -a $list)
 	fi
 	tDev=$(readlink -f $devDisk/$targetUsb)
 	echo $tDev
