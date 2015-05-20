@@ -193,8 +193,8 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 					cent=00
 				case ${#pro} in
 				#0)	echo impossible	;;
-				1)	fixer=13 	;;
-				2)	fixer=14 	;;
+				1)	fixer=13 ;;
+				2)	fixer=14 ;;
 				3)	fixer=15 ;;
 				esac
 				
