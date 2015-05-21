@@ -20,17 +20,15 @@
 #
 #	System defaults
 #
-	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/apps.conf" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" && \
-		. "$TUI_FILE_CONF_APPS" && \
-		. "$TUI_FILE_CONF_SETTINGS" || \
-		. tui	# This first call would create the RC if its missing.
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
+	do	[ -f "$f" ] && source "$f"
+	done
+	
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.6
 	ME="${0##*/}"
 #
 #	Check for the environment to load
@@ -39,27 +37,29 @@
 		tui-printf -S 1 "$ME: Requires to be in GUI mode" && \
 		exit 1
 	
-	if ! which $TERMINAL > /dev/zero
+	if ! which $TERMINAL 2>/dev/zero 1>/dev/zero
 	then	# List of known but possible unhandled terminals
-		list="caja-open-terminal caja-terminal eterm fbterm fourterm gnome-terminal guake konsole5 konsole lxterminal mate-terminal mrxvt qterminal termit uxterm vte xfce4-terminal"
+		list="$(<$TUI_DIR_LIST/terminals)"
 		found=false
 		for TERMINAL in $list;do
 			which $TERMINAL 1>/dev/zero 2>/dev/zero && found=true && break
 		done
 		$found && tui-conf-set -v ${TUI_USER_CONF/user/apps/} TERMINAL $TERMINAL
-		$found && \
-			tui-printf -S 1 "No terminal could be identified, please set one manual in $APPS, using fallback (xterm) now." && \
-			TERMINAL=xterm
+		! $found && \
+			tui-printf -S 1 "FATAL ERROR: No terminal could be identified, please set one manual in $APPS!" && \
+			exit 1
 	fi
 #
 #	Variable handling
 #
 	#[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
 	case "$1" in
-	"-h")	echo -e "$ME ($script_version)
-			\rUsage: $ME \"<cmd>\"
-			\rExecutes <cmd> in another terminal ($TERMINAL) window, closes on termination according to your setting with that terminal.
-			\r"
+	"-h"|"--help"|"")
+		printf '%s\n' \
+			"$ME ($script_version)" \
+			"Usage: $ME \"<cmd>\"" \
+			"Executes <cmd> in another terminal ($TERMINAL) window, closes on termination according to your setting with that terminal." \
+			""
 		exit $RET_HELP
 		;;
 	esac
@@ -68,7 +68,7 @@
 	# Fill the fallback, to avoid empty calls
 	TERMINAL="${TERMINAL:-$TERM}"
 	case $TERMINAL in
-	gnome-terminal|lxterminal|vte|xterm)
+	gnome-terminal|lxterminal|vte|[eipx]term)
 				[ -z "$1" ] && opt="" || opt="-e "	;;
 	termit)			[ -z "$1" ] && opt="" || opt="-c "	;;
 	*)			[ -z "$1" ] && opt="" || opt="-e "

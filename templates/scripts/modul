@@ -23,7 +23,10 @@ cat > "$DEST" << EOF
 #
 # ------------------------------------------------------------------------
 #
-	source tui
+	source "\$HOME/.tui_rc" || . tui
+	for config in \$TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,USER,SETTINGS,STATUS,SYSTEM}
+	do	[ -f "\$config" ] && source "$config"
+	done
 #
 #	File:		${DEST##*/}
 #	Author: 	$USER_NAME
@@ -31,7 +34,7 @@ cat > "$DEST" << EOF
 #	License:	$DEFAULT_LICENSE
 #	Created:	$(date +'%Y.%m.%d')
 #	Changed:	$(date +'%Y.%m.%d')
-	script_version=0.0.1
+	script_version=0.1
 	TITLE="${DEST##*/}"
 #	Description:	Text TODO
 #
@@ -50,22 +53,6 @@ cat > "$DEST" << EOF
 #	Variable defaults (options)
 #
 	beVerbose=false
-#
-#	Configuration file template
-#
-#
-	config_template="# Configuration file for \$ME (\$script_version)
-#
-#	Booleans
-#
-	beVerbose=false
-	beQuiet=false
-#
-#	Variables
-#
-	DIR_CONFIG=\"\$HOME/.config/\$ME\"
-	TEMPFILE=\"\$DIR_CONFIG/tmp.tmp~)\"
-"
 #
 #	Functions
 #
@@ -88,17 +75,30 @@ cat > "$DEST" << EOF
 		
 		HELP_SCREEN
 	}
+	function write_config() {
+	# Simply shows the helpscreen
+	# 
+		cat > "$CONFIG" <<-wrtConfig
+		# Configuration file for \$ME (\$script_version)
+		#
+		#	Booleans
+		#
+			beVerbose=false
+			beQuiet=false
+		#
+		#	Variables
+		#
+			DIR_CONFIG="\$HOME/.config/\$ME"
+			TEMPFILE="\$DIR_CONFIG/tmp.tmp~)"
+		wrtConfig
+	}
 #
 #	Environment checks
 #
-	[ ! -f "\$CONFIG" ] && \\
-		echo "\$config_template" > "\$CONFIG"
-## TODO : Remove this 'source block' if you want to read the variables from CONFIG manualy
+	[ ! -f "\$CONFIG" ] && write_config
+## TODO : Remove this 'source line' if you want to read the variables from CONFIG manualy
 	# Load default values before parsing options
-	if ! source "\$CONFIG" 
-	then	# Could not source the configuuration...
-		tui-status 1 "Failed to load: \$CONFIG"
-	fi
+	source "\$CONFIG" || tui-status 1 "Failed to load: \$CONFIG"
 #
 #	Catching Arguments
 #

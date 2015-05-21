@@ -20,33 +20,38 @@
 #
 #	System defaults
 #
-	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/apps.conf" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" && \
-		. "$TUI_FILE_CONF_APPS" && \
-		. "$TUI_FILE_CONF_SETTINGS" || \
-		. tui	# This first call would create the RC if its missing, and load all the required variables.
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
+	do	[ -f "$f" ] && source "$f"
+	done
+	
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="${0##*/}"
 	
 	help_text="$ME ($script_version)
-		\rUsage: $ME [options] 'URL1' 'URL2' ...
-		\rOpens provided URL/s in \$BROWSER_[CLI,GUI]
+		\rUsage: $ME [options] 
+		\
 		\r"
 #
 #	Variable handling
 #
 	[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
 	for A in "${@}";do
-	case "$A" in
-	"-h")	printf "$help_text" ; exit $RET_HELP
+	case "$1" in
+	"-h"|"--help"|"")
+		printf '%s\n' \
+			"$ME ($script_version)" \
+			"Usage: $ME [options] 'URL1' 'URL2' ..." \
+			"" \
+			"	Opens provided URL/s in \$BROWSER_[CLI,GUI]" \
+			""
+		exit $RET_HELP
 		;;
-	"-m")	MODE=$2
-		shift 2
+	"-c")	MODE=cli
+		shift
 		;;
 	esac
 	done
@@ -59,18 +64,12 @@
 #	Functions
 #
 	GetAvailableApp() { # gui|cli
-	# Returns the first found editor for either GUI or CLI
+	# Returns the first found browser for either GUI or CLI
 	#
-		[ -z "$1" ] && echo "GetAvailableApp requires: gui or cli" && return 1
-		
-		case "$1" in
-		cli)	LIST="w3m lynx elinks"	;;
-		gui)	LIST="firefox chrome chromium epiphany konqueror midori opera seamonkey safari "	;;
-		esac
-		
+		#[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
+		LIST="$(<$TUI_DIR_LIST/web_${MODE})"
 		for L in $LIST;do
-			which $L 2>/dev/zero 1>/dev/zero && \
-				echo "$L" && \
+			which $L 2>/dev/zero && \
 				return 0
 		done
 		return 1

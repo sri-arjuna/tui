@@ -86,6 +86,7 @@ rm -rf %{buildroot}
 - Added:     tui-asroot, executes command as root, uses sudo if useSudo is true.
 - Changed:   tui-progress, new arrangements alignments
 - Changed:   tui-str-usb, optimized first usage, autoselection, and cardread ignore
+- Changed:   tui-{edit,terminal,web}, updated to paths and now read list files.
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.

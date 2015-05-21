@@ -23,7 +23,10 @@ cat > "$DEST" << EOF
 #
 # ------------------------------------------------------------------------
 #
-	source tui
+	source "\$HOME/.tui_rc" || . tui
+	for config in \$TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,USER,SETTINGS,STATUS,SYSTEM}
+	do	[ -f "\$config" ] && source "$config"
+	done
 #
 #	File:		${DEST##*/}
 #	Author: 	$USER_NAME

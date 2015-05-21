@@ -20,34 +20,34 @@
 #
 #	Variable defaults
 #
-	script_version=1.3
-	ME="$(basename $0)"
+	script_version=1.4
+	ME="${0##*/}"
 #
 #	Check for the environment to load
 #
-	source /etc/tui/apps.conf
-	[ 0 -eq $UID ] || \
-		CONF="$HOME/.config/tui/apps.conf"
-	[ -f "$CONF" ] && source "$CONF"
-	
-	help_text="$ME ($script_version)
-		\rUsage: $ME [options] [/path/to/]FILE [../]FILE2 ...
-		\rOpens provided FILE/s in the favorite editor according to environment.
-		\rIn VT it will open \"$EDITOR_CLI\" and in GUI it will open \"$EDITOR_GUI\"
-		\r"
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
+	do	[ -f "$f" ] && source "$f"
+	done
 	tui-bol-gui && \
 		MODE=gui || \
 		MODE=cli
 #
 #	Variable handling
 #
-	[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
-	for A in "${@}";do
-	case "$A" in
-	"-h")	printf "$help_text" ; exit $RET_HELP
+	case "$1" in
+	"-h"|"--help"|"")
+		printf '%s\n' \
+			"$ME ($script_version)" \
+			"Usage: $ME [options] [/path/to/]FILE [../]FILE2 ..." \
+			"" \
+			"	Opens provided FILE/s in the favorite editor according to environment." \
+			"	In multiuser or emergency stage it will open \"$EDITOR_CLI\" and in graphical stage it will open \"$EDITOR_GUI\"" \
+			""
+		exit $RET_HELP
 		;;
-	"-m")	MODE=$2
-		shift 2
+	"-c")	MODE=cli
+		shift
 		;;
 	esac
 	done
@@ -58,13 +58,8 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
-		
-		case "$1" in
-		cli)	LIST="emacs vim nano vi"	;;
-		gui)	LIST="emacs notepadqq code-editor brackets geany pluma gedit leafpad kedit notepad editplus nedit"	;;
-		esac
-		
+		#[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
+		LIST="$(<$TUI_DIR_LIST/editor_${MODE})"
 		for L in $LIST;do
 			which $L 2>/dev/zero && \
 				return 0
@@ -75,23 +70,26 @@
 #	Display
 #
 	if [ -z "$EDITOR" ]
-	then	case $MODE in
+	then	case "$MODE" in
 		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero )	;;
 		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero )	;;
 		esac
 		export EDITOR
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $EDITOR > /dev/zero  1>/dev/zero 2>/dev/zero
+	if [ -z "$EDITOR" ]
 	then 	# The EDITOR is not available, search for default
 		EDITOR=$(GetAvailableApp $MODE)
 		[ $MODE = cli ] && \
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
-		[ -z "$EDITOR" ] && tui-echo "No editor for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
+		[ -z "$EDITOR" ] && \
+			tui-echo "No editor for $MODE mode could be found, please change \"$CONF\" manualy!" && \
+			exit 1
 		tui-conf-set "$CONF" $var $EDITOR
 	fi
-	
+	# Open each file 'seperatly',
+	# as not all editors support to open multiple files at once
 	for A in "${ARGS[@]}";do
 		[ ! -z "$A" ] && \
 			tui-echo "Opening:" "$A" && \
