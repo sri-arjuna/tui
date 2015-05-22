@@ -100,8 +100,8 @@
 		else	te "You're a regular user, so a custom installation is recomended."
 			te "Note this makes things complicate if your scripts shall be used as root or with sudo."
 		fi
-		catched_root=${SUGGESTED_ROOT:-$CHROOT}
-		catched_prefix=${SUGGESTED_PREFIX:-$PREFIX}
+		catched_root=${CHROOT:-$SUGGESTED_ROOT}
+		catched_prefix=${PREFIX:-$SUGGESTED_PREFIX}
 		te
 		t2 "Installation root:" "$catched_root"
 		t2 "Installation prefix:" "$catched_prefix"
