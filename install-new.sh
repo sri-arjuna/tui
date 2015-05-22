@@ -131,33 +131,34 @@
 		tt "Installing now..."
 		te
 		te ; te "Creating system paths..."
-		(set -x; mkdir -p $DIR_COMPL $TUI_DIR_{CONF,DOCS,MANPAGES,LOGS,SYSTEM,TEMPLATES,THEMES,USER,CACHE})
-		(set -x; mkdir -p $TUI_DIR_USER_{LOGS,SCRIPTS,MANPAGES,TEMPLATES,THEMES})
+		mkdir -p $DIR_COMPL $TUI_DIR_{CONF,DOCS,MANPAGES,LOGS,SYSTEM,TEMPLATES,THEMES,USER,CACHE}
+		mkdir -p $TUI_DIR_USER_{LOGS,SCRIPTS,MANPAGES,TEMPLATES,THEMES}
 		
 		te ; te "Copying binaries..."
-		(set -x; cp -a bin/tui* "${TUI_DIR_BIN:-/usr/bin}")
+		cp -a bin/tui* "${TUI_DIR_BIN:-/usr/bin}"
 		
 		te ; te "Copying configuration (system)..."
-		(set -x; cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}")
+		cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}"
 		te ; te "Copying configuration (user)..."
-		(set -x; cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}")
+		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"
 		
 		te ; te "Copying documentation..."
-		(set -x; cp -a docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}")
+		cp -a docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		
 		te ; te "Copying system..."
-		(set -x; cp -aR docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}")
-		(set -x; cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}")
-		(set -x; cp -a tui_compl.bash $DIR_COMPL/)
-		(set -x; cp -a uninstall.sh $TUI_DIR_SYSTEM)
+		cp -aR docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		cp -a tui_compl.bash $DIR_COMPL/
+		cp -a uninstall.sh $TUI_DIR_SYSTEM
+		
 		te ; te "Copying templates..."
-		(set -x; cp -aR templates "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}")
+		cp -aR templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
 		
 		te ; te "Copying themes..."
-		(set -x; cp -aR templates "${TUI_DIR_THEMES:-/usr/share/tui/themes}")
+		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
 		
 		te ; te "Copying lists..."
-		(set -x; cp -a lists "${TUI_DIR_LIST:-/usr/share/tui/lists}")
+		cp -a lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
 		
 		tui-status $? "Installation successfull!"
 		exit $?
