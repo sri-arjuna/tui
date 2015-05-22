@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.0
-Release:     0%{?dist}
+Release:     2%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -18,7 +18,6 @@ Requires:    coreutils
 Advanced command based framework for scripts
 Each command represents a known counterpart from a regular command,
 or describes its task with its name.
-
 
 
 %prep
@@ -74,10 +73,11 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
-* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-1
+* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-2
 - Changed:   install-new.sh had a typo and copied the folder to destination
 - Changed:   tui, if a loadlist is missing it rewrites a default one now
 - Changed:   bash-completion should be installed properly again with rpm
+- Changed:   Replaced old install script with the new one.
 
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-1
 - Updated:   tui-new-script, had an additional /templates string
@@ -85,24 +85,22 @@ rm -rf %{buildroot}
 
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-0
 - Changed:   tui, now using an RC file to provide internal paths
--                 required for manual install and some exotic bsd, linux, unix distros
+-                required for manual install and some exotic bsd, linux, unix distros
 - Changed:   Preparing themes to 'not' calculate BORDER_RIGHT, if its set in the theme
 - Changed:   Conffiles for both, system and user
 - Split:     Settings.conf, previously part of apps.conf
-- Changed:   path adaption to all the command, part 1
 - Touched:   tui, tui-bgjob, tui-browser, tui-cat, tui-cp, tui-dd, tui-download, tui-ftp, 
 -            tui-header, tui-indi, tui-mv, tui-printf, tui-progress, tui-select, 
 -            tui-str-extension, tui-tar, tui-new-*
+- Updated:   Paths in tui-{echo,edit,install,list,log,press,rnd,status,title,wait}
+-            tui-bol-gui  and tui-str-{encrypt,genfilename}
 - Added:     tui-bol-root, tui-str-bol-conv
-- Changed:   tui-printf, rework done - seems ok
 - Added:     tui-asroot, executes command as root, uses sudo if useSudo is true.
 - Changed:   tui-progress, new arrangements alignments
 - Changed:   tui-str-usb, optimized first usage, autoselection, and cardread ignore
 - Updated:   tui-{edit,terminal,web}, updated to paths and now read list files.
-- Updated:   Paths in tui-{echo,edit,install,list,log,press,rnd,status,title,wait}
--            tui-bol-gui  and tui-str-{encrypt,genfilename}
 - Changed:   tui-wait, updated timecode display
-- Changed:   tui-printf, fixed clean line(ty chubbler) and other
+- Changed:   tui-printf, fixed clean line(ty chubbler) and other small things
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.
