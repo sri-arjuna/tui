@@ -147,30 +147,30 @@
 		te "* Copying themes..."
 		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
 		
-		tui-title "Copying documentation"
+		bin/tui-title "Copying documentation"
 		#cp -a docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
-		tui-cp -q docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
+		bin/tui-cp -q docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		
-		tui-title "Copying system"
+		bin/tui-title "Copying system"
 		#cp -aR docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		tui-cp -q docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		bin/tui-cp -q docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
 		#cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		tui-cp -q conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		tui-cp -q tui_compl.bash $DIR_COMPL/
-		tui-cp -q uninstall.sh $TUI_DIR_SYSTEM
+		bin/tui-cp -q conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		bin/tui-cp -q tui_compl.bash $DIR_COMPL/
+		bin/tui-cp -q uninstall.sh $TUI_DIR_SYSTEM
 		
-		tui-title "Copying templates"
+		bin/tui-title "Copying templates"
 		#cp -aR templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
-		tui-cp -q templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
+		bin/tui-cp -q templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
 		
-		tui-title "Copying lists"
-		tui-cp -q lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
+		bin/tui-title "Copying lists"
+		bin/tui-cp -q lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
 		RET=$?
 		
 		if [ $RET -eq 0 ]
-		then	tui-header "" "Report" ""
-			tui-status $RET "Installation successfull!" 2>/dev/zero && \
-			tui-yesno "Do you want to configure TUI now?" && tui config
+		then	bin/tui-header "" "Report" ""
+			bin/tui-status $RET "Installation successfull!" 2>/dev/zero && \
+			bin/tui-yesno "Do you want to configure TUI now?" && tui config
 		fi
 		exit $RET
 	}
