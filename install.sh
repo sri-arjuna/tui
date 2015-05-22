@@ -41,7 +41,7 @@
 exit	
 	
 	# Default paths, hardcoded
-	DIR_CFG"${TUI_DIR_CONF:-$CHROOT/etc/$app}"
+	DIR_CFG="${TUI_DIR_CONF:-$CHROOT/etc/$app}"
 	DIR_COMPL="${DIR_CFG/tui/bash_completion.d}" #/etc/bash_completion.d"
 	
 	

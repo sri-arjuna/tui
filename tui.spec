@@ -74,6 +74,10 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
+* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-1
+- Updated:   tui-new-script, had an additional /templates string
+- Added:     install-new.sh, simplified and 'guided' installation script
+
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-0
 - Changed:   tui, now using an RC file to provide internal paths
 -                 required for manual install and some exotic bsd, linux, unix distros

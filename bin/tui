@@ -134,7 +134,6 @@
 			 	TUI_DIR_CACHE="${TUI_DIR_CACHE}"
 			[ -z "\$TUI_DIR_LIST" ] && readonly \\
 			 	TUI_DIR_LIST="${TUI_DIR_SYSTEM}/lists"
-			
 			#
 			#	Paths	:	User
 			#
