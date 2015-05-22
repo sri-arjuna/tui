@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.05.10
-	script_version=2.0
+#	Changed:	2015.05.22
+	script_version=2.0.1
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
@@ -185,6 +185,7 @@
 			# This list defines the loading order do NOT change
 			user.conf
 			apps.conf
+			settings.conf
 			
 			LOADLIST
 		}
@@ -277,11 +278,13 @@
 #
 #	Load Environment	:	User settings
 #
-	[ -f "$TUI_FILE_USER_LOADLIST" ] || return 99
+	#if
+	[ -f "$TUI_FILE_USER_LOADLIST" ] || printf '%s\n' {user,apps,settings}.conf > "$TUI_FILE_USER_LOADLIST"
+	#then	# Exit according to wether the script is executed or sourced
+	#	[ "$ME" = tui ] && exit 99 || return 99
+	#fi
 	while read f
 	do	[ ! -z "$f" ] && [ ! "#" = "${f:0:1}" ] && \
-			[ ! paths.conf = "$f" ] && \
-			[ ! files.conf = "$f" ] && \
 			[ -f "$f" ] && \
 			source "$TUI_DIR_USER/$f"  && \
 			printf "." > /dev/stderr
