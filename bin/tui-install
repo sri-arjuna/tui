@@ -19,15 +19,19 @@
 #
 # ------------------------------------------------------------------------
 #
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_CONF_{COMMANDS,STATUS}
+	do	[ -f "$f" ] && source "$f"
+	done
+#
 #	File:		tui-install
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.05.01
-	script_version=0.6
+#	Changed:	2015.05.21
+	script_version=0.6.1
 	TITLE="Install packages"
-	source /etc/tui/commands.conf	# Like AWK, GREP, SED
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
 #
