@@ -41,11 +41,11 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name} \
-                     %{buildroot}%{_datadir}/bash-completion/
+                     %{buildroot}%{_datadir}/bash-completion/completions
 # Move the executeables
 rm -fr %{name}/screenshots
 mv %{name}/bin/*     %{buildroot}%{_bindir}/
-mv %{name}/%{name}_compl.bash %{buildroot}%{_datadir}/bash-completion/
+mv %{name}/%{name}_compl.bash %{buildroot}%{_datadir}/bash-completion/completions
 # Copy system defaults to system
 echo "PREFIX=/usr" >> %{name}/conf.etc/tui.conf
 cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
@@ -71,13 +71,17 @@ rm -rf %{buildroot}
 
 %config
 %{_sysconfdir}/%{name}/
-%{_datadir}/bash-completion/%{name}_compl.bash
+%{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-1
+- Changed:   install-new.sh had a typo and copied the folder to destination
+- Changed:   tui, if a loadlist is missing it rewrites a default one now
+- Changed:   bash-completion should be installed properly again with rpm
+
+* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-1
 - Updated:   tui-new-script, had an additional /templates string
 - Added:     install-new.sh, simplified and 'guided' installation script
-- Changed:   tui, if a loadlist is missing it rewrites a default one now
 
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-0
 - Changed:   tui, now using an RC file to provide internal paths
