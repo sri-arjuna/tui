@@ -63,15 +63,47 @@ Examples:	$ME 2m
 	*)	tui-status 1 "Please use either (s)econds, (m)inutes, or (h)ours"
 	esac
 #
+#	Functions
+#
+	function seconds2time() { #
+	# Returns the time as string
+	# as much as applicable: hh:mm:ss
+		# Calculate values
+		secs=$seconds			# Use a temp var
+		minutes=$(( $seconds / 60 ))	# This many minutes are found
+		sub_s=$(( $minutes * 60 ))	# These minutes represent that many seconds
+		secs=$(( $secs - $sub_s ))	# Update the secs
+		hours=$(( $minutes / 60 ))	# This many hours from the minutes
+		sub_m=$(( $hours  * 60 ))	# These hours represent that many minutes
+		minutes=$(( $minutes - $sub_m ))	# Update the remaining minutes
+		# Generate strings
+		if [ $minutes -gt 0 ] 
+		then	[ ${#minutes} -eq 1 ] && \
+				[ $hours -gt 0 ] && \
+				minutes="0${minutes}:" || \
+				minutes+=":"
+		else	[ $hours -gt 0 ] && \
+				minutes="00:" || \
+				minutes=""
+		fi
+		if [ $secs -gt 0 ] 
+		then	[ ${#secs} -eq 1 ] && secs="0${secs}"
+		else	secs="00"
+		fi
+		[ $hours -gt 0 ] && hours="$hours:" || hours=""
+		# Output
+		echo "${hours}${minutes}${secs}"		
+	}
+#
 #	Action - loop
 #
 	while [ $seconds -ge 0 ]
 	do 	# First display current / passed time
 		# Generate string & output to user
-		time_string="$hours:$minutes:$seconds"
-		tui-printf  "$MSG" "$time_string"
+		time_string="$(seconds2time $seconds)"
+		./tui-printf  "$MSG" "$time_string"
 		
-		# Already reached 0
+		# Already reached 0?
 		[ "$hours$minutes$seconds" = "000" ] && \
 			tui-echo "$MSG" "$NEXT" && \
 			exit 0
