@@ -20,21 +20,23 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.2
-	ME="$(basename $0)"
-	help_text="$ME ($script_version)
-		\rUsage: $ME [str1] [str2] [str3]
-		\rPrints str1 on the left
-		\rPrints str2 in the middle
-		\rPrints str3 on the right
-		\rIf 2 strings are passed, they're printed left and right.
-		\r"
-	ARGS_COUNT=$#
+	script_version=0.7.3
+	ME="${0##*/}"
 #
 #	Variable handling
 #
 	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	"-h"|"--help")
+		printf '%s\n' \
+			"$ME ($script_version)" \
+			"Usage: $ME [str1] [str2] [str3]" \
+			"	Prints str1 on the left" \
+			"	Prints str2 in the middle" \
+			"	Prints str3 on the right" \
+			"If 2 strings are passed, they're printed left and right." \
+			"One can pass emptry strings to align the desired output." \
+			""
+		exit 99
 		;;
 	*)	[ "-" = "${1:0:1}" ] && \
 			leadingDASHdummy="--" || \
@@ -44,14 +46,10 @@
 #
 #	Display
 #
-	#while [ $# -gt 3 ]
-        #do
-                case $ARGS_COUNT in
-                0)	tui-printf -E 			;;
-                1)	tui-printf -E $leadingDASHdummy "$1"		;;
-                2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
-                3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
-                esac
-        #        shift 3
-        #done
+	case $# in
+	0)	tui-printf -E 					;;
+	1)	tui-printf -E $leadingDASHdummy "$1"		;;
+	2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
+	3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
+	esac
         

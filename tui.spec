@@ -87,6 +87,8 @@ rm -rf %{buildroot}
 - Changed:   tui-progress, new arrangements alignments
 - Changed:   tui-str-usb, optimized first usage, autoselection, and cardread ignore
 - Changed:   tui-{edit,terminal,web}, updated to paths and now read list files.
+- Changed:   Updated paths: tui-{echo,edit,log,press,rnd,status,title} and
+-            tui-bol-gui and tui-str-encrypt
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.

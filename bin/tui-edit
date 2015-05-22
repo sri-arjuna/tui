@@ -18,6 +18,13 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License 3 (GPLv3)
+#	Created:	2011.07.10
+#	Changed:	2015.01.23
+#
+#
 #	Variable defaults
 #
 	script_version=1.4
@@ -29,6 +36,7 @@
 	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done
+	# Get the mode
 	tui-bol-gui && \
 		MODE=gui || \
 		MODE=cli

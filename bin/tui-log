@@ -17,9 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-#	Simon Arjuna Erat (sea), erat.simon@gmail.com
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
+	do	[ -f "$f" ] && source "$f"
+	done
 #
 #	File:		tui-log
+#	Author: 	Simon Arjuna Erat (sea), erat.simon@gmail.com
 #	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
 #	Changed:	2015.02.18
@@ -30,13 +34,13 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.6.2
+	script_version=0.6.3
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
 	T="$(date +%T)"
 	daily_date_str="#### $(date +'%F') ####"	# Only used if log dont uses the date otherwise
-	source /etc/tui/commands.conf	# Like AWK, GREP, SED
+	
 	SEP="\t"
 	beVerbose=false
 #

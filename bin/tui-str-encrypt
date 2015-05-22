@@ -19,15 +19,15 @@
 #
 # ------------------------------------------------------------------------
 #
-	#source tui
-	source /etc/tui/commands.conf
+	source "$HOME/.tui_rc" || . tui
+	. $TUI_FILE_CONF_COMMANDS
 #
 #	File:		tui-str-encrypt
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.03.26
-#	Changed:	2015.03.26
+#	Changed:	2015.05.21
 	script_version=0.2
 	TITLE="tui-str-encrypt"
 #	Description:	Encrypting text on the fly

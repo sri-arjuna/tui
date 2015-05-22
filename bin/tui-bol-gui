@@ -19,15 +19,17 @@
 #
 # ------------------------------------------------------------------------
 #
-	source tui
+	#source tui
+	. "$HOME/.tui_rc"
+	. "$TUI_FILE_CONF_COMMANDS"
 #
 #	File:		tui-bol-gui
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.05.07
-	script_version=0.1
+#	Changed:	2015.05.21
+	script_version=0.2
 	TITLE="tui-bol-gui"
 #	Description:	Returns true if user is in GUI mode.
 #
@@ -81,7 +83,7 @@
 #	Display & Action
 #
 	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-	if [ ! "" = "$DE" ] || [ xterm = "$TERM" ]
+	if [ ! "" = "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other term/in/ator's
 	then	$beVerbose && \
 			echo "$DE" && \
 			exit 0 || exit 0

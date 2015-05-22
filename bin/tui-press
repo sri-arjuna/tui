@@ -18,15 +18,22 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License 3 (GPLv3)
+#	Created:	2011.07.10
+#	Changed:	2015.01.23
+#
 #	Variable defaults
 #
-	script_version=0.2
-	ME="$(basename $0)"
+	script_version=0.3
+	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
 		\rRequires the user to press enter to continue
 		\r"
-	MESSAGE="Press [ENTER] to continue"
+	default_text="Press [ENTER] to continue"
+	MESSAGE="${1:-${default_text}"
 #
 #	Variable handling
 #

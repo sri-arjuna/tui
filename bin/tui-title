@@ -20,8 +20,8 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.1
-	ME="$(basename $0)"
+	script_version=0.7.2
+	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [str1] [str2] [str3]
 		\rPrints str1 on the left
