@@ -1,7 +1,7 @@
 Name:        tui
 Version:     0.8.0
 Release:     0%{?dist}
-Summary:     A robust I/O toolset for your scripts
+Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -15,8 +15,11 @@ Requires:    coreutils
 
 
 %description
-Create a Text User Interface for your script!
-Providing 'coding helpers' as well.
+Advanced command based framework for scripts
+Each command represents a known counterpart from a regular command,
+or describes its task with its name.
+
+
 
 %prep
 %setup -q -c %{name}-%{version}
@@ -71,7 +74,7 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
-* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0
+* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-0
 - Changed:   tui, now using an RC file to provide internal paths
 -                 required for manual install and some exotic bsd, linux, unix distros
 - Changed:   Preparing themes to 'not' calculate BORDER_RIGHT, if its set in the theme

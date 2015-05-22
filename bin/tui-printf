@@ -338,7 +338,12 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Generat output strings
 #
-	CL=="\e[2K"
+	CL="\e[2K"
+	if $doTitle || $doHeader
+	then	# See 'man console_codes' and figure an algo to clear those fields, rather than print space
+		str=$(printf '%*s' $(( $WIDTH - 4)))
+	else	str=""
+	fi
 	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
 	IDENT="${POS_CLI}$FIRST"
 	CLOSE="${POS_THIRD}$THIRD ${POS_CLC}${COLOR_LINE_CLOSE}"

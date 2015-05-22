@@ -310,7 +310,7 @@
 			YES=true
 			;;
 		theme)	if [ -z "$2" ]
-			then	#tui-echo "TUI_THEME is set to:" "${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
+			then	tui-echo "TUI_THEME is set to:" "${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
 				exit $?
 			else	tui-conf-set -v "$TRC" "TUI_THEME" "$2"
 				exit $?
