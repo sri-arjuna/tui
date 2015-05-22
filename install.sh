@@ -20,10 +20,11 @@
 # ------------------------------------------------------------------------
 #
 #	This script will help you to install TUI on your system
+#	Last Update:	2015.05.22
 #
 #	Internals
 #
-	script_version=0.6
+	script_version=0.7
 	TRC=$HOME/.tui_rc
 #
 #	Variables
@@ -126,11 +127,11 @@
 	# Create the user RC file with the set installation paths
 	# Then copy the files to their paths
 		[ ! -f bin/tui ] && te && te "As of now, you must be in the projects home directory to install TUI!" && exit 1
+		printf '%s' "Writing RC file"
 		CHROOT="$catched_root" PREFIX="$catched_prefix" . bin/tui
 		
-		te;te;te
+		te;te
 		tt "Installing now..."
-		te
 		te "* Creating system paths..."
 		mkdir -p $DIR_COMPL $TUI_DIR_{CONF,DOCS,MANPAGES,LOGS,SYSTEM,TEMPLATES,THEMES,USER,CACHE}
 		mkdir -p $TUI_DIR_USER_{LOGS,SCRIPTS,MANPAGES,TEMPLATES,THEMES}
@@ -143,26 +144,35 @@
 		te "* Copying configuration (user)..."
 		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"
 		
-		te "* Copying documentation..."
-		cp -a docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
-		
-		te "* Copying system..."
-		cp -aR docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		cp -a tui_compl.bash $DIR_COMPL/
-		cp -a uninstall.sh $TUI_DIR_SYSTEM
-		
-		te "* Copying templates..."
-		cp -aR templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
-		
 		te "* Copying themes..."
 		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
 		
-		te "* Copying lists..."
-		cp -a lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
+		tui-title "Copying documentation"
+		#cp -a docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
+		tui-cp -q docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		
-		tui-status $? "Installation successfull!"
-		exit $?
+		tui-title "Copying system"
+		#cp -aR docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		tui-cp -q docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		#cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		tui-cp -q conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		tui-cp -q tui_compl.bash $DIR_COMPL/
+		tui-cp -q uninstall.sh $TUI_DIR_SYSTEM
+		
+		tui-title "Copying templates"
+		#cp -aR templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
+		tui-cp -q templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
+		
+		tui-title "Copying lists"
+		tui-cp -q lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
+		RET=$?
+		
+		if [ $RET -eq 0 ]
+		then	tui-header "" "Report" ""
+			tui-status $RET "Installation successfull!" 2>/dev/zero && \
+			tui-yesno "Do you want to configure TUI now?" && tui config
+		fi
+		exit $RET
 	}
 #
 #	Action & Display

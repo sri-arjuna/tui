@@ -30,15 +30,17 @@
 		. "$TUI_FILE_CONF_SYSTEM"  || \
 		. tui
 	# If there is a user theme directory, use that one instead
-	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
-	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	[ -f "$TUI_DIR_USER_THEMES"/* ] && \
+		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
+		use_DIR_THEME="$TUI_DIR_THEMES"
+	. "$use_DIR_THEME/$TUI_THEME" 
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 #
 #	Variable defaults
 #
-	script_version=0.8
+	script_version=0.8.1
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"

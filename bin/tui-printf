@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.05.21
-	script_version=2.0
+#	Changed:	2015.05.22
+	script_version=2.0.1
 #	Description:	The absolute core display function for TUI
 #
 #	Variables
@@ -37,8 +37,11 @@
 	do	source "$f"
 	done
 	# If there is a user theme directory, use that one instead
-	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
-	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	#[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	[ -f "$TUI_DIR_USER_THEMES"/* ] && \
+		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
+		use_DIR_THEME="$TUI_DIR_THEMES"
+	. "$use_DIR_THEME/$TUI_THEME" 
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
@@ -313,7 +316,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		half=$(( ${#SECOND} / 2 ))
 		pos_center_num=$(( $center - $half  ))
 		POS_CENTER="\033[${pos_center_num}G"
-		SECOND="${POS_CENTER}$SECOND"
+		#SECOND="${POS_CENTER}$SECOND"
 		;;
 	esac
 #
@@ -344,13 +347,19 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		str=$(printf '%*s' $(( $WIDTH - 4)))
 	else	str=""
 	fi
-	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
-	IDENT="${POS_CLI}$FIRST"
-	CLOSE="${POS_THIRD}$THIRD ${POS_CLC}${COLOR_LINE_CLOSE}"
-	END="${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
+	# Generate borders
+	START="${CL}${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}${str}"
+	END="${POS_CLC}${COLOR_LINE_CLOSE}${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
 #
 #	Display & Action
 #
-	printf "${CL}${START}${str}${IDENT}"
-	printf "${SECOND}"
-	printf "${CLOSE}${END}"
+	printf "${START}"
+	[ -z "$FIRST" ]  || printf "${POS_CLI}$FIRST"
+	if [ ! -z "$SECOND" ] 
+	then	num_tmp=$(( $pos_cli_num + ${#FIRST} ))
+		[ $num_tmp -gt $pos_center_num ] && \
+			POS_CENTER="\033[$(( $num_tmp + 1 ))G"
+		printf  "${POS_CENTER}$SECOND"
+	fi
+	[ -z "$THIRD" ]  || printf "${POS_THIRD}$THIRD"
+	printf "${END}"

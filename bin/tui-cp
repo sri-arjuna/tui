@@ -26,8 +26,8 @@
 		. "$TUI_DIR_CONF/settings.conf" || \
 		. tui	# This first call would create the RC if its missing.
 	
-	script_version=0.5
-	ME="$(basename $0)"
+	script_version=0.5.1
+	ME="${##0*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] file1 file2 ... ... target_directory
 		\rWhere options are:
@@ -51,7 +51,7 @@
 	showRegular=false
 	showLong=false
 	# Just in case user has an alias for ls
-	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
+	#LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	COUNTER=0
 	tui-progress -r
 	showtotal=false
@@ -197,6 +197,7 @@
 					DEST=$(FileSize "$trgt") || \
 					DEST=$(FolderSize "$trgt")
 				tui-progress -b -m $ORG -c $DEST "Copying $display_trgt..."
+				TOTAL=${TOTAL:-$ORG}
 			else	tui-progress "Copying $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actualy represents the failures, TODO Error '127,130'
@@ -213,7 +214,8 @@
 		then	tui-status $(cat $TUI_FILE_TEMP) "Copied $display_trgt"
 		#else
 		elif $showtotal
-		then	tui-status -r $(cat $TUI_FILE_TEMP) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+		then	TOTAL=${TOTAL:-0}
+			tui-status -r $(cat $TUI_FILE_TEMP) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
 			#showtotal=true
 		fi
 	done
