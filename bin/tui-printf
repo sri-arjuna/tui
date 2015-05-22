@@ -23,7 +23,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.05.20
+#	Changed:	2015.05.21
 	script_version=2.0
 #	Description:	The absolute core display function for TUI
 #
@@ -32,12 +32,10 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tui_rc" && \
-		. "$TUI_FILE_CONF_COMMANDS" && \
-		. "$TUI_FILE_CONF_COLORS" && \
-		. "$TUI_FILE_CONF_STATUS" && \
-		. "$TUI_FILE_CONF_SYSTEM"  || \
-		. tui
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,STATUS,SYSTEM}
+	do	source "$f" && printf "." > /dev/stderr
+	done
 	# If there is a user theme directory, use that one instead
 	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
 	. "$TUI_DIR_THEMES/$TUI_THEME" 
@@ -350,6 +348,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			pos_third_num=$(( $pos_third_num + 1 ))
 		POS_THIRD="\033[${pos_third_num}G"
 	fi
+	CL=="\e[2K"
 	IDENT="${POS_CLI}$FIRST"
 	CLOSE="${POS_THIRD}$THIRD ${POS_CLC}${COLOR_LINE_CLOSE}"
 	END="${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
@@ -365,6 +364,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		#str="\e[2K"	# See console_codes, for later improvements
 	else	str=""
 	fi
-	printf "${START}${str}${IDENT}"
+	printf "${CL}${START}${str}${IDENT}"
 	printf "${SECOND}"
 	printf "${CLOSE}${END}"

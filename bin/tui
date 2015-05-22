@@ -272,7 +272,7 @@
 #	Load Environment	:	System wide / defaults
 #
 	source "$TRC" && printf "." > /dev/stderr
-	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,SYSTEM}
+	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	source "$f" && printf "." > /dev/stderr
 	done
 #
