@@ -34,7 +34,7 @@
 	# create the RC and load all variable if RC is not present yet.
 	source "$HOME/.tui_rc" || . tui
 	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,STATUS,SYSTEM}
-	do	source "$f" && printf "." > /dev/stderr
+	do	source "$f"
 	done
 	# If there is a user theme directory, use that one instead
 	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
@@ -298,20 +298,18 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	pos_cli_num=$(( 0 + ${#BORDER_LEFT} + 2 ))
 	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 2))
 	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} ))
-	pos_center_num=""
-	pos_third_num=""
 	# POS_ID
 	POS_CLS="\033[0G"	# This is always 0, and therefor doesnt require a pos_id_num calculation
 	POS_CLI="\033[${pos_cli_num}G"
 	POS_CLC="\033[${pos_clc_num}G"
 	POS_CLE="\033[${pos_cle_num}G"
+	# Center for last task
+	pos_center_num=""
+	pos_third_num=""
 	POS_CENTER=""
 	POS_THIRD=""
-	
-	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
-	
+	# Calculate mising positions and generate output strings
 	case $ARGS_COUNT in
-	#0)	echo nothing todo	;;
 	1)	if $doTitle #&& ! $doStatus
 		then	SECOND="$FIRST"
 			FIRST=" "
@@ -321,11 +319,12 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			pos_center_num=$(( $center - $half  ))
 			POS_CENTER="\033[${pos_center_num}G"
 			SECOND="${POS_CENTER}$SECOND"
-		fi			;;
+		fi
+		;;
 	2)	! $doStatus && \
 			THIRD="$SECOND" && \
 			SECOND=""
-					;;
+		;;
 	3)	center=$(( $WIDTH / 2 ))
 		half=$(( ${#SECOND} / 2 ))
 		pos_center_num=$(( $center - $half  ))
@@ -333,7 +332,10 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		SECOND="${POS_CENTER}$SECOND"
 		;;
 	esac
-	
+#
+#	Passing color escape sequences increases the chars required, but lowers the chars shown
+#	This part is to fix this part for the alignment
+#
 	if $doStatus
 	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
 		case $NUM_ID in
@@ -348,7 +350,11 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			pos_third_num=$(( $pos_third_num + 1 ))
 		POS_THIRD="\033[${pos_third_num}G"
 	fi
+#
+#	Generat output strings
+#
 	CL=="\e[2K"
+	START="${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
 	IDENT="${POS_CLI}$FIRST"
 	CLOSE="${POS_THIRD}$THIRD ${POS_CLC}${COLOR_LINE_CLOSE}"
 	END="${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
@@ -359,11 +365,11 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	# This is supposed to 'keep' artificial linebreaks rather than get them on one line
         #[ "\\" = "${FIRST:0:(-1)}" ] && \
         #        FIRST="${FIRST}\\"
-	if $doTitle || $doHeader
-	then	str=$(printf '%*s' $(( $WIDTH - 4)))
-		#str="\e[2K"	# See console_codes, for later improvements
-	else	str=""
-	fi
+#	if $doTitle || $doHeader
+#	then	str=$(printf '%*s' $(( $WIDTH - 4)))
+#		#str="\e[2K"	# See console_codes, for later improvements
+#	else	str=""
+#	fi
 	printf "${CL}${START}${str}${IDENT}"
 	printf "${SECOND}"
 	printf "${CLOSE}${END}"
