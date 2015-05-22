@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.7.6
-Release:     807%{?dist}
+Version:     0.8.0
+Release:     0%{?dist}
 Summary:     A robust I/O toolset for your scripts
 
 License:     GPLv3
@@ -71,7 +71,7 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/%{name}_compl.bash
 
 %changelog
-* Mon May 11 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-777
+* Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0
 - Changed:   tui, now using an RC file to provide internal paths
 -                 required for manual install and some exotic bsd, linux, unix distros
 - Changed:   Preparing themes to 'not' calculate BORDER_RIGHT, if its set in the theme
@@ -86,9 +86,11 @@ rm -rf %{buildroot}
 - Added:     tui-asroot, executes command as root, uses sudo if useSudo is true.
 - Changed:   tui-progress, new arrangements alignments
 - Changed:   tui-str-usb, optimized first usage, autoselection, and cardread ignore
-- Changed:   tui-{edit,terminal,web}, updated to paths and now read list files.
-- Changed:   Updated paths: tui-{echo,edit,log,press,rnd,status,title} and
--            tui-bol-gui and tui-str-encrypt
+- Updated:   tui-{edit,terminal,web}, updated to paths and now read list files.
+- Updated:   Paths in tui-{echo,edit,install,list,log,press,rnd,status,title,wait}
+-            tui-bol-gui  and tui-str-{encrypt,genfilename}
+- Changed:   tui-wait, updated timecode display
+- Changed:   tui-printf, fixed clean line(ty chubbler) and other
 
 * Sun May 10 2015 - Simon A. Erat - erat.simon@gmail.com - 0.7.6-5
 - Updated:   tui-progress, procent is now only shown in long bar mode.

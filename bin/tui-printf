@@ -33,7 +33,7 @@
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	source "$HOME/.tui_rc" || . tui
-	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,STATUS,SYSTEM}
+	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 	do	source "$f"
 	done
 	# If there is a user theme directory, use that one instead
@@ -77,8 +77,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	THIRD=""
 	COLUMNS=${COLUMNS:-$(tput cols)}
 	WIDTH=$COLUMNS
-	#((WIDTH -= (${#BORDER_LEFT} + ${#BORDER_RIGHT} + 2))) 	# 2=1 space from left and right border each
-	#WIDTH=$[ $WIDTH / 2 * 2 ]		# Make it even 
 	doEcho=false
 	doHeader=false
 	doStatus=false
@@ -121,8 +119,8 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			tui-printf -S 1 "$ME: For option '-S' the first argument needs to be numeric only!" && \
 			exit 1
 		
-		# get the vars
-		source "$TUI_DIR_CONF/status.conf"
+		# get the vars, load this only on demand, its a tiny, but still a speed increase!
+		source "$TUI_FILE_CONF_STATUS"
 		unset retvalue[@]
 		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
 		retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
@@ -150,16 +148,10 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		ARGS_COUNT=3
 		THIRD="${retvalue[$NUM_ID]}"	#     = 6+2=8
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
-#	elif $doTitle && [ $ARGS_COUNT -eq 1 ]
-#	then	FIRST=" "
-#		SECOND="$1"
-#		THIRD=" "
-#		len_strings=${#SECOND}
-#		echo jup
 	else
-		[ ! -z "$1" ] && FIRST="$1" #&& ((ARGS_COUNT++))
-		[ ! -z "$2" ] && SECOND="$2" # && ((ARGS_COUNT++))
-		[ ! -z "$3" ] && THIRD="$3" #&& ((ARGS_COUNT++))
+		[ ! -z "$1" ] && FIRST="$1"
+		[ ! -z "$2" ] && SECOND="$2"
+		[ ! -z "$3" ] && THIRD="$3"
 		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
 	fi
 	# Prepare temporary display style according to $MODE
@@ -169,10 +161,10 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Verify all fit on 1 line
 #
-	if [ 50 -gt $WIDTH ]
+	if [ 5 -gt $WIDTH ]
 	then	# Screen is too small, should not happend
 		for S in "$FIRST" "$SECOND" "$THIRD"
-		do 	[ -z "$S" ] || echo "$S"
+		do 	[ -z "$S" ] || printf "\r%s\n" "$S"
 		done
 		exit ${NUM_ID:-0}
 	fi
@@ -180,7 +172,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	if [ $len_strings -gt $WIDTH ]
 	then 	# All vars are larger than the line supports
 		# Splitting required
-		#echo $ARGS_COUNT
 		case $ARGS_COUNT in
 		1)	# Split up the only argument passed
 			half=$[ ${#FIRST} / 2 ]
@@ -216,14 +207,8 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			fi
 			;;
 		3)	# Print only 2 on the first line
-			#  TODO FIXME -- ERORR MUST BE HERE
 			if $doStatus
 			then	[ -z "$FIRST" ] || tui-printf $optStyleTMP "$FIRST" 
-				#echo "$FIRST"
-				#echo "$optStyle"
-				#echo $NUM_ID
-				#echo "$SECOND"
-				#exit
 				[ ${#SECOND} -gt $WIDTH ] && \
 					tui-printf $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}" && \
 					tui-printf $optStyle "$NUM_ID" " " "${SECOND:($WIDTH - 3)}"|| \
@@ -237,7 +222,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 					[ -z "$SECOND" ] && \
 						tui-printf $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
 						tui-printf $optStyle $NUM_ID "$SECOND"
-					#tui-printf $optStyle $NUM_ID #"$THIRD" ""
 				elif [ ${#SECOND} -gt $WIDTH ]
 				then	# The second one is too long
 					[ -z "$FIRST" ] || tui-printf $optStyleTMP "$FIRST" 
@@ -346,6 +330,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		POS_THIRD="\033[${pos_third_num}G"
 	else	pos_third_num=$(( $pos_cle_num - 1 - ${#THIRD} ))
 		# Fix one position place if there was a %
+		# Need to improve, if multiple '%' occours
 		echo "$THIRD" | $GREP -q '%' && \
 			pos_third_num=$(( $pos_third_num + 1 ))
 		POS_THIRD="\033[${pos_third_num}G"
@@ -361,15 +346,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Display & Action
 #
-	# Escape trailing backslash, from whichever argument passed
-	# This is supposed to 'keep' artificial linebreaks rather than get them on one line
-        #[ "\\" = "${FIRST:0:(-1)}" ] && \
-        #        FIRST="${FIRST}\\"
-#	if $doTitle || $doHeader
-#	then	str=$(printf '%*s' $(( $WIDTH - 4)))
-#		#str="\e[2K"	# See console_codes, for later improvements
-#	else	str=""
-#	fi
 	printf "${CL}${START}${str}${IDENT}"
 	printf "${SECOND}"
 	printf "${CLOSE}${END}"
