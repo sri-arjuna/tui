@@ -79,6 +79,8 @@ rm -rf %{buildroot}
 -            required to use a progress bar as indicator.
 - Updated:   tui-cp, showed wrong name in helpscreen
 - Updated:   install.sh, bash-completion path was missing 'share'
+- Updated:   tui-status/conf.etc/status.conf, didnt recognize console
+- Changed:   Screenshot strucuture
 
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-0
 - Fixed:     tui, checked for user configurations without the path
