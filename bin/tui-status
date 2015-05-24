@@ -61,15 +61,16 @@
 		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
 		
 		printf "$help_text
-Interpreted errorlevels:\n"
+
+Interpreted errorlevels are:\n"
 		for num in $(seq 0 1 120)
 		do	str="${retvalue[$num]}"
 			[ ! "" = "$(printf '%s' $str)" ] && \
-				printf "\t$num \tor \$RET_$(printf ${STATUS_TEXT[$num]})\t = \t$str\t\n"
+				printf "\t$num \tor \$RET_$(printf ${STATUS_TEXT[$num]})\t = \t$str  =\t\$TUI_$(printf ${STATUS_TEXT[$num]})\n"
 		done
 		printf "
 Where options are:
-	-h	This
+	-h	This screen
 	-r	Return on line, dont do a newline.
 "
 		exit $RET_HELP
