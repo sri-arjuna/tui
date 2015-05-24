@@ -101,7 +101,7 @@ Examples:	$ME 2m
 	do 	# First display current / passed time
 		# Generate string & output to user
 		time_string="$(seconds2time $seconds)"
-		./tui-printf  "$MSG" "$time_string"
+		tui-printf  "$MSG" "$time_string"
 		
 		# Already reached 0?
 		[ "$hours$minutes$seconds" = "000" ] && \

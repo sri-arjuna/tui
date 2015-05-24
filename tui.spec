@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.0
-Release:     2%{?dist}
+Release:     3%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -73,6 +73,9 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Sat May 23 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-3
+- Fixed:     tui-wait, had a local reference left from devel branch
+
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-2
 - Changed:   install-new.sh had a typo and copied the folder to destination
 - Changed:   tui, if a loadlist is missing it rewrites a default one now
