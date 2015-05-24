@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
-# File: 	tui_status
-# Description:	Demonstrates some examples with tui-status
-# GNU General Public License (GPL) 2015 by sea (erat.simon@gmail.com)
-# ------------------------------------------------------
+# -- Sample script to use with likewise named command --
 #
-#	Variables
-#
-	
-#
-#	Functions
-#
-	
 #
 #	Action & Display
 #
@@ -18,7 +8,7 @@
 	
 	# Simple Call : 1
 	# ---------------
-	# Simply check how previous command was executed
+	# Simply check how previous command was executed, this will fail
 	(set -x;grep SOMETHING /etc/fstab)
 	tui-status $? "Last command exit code was: $(tui-str-bol-conv -d $?)"
 	

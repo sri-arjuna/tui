@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# -- Sample script to use with likewise named command --
+#
+#	Variables
+#
+	IAM_SAMPLE="${0##*/}"
+	LIST="one two three four five six seven eight nine ten eleven twelve"
+	tui-title "$IAM_SAMPLE samples"
+#
+#	select entries of a list
+#
+	tui-title "Sample: #1"
+	tui-select $LIST
+#
+#	Print the list with 2 columns
+#
+	tui-echo
+	tui-title "Sample: #2"
+	value=$(tui-select -2 $LIST)
+	tui-status $? "Selected:" "$value"
+#
+#	Print the list with 1 column
+#
+	tui-echo
+	tui-title "Sample: #3"
+	value=$(tui-select -1 $LIST)
+	tui-status $? "Selected:" "$value"
+#
+#	Get a looped menu
+#
+	tui-echo
+	tui-title "Sample: #4"
+	while 	var=$(tui-select $LIST Back)
+		[ ! Back = "$var" ]
+	do	tui-title "You need to go 'Back' here :p"
+		tui-wait 3 "Do your code here... '\$var' is: \"$var\"..."
+	done

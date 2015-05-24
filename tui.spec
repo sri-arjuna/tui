@@ -74,13 +74,14 @@ rm -rf %{buildroot}
 
 %changelog
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-1
+- Fixed:     install.sh, bash-completion path was missing 'share'
+- Fixed:     tui-status/conf.etc/status.conf, didnt recognize console
+- Added:     docs/samples/tui_{browser,list,read,select,status,yesno}
 - Updated:   tui-bgjob, added option -e BYTES, which may obsolete
 -            option -s FILE on some occasions. Either of which is 
 -            required to use a progress bar as indicator.
 - Updated:   tui-cp, showed wrong name in helpscreen
-- Updated:   install.sh, bash-completion path was missing 'share'
-- Updated:   tui-status/conf.etc/status.conf, didnt recognize console
-- Changed:   Screenshot strucuture
+- Changed:   Screenshot structure
 
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-0
 - Fixed:     tui, checked for user configurations without the path

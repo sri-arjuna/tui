@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# -- Sample script to use with likewise named command --
+#
+IAM_SAMPLE="${0##*/}"
+
+tui-title "$IAM_SAMPLE samples"
+
+#
+#	Can be used line after line
+#
+	tui-echo "Sample: #1"
+	tui-yesno "Ask a question to answer with yes or no?"
+	tui-echo "Your answer was: $(tui-str-bol-conv $?)"
+#
+#	Regular if block, with very simple condition inside
+#
+	tui-echo
+	tui-echo "Sample: #2"
+	if tui-yesno "Try something more complex?"
+	then	tui-yesno "Show FSTAB?" && tui-cat /etc/fstab
+		tui-yesno "Show crypttab?" && tui-asroot tui-cat /etc/crypttab
+	else	tui-status 4 "You skipped the fs/crypt-tab display."
+	fi
+#
+#	Very Simple condition
+#
+	tui-echo
+	tui-echo "Sample: #3"
+	tui-yesno "Show uname info?" && uname -a
+#
+#	Simple condition
+#
+	tui-echo
+	tui-echo "Sample: #4"
+	tui-yesno "Quit script now with success?" && \
+		tui-status $? "Yay all good on exit!" || \
+		tui-status $? "Script ending now with a failure!"
+	exit $?

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# -- Sample script to use with likewise named command --
+#
+#	Variables
+#
+	IAM_SAMPLE="${0##*/}"
+	LIST="one two three four five six seven eight nine ten eleven twelve"
+	tui-title "$IAM_SAMPLE samples"
+#
+#	List entries of a list
+#
+	tui-title "Sample: #1"
+	tui-list $LIST
+#
+#	Print the list with 2 columns with roman counting
+#
+	tui-echo
+	tui-title "Sample: #2"
+	tui-list -2r $LIST
+#
+#	Print the list with 1 columns with alphabetic counting
+#
+	tui-echo
+	tui-title "Sample: #3"
+	tui-list -1a $LIST
+#
+#	Print without indexing at all
+#
+	tui-echo
+	tui-title "Sample: #4"
+	tui-list -n $LIST

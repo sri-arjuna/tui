@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# -- Sample script to use with likewise named command --
+#
+#	Variables
+#
+	IAM_SAMPLE="${0##*/}"
+	DE=$(tui-bol-gui -v)
+	MENU=$HOME/bin
+	
+	tui-title "$IAM_SAMPLE samples"
+#
+#	Start browsing using the current path as 'virtual root'
+#
+	tui-title "Sample: #1"
+	tui-browser
+	tui-wait 5 "Look at the blue bar, left and right - and the 'content'..."
+	
+#
+#	Apply custom labels and define a virtual root
+#
+	tui-echo
+	tui-title "Sample: #2"
+	tui-wait 3 "They become changed now, hope $MENU exists and has content..."
+	tui-browser 	-T "Sample Title" \
+			-U "${DE:-console}" \
+			-p "$MENU"
+#
+#	Change to text mode and change default labels
+#
+	tui-echo
+	tui-title "Sample: #3"
+	tui-wait 2 "Introducing text mode"
+	tui-wait 5 "Type: 'q' [enter] to quit or 'b' [enter] to leave a sub dir"
+	tui-browser 	-T "Sample Title" \
+			-U "${DE:-console}" \
+			-p "$MENU" \
+			-m \
+			-D "Sample Dir Section" \
+			-F "Sample File Section"
+#
+#	Apply custom labels and define a virtual root
+#	Also force tui-browser to execute found scripts with a custom shell (ksh)
+#	Sourced the config file and sources either the file passed to -s,
+# 	or source all files found in the path passed to -s.
+#	It will then provide all variables they contain to all scripts executed by tui-browser
+#	Functions are in progress, but their recognition doesnt always work
+#
+	tui-echo
+	tui-title "Sample: #4"
+	tui-wait 3 "Using a config file, and source 'libraries', and use ksh to execute found scripts"
+	tui-browser 	-T "Sample Title" \
+			-U "${DE:-console}" \
+			-p "$MENU" \
+			-c "$HOME/.tui_rc
+			-s $(tui-conf-get $HOME/.tui_rc TUI_DIR_CONF) \
+			-x ksh
