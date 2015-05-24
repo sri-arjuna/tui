@@ -80,8 +80,10 @@ rm -rf %{buildroot}
 - Updated:   tui-bgjob, added option -e BYTES, which may obsolete
 -            option -s FILE on some occasions. Either of which is 
 -            required to use a progress bar as indicator.
+- Updated:   uninstall.sh, now uses the RC file too
 - Updated:   tui-cp, showed wrong name in helpscreen
 - Changed:   Screenshot structure
+- Changed:   tui info -> tui provides, better structured output
 
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-0
 - Fixed:     tui, checked for user configurations without the path
