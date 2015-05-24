@@ -20,11 +20,11 @@
 # ------------------------------------------------------------------------
 #
 #	This script will help you to install TUI on your system
-#	Last Update:	2015.05.22
+#	Last Update:	2015.05.24
 #
 #	Internals
 #
-	script_version=0.7
+	script_version=0.8
 	TRC=$HOME/.tui_rc
 #
 #	Variables
@@ -110,17 +110,15 @@
 		t2 "Binary files will be installed to:" "$catched_prefix/bin"
 		t2 "Config files will be installed to:" "$catched_root/etc/tui"
 		t2 "Application data will be installed to:" "$catched_prefix/share/tui"
-		t2 "User configuration defaults to: " "\$XDG_CONFIG_DIR or \$HOME/.config/tui"
+		t2 "User configuration defaults to: " "\$XDG_CONFIG_DIR[/tui] or \$HOME/.config[/tui]"
+		te
+		te "To change the installation destination, please start as root or start like:"
+		te "${bluef}${whiteb}CHROOT=/path/to/chroot PREFIX=/path/to/chroot/usr $0$reset"
 		te
 		if ! yesno "Do you want to continue?"
-		then	te
-			te "To change the installation destination, please start as root or start like:"
-			te
-			te "${bluef}${whiteb}CHROOT=/path/to/chroot PREFIX=/path/to/chroot/usr $0$reset"
-			te
-			exit 0
+		then	exit 0
 		fi
-		[ -z "$DIR_COMPL" ] && DIR_COMPL=$catched_prefix/bash_completion/completions
+		[ -z "$DIR_COMPL" ] && DIR_COMPL=$catched_prefix/share/bash_completion/completions
 		install_tui
 	}
 	install_tui() { #
@@ -148,29 +146,30 @@
 		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
 		
 		bin/tui-title "Copying documentation"
-		#cp -a docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		bin/tui-cp -q docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		
 		bin/tui-title "Copying system"
-		#cp -aR docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		bin/tui-cp -q docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		#cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		bin/tui-cp -q conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		bin/tui-cp -q tui_compl.bash $DIR_COMPL/
-		bin/tui-cp -q uninstall.sh $TUI_DIR_SYSTEM
+		bin/tui-cp -lq docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		bin/tui-cp -lf conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		bin/tui-cp -ld uninstall.sh $TUI_DIR_SYSTEM
+		bin/tui-cp -l tui_compl.bash $DIR_COMPL
 		
 		bin/tui-title "Copying templates"
-		#cp -aR templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
 		bin/tui-cp -q templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
 		
 		bin/tui-title "Copying lists"
 		bin/tui-cp -q lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
 		RET=$?
 		
-		if [ $RET -eq 0 ]
-		then	bin/tui-header "" "Report" ""
-			bin/tui-status $RET "Installation successfull!" 2>/dev/zero && \
+		if [ ${RET:-1} -eq 0 ]
+		then	bin/tui-header "" "Status Report" ""
+			bin/tui-status $RET "Installation successfull" && \
 			bin/tui-yesno "Do you want to configure TUI now?" && tui config
+		else	te "Installation failed...  ;("
+			t2 "CHROOT was:" "$CHROOT"
+			t2 "PREFIX was:" "$PREFIX"
+			t2 "USER was:"   "$USER"
+			t2 "Probably an expected path was not found."
 		fi
 		exit $RET
 	}

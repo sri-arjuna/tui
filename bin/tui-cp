@@ -26,8 +26,8 @@
 		. "$TUI_DIR_CONF/settings.conf" || \
 		. tui	# This first call would create the RC if its missing.
 	
-	script_version=0.5.1
-	ME="${##0*/}"
+	script_version=0.5.2
+	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] file1 file2 ... ... target_directory
 		\rWhere options are:

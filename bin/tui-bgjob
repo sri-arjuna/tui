@@ -24,7 +24,7 @@
 #	Variable defaults
 #
 	source tui
-	script_version=0.7
+	script_version=0.7.1
 	ME="$(basename $0)"
 	[ -z "$TUI_FILE_TEMP" ] && source $TUI_DIR_CONF/tui.conf
 	help_text="\r$ME ($script_version)
@@ -33,22 +33,28 @@
 		\r
 		\r\t-f [/path/to/]file\tPrint the filesize of passed file
 		\r\t-s [/path/to/]orgfile\tSwitches to progressbar if $TUI_FONT_BOLD-f file$TUI_RESET is passed too
+		\r\t-e BYTESEXPECTED\tRequired to adjuet the progressbar, leave out to just print the actual file size
 		\r
 		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
 		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) ir uses.
 		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
 		\r"
 	CHECKFILE=false
-	SIZE_ORG=0
+	SIZE_ORG=""
+	showBAR=false
+	MAX_BYTES=""
 #
 #	Variable handling
 #
 	[ -z "$3" ] && printf "$help_text" && exit $RET_HELP
 	BG_RET="-1"
-	while getopts "hf:s:" opt
+	while getopts "he:f:s:" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
+			;;
+		e)	showBar=true
+			MAX_BYTES="$OPTARG"
 			;;
 		f)	FILECHECK="$OPTARG"
 			CHECKFILE=true
@@ -77,16 +83,19 @@
 #
 #	While the job is running...
 #
-	sleep 1
-	while ps |$GREP -q $PID
+	sleep 0.5
+	while ps | $GREP -q $PID
 	do	if $CHECKFILE
-		then 	if [ $SIZE_ORG -eq 0 ]
+		then 	if $showBar
+			then	FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
+				tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS"
+			elif [ -z "$SIZE_ORG" ]
 			then	[ -e "$FILECHECK" ] && \
 					FS=$($LS -lh "$FILECHECK"|$AWK '{print $5}') || \
 					FS=0
 				tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
 			else	FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
-				tui-progress -bm $SIZE_ORG -c $FS "$TXT_PROGRESS"
+				tui-progress -bm $MAX_BYTES -c $FS "$TXT_PROGRESS"
 			fi
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi

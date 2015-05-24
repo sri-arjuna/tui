@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.1
-Release:     0%{?dist}
+Release:     1%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -73,6 +73,13 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-1
+- Updated:   tui-bgjob, added option -e BYTES, which may obsolete
+-            option -s FILE on some occasions. Either of which is 
+-            required to use a progress bar as indicator.
+- Updated:   tui-cp, showed wrong name in helpscreen
+- Updated:   install.sh, bash-completion path was missing 'share'
+
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-0
 - Fixed:     tui, checked for user configurations without the path
 - Updated:   tui-select, didnt have -1|2 in the getopts parselist
