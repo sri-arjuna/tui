@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.05.22
-	script_version=2.0.1
+#	Changed:	2015.05.24
+	script_version=2.0.2
 #	Description:	The absolute core display function for TUI
 #
 #	Variables
@@ -37,11 +37,10 @@
 	do	source "$f"
 	done
 	# If there is a user theme directory, use that one instead
-	#[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
-	[ -f "$TUI_DIR_USER_THEMES"/* ] && \
-		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
-		use_DIR_THEME="$TUI_DIR_THEMES"
-	. "$use_DIR_THEME/$TUI_THEME" 
+	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
+	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
+	else	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	fi
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done

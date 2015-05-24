@@ -28,15 +28,15 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tui_rc" && \
-		. "$TUI_FILE_CONF_COMMANDS" && \
-		. "$TUI_FILE_CONF_COLORS" && \
-		. "$TUI_FILE_CONF_STATUS" && \
-		. "$TUI_FILE_CONF_SYSTEM"  || \
-		. tui
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
+	do	source "$f"
+	done
 	# If there is a user theme directory, use that one instead
-	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
-	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
+	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
+	else	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	fi
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
@@ -44,7 +44,7 @@
 #	Variables
 #	
 	ME=${0##*/}
-	script_version=0.7
+	script_version=0.8.0
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -60,7 +60,7 @@ Where options are:
 #	Action
 #
 	ROWS=""
-	while getopts "ha" opt
+	while getopts "12ha" opt
 	do	case "$opt" in
 		h|"")	printf "$help_text"
 			exit 99
@@ -90,15 +90,22 @@ Where options are:
 	todo=false
 	while $invalid
 	do	# Reset input line
-		#tui-printf ">" > /dev/stderr
-                #printf "\r$BORDER_LEFT > " > /dev/stderr
 		printf "\r${BORDER_LEFT} >   \r${BORDER_LEFT} > " > /dev/stderr 
 		invalid=false
 		
 		# Get input
 		read -n ${#len} NUM
+		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
+		if ! echo "$NUM" | $GREP -q ^[0-9] 
+		then	NUM="" 
+			invalid=true 
+			tui-printf "" "" ""
+			continue
+		fi
+		#NUM=$(echo "$NUM"|$GREP -v '[')
 		NUM=$(echo "$NUM")
+		[ -z "$NUM" ] && NUM="" && invalid=true && continue
 		
 		# It is a number in range?
 		if [ "" = "$(echo "$NUM"|tr -d [:digit:])" ] && [ ${#NUM} -ne 0 ]
@@ -122,7 +129,10 @@ Where options are:
 	# Make 'nice to have' linebreak when read automaticly stops reading
 	if [ ${#NUM} -eq ${#len} ] 
 	then	# Only print newline character if the entered number as the longest number
-		printf "\n" > /dev/stderr
+		# But not sub zero
+		[ ${NUM} -ne -1 ] && printf "\n" > /dev/stderr
+	else	# Since arrays are 0 indexed, 10 becomes 9 and need speacial treatement
+		[ ${NUM} -eq 9 ] && printf "\n" > /dev/stderr
 	fi
 	
 	# This is the output

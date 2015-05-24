@@ -23,13 +23,13 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.05.22
-	script_version=2.0.1
+#	Changed:	2015.05.24
+	script_version=2.1
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
 #
-	TUI_VERSION=0.8.0
+	TUI_VERSION=0.8.1
 	TRC="$HOME/.tui_rc"
 #
 #	Functions
@@ -278,14 +278,14 @@
 #
 #	Load Environment	:	User settings
 #
-	#if
+	# Write default loadlist if file is missing
 	[ -f "$TUI_FILE_USER_LOADLIST" ] || printf '%s\n' {user,apps,settings}.conf > "$TUI_FILE_USER_LOADLIST"
-	#then	# Exit according to wether the script is executed or sourced
-	#	[ "$ME" = tui ] && exit 99 || return 99
-	#fi
+	# Read loadlist and start parsing only if variable is not empty
 	while read f
-	do	[ ! -z "$f" ] && [ ! "#" = "${f:0:1}" ] && \
-			[ -f "$f" ] && \
+	do	# Filter out comments and verify file exists before sourcing it.
+		[ ! -z "$f" ] && \
+			[ ! "#" = "${f:0:1}" ] && \
+			[ -f "$TUI_DIR_USER/$f" ] && \
 			source "$TUI_DIR_USER/$f"  && \
 			printf "." > /dev/stderr
 	done<"$TUI_FILE_USER_LOADLIST"
@@ -293,7 +293,8 @@
 #	Display ?
 #
 	if [ "${0##*/}" = "tui" ]
-	then	case "$1" in
+	then	# It is not sourced
+		case "$1" in
 		"-h"|"--help"|"help")
 			help_screen
 			hadOpts=true
@@ -324,11 +325,10 @@
 			tui-printf -E "Any escape sequence for that matter." "$TUI_INFO"
 			tui-printf -T "Variables provided by sourcing TUI (internals)"
 			
-			for foundVar in ${!TUI_*} ${!RET_*} #${!@_CLI} ${!*\_GUI}
-			do	#echo $foundVar | $GREP -q COLOR_ || \
-				tui-printf -E \
+			for foundVar in ${!TUI_*} ${!RET_*}
+			do	tui-printf -E \
 					"$foundVar" \
-					"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))" # > $TUI_FILE_TEMP);<$TUI_FILE_TEMP )"
+					"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
 			done
 			
 			tui-printf -T "Variables provided by sourcing TUI (User specific)"
@@ -349,7 +349,7 @@
 				for foundVar in $list 
 				do	tui-printf -E \
 						"$foundVar" \
-						"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))" # > $TUI_FILE_TEMP);<$TUI_FILE_TEMP )"
+						"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
 				done
 			done
 			exit $?
