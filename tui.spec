@@ -84,6 +84,7 @@ rm -rf %{buildroot}
 - Updated:   tui-cp, showed wrong name in helpscreen
 - Changed:   Screenshot structure
 - Changed:   tui info -> tui provides, better structured output
+- Changed:   tui-psm, verbose mode enables terminal windows, gui only
 
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-0
 - Fixed:     tui, checked for user configurations without the path

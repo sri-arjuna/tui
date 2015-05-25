@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	. tui
+	. tui 2>/dev/zero
 #	File:		tui-psm
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -48,6 +48,7 @@
 	COUNT=false
 	QUIET=false
 	DEBUG=false
+	beVerbose=false
 #
 #
 #	Help text
