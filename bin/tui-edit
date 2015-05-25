@@ -22,12 +22,12 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.01.23
+#	Changed:	2015.05.25
 #
 #
 #	Variable defaults
 #
-	script_version=1.4
+	script_version=1.5
 	ME="${0##*/}"
 #
 #	Check for the environment to load
@@ -58,7 +58,7 @@
 		shift
 		;;
 	esac
-	done
+	
 	ARGS=($(echo "${@}"))
 #
 #	Functions
@@ -66,9 +66,7 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		#[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
-		LIST="$(<$TUI_DIR_LIST/editor_${MODE})"
-		for L in $LIST;do
+		for L in $(<$TUI_DIR_LIST/editor_${MODE});do
 			which $L 2>/dev/zero && \
 				return 0
 		done
@@ -92,9 +90,9 @@
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
 		[ -z "$EDITOR" ] && \
-			tui-echo "No editor for $MODE mode could be found, please change \"$CONF\" manualy!" && \
+			tui-echo "No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manualy!" && \
 			exit 1
-		tui-conf-set "$CONF" $var $EDITOR
+		tui-conf-set "$TUI_FILE_USER_APPS" $var $EDITOR
 	fi
 	# Open each file 'seperatly',
 	# as not all editors support to open multiple files at once

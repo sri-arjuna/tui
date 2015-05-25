@@ -24,8 +24,8 @@
 #	Variable defaults
 #
 	source tui
-	script_version=0.7.1
-	ME="$(basename $0)"
+	script_version=0.7.2
+	ME="${0##*/}"
 	[ -z "$TUI_FILE_TEMP" ] && source $TUI_DIR_CONF/tui.conf
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
@@ -40,9 +40,10 @@
 		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
 		\r"
 	CHECKFILE=false
-	SIZE_ORG=""
+	SIZE_ORG=0
 	showBAR=false
-	MAX_BYTES=""
+	MAX_BYTES=0
+	FS=0
 #
 #	Variable handling
 #
@@ -64,6 +65,7 @@
 			else	tui-status 1 "$ME: File \"$OPTARG\" could not be found!"
 				exit $?
 			fi
+			showBar=true
 			;;
 		esac
 	done
@@ -72,6 +74,7 @@
 	JOB="$1"
 	TXT_PROGRESS="$2"
 	TXT_EXIT="$3"
+	MAX_BYTES=${MAX_BYTES:-${SIZE_ORG:-0}}
 	[ -z "$4" ] && WAIT=0.7 || WAIT="$4"
 #
 #	Send job to bg and get pid
@@ -84,19 +87,20 @@
 #	While the job is running...
 #
 	sleep 0.5
+	# The task is still running
 	while ps | $GREP -q $PID
-	do	if $CHECKFILE
-		then 	if $showBar
-			then	FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
-				tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS"
-			elif [ -z "$SIZE_ORG" ]
-			then	[ -e "$FILECHECK" ] && \
-					FS=$($LS -lh "$FILECHECK"|$AWK '{print $5}') || \
-					FS=0
-				tui-printf "$TXT_PROGRESS" "( $FS )"  "[  $(tui-indi)   ]" 2>&1
-			else	FS=$($LS -l "$FILECHECK"|$AWK '{print $5}')
-				tui-progress -bm $MAX_BYTES -c $FS "$TXT_PROGRESS"
-			fi
+	do	# Update FileSize variable, if required
+		$CHECKFILE && \
+			FS=$($LS -l "$FILECHECK"|$AWK '{print $5}') && \
+			FS_SHOW=$($LS -lh "$FILECHECK"|$AWK '{print $5}') && \
+		# Print output according to passed options
+		if $CHECKFILE && $showBar
+		then 	tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
+		elif $CHECKFILE && ! $showBar
+		then	tui-progress -lm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
+		elif ! $CHECKFILE && $showBar
+		then	tui-status 1 "Must pass a '-f file' to check!"
+			exit 1
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi
 		sleep $WAIT

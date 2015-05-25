@@ -131,34 +131,33 @@
 		te;te
 		tt "Installing now..."
 		te "* Creating system paths..."
-		mkdir -p $DIR_COMPL $TUI_DIR_{CONF,DOCS,MANPAGES,LOGS,SYSTEM,TEMPLATES,THEMES,USER,CACHE}
+		mkdir -p $DIR_COMPL $TUI_DIR_{CONF,DOCS,MANPAGES,LOGS,LIST,SYSTEM,TEMPLATES,THEMES,USER,CACHE}
 		mkdir -p $TUI_DIR_USER_{LOGS,SCRIPTS,MANPAGES,TEMPLATES,THEMES}
 		
 		te "* Copying binaries..."
-		cp -a bin/tui* "${TUI_DIR_BIN:-/usr/bin}"
+		cp -a bin/tui* "${TUI_DIR_BIN:-/usr/bin}"/
 		
 		te "* Copying configuration (system)..."
-		cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}"
+		cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}"/
 		te "* Copying configuration (user)..."
-		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"
+		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"/
 		
 		te "* Copying themes..."
-		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
+		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"/
 		
 		bin/tui-title "Copying documentation"
-		bin/tui-cp -q docs/[LR]* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
+		bin/tui-cp -q docs/* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"/
 		
 		bin/tui-title "Copying system"
-		bin/tui-cp -lq docs/* "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		bin/tui-cp -lf conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		bin/tui-cp -ld uninstall.sh $TUI_DIR_SYSTEM
-		bin/tui-cp -l tui_compl.bash $DIR_COMPL
+		bin/tui-cp -lf conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"/
+		bin/tui-cp -lfd uninstall.sh $TUI_DIR_SYSTEM/
+		bin/tui-cp -lf tui_compl.bash $DIR_COMPL/
 		
 		bin/tui-title "Copying templates"
-		bin/tui-cp -q templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
+		bin/tui-cp -qf templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
 		
 		bin/tui-title "Copying lists"
-		bin/tui-cp -q lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
+		bin/tui-cp -qf lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
 		RET=$?
 		
 		if [ ${RET:-1} -eq 0 ]

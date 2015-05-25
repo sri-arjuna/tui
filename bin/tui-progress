@@ -154,7 +154,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			CURRENT=$(read_tmp)
 			CURRENT=$(( $CURRENT + 1 ))
 		fi
-		if [ ! $MAX -gt 1 ] || [ -z "$CURRENT" ]
+		if [ -z "$MAX" ] || [ -z "$CURRENT" ]  #|| [ ! $MAX -gt 1 ]
 		then	# Improper handling
 			tui-status 1 "Usage: $ME -bc \$CUR_VALUE -m \$MAV_VALUE 'msg'"
 			exit 1

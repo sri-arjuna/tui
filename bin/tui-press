@@ -22,18 +22,18 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.01.23
+#	Changed:	2015.05.25
 #
 #	Variable defaults
 #
-	script_version=0.3
+	script_version=0.4
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
 		\rRequires the user to press enter to continue
 		\r"
 	default_text="Press [ENTER] to continue"
-	MESSAGE="${1:-${default_text}"
+	MESSAGE="${1:-${default_text}}"
 #
 #	Variable handling
 #
