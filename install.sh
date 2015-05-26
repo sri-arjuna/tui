@@ -138,20 +138,20 @@
 		cp -a bin/tui* "${TUI_DIR_BIN:-/usr/bin}"/
 		
 		te "* Copying configuration (system)..."
-		cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}"/
+		cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}"
 		te "* Copying configuration (user)..."
-		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"/
+		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"
 		
 		te "* Copying themes..."
-		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"/
+		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
 		
 		bin/tui-title "Copying documentation"
-		bin/tui-cp -q docs/* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"/
+		bin/tui-cp -d docs/* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		
 		bin/tui-title "Copying system"
-		bin/tui-cp -lf conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"/
-		bin/tui-cp -lfd uninstall.sh $TUI_DIR_SYSTEM/
-		bin/tui-cp -lf tui_compl.bash $DIR_COMPL/
+		bin/tui-cp -lf conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		bin/tui-cp uninstall.sh $TUI_DIR_SYSTEM
+		bin/tui-cp -lf tui_compl.bash $DIR_COMPL
 		
 		bin/tui-title "Copying templates"
 		bin/tui-cp -qf templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
@@ -177,13 +177,10 @@
 #
 	while true;do
 		clear
-		sep=173
 		tmp_str=$(
-			for n in 101 156 157 164 150 145 162 $sep \
-				163 143 162 151 160 164 $sep \
-				142 162 157 165 147 150 164 $sep \
-				164 157 $sep 171 157 165 $sep \
-				142 171;do printf "\\$n" ;done
+			for n in 101 156 157 164 150 145 162 173 163 143 162 151 160 164 173 142 \
+				162 157 165 147 150 164 173 164 157 173 171 157 165 173  142 171
+			do printf "\\$n" ;done
 			) 
 		te "$tmp_str" | sed s,'{',' ',g
 		te

@@ -23,10 +23,14 @@
 #
 #	Variable defaults
 #
-	source tui
-	script_version=0.7.2
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_CONF_{COMMANDS,SYSTEM}
+	do	[ -f "$f" ] && source "$f"
+	done
+	
+	script_version=0.7.3
+	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
-	[ -z "$TUI_FILE_TEMP" ] && source $TUI_DIR_CONF/tui.conf
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 		\rNOTE:\t'Progress String' may contain shell escaped commands.
@@ -54,7 +58,7 @@
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
-		e)	showBar=true
+		e)	#showBar=true
 			MAX_BYTES="$OPTARG"
 			;;
 		f)	FILECHECK="$OPTARG"
@@ -70,19 +74,27 @@
 		esac
 	done
 	shift $(($OPTIND - 1))
-	
 	JOB="$1"
 	TXT_PROGRESS="$2"
 	TXT_EXIT="$3"
 	MAX_BYTES=${MAX_BYTES:-${SIZE_ORG:-0}}
 	[ -z "$4" ] && WAIT=0.7 || WAIT="$4"
+	$CHECKFILE && \
+		[ $MAX_BYTES -gt 0 ] && \
+		showBar=true
 #
 #	Send job to bg and get pid
 #
+	[ ! -f "$JOB" ] && \
+		tui-printf -rS 1 "Failed, job: $JOB not found!" && \
+		exit 1
 	tui-printf -rS 2 "Starting job..."
-	($SHELL "$JOB" && printf 0 > /dev/stdout > "$TUI_FILE_TEMP" || \
-			printf 1 > /dev/stdout > "$TUI_FILE_TEMP"
-	)   & PID=$!
+	(
+		$SHELL "$JOB" && \
+			printf 0 > /dev/stdout > "$TMP" || \
+			printf 1 > /dev/stdout > "$TMP"
+	)   & 
+	PID=$!
 #
 #	While the job is running...
 #
@@ -94,13 +106,11 @@
 			FS=$($LS -l "$FILECHECK"|$AWK '{print $5}') && \
 			FS_SHOW=$($LS -lh "$FILECHECK"|$AWK '{print $5}') && \
 		# Print output according to passed options
+		printf "\e[2K"
 		if $CHECKFILE && $showBar
 		then 	tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
 		elif $CHECKFILE && ! $showBar
 		then	tui-progress -lm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
-		elif ! $CHECKFILE && $showBar
-		then	tui-status 1 "Must pass a '-f file' to check!"
-			exit 1
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]" 2>&1
 		fi
 		sleep $WAIT
@@ -108,7 +118,8 @@
 #
 #	Report Return Code of ended bg-job
 #
-	BG_RET=$(cat $TUI_FILE_TEMP)
+	BG_RET=$(cat "$TMP")
+	rm -f "$TMP"
 	if [ "$BG_RET" = "-1" ]
 	then	tui-echo "$TXT_EXIT" "Could not retrieve returnvalue" "$INFO"
 		exit $RET_INFO

@@ -19,15 +19,19 @@
 #
 # ------------------------------------------------------------------------
 #
-	source tui
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_{CONF,USER}_{COMMANDS,SETTINGS}
+	do	[ -f "$f" ] && source "$f"
+	done
+	
 #
 #	File:		tui-asroot
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.05.17
-	script_version=0.2
+#	Changed:	2015.05.25
+	script_version=0.3
 	TITLE="Run as root"
 #	Description:	Executes passed command as root
 #
@@ -35,7 +39,8 @@
 #	Script Environment
 #
 	ME="${0##*/}"				# Basename of tui-asroot
-	SUDO=\sudo #$(which sudo)
+	# $SUDO is defined in $TUI_FILE_CONF_COMMANDS
+	TMP="$TUI_FILE_TEMP.$$.asroot"
 #
 #	Variable defaults (options)
 #
@@ -57,7 +62,6 @@ Where options are:
 #
 #	Catching Arguments
 #
-	# A ':' after a char indicates that this option requires an argument
 	# Get access to the passed value of the argument by using $OPTARG
 	while getopts h opt
 	do 	case $opt in
@@ -66,14 +70,23 @@ Where options are:
 			;;
 		esac
 	done
-	#shift $(($OPTIND - 1))
-	
 #
 #	Display & Action
 #
+	#touch "$TMP";>"$TMP"
+	#set -x
 	if tui-bol-root
-	then	"${@}"
+	then	"${@}"  
+		exit $?
+	#	&&  exit 0 || exit 1
 	elif ${useSudo:-false}
-	then	$SUDO -t "Password for $USER" "${@}"
-	else	su -c "${@}"
+	then	${SUDO:-sudo} -p "Password for $USER" "${@}" #; echo \$?  > /dev/stdout > $TMP"
+		exit $?
+	else	su -c "${@}" # ; echo \$? > /dev/stdout > $TMP"
+		exit $?
 	fi
+	exit 1
+	RET=$(<"$TMP")
+	rm -f "$TMP"
+	exit $RET
+	set +x

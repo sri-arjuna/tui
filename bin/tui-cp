@@ -20,13 +20,12 @@
 #
 #	Variable defaults
 #
-	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/apps.conf" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" || \
-		. tui	# This first call would create the RC if its missing.
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
+	do	[ -f "$f" ] && source "$f"
+	done
 	
-	script_version=0.5.2
+	script_version=0.5.4
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] file1 file2 ... ... target_directory
@@ -39,11 +38,7 @@
 		\r
 		\r"
 	
-	FILE_TEMP="$TUI_DIR_CACHE/$ME.status"
-	FILE_CMD="$TUI_DIR_CACHE/bgjob"
-	TMP=$TUI_FILE_TEMP
-	touch $TMP
-	#umask 022 $FILE_CMD $FILE_TEMP
+	FILE_TEMP="$TUI_DIR_CACHE/$ME.$$.status"
 	DEST=""
 	showBar=true
 	doExtract=false
@@ -184,7 +179,7 @@
 				display_trgt="${TARGET##*/}"
 		fi
 		
-		( cp $c_opt "$thisFile" "$TARGET" ; echo $? > $TUI_FILE_TEMP ) &
+		( cp $c_opt "$thisFile" "$TARGET" ; echo $? > $FILE_TEMP ) &
 		pid=$!
 
 		sleep $waiting
@@ -201,7 +196,8 @@
 			else	tui-progress "Copying $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actualy represents the failures, TODO Error '127,130'
-				TOTAL=$(( $TOTAL + $(cat $TUI_FILE_TEMP) ))
+				cat_num=$(cat $FILE_TEMP)
+				TOTAL=$(( $TOTAL + ${cat_num:-0} ))
 			fi
 			# Since there is no visual progress, this 'waiting' is hardcoded
 			sleep $waiting
@@ -209,16 +205,17 @@
 
 		# Final Message
 		if $showRegular
-		then	tui-status $(cat $TUI_FILE_TEMP) "Copied $display_trgt"
+		then	tui-status $(cat "$FILE_TEMP") "Copied $display_trgt"
 		elif $showBar
-		then	tui-status $(cat $TUI_FILE_TEMP) "Copied $display_trgt"
+		then	tui-status $(cat "$FILE_TEMP") "Copied $display_trgt"
 		#else
 		elif $showtotal
 		then	TOTAL=${TOTAL:-0}
-			tui-status -r $(cat $TUI_FILE_TEMP) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+			tui-status -r $(cat "$FILE_TEMP") "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
 			#showtotal=true
 		fi
 	done
-	$showtotal && tui-status  $(cat $TUI_FILE_TEMP) "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
-	exit $(cat $TUI_FILE_TEMP)
-	
+	$showtotal && tui-status  $(cat "$FILE_TEMP") "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+	RET=$(cat "$FILE_TEMP")
+	rm -f "$FILE_TEMP"
+	exit $RET

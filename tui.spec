@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.1
-Release:     1%{?dist}
+Release:     3%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -73,6 +73,14 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Tue May 26 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-4
+- Changed:   tui-asroot, commands.conf, moved '$SUDO' declaration
+- Changed:   tui-bgjob, hotfix of option parsing
+- Changed:   tui-cp, variable hotifx
+- Changed:   tui-psm, hopefully improved logfile reading
+- Changed:   tui-progress, bar adjustemts... 3/4, really?
+- Changed:   install.sh
+
 * Sun May 24 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-1
 - Fixed:     install.sh, bash-completion path was missing 'share'
 - Fixed:     uninstall.sh, now uses the RC file too

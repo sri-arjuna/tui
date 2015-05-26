@@ -25,8 +25,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
-#	Changed:	2015.05.07
-	script_version=0.9
+#	Changed:	2015.05.26
+	script_version=0.9.3
 	TITLE="Paralell Script Manager"
 #	Description:	Executes all scripts in paralell, unless LIMIT says diffrent, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
@@ -39,10 +39,12 @@
 	[ ! "." = "$(dirname $0)" ] && \
 		ME_DIR="$(dirname $0)" || \
 		ME_DIR="$(pwd)"			# Dirname of tui-bg-scripts
-	CONFIG_DIR="$HOME/.config/$ME"		# Configuration directory
+	CONFIG_DIR="$TUI_DIR_USER"		# Configuration directory
 	CONFIG="$CONFIG_DIR/$ME.conf"		# Configuration file
-	TEMP="$CONFIG_DIR/temp/$$"
-	LOG="$CONFIG_DIR/$ME.log"		# Logfile
+	TEMP="$TUI_DIR_CACHE/$ME/$$"		# Make dynamic subfolders, so multiple instances would be possible (but not recomended!)
+	tui-bol-root && \
+		LOG="$TUI_DIR_LOGS/$ME.log" || \
+		LOG="$TUI_DIR_USER_LOGS/$ME.log" # Logfile placement according to user
 	LIMIT=5
 	WAIT=5
 	COUNT=false
@@ -71,10 +73,6 @@ Where options are:
 
 Files:
 --------------------------------------
-Script:		$ME
-Script-Dir:	$ME_DIR
-Config: 	$CONFIG
-Config_Dir:	$CONFIG_DIR
 Log:		$LOG
 Tempdir:	$TEMP
 "
@@ -139,16 +137,17 @@ Tempdir:	$TEMP
 	MAX=${#script_name[@]}		# Max amount of scripts
 	script_status=( $(for s in "${script_name[@]}";do echo "3";done) )		# Status with same counter of that file	: done(0) failed(1) running(2) todo(3)
 	script_pid=()			# PID with the same counter of that file
-
 	# Counters
 	RUN=0			# How many scripts are currently running
+	# Verify all scripts are executeable
+	for script in "${script_name[@]}";do [ -x "$script" ] || chmod +x "$script";done
 #
 #	Display & Action
 #
 	DONE=0
 	while [ $DONE -lt $MAX ]
 	do	# Loop the menu
-		C=0
+		C=0			# Reset counters to prevent 'over counting'
 		DONE=0			# How many scripts are 'done' (regardless of status)
 		GOOD=0			# How many scripts ended succesffully
 		if ! $QUIET
@@ -162,6 +161,8 @@ Tempdir:	$TEMP
 			STATUS="${script_status[$C]}"	# Current status
 			RET_FILE="$TEMP/$(basename ${script_name[$C]}).ret"
 			TMP="$TEMP/$(basename ${script_name[$C]}).cmd"
+			script="${script_name[$C]}"
+			
 			# Do action according to current status
 			case $STATUS in
 			2)	# IS PID still available?
@@ -173,10 +174,15 @@ Tempdir:	$TEMP
 						[ -z "$RET" ] && RET=1
 						script_status[$C]=$RET
 						((RUN--))
-						doLog "Finished script: ${script_name[$C]} with $RET"
+						# Make logfile a bit more informative
+						msg="end"
+						[ $RET -eq 130 ] && msg="cancel"
+						[ $RET -eq 127 ] && msg="typo"
+						doLog "$script($pid) ,$msg $RET"
 					fi
-				else 	tui-status 1 "This should not happen, empty pid while running"
-					doLog "FAILED script: Empty pid while running : ${script_name[$C]} with $pid returned $RET"
+				else 	msg="FAILED script: Empty pid while running : $script($pid) returned $RET"
+					tui-status 1 "$msg"
+					doLog "$msg"
 				fi
 				;;
 			3)	# Its TODO, can we start it?
@@ -184,16 +190,15 @@ Tempdir:	$TEMP
 				then 	script_status[$C]=2
 					STATUS=2
 					((RUN++))
-					script="${script_name[$C]}"
 					[ [./] = "${script:0:1}" ] && PRE="" || PRE="./"
 					cmd="\"${PRE}$script\" ; echo \$? > \"$RET_FILE\""
 					touch "$RET_FILE"
 					$beVerbose && \
 						echo "$cmd" > "$TMP" && \
-						tui-terminal sh $TMP || \
+						tui-terminal "$TMP" || \
 						( eval "$cmd" 1>/dev/zero ) &
 					script_pid[$C]=$!
-					doLog "Started script: $script @ $!"
+					doLog "$script($!) ,starting"
 				fi
 				;;
 			*)	((DONE++))
@@ -231,6 +236,7 @@ Tempdir:	$TEMP
 #	Exit how the user want
 #
 	doLog "You started $MAX scripts, of which $GOOD exited with success"
+	tui-log -e "$LOG" "----------------------------------------------"
 	tui-log -e "$LOG" ""
 	rm -fr "$TEMP"
 

@@ -19,23 +19,21 @@
 #
 # ------------------------------------------------------------------------
 #
-	
 #
 #	File:		tui-bol-root
 #	Author: 	sea
 #	Contact:	sea AT localhost.localdomain
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.16
-#	Changed:	2015.05.16
-	script_version=0.1
+#	Changed:	2015.05.26
+	script_version=0.2
 	TITLE="tui-bol-root"
-#	Description:	Text TODO
+#	Description:	Returns true if current user is root
 #
 #
 #	Script Environment
 #
-	ME="${0##*/}"				# Basename of tui-bol-root
-	
+	ME="${0##*/}"
 #
 #	Functions
 #
@@ -63,7 +61,7 @@
 #
 #	Action & Display
 #
-	if [ "$(whoami)" = root ] || [ $UID -eq 0 ]
+	if [ $UID -eq 0 ] || [ "$(whoami)" = "root" ]
 	then	exit 0
 	else 	exit 1
 	fi

@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.05.20
-	script_version=0.9
+#	Changed:	2015.05.25
+	script_version=0.9.2
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -239,8 +239,10 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #	Display & Action
 #
 	if [ -z "$MESSAGE" ]
-	then	[ $pro -ne 100 ]  && PROGRESS+=" "
-		tui-printf "${PROGRESS}" "${STATUS}"
+	then	$longBar && [ $pro -ne 100 ]  && PROGRESS+=" "
+		$longBar && \
+			tui-printf "${PROGRESS}" "${STATUS}" || \
+			tui-printf "" "${PROGRESS}${STATUS}"
 	else	[ ${pro:-0} -ne 100 ]  && PROGRESS+=" "
 		tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
 	fi
