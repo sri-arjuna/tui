@@ -1,15 +1,107 @@
-README - 0.7.2
+README - 0.8.2
 ==============
 
-1. Introduction
----------------
+For installation please see [./docs/INSTALL.md](./docs/INSTALL.md)
+
+For configuration please see [./docs/CONFIG.md](./docs/CONFIG.md)
+
+
+1. What is SWARM?
+-----------------
+SWARM (Shell Wrapper And Runtime Modificator), is a command based framework
+to enable scripts to provide an interface-like feeling, while also eases some
+repeative tasks for developers or the author of such scripts.
+
+It provides command-wrappers for either thir identical named counterpart, 
+or describe their task in a 'natural developer' language.
+
+Its very basic task is to wrap up to three strings, aligining left, center and right with borders,
+and use 2 colors to provide a header (top, outer) and title (sub,inner) visualy colored horizontal dividers
+defined by a theme changable per user preference.
+
+While this is accomplished with just 4 commands, the real benefit comes with all the other commands,
+which generally do what their name describes and are already using the wrapping  and alignment provided by SWARM.
+
+Beeing a modern console tool, it also takes advantage of beeing within a GUI enviornment.
+**swarm-status NUM ["STRING"]** will prodive ANSI chars for a nicer view instead of textual based information otherwise.
+Also, when invoking external commands with **swarm-{edit,filemgr,web}** it will use the per-user prefered
+application set in $SWARM\_FILE\_USER\_APPS according to wether the script is executed in a terminal window or a tty.
+However, there is no mouse interaction, as the focus of its purpose is the console or a headless device, such as a server or Raspery Pi.
+
+2. Dependcies
+-------------
+
+Its dependency list is quite short.
+As the goal was to be as minimalistic as possible regarding its dependencies, 
+and beeing as 'linux-philosophy-close-as-possible' as i understand it.
+
+Origin:
+	Everything is a file.
+And my addition:
+	Every file is text.
+
+So i decided to write everything as scripts, which enables me the stay almost dependency-less to match a minimalistic apporoach.
+
+*	bash
+*	coreutils
+*	awk
+*	grep
+*	sed
+*	(sudo)
+
+Which it requires **bash** to execute its commands, at some certain circumstance you can even tell one of the scripts to fail when executing a bash script, rather than a script of another script langauge.
+Saying, as it is command based, it can be used by every scripting language available.
+
+
+**swarm-terminal** beeing some kind of exception here, as it will only work in a GUI enviornment, 
+but this will also start the prefered terminal window of the user, 
+with its last list entry **xterm** ment as last fallback option.
+
+As it is command based and uses a dash (-) to seperate descriptors, it is possible to group some tasks.
+Those are swarm-bol-\*, swarm-conf-\*, swarm-math-\*, swarm-str-\*, which are considered coding helpers.
+
+There are three special cases:
+
+*	swarm-install, is ment to install packages distro-independant, so the scripter doesnt have to care wether its apt-get, emerge, dnf, pacman, pkg or zypper
+*	swarm-printf, does not accecpt string formating as its origin name
+*	swarm-psm, is the only abrevihation, background script manager
+
+
+It also attempts to reduce required user interaction to a minimum, 
+by not requiring an [ENTER] after typing 'y' or 'n' to answer tui-yesno,
+or by having tui-select count the number of options and 
+stops reading at given amount of characters corresponding to the length of the count of options.
+These small things, give a much more dynamic feeling to the TUI it generates.
+
+This said
+
+
 
 In the modern days, scripts are often not as valued as they should be, and having graphical interfaces certainly increases this trend.
 
 But there are uses where scripts are just more applicable than a full blown compiled application.
 
-TUI helps you to achieve script wich provide alot of comfort and simplicity for both, the scripter and enduser.
+TUI helps you to achieve script wich provide alot of comfort and simplicity for both, the scripter and user. 
 
+
+1. Introduction
+---------------
+
+Beeing aware that i probably missed its coolness by like 20 years, 
+this is what i always wanted to do, eversince my first contact with a computer.
+
+I always thought there was missing a framework to give the look and feel of an interface.
+
+There are lots of tools to make an interface on the console/terminal, but most of them or dialog based, 
+which to my understanding is ridioulous for a console/terminal.
+
+Thus i wanted something that (generaly speaking) works on a 'per-line' and 'command-as-function' basis,
+rather than on a 'dialog' basis.
+
+Something that can be used individually and simple be used as a standalone tool, 
+but brings the most benefit if used as the collection/framework it is.
+
+I wanted to provide functionality with the most natural speaking and meaningfull appraoch i can achieve.
 
 
 1.1. What is TUI?
