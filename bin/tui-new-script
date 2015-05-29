@@ -20,8 +20,11 @@
 #
 #	Variable defaults
 #
-	source tui
-	script_version=1.3.1
+	#source tui
+	source $HOME/.tui_rc
+	source $TUI_FILE_USER
+	source $TUI_FILE_USER_SETTINGS
+	script_version=1.4
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -33,27 +36,31 @@ Examples:	$ME fileA.sh			# Creates a script in ~/bin or ~/.local/bin if existing
 		$ME -s /opt/bin/fileB.sh	# Creates a standalone application script in /opt/bin
 Where options are:
 	-h		This screen
-	-s(tandalone)	Create a standalone application script template
+	-e(mpty)	Creates an empty script (default)
+	-s(tandalone)	Creates a standalone application script template
 	-r(egular)	Creates a same as default (no option), but less pre-sets
 	-t(ool)		Creates a template optimized for quiet and verbose mode
 	-m(inimal)	Creates a minimal header
+	-M(odul)	Creates a 'modul' kind of script for inside tui-browser
 	
 "
 	DEST=""
 	TITLE="sea's New script script"
-	SCRIPT="modul" # The default
+	SCRIPT="$default_new_script_type" # The default
 #
 #	Variable handling
 #
 	tui-title "$TITLE ($script_version)"
-	while getopts "hsrtm" name
+	while getopts "hsrtmMe" name
 	do 	case $name in
 		h)	printf "$help_text"
-			exit $RET_HELP	;;
+			exit $RET_HELP		;;
 		s)	SCRIPT="standalone"	;;
 		r)	SCRIPT="regular"	;;
-		t)	SCRIPT="tool"	;;
+		t)	SCRIPT="tool"		;;
 		m)	SCRIPT="minimal"	;;
+		m)	SCRIPT="modul"	;;
+		e)	SCRIPT="empty"		;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
 	done
@@ -65,31 +72,41 @@ Where options are:
 	then	DEST=$(tui-read "Enter the filename:")
 		if [ "$DEST" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
-			tui-bol-dir "$(dirname $DEST)"
+			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
 		else	DEST="$1"
 			tui-bol-dir -v "$(dirname $DEST)"
 		fi
 	else	if [ "$1" = "$(basename $1)" ]
-		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
-			tui-bol-dir "$(dirname $DEST)"
+		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST/$1"
+			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
 		else	DEST="$1"
 			tui-bol-dir -v "$(dirname $DEST)"
 		fi
 	fi
 	
 	if [ -f "$DEST" ]
-	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
-		tui-status $? "Overwrite file: $DEST"
+	then	tui-yesno "File $DEST exists... Overwrite?" ||  ( 
+			BACKUP="$DEST-$(date +'%F-%T').bak"
+			mv "$DEST" "$BACKUP"
+			tui-status $? "Saved original $DEST to $BACKUP"
+		)
 	fi
-	source $TUI_DIR_TEMPLATES/scripts/$SCRIPT
-	if tui-status $? "Saved: $(printf $DEST)"
+	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
+	then	source "$TUI_DIR_TEMPLATES/scripts/$SCRIPT"
+	elif [ -f "$TUI_DIR_USER_SCRIPTS/$SCRIPT" ]
+	then	tui-cp "$TUI_DIR_USER_SCRIPTS/$SCRIPT" "$DEST"
+	else	tui-status 1 "Fatal error, template \"$SCRIPT\" not found!"
+		exit 1
+	fi
+	[ -f "$DEST"]
+	if tui-status $? "Saved: $DEST"
 	then	chmod +x "$DEST"
 	else	exit $?
 	fi
-	doMan=false
 	
-	tui-yesno "Create a manpage too?" && \
-		tui-new-manpage "$DEST"
-	
-	# Open the scriot AFTER the manpage... to encourage the writing of the manpages ;)
+	if $default_new_script_manpage_ask
+	then	tui-yesno "Create a manpage too?" && \
+			tui-new-manpage "$DEST"
+	fi
+	# Open the script AFTER the manpage... to encourage the writing of the manpages first ;)
 	tui-edit "$DEST"

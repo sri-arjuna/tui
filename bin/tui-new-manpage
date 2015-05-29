@@ -20,8 +20,10 @@
 #
 #	Variable defaults
 #
-	source tui
-	script_version=0.4
+	source $HOME/.tui_rc
+	source $TUI_FILE_USER
+	source $TUI_FILE_USER_SETTINGS
+	script_version=0.5
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -39,7 +41,7 @@ Where options are:
 "
 	DEST=""
 	TITLE="sea's New manpage script"
-	SHELL_EXT="minimal"
+	SHELL_EXT=""
 #
 #	Variable handling
 #
@@ -55,6 +57,7 @@ Where options are:
 			exit $RET_HELP	;;
 		esac
 	done
+	SHELL_EXT="${SHELL_EXT:-$default_new_manpage_type}"
 	shift $(($OPTIND - 1))
 #
 #	Display
@@ -63,13 +66,13 @@ Where options are:
 	then	DEST=$(tui-read "Enter the filename:")
 		if [ "$DEST" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
-			tui-bol-dir "$(dirname $DEST)"
+			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
 		else	DEST="$1"
 			tui-bol-dir -v "$(dirname $DEST)"
 		fi
 	else	if [ "$1" = "$(basename $1)" ]
-		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
-			tui-bol-dir "$(dirname $DEST)"
+		then	DEST="$TUI_DIR_USER_SCRIPTS/$1"
+			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
 		else	DEST="$1"
 			tui-bol-dir -v "$(dirname $DEST)"
 		fi
@@ -83,4 +86,5 @@ Where options are:
 	source $TUI_DIR_TEMPLATES/manpage/$SHELL_EXT > "$DEST"
 	tui-status $? "Saved: $(printf $DEST)"
 	# Open the scriot AFTER the manpage... to encourage the writing of the manpage
+	#set -x
 	tui-edit "$DEST"

@@ -17,18 +17,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
+source $HOME/.tui_rc
+source $TUI_FILE_USER
+source $TUI_FILE_USER_SETTINGS
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.02.18
-	script_version=0.4.1
-#	Description:	Descriptional text goes here
+#	Changed:	2015.05.29
+	script_version=0.5
+#	Description:	Helps to create a tui-browser project
 #
 #	Variables
 #
-	source tui
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	TITLE="Create a new framework project using $ME"
@@ -59,12 +61,12 @@ Where options are:
 #
 #	Display & Action
 #
-	APP_TITLE=""
-	APP_BASE=""	# Where is the framework root
-	APP_USER_LABEL=""
+	APP_TITLE=""	# Project name
+	APP_BASE=""	# Where is the project root
+	APP_USER_LABEL=""	# Top left label
 	APP_FOLDERS=""	# label
 	APP_FILES=""	# Label
-	APP_FILE=""	# save point
+	APP_FILE=""	# save point, starter script
 	APP_DATA=""	# Where are the scripts to present
 	APP_INCLUDE=""
 	
@@ -74,18 +76,44 @@ Where options are:
 	tui-echo
 	# MUST BE
 	tui-title "Required Information:"
-	APP_TITLE=$(tui-read "What is the frameworks's title:")
-	APP_FILE=$(tui-read "What is the frameworks's filename (only name):")
-	APP_BASE=$(tui-read "Where is the '$APP_FILE' saved (just path):")
-	APP_DATA=$(tui-read "Where are the scripts to present in $APP_TITLE (just subdirname to $APP_BASE):")
+	APP_NAME=$(tui-read "What is the folder its name?")
+	
+	tui-echo
+	tui-echo "The project its title, displayed in the upper left header area, may contain spaces"
+	APP_TITLE=$(tui-read "What is the project its name or title:")
+	
+	tui-echo
+	APP_FILE=$(tui-read "What is the filename to execute (name only):")
+	
+	tui-echo
+	APP_BASE=$(tui-read "Where is the '$APP_FILE' saved (just path, leave empty for $default_new_browser_dir/$APP_NAME):")
+	APP_BASE="${APP_BASE:-$default_new_browser_dir/$APP_NAME}"
+	
+	tui-echo
+	tui-echo "Where are the scripts to present $APP_TITLE?"
+	APP_DATA=$(tui-read "Leave  subdirname to $APP_BASE/")
+	
+	tui-echo
+	tui-bol-dir "$APP_BASE/$APP_DATA"
+	
 	# Optional
 	if tui-yesno "Make more changes?"
 	then	tui-title "$INFO" "Leave empty for default values, use 1 space for empty fields" "$INFO"
-		APP_FILES=$(tui-read "What is the new label for files:")
-		APP_FOLDERS=$(tui-read "What is the new label for files:")
-		APP_USER_LABEL=$(tui-read "What is the new label for 'user-area-label':")
-		#APP_TITLE=$(tui-read "What is the frameworks's title: ")
+		APP_FOLDERS=$(tui-read "What is the new caption for folders:")
+		APP_FILES=$(tui-read "What is the new caption for files:")
+		APP_USER_LABEL=$(tui-read "What is the new caption for upper right top line:")
 	fi
-	tui-bol-dir "$APP_TITLE/$APP_DATA"
-	source "$TUI_DIR_TEMPLATES/browser" > "$APP_TITLE/$APP_FILE"
-	tui-filemgr "$APP_TITLE"
+	
+	if ${default_new_browser_manpage_create:-true}
+	then	case "${default_new_browser_manpage_type:-application}" in
+		application)	var_opt="-a"	;;
+		*)		var_opt=""	;;
+		esac
+		tui-bol-dir -v "$APP_BASE/man"
+		${0/browser/manpage} $varOpt "$APP_BASE/man/$APP_FILE"
+	fi
+	
+	source "$TUI_DIR_TEMPLATES/browser" > "$APP_BASE/$APP_FILE"
+	chmod +x "$APP_BASE/$APP_FILE"
+	tui-filemgr "$APP_BASE"
+	

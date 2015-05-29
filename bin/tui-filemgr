@@ -26,11 +26,11 @@
 #	Check for the environment to load
 #
 	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/apps.conf" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" && \
 		. "$TUI_FILE_CONF_APPS" && \
-		. "$TUI_FILE_CONF_SETTINGS" || \
+		. "$TUI_FILE_CONF_COMMANDS" && \
+		. "$TUI_FILE_CONF_SETTINGS" && \
+		. "$TUI_FILE_USER_APPS" && \
+		. "$TUI_FILE_USER_SETTINGS" || \
 		. tui	# This first call would create the RC if its missing.
 	
 	help_text="$ME ($script_version)
@@ -58,16 +58,8 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
-		
-		case "$1" in
-		cli)	LIST="mc fd fdclone vifm"	;;
-		gui)	LIST="pcmanfm thunar nautilus dolphin konquerer krusader xfe 4pane gentoo filerunner "	;;
-		esac
-		
-		for L in $LIST;do
-			which $L 2>/dev/zero  1>/dev/zero&& \
-				echo "$L" && \
+		for L in $(<$TUI_DIR_LIST/editor_${MODE});do
+			which $L 2>/dev/zero && \
 				return 0
 		done
 		return 1
@@ -95,7 +87,7 @@
 			var=FILEMGR_CLI || \
 			var=FILEMGR_GUI
 		[ -z "$FILEMGR" ] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
-		tui-conf-set "$CONF" $var $FILEMGR
+		tui-conf-set "$TUI_FILE_USER_APPS" $var $FILEMGR
 	fi
 	
 	for A in "${@}";do
