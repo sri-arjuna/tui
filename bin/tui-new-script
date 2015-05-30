@@ -98,7 +98,7 @@ Where options are:
 	else	tui-status 1 "Fatal error, template \"$SCRIPT\" not found!"
 		exit 1
 	fi
-	[ -f "$DEST"]
+	[ -f "$DEST" ]
 	if tui-status $? "Saved: $DEST"
 	then	chmod +x "$DEST"
 	else	exit $?
