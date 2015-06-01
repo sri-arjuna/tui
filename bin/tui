@@ -47,13 +47,13 @@
 		$TITLE
 		Usage: 	$ME [config|reset[-yes]|theme] (source tui)
 		Where options are:
-			-h		This screen
-			config		Enters directly into config mode
-			reset		Resets configuration to defaults, root will reset systemwide defaults
-			reset-yes	Doesnt ask for verification
-			theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme to THEME.
-					As root, changes the root theme only.
-		
+		 	-h		This screen
+		 	config		Enters directly into config mode
+		 	reset		Resets configuration to defaults, root will reset systemwide defaults
+		 	reset-yes	Doesnt ask for verification
+		 	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme to THEME.
+		 			As root, changes the root theme only.
+		 
 		SCREEN
 	}
 	function first_time() { #

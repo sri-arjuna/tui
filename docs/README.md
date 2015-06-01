@@ -9,6 +9,53 @@ TUI - a (line based) Text User Interface framework
 Description / What is it?:
 --------------------------
 
+It is a command based framework which wraps the task (executed command name represents task or description) into an adaptive Text User Interface (TUI).
+It is a framework to be used in the shell or shell scripts, though the usage of scripts is recomended to preserve the interface feeling.
+It aims to simplify the task of script writing and mainwhile reward the scripter and the final user with a TUI.
+
+This said, when executed alone, a single tui-<command>, it doesnt look that interface'ish.
+However, as soon you append a few tui-echo after another or use tui-cat to print a small textfile to the screen, you will feel the difference.
+
+The core display commands are:
+
+* tui-header, has the full background colored
+* tui-title, has only the inline background colored
+* tui-echo
+* tui-printf
+* tui-cat
+* tui-list
+
+Default behaviour:
+Prints left and right border according to selected theme, and colors tui-header and tui-title.
+Each of the core display commands prints up to 3 strings to align output.
+While tui-title prints a single string centered, the others will print if left.
+If passed 2 strings, first one will be left, second will be right.
+If passed 3 strings, the 2nd will be centered and the third one be right.
+Use tui-list to print more than three string, and use -1 or -2 to force to pass only that many items to print a line.
+
+tui-printf might be irritating at first, as it doesnt accept the string formating as its name-ancestor printf, but it is the absolute core display tool used in TUI, and therefor deserves that name.
+Please see its helpscreen or manpage or the examples for more details.
+
+There are several tools that work with their or passed return/exit codes.
+tui-yesno beeing one of them as it returns no visible value, just its exit code changes from 0 for yes, to 1 for no.
+
+	if tui-yesno
+	then	tui-echo "Do this" "$list"
+	else	tui-status 4 "Skipped"
+	fi
+
+There are also tools that expect the returned value to be stored as a string variable, such as tui-select.
+
+	A="Some Entries"
+	B="With whitespaces"
+	while [ ! "$MENU" = Quit ]
+	do	MENU=$(tui-select Quit "$A" "$B")
+		case "$MENU" in
+		"$A")	echo todo	;;
+		"$B"	echo todo	;;
+		esac
+	done
+
 As an application/package it is a dependency, not a standalone application, it also requires bash to be installed, however your script could be _anyhting_ from bash to zsh.
 
 It is not ment that 'endusers' (have to) care about TUI, its ment that a scripter uses tui as his library (-functions).

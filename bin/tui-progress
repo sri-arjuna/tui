@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.05.25
-	script_version=0.9.2
+#	Changed:	2015.06.01
+	script_version=0.9.3
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -45,6 +45,7 @@ Where options are:
 	-b(ar)			Enables the 'bar' mode (minimal)
 	-B(ar)	        VAL     Changes the bar-symbol to VAL
 	-c(urrent)	VAL	Required für bar-mode
+	-C(learline)		Clear the line before print a new value, recomended if you pass multiple files
 	-m(ax)		VAL	If provided, changes progressstring output to 'calculated-num / VAL '
 	-l(ong)			Prints more info when in bar mode.
 	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
@@ -63,7 +64,9 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	TOTAL=$[ ${#INDI[@]} -1 ]
 	TYPE=dash
 	MAX=1
-	CURRENT=
+	VAL=0
+	CURRENT=0
+	CLEARLINE=false
 	valPassed=false
 	hadOpts=false
 	doReset=false
@@ -104,7 +107,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Catching Arguments
 #
-	while getopts "c:B:bi:lm:rh" name
+	while getopts "c:CB:bi:lm:rh" name
 	do 	case $name in
 		B)	BAR="$OPTARG"
 			hadOpts=true		;;
@@ -112,6 +115,8 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			hadOpts=true		;;
 		c)	CURRENT="$OPTARG"
 			valPassed=true
+			hadOpts=true		;;
+		C)	CLEARLINE=true
 			hadOpts=true		;;
 		i)	ID="$OPTARG"
 			hasID=true
@@ -147,16 +152,16 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	num)	# Create initial tempfile if none exists
 		[ ! -f "$TMPFILE" ] && \
 			touch "$TMPFILE" && \
-			reset_temp
+			reset_temp || exit 1
 		;;
 	bar)	if [ -z "$CURRENT" ]
 		then	# Kind of a workaround
-			CURRENT=$(read_tmp)
-			CURRENT=$(( $CURRENT + 1 ))
+			VAL=$(read_tmp)
+			VAL=$(( $VAL + 1 ))
 		fi
 		if [ -z "$MAX" ] || [ -z "$CURRENT" ]  #|| [ ! $MAX -gt 1 ]
 		then	# Improper handling
-			tui-status 1 "Usage: $ME -bc \$CUR_VALUE -m \$MAV_VALUE 'msg'"
+			tui-status 1 "Usage: $ME [-r] [-m \$MAV_VALUE]  [-bc \$CUR_VALUE] [-l]]  'msg'"
 			exit 1
 		fi
 	esac
@@ -164,6 +169,9 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #	Read initial value from tmpfile
 #
 	[ -z "$(echo $CURRENT|tr -d [[:alpha:]])" ] && VAL=$(read_tmp) || VAL="$CURRENT"
+	#VAL=${VAL:-0}
+	MAX=${MAX:-0}
+	VAL=${VAL/*\/}
 #
 #	Generate output string
 #
@@ -238,6 +246,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Display & Action
 #
+	$CLEARLINE && printf "\e[2K" &
 	if [ -z "$MESSAGE" ]
 	then	$longBar && [ $pro -ne 100 ]  && PROGRESS+=" "
 		$longBar && \
