@@ -73,6 +73,9 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Thu May 28 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-6
+- Changed:   tui-bgjob, adjusted displaying algorythm
+
 * Thu May 28 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-4
 - Changed:   tui-new-*, had some invalid references left
 - Changed:   tui-new-*, added some default values to settings.conf,
