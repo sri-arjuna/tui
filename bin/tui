@@ -22,9 +22,9 @@
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
-#	Created:	2013.05.03
-#	Changed:	2015.05.24
-	script_version=2.1
+#	Created:        2013.05.03 (rev:3)
+#	Changed:	2015.06.02
+	script_version=2.2
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
@@ -105,9 +105,9 @@
 			#
 			 	TUI_THEME=$THM
 			#
-			#	Paths	:	Custom Installation
+			#	Paths	:	Used by the Installation-Script (update)
 			#
-			[ -z "\$TUI_DIR_INSTALL_ROOT" ] && readonly \\
+			[ -z "\$TUI_DIR_INSTALL_ROOT" ] && \\
 			 	TUI_DIR_INSTALL_ROOT="${TC%/}"
 			[ -z "\$TUI_PREFIX" ] && readonly \\
 			 	TUI_PREFIX="\$TUI_DIR_INSTALL_ROOT/usr"
@@ -118,7 +118,7 @@
 			[ -z "\$TUI_DIR_USER" ] && readonly \\
 			 	TUI_DIR_USER="$XDG_CONFIG_DIR/tui"
 			#
-			#	Paths	:	System
+			#	Paths	:	Used to run the System
 			#
 			[ -z "\$TUI_DIR_CONF" ] && readonly \\
 			 	TUI_DIR_CONF="\$TUI_DIR_INSTALL_ROOT/etc/tui"
@@ -135,7 +135,7 @@
 			[ -z "\$TUI_DIR_LIST" ] && readonly \\
 			 	TUI_DIR_LIST="${TUI_DIR_SYSTEM}/lists"
 			#
-			#	Paths	:	User
+			#	Paths	:	That are about the User
 			#
 			[ -z "\$TUI_DIR_USER_LOGS" ] && readonly \\
 			 	TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
@@ -148,7 +148,8 @@
 			[ -z "\$TUI_DIR_USER_THEMES" ] && readonly \\
 			 	TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
 			#
-			#	Files	:	System
+			#	Files
+			#	Direct access to the most important configuration files for the System
 			#
 			[ -z "\$TUI_FILE_CONF_APPS" ] && readonly \\
 			 	TUI_FILE_CONF_APPS="\$TUI_DIR_CONF/apps.conf"
@@ -163,7 +164,7 @@
 			[ -z "\$TUI_FILE_CONF_SYSTEM" ] && readonly \\
 			 	TUI_FILE_CONF_SYSTEM="\$TUI_DIR_CONF/tui.conf"
 			#
-			#	Files	:	User
+			#	Files	:	User specific configuration files
 			#
 			[ -z "\$TUI_FILE_USER" ] && readonly \\
 			 	TUI_FILE_USER="\$TUI_DIR_USER/user.conf"
