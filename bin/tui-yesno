@@ -23,12 +23,11 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tui_rc" && \
-		. "$TUI_FILE_CONF_COMMANDS" && \
-		. "$TUI_FILE_CONF_COLORS" && \
-		. "$TUI_FILE_CONF_STATUS" && \
-		. "$TUI_FILE_CONF_SYSTEM"  || \
-		. tui
+	source "$HOME/.tui_rc" || . tui
+	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
+	do	source "$f"
+	done
+	source "$TUI_FILE_USER_SETTINGS"
 	# If there is a user theme directory, use that one instead
 	[ -f "$TUI_DIR_USER_THEMES"/* ] && \
 		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
@@ -51,7 +50,7 @@
 $ME ($script_version)
 Usage: 	$ME \"Question\"
 
-Example:
+Example: (Accepts: 'y,o,j,s', denies everything else)
 	if $ME 'Do you want to do this?'
 	then echo yes
 	else echo no
@@ -68,12 +67,15 @@ Example:
 	"-h")	printf "$help_text" ; exit $RET_HELP
 		;;
 	esac
+	$select_read_numbers && \
+		cmd="read -n1" || \
+		cmd="read"
 #
 #	Display
 #
 	tui-printf "$1" > /dev/stderr
 	printf "\r$BORDER_LEFT $1 (y/n) " > /dev/stderr
-	read -n1 answer 
+	$cmd answer 
 	#printf "\r"  > /dev/stderr
 	tui-echo "$1 (y/n)" "$answer"  > /dev/stderr
 	case "$answer" in

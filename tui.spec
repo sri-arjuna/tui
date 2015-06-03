@@ -77,6 +77,7 @@ rm -rf %{buildroot}
 - Updated:   tui-echo, tui-header, tui-title now read from pipe if passed '-'
 -            tui-list and tui-select try
 -            to read from pipe if no arguments are passed
+- Updated:   Applied some handlers to catch different 'read' builds
 
 * Thu May 28 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-6
 - Changed:   tui-bgjob, adjusted displaying algorythm
