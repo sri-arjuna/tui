@@ -90,6 +90,34 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Catching Arguments
 #
+	case "$1" in
+	"-h"|"--help")
+		printf '%s\n' \
+			"" \
+			"$ME ($script_version)" \
+			"Usage: 	$ME [opts] [[-] | [str1] [str2] [str3]]" \
+			"" \
+			"Pass '-' to read input from pipe" \
+			"One can pass emptry strings to align the desired output." \
+			"	Prints one string on the left" \
+			"	Prints two strings left and right" \
+			"	Prints three strings left, centred and right" \
+			"" \
+			"Where options are:" \
+			"	-h|--help	This screen" \
+			"	-E		Prints the echo" \
+			"	-H		Prints the header" \
+			"	-r		Returns cursors to line start" \
+			"	-S	NUM	Prints status, without exit status" \
+			"	-T		Prints the title" \
+			"" 
+		exit 99
+		;;
+	"-")	# Read pipe
+		read LEFT CENTER RIGHT 
+		set "$LEFT" "$CENTER" "$RIGHT"
+		;;
+	esac
 	while getopts "EHTS:hr" name
 	do 	case "$name" in
 		E|echo) 	doEcho=true
@@ -103,9 +131,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				NUM_ID="$OPTARG" ;;
 		r|return)	doReturn=true
 				NL="\r" 	;;
-		h|*)		printf "$help_text"
-				exit $RET_HELP
-				;;
 		esac
 	done
 	shift $(($OPTIND - 1))

@@ -22,6 +22,8 @@
 #	A simple tool which returns the string of the selected num-id
 #
 #
+#	TODO
+#		check for:  read -h 2>&1|grep "\-n"
 #
 #	Variable environment
 #
@@ -54,13 +56,17 @@ Usage: 		$ME [options] LIST 'of items' ..
 Examples:	ret=\$($ME one two three)
 		$ME *
 Where options are:
-		-a	Autoselect if only one entry was found
+		-1|2		Print that many rows
+		-a		Autoselect if only one entry was found
+		-v(erbose)		Print cancel option 0.
+	
+		
 "
 #
 #	Action
 #
 	ROWS=""
-	while getopts "12ha" opt
+	while getopts "12hav" opt
 	do	case "$opt" in
 		h|"")	printf "$help_text"
 			exit 99
@@ -69,12 +75,20 @@ Where options are:
 			;;
 		1|2)    ROWS=$opt
 			;;
+		v)	beVerbose=true
+			;;
 		esac
 	done
 	shift $(($OPTIND - 1))
-	[ -z "$ROWS" ] || ROWS="-$ROWS"
+	[ -z "$ROWS" ] || ROWS="$ROWS"
 	
 	# This many digits to read at max
+	wasPipe=false
+	[ -z "$1" ] && \
+		wasPipe=true && \
+		while IFS= read -r ARG
+		do	set -- "$@" "$ARG"
+		done
 	ARGS=("${@}")
 	len=${#ARGS[@]}
 	$AUTO && \
@@ -83,7 +97,9 @@ Where options are:
 		exit 0
 	
 	# Show the options
-	tui-list $ROWS "${ARGS[@]}" > /dev/stderr
+	#$beVerbose && \
+	#	bin/tui-list -vn$ROWS Cancel "${ARGS[@]}" > /dev/stderr || \
+		bin/tui-list -n$ROWS "${ARGS[@]}" > /dev/stderr
 	
 	# Repeat input while invalid
 	invalid=true
@@ -94,9 +110,12 @@ Where options are:
 		invalid=false
 		
 		# Get input
-		read -n ${#len} NUM
+		$wasPipe && \
+			read -n ${#len} NUM </dev/tty || \
+			read -n ${#len} NUM
 		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
+		[ 0 -eq $NUM ] && exit 1
 		if ! echo "$NUM" | $GREP -q ^[0-9] 
 		then	NUM="" 
 			invalid=true 

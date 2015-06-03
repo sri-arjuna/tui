@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.7.3
+	script_version=0.8
 	ME="${0##*/}"
 #
 #	Variable handling
@@ -29,12 +29,12 @@
 	"-h"|"--help")
 		printf '%s\n' \
 			"$ME ($script_version)" \
-			"Usage: $ME [str1] [str2] [str3]" \
-			"	Prints str1 on the left" \
-			"	Prints str2 in the middle" \
-			"	Prints str3 on the right" \
-			"If 2 strings are passed, they're printed left and right." \
+			"Usage: $ME [[-] | [str1] [str2] [str3]]" \
+			"Pass '-' to read input from pipe" \
 			"One can pass emptry strings to align the desired output." \
+			"	Prints one string on the left" \
+			"	Prints two strings left and right" \
+			"	Prints three strings left, centred and right" \
 			""
 		exit 99
 		;;
@@ -46,6 +46,7 @@
 #
 #	Display
 #
+	[ "-" = "$1" ] && read LEFT CENTER RIGHT && set "$LEFT" "$CENTER" "$RIGHT"
 	case $# in
 	0)	tui-printf -E 					;;
 	1)	tui-printf -E $leadingDASHdummy "$1"		;;

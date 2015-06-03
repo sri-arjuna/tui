@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.03.17
-	script_version=1.3
+#	Changed:	2015.06.03
+	script_version=1.4
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.
@@ -37,7 +37,10 @@
 #
 #	Variable defaults (options)
 #
-	MODE=num
+	MODE=none
+	beVerbose=false
+	SEP=""
+        ROWS=3
 #
 #	Help text
 #
@@ -51,16 +54,14 @@ Where options are:
 	-h(elp) 		This screen
 	-a(lpha)		Use letters instead of numbers
 	-r(oman)		Use roman letters instead of numbers (up to 3000 valid)
-	-n(one)			Dont use any counting, just list each entry
-
+	-n(um)			User regular numbers for counting
+	-v(erbose)		Print cancel option 0.
 "
 #	-r(oman)		Use roman letters as numbers
 
 	#[ -z $1 ] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
 	# A ':' after a char indicates that this option requires an argument
-	SEP=") "
-        ROWS=3
-	while getopts "ahnr12" opt
+	while getopts "ahnr12v" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
@@ -69,16 +70,20 @@ Where options are:
                 a)	MODE=alpha 	;;
 		r)	MODE=roman
 			SEP=". "	;;
-		n)	MODE=none
-			SEP=""		;;
+		n)	MODE=num
+			SEP=") "	;;
+		v)	beVerbose=true	;;
 		# *)	printf "$help_text" ; exit $?	;;
 		esac
 	done
 	shift $(($OPTIND - 1))
+	[ -z "$1" ] && \
+		while IFS= read -r ARG
+		do	set -- "$@" "$ARG"
+		done
 	ARGS=( "${@}")			# Remaining arguments
 	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
 	COLUMNS=$(tput cols)
-	#SEP+=" "
 #
 #	Functions
 #
