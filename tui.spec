@@ -73,6 +73,11 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Wed Jun 03 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-7
+- Updated:   tui-echo, tui-header, tui-title now read from pipe if passed '-'
+-            tui-list and tui-select try
+-            to read from pipe if no arguments are passed
+
 * Thu May 28 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-6
 - Changed:   tui-bgjob, adjusted displaying algorythm
 
