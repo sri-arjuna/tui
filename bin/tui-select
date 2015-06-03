@@ -31,9 +31,10 @@
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	source "$HOME/.tui_rc" || . tui
-	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
+	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
 	do	source "$f"
 	done
+	source "$TUI_FILE_USER_SETTINGS"
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
 	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
@@ -62,6 +63,21 @@ Where options are:
 	
 		
 "
+#
+#	Prepare command
+#
+	sourceAgain=false
+	if [ -z "$select_read_numbers" ]
+	then	read -h 2>&1|grep -q "\-n"
+		tui-conf-set "$TUI_FILE_USER_SETTINGS" select_read_numbers $(tui-str-bol-conv -t $?)
+		sourceAgain=true
+	fi
+	if [ -z "$select_read_timeout" ]
+	then	read -h 2>&1|grep -q "\-t"
+		tui-conf-set "$TUI_FILE_USER_SETTINGS" select_read_timeout $(tui-str-bol-conv -t $?)
+		sourceAgain=true
+	fi
+	$sourceAgain && source "$TUI_FILE_USER_SETTINGS"
 #
 #	Action
 #
@@ -95,11 +111,11 @@ Where options are:
 		[ $len -eq 1 ] && \
 		printf '%s\n' "$ARGS" > /dev/stdout && \
 		exit 0
-	
-	# Show the options
-	#$beVerbose && \
-	#	bin/tui-list -vn$ROWS Cancel "${ARGS[@]}" > /dev/stderr || \
-		bin/tui-list -n$ROWS "${ARGS[@]}" > /dev/stderr
+	$select_read_numbers && \
+		cmd="read -n ${#len}" || \
+		cmd="read"
+	# Show the entries
+	tui-list -n$ROWS "${ARGS[@]}" > /dev/stderr
 	
 	# Repeat input while invalid
 	invalid=true
@@ -111,8 +127,8 @@ Where options are:
 		
 		# Get input
 		$wasPipe && \
-			read -n ${#len} NUM </dev/tty || \
-			read -n ${#len} NUM
+			$cmd NUM </dev/tty || \
+			$cmd NUM
 		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
 		[ 0 -eq $NUM ] && exit 1
