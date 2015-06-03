@@ -47,7 +47,7 @@
 #	Variables
 #	
 	ME=${0##*/}
-	script_version=0.8.0
+	script_version=0.8.1
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)

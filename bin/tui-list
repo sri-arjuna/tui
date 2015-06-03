@@ -25,7 +25,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
 #	Changed:	2015.06.03
-	script_version=1.4
+	script_version=1.5
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.

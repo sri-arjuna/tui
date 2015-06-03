@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.8
+	script_version=0.8.1
 	ME="${0##*/}"
 #
 #	Variable handling

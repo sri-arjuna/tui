@@ -42,7 +42,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.0.2
+	script_version=1.0.3
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
