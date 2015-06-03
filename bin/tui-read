@@ -27,9 +27,10 @@
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	source "$HOME/.tui_rc" || . tui
-	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
+	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
 	do	source "$f"
 	done
+	source "$TUI_FILE_USER_SETTINGS"
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
 	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
@@ -41,8 +42,8 @@
 #
 #	Variable defaults
 #
-	script_version=1.0.1
-	ME="$(basename $0)"
+	script_version=1.0.2
+	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
 Usage: 		$ME [options] MSG
@@ -65,19 +66,28 @@ Examples:	$ME \"What is your favorite color?\"
 	done
 	shift $(($OPTIND - 1))
 #
+#	Prepare command
+#
+	sourceAgain=false
+	if [ -z "$select_read_numbers" ]
+	then	read -h 2>&1|grep -q "\-n"
+		tui-conf-set "$TUI_FILE_USER_SETTINGS" select_read_numbers $(tui-str-bol-conv -t $?)
+		sourceAgain=true
+	fi
+	if [ -z "$select_read_timeout" ]
+	then	read -h 2>&1|grep -q "\-t"
+		tui-conf-set "$TUI_FILE_USER_SETTINGS" select_read_timeout $(tui-str-bol-conv -t $?)
+		sourceAgain=true
+	fi
+	$sourceAgain && source "$TUI_FILE_USER_SETTINGS"
+#
 #	Display
 #
 	[ -z "$1" ] && \
 		txt="Type your input:" || \
 		txt="$1"
 	tui-printf "$txt" > /dev/stderr
-	printf "\r$BORDER_LEFT $txt " > /dev/stderr
-	read ${doPassword} INPUT
-	
-	# Seems this doesnt work here, as one presses enter and gets a linebreak from that.
-	#[ -z "$doPassword" ] || INPUT="${$INPUT/\<password\>}"	
-	#printf "\n\n" > /dev/stderr
-#	tui-echo "$txt" "$INPUT" > /dev/stderr
-	
-	printf '%s' "$INPUT"  > /dev/stdout
-	[ -z "$doPassword" ] || printf "\n" > /dev/stderr
+	printf "\r$BORDER_LEFT $txt " >&2
+	read ${doPassword} INPUT </dev/tty
+	printf '%s' "$INPUT"  >&1
+	[ -z "$doPassword" ] || printf "\n" >&2
