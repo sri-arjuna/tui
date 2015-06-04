@@ -28,7 +28,7 @@
 	do	[ -f "$f" ] && source "$f"
 	done
 	
-	script_version=0.8
+	script_version=0.8.1
 	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
@@ -79,7 +79,7 @@
 	TXT_EXIT="$3"
 	MAX_BYTES=${MAX_BYTES:-${SIZE_ORG:-0}}
 	[ -z "$4" ] && WAIT=0.7 || WAIT="$4"
-	#$CHECKFILE && \
+	$CHECKFILE && \
 		[ $MAX_BYTES -gt 0 ] && \
 		showBar=true || showBar=false
 #
@@ -110,7 +110,9 @@
 		if $CHECKFILE
 		then	if $showBar
 			then	tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
-			else	tui-progress -lm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
+			else	[ -z "${MAX_BYTES/0}" ] && \
+					tui-progress -c $FS "$TXT_PROGRESS ($FS_SHOW)" || \
+					tui-progress -lm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
 			fi
 		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]"
 		fi

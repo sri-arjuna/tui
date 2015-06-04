@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.06.01
-	script_version=0.9.3
+#	Changed:	2015.06.03
+	script_version=0.9.4
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -132,8 +132,6 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			hadOpts=true		;;
 		esac
 	done
-	$hadOpts && shift $(($OPTIND - 1))
-	MESSAGE="$1"
 #
 #	Check for all required options
 #	
@@ -141,18 +139,22 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	then	TMPFILE="$TUI_DIR_CACHE/tui-progress_ids.tmp"
 	else	TMPFILE="$TUI_DIR_CACHE/tui-progress_default.tmp"
 	fi
+	$hadOpts && shift $(($OPTIND - 1)) #|| VAL=$(read_tmp)
+	MESSAGE="$1"
 	$doReset && \
 		reset_temp && \
 		exit 0
 	
 	case "$TYPE" in
 	dash)	# Default behaviour, no options
-		>/dev/zero
+		#>/dev/zero
+		$hadOpts || VAL=$(read_tmp)
 		;;
 	num)	# Create initial tempfile if none exists
 		[ ! -f "$TMPFILE" ] && \
 			touch "$TMPFILE" && \
 			reset_temp || exit 1
+		VAL=$(read_tmp)
 		;;
 	bar)	if [ -z "$CURRENT" ]
 		then	# Kind of a workaround
@@ -168,16 +170,18 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Read initial value from tmpfile
 #
-	[ -z "$(echo $CURRENT|tr -d [[:alpha:]])" ] && VAL=$(read_tmp) || VAL="$CURRENT"
-	#VAL=${VAL:-0}
+	[ ! -z "$(echo $CURRENT|tr -d [[:alpha:]])" ] && \
+		VAL=$(read_tmp) || VAL="$CURRENT"
+	VAL=${VAL:-0}
 	MAX=${MAX:-0}
-	VAL=${VAL/*\/}
+	#VAL=${VAL/*\/}
 #
 #	Generate output string
 #
 	case "$TYPE" in
 		dash)	[ $VAL -gt 3 ] && VAL=0
 			PROGRESS="[  ${INDI[$VAL]}   ]"
+			#VAL=$(($VAL+1))	# Doesnt change a thing?
 			;;
 		num)	# Dont show if VAL is higher than MAX
 			[ $VAL -gt $MAX ] && exit 1
@@ -231,9 +235,11 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #	Update value for next access
 #
 	case "$TYPE" in
-	dash) 	[ ! $VAL -ge 3 ] && \
-			save_tmp $(($VAL + 1 )) || \
-			save_tmp  0
+	dash) 	if [ $VAL -lt 3 ]
+		then	num=$(($VAL+1))
+			save_tmp $num
+		else	save_tmp 0
+		fi
 		;;
 	num)	num=$(($VAL+1))
 		save_tmp $num
@@ -248,10 +254,10 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 	$CLEARLINE && printf "\e[2K" &
 	if [ -z "$MESSAGE" ]
-	then	$longBar && [ $pro -ne 100 ]  && PROGRESS+=" "
+	then	$longBar && [ $pro -ne 100 ] && [ ! $TYPE = dash ] && PROGRESS+=" "
 		$longBar && \
 			tui-printf "${PROGRESS}" "${STATUS}" || \
 			tui-printf "" "${PROGRESS}${STATUS}"
-	else	[ ${pro:-0} -ne 100 ]  && PROGRESS+=" "
+	else	[ ${pro:-0} -ne 100 ] && [ ! $TYPE = dash ] && PROGRESS+=" "
 		tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
 	fi

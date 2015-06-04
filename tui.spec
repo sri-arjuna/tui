@@ -73,6 +73,10 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Wed Jun 03 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-8
+- Fixed:     tui-bgjob, tui-printf, tui-progress, tui-status
+-            Either misalignend or non-printed output
+
 * Wed Jun 03 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-7
 - Updated:   tui-echo, tui-header, tui-title now read from pipe if passed '-'
 -            tui-list and tui-select try
