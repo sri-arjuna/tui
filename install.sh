@@ -20,11 +20,11 @@
 # ------------------------------------------------------------------------
 #
 #	This script will help you to install TUI on your system
-#	Last Update:	2015.05.24
+#	Last Update:	2015.06.04
 #
 #	Internals
 #
-	script_version=0.8
+	script_version=0.8.5
 	TRC=$HOME/.tui_rc
 #
 #	Variables
@@ -41,25 +41,21 @@
 	initializeANSI() { #
 	#
 	#
-		esc=""
-
-		blackf="${esc}[30m";	redf="${esc}[31m";	greenf="${esc}[32m"
-		yellowf="${esc}[33m";	bluef="${esc}[34m";	purplef="${esc}[35m"
-		cyanf="${esc}[36m";	whitef="${esc}[37m"
-
+		esc="";		blackf="${esc}[30m";	redf="${esc}[31m"
+		greenf="${esc}[32m";	yellowf="${esc}[33m";	bluef="${esc}[34m"
+		purplef="${esc}[35m";	cyanf="${esc}[36m";	whitef="${esc}[37m"
 		blackb="${esc}[40m";	redb="${esc}[41m";	greenb="${esc}[42m"
 		yellowb="${esc}[43m";	blueb="${esc}[44m";	purpleb="${esc}[45m"
-		cyanb="${esc}[46m";	whiteb="${esc}[47m"
-
-		reset="${esc}[0m"
+		cyanb="${esc}[46m";	whiteb="${esc}[47m";	reset="${esc}[0m"
 	}
 	yesno()	{ # "Question"
 	#
 	#
 		while true; do
-			read -p "${1} (y/n): " -n1 response ; echo
-			case "$response" in
-				[yY]) return 0 ;;
+			echo "${1} (y/n): "
+			read response ; echo
+			case "${response:0:1}" in
+				[yYjJsSOo]) return 0 ;;
 				[nN]) return 1 ;;
 				*) echo ;
 			esac
@@ -101,8 +97,12 @@
 		else	te "You're a regular user, so a custom installation is recomended."
 			te "Note this makes things complicate if your scripts shall be used as root or with sudo."
 		fi
-		catched_root=${CHROOT:-$SUGGESTED_ROOT}
-		catched_prefix=${PREFIX:-$SUGGESTED_PREFIX}
+		if [ -f "$TRC" ]
+		then	catched_root=${CHROOT:-$TUI_DIR_INSTALL_ROOT}
+			catched_prefix=${PREFIX:-$TUI_PREFIX}
+		else	catched_root=${CHROOT:-$SUGGESTED_ROOT}
+			catched_prefix=${PREFIX:-$SUGGESTED_PREFIX}
+		fi
 		te
 		t2 "Installation root:" "$catched_root"
 		t2 "Installation prefix:" "$catched_prefix"
@@ -125,7 +125,7 @@
 	# Create the user RC file with the set installation paths
 	# Then copy the files to their paths
 		[ ! -f bin/tui ] && te && te "As of now, you must be in the projects home directory to install TUI!" && exit 1
-		printf '%s' "Writing RC file"
+		printf '%s' "Writing RC file ($TRC)"
 		CHROOT="$catched_root" PREFIX="$catched_prefix" . bin/tui
 		
 		te;te
