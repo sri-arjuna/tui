@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-# File		typewriter
+# File		cat and typewriter
 # Description:	Simply prints a string char by char, waiting a certin delay in between.
 # ------------------------------------------------------
 #
@@ -25,7 +25,7 @@
 #
 	BORDER_RIGHT=""
 	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
+		. "$TUI_FILE_CONF_COMMANDS" && \
 		. "$TUI_DIR_THEMES/$TUI_THEME"  || . tui	# This first call would create the RC if its missing.
 	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
 	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
@@ -33,9 +33,10 @@
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
 	ME="${0##*/}"
-	script_version=0.6.5
+	script_version=0.8
 	DELAY=0.05
 	TITLE=false
+	wasPipe=false
 	MODE=cat
 	
 	help_text="$ME ($script_version)
@@ -66,10 +67,11 @@ Options:
 		esac
 	done
 	shift $(($OPTIND - 1))
-	
 	[ -z "$1" ] && \
-		echo "$help_text" && \
-		exit 1
+		wasPipe=true && \
+		while IFS= read -r ARG
+		do	set -- "$@" "$ARG"
+		done
 	ARGS=("${@}")
 #
 #	Display & Action
@@ -89,8 +91,11 @@ Options:
 					# Print content
 					tui-printf -E $leadingDASHdummy "${content}"
 				done<"$arg"
-			else	RET=1
-				tui-printf -S $RET "File not found: $arg"
+			else	if ! $wasPipe
+				then	RET=1
+					tui-printf -S $RET "File not found: $arg"
+				else	tui-echo "$arg"
+				fi
 			fi
 		done
 		;;
