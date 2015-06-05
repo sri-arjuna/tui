@@ -73,11 +73,11 @@ Where options are:
 #	Action & Display
 #
 	NUM=$1
-	${beVerbose} && echo "  $NUM"
+	${beVerbose} && echo "  $NUM" >&2
 	shift
 	for num in $@
 	do	NUM=$(echo $NUM $num|$AWK '{print ($1 ^ $2)}')
-		$beVerbose && printf "^ $num ${posVerbose}\t= $NUM\n"
+		$beVerbose && printf "^ $num ${posVerbose}\t= $NUM\n" >&2
 	done
-	$beVerbose && echo "--------------------------"
+	$beVerbose && echo "--------------------------" >&2
 	echo $NUM
