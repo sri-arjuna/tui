@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by sea, sea@localhost.localdomain
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+	source "$HOME/.tui_rc" || . tui
+	source "$TUI_FILE_CONF_COMMANDS"
+#
+#	File:		tui-math-add
+#	Author: 	sea
+#	Contact:	sea@localhost.localdomain
+#	License:	GNU General Public License (GPL)
+#	Created:	2015.06.04
+#	Changed:	2015.06.04
+	script_version=0.2
+	TITLE="TUI awk based mathematic"
+#	Description:	Text TODO
+#
+#
+#	Script Environment
+#
+	ME="${0##*/}"				# Basename of tui-math-add
+	ME="${ME/.sh/}"				# Cut off .sh extension
+#
+#	Help text
+#
+	help_text="
+$ME ($script_version)
+${TITLE^}
+Usage: 		$ME [-h] NUM1 [ NUM2 NUM3 ... ]
+Examples:	$ME 25
+		5
+
+Where options are:
+	-h(elp) 		This screen	
+
+"
+#
+#	Catching Arguments
+#
+	while getopts "h" opt
+	do 	case $opt in
+		h)	printf "$help_text"
+			exit $RET_HELP
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	[ -z "$1" ] && echo "Usage: $ME NUM1 [ NUM2 ... ]" && exit 1
+#
+#	Action & Display
+#
+	for num in $@
+	do	$AWK -v N=$num 'BEGIN {print sqrt(N)}'
+	done

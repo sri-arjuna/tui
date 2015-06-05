@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.1
-Release:     8%{?dist}
+Release:     9%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -73,6 +73,12 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Thu Jun 04 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-9
+- Updated:   tui-cat, got now handles pipes too
+- Added:     tui-math-add, tui-math-div, tui-math-mlt, 
+-            tui-math-pwr, tui-math-sqr and tui-math-sub
+
+
 * Wed Jun 03 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-8
 - Fixed:     tui-bgjob, tui-printf, tui-progress, tui-status
 -            Either misalignend or non-printed output
