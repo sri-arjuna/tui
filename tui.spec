@@ -81,6 +81,7 @@ rm -rf %{buildroot}
 -            also actualy reads the previous installed paths, 
 -            for easier reinstallation or updates
 - Updated:   tui-progress, did a major rewrite and code reduce.
+- Updated:   tui-echo, tui-header, tui-title now parse multiline stream
 
 * Wed Jun 03 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.1-8
 - Fixed:     tui-bgjob, tui-printf, tui-progress, tui-status

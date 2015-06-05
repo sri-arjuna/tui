@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.8.1
+	script_version=0.8.2
 	ME="${0##*/}"
 #
 #	Variable handling
@@ -46,11 +46,21 @@
 #
 #	Display
 #
-	[ "-" = "$1" ] && read LEFT CENTER RIGHT && set "$LEFT" "$CENTER" "$RIGHT"
-	case $# in
-	0)	tui-printf -E 					;;
-	1)	tui-printf -E $leadingDASHdummy "$1"		;;
-	2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
-	3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
-	esac
-        
+	if [ "-" = "$1" ]
+	then	# Do pipe handling
+		while read LEFT CENTER RIGHT
+		do	set "$LEFT" "$CENTER" "$RIGHT"
+			case $# in
+			0)	tui-printf -E 					;;
+			1)	tui-printf -E $leadingDASHdummy "$1"		;;
+			2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
+			3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
+			esac
+		done
+	else	case $# in
+		0)	tui-printf -E 					;;
+		1)	tui-printf -E $leadingDASHdummy "$1"		;;
+		2)	tui-printf -E $leadingDASHdummy "$1" "$2" 	;;
+		3)	tui-printf -E $leadingDASHdummy "$1" "$2" "$3"	;;
+		esac
+        fi
