@@ -18,23 +18,50 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tui_rc" && \
-		. "$TUI_DIR_CONF/commands.conf" || \
-		. tui	# This first call would create the RC if its missing.
+	source "$HOME/.tui_rc" || tui
+	. "$TUI_FILE_CONF_COMMANDS"
+	for d in "$TUI_DIR_THEMES" "$TUI_DIR_USER_THEMES"
+	do	[ -f "$d/$TUI_THEME" ] && . "$d/$TUI_THEME" && break
+	done
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.06.03
-	script_version=0.9.4
+#	Changed:	2015.06.05
+	script_version=1.0
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
 #	Variables
 #
 	TITLE="Progress indicator"
-	ME="${0##*/}"
+	ME="${0##*/}"	# Name
+	# internals
+	TYPE=""		# Start with no display mode
+	INDI=( '\' '|' '/' '-' )	# Dont use tui-indi, for asynchronus display
+	TOTAL=$[ ${#INDI[@]} -1 ]
+	WIDTH=${COLUMNS:-$(tput cols)}
+	# id file?
+	ID_CUR=$$	# -i ID storage id
+	ID=""		# -i ID storage id
+	# bols
+	CLEARLINE=false	# Clear line between display calls?
+	hadOpts=false	# Shift only if it had opts
+	doReset=false	# Reset the ID file?
+	doBar=false
+	longBar=false	# Show (& calc) the STATUS (procent)
+	hasID=false
+	# opts
+	MAX=
+	VAL=
+	CURRENT=
+	BAR='='
+	# Display
+	PROGRESS=""
+	STATUS=""
+	MESSAGE=""
+	# Help
 	help_text="
 $ME ($script_version)
 $TITLE
@@ -50,7 +77,7 @@ Where options are:
 	-l(ong)			Prints more info when in bar mode.
 	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
 				Should be provided if used with -m
-	-r(eset)		Resets the tempfile, should be used before one is passing -
+	-r(eset)		Resets the tempfile, should be used before one is passing 
 
 When called without options, it simply displays a rotating dash (-/|\) on the right side.
 When called with option '-m NUM' it increments the number found in the tempfile, and showing [ incr/NUM ], before using this mode, you should reset the tempfile (-r), or use a specific tempfile identifier (-i STRING_ID).
@@ -58,25 +85,17 @@ You can overwrite the requirement for a tempfile, if you pass '-c NUM'.
 When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 
 "
-	ID_CUR=$$
-	ID=""
-	INDI=( '\' '|' '/' '-' )
-	TOTAL=$[ ${#INDI[@]} -1 ]
-	TYPE=dash
-	MAX=1
-	VAL=0
-	CURRENT=0
-	CLEARLINE=false
-	valPassed=false
-	hadOpts=false
-	doReset=false
-	longBar=false
-	hasID=false
-	BAR='='
-	PROGRESS=""
 #
 #	Functions
 #
+	simple_status() {
+	# Generates a single string to represent the actual task/case
+	#
+		tmp=""
+		[ ! -z "$MAX" ] && tmp="NUM"
+		$doBar && [ ! -z "$MAX" ] && tmp="BAR"
+		echo ${tmp:-DASH}
+	}
 	reset_temp() { # ID
 	# Resets the counter according to passed ID
 	#
@@ -94,14 +113,15 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		then	tui-conf-set "$TMPFILE" "$ID" $1
 		else	echo $1 > "$TMPFILE"
 		fi
-		#echo was here too
 	}
 	read_tmp() { 
 	# Reads VAL in the tempfile according to passed id
 	# Returns VAL
 		if $hasID
 		then	tui-conf-get "$TMPFILE" "$ID"
+			return $?
 		else	cat "$TMPFILE"
+			return $?
 		fi
 	}
 #
@@ -111,10 +131,9 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	do 	case $name in
 		B)	BAR="$OPTARG"
 			hadOpts=true		;;
-		b)	TYPE=bar
+		b)	doBar=true
 			hadOpts=true		;;
-		c)	CURRENT="$OPTARG"
-			valPassed=true
+		c)	VAL="$OPTARG"
 			hadOpts=true		;;
 		C)	CLEARLINE=true
 			hadOpts=true		;;
@@ -124,7 +143,6 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		l)	longBar=true
 			hadOpts=true		;;
 		m)	MAX="$OPTARG"
-			[ dash = $TYPE ] && TYPE=num
 			hadOpts=true		;;
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
@@ -132,132 +150,127 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			hadOpts=true		;;
 		esac
 	done
+	$hadOpts && shift $(($OPTIND - 1))
 #
 #	Check for all required options
 #	
+	MESSAGE="$1"
+	TYPE=$(simple_status)
 	if $hasID
 	then	TMPFILE="$TUI_DIR_CACHE/tui-progress_ids.tmp"
 	else	TMPFILE="$TUI_DIR_CACHE/tui-progress_default.tmp"
 	fi
-	$hadOpts && shift $(($OPTIND - 1)) #|| VAL=$(read_tmp)
-	MESSAGE="$1"
+#
+#	Something quick?
+#
 	$doReset && \
 		reset_temp && \
 		exit 0
-	
-	case "$TYPE" in
-	dash)	# Default behaviour, no options
-		#>/dev/zero
-		$hadOpts || VAL=$(read_tmp)
+#
+#	Prepare required tasks from options
+#
+	case "${TYPE}" in
+	DASH|NUM)
+		# Create initial tempfile if none exists
+		if [ ! -f "$TMPFILE" ]
+		then	if tui-bol-dir "$TUI_DIR_CACHE" 
+			then	touch "$TMPFILE"
+			fi
+			reset_tmp || exit 1
+		fi
+		[ -z "$VAL" ] && \
+			VAL=$(read_tmp) && \
+			doSave=true || \
+			doSave=false
 		;;
-	num)	# Create initial tempfile if none exists
-		[ ! -f "$TMPFILE" ] && \
-			touch "$TMPFILE" && \
-			reset_temp || exit 1
-		VAL=$(read_tmp)
-		;;
-	bar)	if [ -z "$CURRENT" ]
+	BAR)	if [ -z "$VAL" ]
 		then	# Kind of a workaround
 			VAL=$(read_tmp)
-			VAL=$(( $VAL + 1 ))
+			#VAL=$(( $VAL + 1 ))
+			save_tmp $(( $VAL + 1 ))
 		fi
-		if [ -z "$MAX" ] || [ -z "$CURRENT" ]  #|| [ ! $MAX -gt 1 ]
+		if [ -z "$MAX" ] || [ -z "$VAL" ]  #|| [ ! $MAX -gt 1 ]
 		then	# Improper handling
 			tui-status 1 "Usage: $ME [-r] [-m \$MAV_VALUE]  [-bc \$CUR_VALUE] [-l]]  'msg'"
 			exit 1
 		fi
 	esac
 #
-#	Read initial value from tmpfile
+#	Generate output string, and save values
 #
-	[ ! -z "$(echo $CURRENT|tr -d [[:alpha:]])" ] && \
-		VAL=$(read_tmp) || VAL="$CURRENT"
-	VAL=${VAL:-0}
-	MAX=${MAX:-0}
-	#VAL=${VAL/*\/}
-#
-#	Generate output string
-#
-	case "$TYPE" in
-		dash)	[ $VAL -gt 3 ] && VAL=0
-			PROGRESS="[  ${INDI[$VAL]}   ]"
-			#VAL=$(($VAL+1))	# Doesnt change a thing?
-			;;
-		num)	# Dont show if VAL is higher than MAX
-			[ $VAL -gt $MAX ] && exit 1
-			PROGRESS="[ $VAL / $MAX ]"
-			;;
-		bar)	# Dont show if VAL is higher than MAX
-			[ $VAL -gt $MAX ] && exit 1
-			[ -z "$COLUMNS" ] && COLUMNS=$(tput cols)
-			if $longBar
-			then	# Show also procent
-				procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
-				[ -z "$MESSAGE" ] && fixer=$(( $fixer - 5 ))
-				# The length that is available to print bars
-				
-				pro=${procent/.*/}
-				[ $pro -gt 100 ] && \
-					pro=100
-				[ $pro -ne 100 ] && \
-					cent=$( while IFS="." read P C;do [ -z "$C" ] && echo 00 || echo $C;done<<<$procent) && \
-					cent=${cent:0:2} || \
-					cent=00
-				case ${#pro} in
-				#0)	echo impossible	;;
-				1)	fixer=13 ;;
-				2)	fixer=14 ;;
-				3)	fixer=15 ;;
-				esac
-				
-				length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - 7 - $fixer  ))
-				STATUS="[ ${pro}.${cent}%% ]"
-				len=$( echo $length $procent | $AWK '{print ($1/100*$2) }' )
-			else	# The length that is available to print bars
-				[ -z "$MESSAGE" ] && \
-					fixer=10 || \
-					fixer=14
-				length=$(( $COLUMNS - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - $fixer ))
-				len=$( echo $length $MAX $VAL | $AWK '{print ($1/$2*$3) }' )
-			fi
+	case "${TYPE}" in
+	DASH)	# Regular animated dash
+		[ $VAL -gt 3 ] && VAL=0
+		STATUS="[  ${INDI[$VAL]}   ]"
+		;;
+	NUM)	# Show incrementing number
+		[ $VAL -gt $MAX ] && \
+			echo "$ME: Should have called \"${TUI_FONT_BOLD}$ME -r\" first!${TUI_FONT_RESET}" >&2
+			#echo "$ME:$LINENO: Error - \"v$VAL -gt m$MAX\"" >&2
+		STATUS="[ $VAL / $MAX ]"
+		;;
+	BAR)	# Show procent only if wanted
+		fixer_fix=0
+		if $longBar
+		then	# Show also procent
+			procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
+			[ -z "$MESSAGE" ] && fixer_fix=8	# Does this depend on $WIDTH?
 			
-			bars=$(printf '%*s' ${len/.*})
-			bars=$(echo "$bars"|$SED s," ","\\$BAR",g)
+			# How many procent?
+			pro=${procent/.*/}
+			[ $pro -gt 100 ] && \
+				pro=100
+			[ $pro -ne 100 ] && \
+				cent=$( while IFS="." read P C;do [ -z "$C" ] && echo 00 || echo $C;done<<<$procent) && \
+				cent=${cent:0:2} || \
+				cent=00
+			case ${#pro} in
+			1)	fixer=13 ;;
+			2)	fixer=14 ;;
+			3)	fixer=15 ;;
+			esac
+			fixer=$(( $fixer - $fixer_fix ))
+			length=$(( $WIDTH - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - 7 - ${fixer:-5}  ))
+			STATUS="[ ${pro}.${cent}%% ]"
+			len=$( echo $length $procent | $AWK '{print ($1/100*$2) }' )
+		else	STATUS=""
+			[ -z "$MESSAGE" ] && fixer_fix=7	# Does this depend on $WIDTH?
+			# The length that is available to print bars
+			[ -z "$MESSAGE" ] && \
+				fixer=10 || \
+				fixer=14
+			fixer=$(( $fixer - $fixer_fix ))
+			length=$(( $WIDTH - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - $fixer ))
+			len=$( echo $length $MAX $VAL | $AWK '{print ($1/$2*$3) }' )
+		fi
+		bars=$(printf '%*s' ${len/.*})
+		bars=$(echo "$bars"|$SED s," ","\\$BAR",g)
 
-			bar_total="$(printf '%*s' ${length/.*})"
-			bar_total="[${bars}${bar_total:${#bars}}]"
-			PROGRESS="$bar_total"
-			;;
+		bar_total="$(printf '%*s' ${length/.*})"
+		bar_total="[${bars}${bar_total:${#bars}}]"
+		PROGRESS="$bar_total"
+		;;
 	#	*)	tui-status 1 "Error, type ($TYPE) is unhandled"	;;
 	esac
-	[ -z "$PROGRESS" ] && tui-printf -S 1 "Something went terrible wrong..." && exit 1
-#
-#	Update value for next access
-#
-	case "$TYPE" in
-	dash) 	if [ $VAL -lt 3 ]
-		then	num=$(($VAL+1))
-			save_tmp $num
-		else	save_tmp 0
-		fi
-		;;
-	num)	num=$(($VAL+1))
-		save_tmp $num
-		;;
-	bar)	if ! $valPassed
-		then	save_tmp $CURRENT
-		fi
-		;;
-	esac
+	#[ -z "$PROGRESS" ] && tui-printf -S 1 "Something went terrible wrong..." && exit 1
 #
 #	Display & Action
 #
 	$CLEARLINE && printf "\e[2K" &
-	if [ -z "$MESSAGE" ]
-	then	$longBar && [ $pro -ne 100 ] && [ ! $TYPE = dash ] && PROGRESS+=" "
-		$longBar && \
-			tui-printf "${PROGRESS}" "${STATUS}" || \
-			tui-printf "" "${PROGRESS}${STATUS}"
-	else	[ ${pro:-0} -ne 100 ] && [ ! $TYPE = dash ] && PROGRESS+=" "
-		tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
-	fi
+	case "${TYPE}" in
+	DASH|NUM)
+		tui-printf "$MESSAGE" "$STATUS"
+		$doSave && \
+			num_save=$(( $VAL + 1 )) && \
+			save_tmp $num_save
+		;;
+	BAR)	if $longBar
+		then	[ -z "$MESSAGE" ] && \
+				tui-printf "${PROGRESS}" "$STATUS" || \
+				tui-printf "$MESSAGE" "${PROGRESS}" "$STATUS"
+		else	[ -z "$MESSAGE" ] && \
+				tui-printf "${PROGRESS}" || \
+				tui-printf "$MESSAGE" "${PROGRESS}"
+		fi
+		;;
+	esac
