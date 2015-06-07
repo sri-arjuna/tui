@@ -28,7 +28,7 @@
 	do	[ -f "$f" ] && source "$f"
 	done
 	
-	script_version=0.8.1
+	script_version=0.8.2
 	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
@@ -111,10 +111,10 @@
 		then	if $showBar
 			then	tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
 			else	[ -z "${MAX_BYTES/0}" ] && \
-					tui-progress -c $FS "$TXT_PROGRESS ($FS_SHOW)" || \
+					tui-progress "$TXT_PROGRESS ($FS_SHOW)" || \
 					tui-progress -lm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
 			fi
-		else	tui-printf "$TXT_PROGRESS" "[  $(tui-indi)   ]"
+		else	tui-progress "$TXT_PROGRESS" #"[  $(tui-indi)   ]"
 		fi
 				
 	#	echo "$LINENO: expecting lineno '' to be executed..."

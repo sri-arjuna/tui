@@ -196,13 +196,13 @@ Where options are:
 			then	OUT[$CUR]="${count}${SEP}${OPT}"
 				shown=false
 				CUR=$(( $CUR + 1 ))
-			else	tui-echo "${OUT[@]}" >> /dev/stderr
+			else	tui-echo "${OUT[@]}" >&2
 				CUR=0 && unset OUT[@] 
 				[ -z "$OPT" ] && shown=true
 				OUT[$CUR]="${count}${SEP}$OPT"
 				CUR=$(( $CUR + 1 ))
 			fi
-		else 	tui-echo "${OUT[@]}" >> /dev/stderr
+		else 	tui-echo "${OUT[@]}" >&2
 			CUR=0 && unset OUT[@] 
 			[ -z "$OPT" ] && shown=true
 			OUT[$CUR]="${count}${SEP}$OPT"
@@ -210,5 +210,5 @@ Where options are:
 		fi
 	done
 	# Print unprinted
-	! $shown && tui-echo "${OUT[@]}" >> /dev/stderr # && printf "\n"
+	! $shown && tui-echo "${OUT[@]}" >&2 # && printf "\n"
 	exit 0

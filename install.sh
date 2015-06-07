@@ -98,10 +98,14 @@
 			te "Note this makes things complicate if your scripts shall be used as root or with sudo."
 		fi
 		if [ -f "$TRC" ]
-		then	catched_root=${CHROOT:-$TUI_DIR_INSTALL_ROOT}
-			catched_prefix=${PREFIX:-$TUI_PREFIX}
-		else	catched_root=${CHROOT:-$SUGGESTED_ROOT}
-			catched_prefix=${PREFIX:-$SUGGESTED_PREFIX}
+		then	[ -z "$TUI_DIR_INSTALL_ROOT" ] && \
+				catched_root=${CHROOT:-$SUGGESTED_ROOT} ||\
+				catched_root="$TUI_DIR_INSTALL_ROOT"
+			[ -z "$TUI_PREFIX" ] && \
+				catched_prefix=${PREFIX:-$SUGGESTED_PREFIX} ||\
+				catched_prefix="$TUI_PREFIX"
+		else	catched_root="${CHROOT:-$SUGGESTED_ROOT}"
+			catched_prefix="${PREFIX:-$SUGGESTED_PREFIX}"
 		fi
 		te
 		t2 "Installation root:" "$catched_root"

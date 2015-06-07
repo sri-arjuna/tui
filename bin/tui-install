@@ -170,7 +170,7 @@ Where options are:
 	case $APP in
 	yum|dnf)		cmd+=" -q -y install"	;;	
 	apt-get)	cmd="-q -y install"	;;
-	pacman)		cmd="-qIY"		;;
+	pacman)		cmd="-Sy"		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (379-1056)
 	brew|port)	cmd="install"		;;
 	cave)		cmd="resolve -x "	;;
