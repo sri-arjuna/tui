@@ -20,11 +20,11 @@
 # ------------------------------------------------------------------------
 #
 #	This script will help you to install TUI on your system
-#	Last Update:	2015.06.04
+#	Last Update:	2015.06.09
 #
 #	Internals
 #
-	script_version=0.8.5
+	script_version=0.8.6
 	TRC=$HOME/.tui_rc
 #
 #	Variables
@@ -122,7 +122,15 @@
 		if ! yesno "Do you want to continue?"
 		then	exit 0
 		fi
-		[ -z "$DIR_COMPL" ] && DIR_COMPL=$catched_prefix/share/bash_completion/completions
+		# Bash completion is quit annoying to catch
+		if [ -z "$DIR_COMPL" ] 
+		then	for TASK in bash_completion bash-completion
+			do	[ -d "$catched_prefix/share/$TASK/completions" ] && \
+					DIR_COMPL="$catched_prefix/share/$TASK/completions" && \
+					break
+			done
+			[ -z "$DIR_COMPL" ] && DIR_COMPL="$catched_prefix/share/bash-completion/completions"
+		fi
 		install_tui
 	}
 	install_tui() { #
