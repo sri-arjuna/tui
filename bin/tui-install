@@ -29,8 +29,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.05.21
-	script_version=0.6.1
+#	Changed:	2015.06.09
+	script_version=0.6.2
 	TITLE="Install packages"
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
@@ -170,12 +170,12 @@ Where options are:
 	case $APP in
 	yum|dnf)		cmd+=" -q -y install"	;;	
 	apt-get)	cmd="-q -y install"	;;
-	pacman)		cmd="-Sy"		;;
+	pacman)		cmd="-S --noconfirm"		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (379-1056)
-	brew|port)	cmd="install"		;;
+	brew|port)	cmd="install -y"		;;
 	cave)		cmd="resolve -x "	;;
 	emerge)		cmd=""			;;
-	zypper)		cmd="install"		;;
+	zypper)		cmd="install -y"		;;
 	pkg)		cmd="install -y"	;;
 	esac
 #	echo "$verbose -- $APP -- $cmd" ; exit
@@ -194,7 +194,7 @@ Where options are:
 			$doLog && tui-log "$LOG" "Execute: $cmd_all"
 			
 			tui-progress -m $# "Installing: $app_name" > /dev/zero
-			tui-printf -rS 2 "Installing $all_name"
+			tui-printf -rS 2 "Installing $app_name"
 			$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
 			
 			tui-status $RET "Installed package: $app_name" && \
