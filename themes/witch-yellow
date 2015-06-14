@@ -3,8 +3,8 @@
 #	BORDER_RIGHT will be mirrored from BORDER_LEFT
 #	Set it manualy if it needs to be escaped.
 #
-	BORDER_LEFT="\\\./"
-	BORDER_RIGHT="\\\./"
+	BORDER_LEFT="\\./"
+	BORDER_RIGHT="\\./"
 #
 #	tui-header will use TUI_BACKGROUND as background color,
 #	and TUI_FOREGROUND as font color.
@@ -13,3 +13,8 @@
 #
 	TUI_BACKGROUND="$TUI_COLOR_BG_YELLOW"
 	TUI_FOREGROUND="$TUI_COLOR_FG_BLACK"
+#
+#	Char indicators
+#
+	TUI_INPUT_CHAR_READ=">"
+	TUI_INPUT_CHAR_SELECT=">"

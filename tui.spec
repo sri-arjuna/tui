@@ -73,6 +73,12 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Fri Jun 12 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.2-1
+- Changed:   Made install script faster again
+- Fixed:     tui-new-browser, figured had to update tui-read
+- Updated:   tui-read, now requires '-n' to loop on empty inputs
+- Updated:   themes/*, Added signs for input (read/select)
+
 * Thu Jun 04 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.2-0
 - Updated:   tui-cat, now handles pipes too
 - Added:     tui-math-add, tui-math-div, tui-math-mlt, 

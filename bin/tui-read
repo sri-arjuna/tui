@@ -42,25 +42,28 @@
 #
 #	Variable defaults
 #
-	script_version=1.0.3
+	script_version=1.1.1
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
 Usage: 		$ME [options] MSG
 Examples:	$ME \"What is your favorite color?\"
 		password=\$($ME -p \"Enter your password:\")
-
+	-n	does not accept empty strings
 "
 	doPassword=""
+	noEmpty=false
 #
 #	Variable handling
 #
-	[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
+	[ -z "$1" ] && set "$TUI_INPUT_CHAR_READ" # printf "$help_text" && exit $RET_HELP
 	while getopts "hp" opt;do
 	case "$opt" in
 	"h")	printf "$help_text" ; exit $RET_HELP
 		;;
 	"p")	doPassword="-se"	
+		;;
+	"n")	noEmpty=true
 		;;
 	esac
 	done
@@ -83,11 +86,16 @@ Examples:	$ME \"What is your favorite color?\"
 #
 #	Display
 #
-	[ -z "$1" ] && \
-		txt="Type your input:" || \
-		txt="$1"
-	tui-printf "$txt" > /dev/stderr
-	printf "\r$BORDER_LEFT $txt " >&2
-	read ${doPassword} INPUT </dev/tty
+	tui-printf "$1" >&2
+	POS="\033[$(( ${#BORDER_LEFT} + ${#1} +3 ))G"
+	printf "\r$BORDER_LEFT $1$POS" >&2
+	if $noEmpty
+	then	while [ -z "$INPUT" ]
+		do	read ${doPassword} INPUT </dev/tty
+			[ "${INPUT:0:3}" = "^[[" ] && INPUT=""
+		done
+	else	read ${doPassword} INPUT </dev/tty
+		[ "${INPUT:0:3}" = "^[[" ] && INPUT=""
+	fi
 	printf '%s' "$INPUT"  >&1
 	[ -z "$doPassword" ] || printf "\n" >&2

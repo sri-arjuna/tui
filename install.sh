@@ -35,11 +35,12 @@
 	else	SUGGESTED_ROOT=$HOME/.local
 		SUGGESTED_PREFIX=$HOME/.local
 	fi
+	SUGGESTED_PROJECT=$HOME/Projects
 #
 #	Functions
 #
 	initializeANSI() { #
-	#
+	# Get the ANSI codes
 	#
 		esc="";		blackf="${esc}[30m";	redf="${esc}[31m"
 		greenf="${esc}[32m";	yellowf="${esc}[33m";	bluef="${esc}[34m"
@@ -49,7 +50,7 @@
 		cyanb="${esc}[46m";	whiteb="${esc}[47m";	reset="${esc}[0m"
 	}
 	yesno()	{ # "Question"
-	#
+	# Returns 0 for yes and 1 for no
 	#
 		while true; do
 			echo "${1} (y/n): "
@@ -62,12 +63,12 @@
 		done
 	}
 	showTitle() { # 
-	#
+	# Shows the title
 	#
 		printf "\t    \033[4mInstalling: Text User Interface - Command framework\033[0m\n\n"
 	}
 	seaLogo() {
-	#
+	# Shows the logo
 	#
 		initializeANSI  
 		cat <<-EOF
@@ -85,13 +86,14 @@
 		
 		EOF
 	}
+	# Some basic display tools
 	tp(){ printf '\r\t\t%s' "${@}" ; }
 	tt(){ printf '\t%s\n\n' "${@}" ; }
 	te(){ printf '%s\n' "${@}" ; }
 	t2(){ printf '%s\t%s\n' "${@}" ; }
 	mainmenu() { #
-	#
-	#
+	# Start the actual installation from here
+	# Inform the user about 'tweaks'
 		if [ $UID -eq 0 ]
 		then	te "You're root, so a system wide installation is recomended."
 		else	te "You're a regular user, so a custom installation is recomended."
@@ -157,25 +159,27 @@
 		te "* Copying themes..."
 		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
 		
-		bin/tui-title "Copying documentation"
-		bin/tui-cp -d docs/* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
+		te "Copying documentation"
+		cp -aR docs/* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
 		
-		bin/tui-title "Copying system"
-		bin/tui-cp -lf conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
-		bin/tui-cp uninstall.sh $TUI_DIR_SYSTEM
-		bin/tui-cp -lf tui_compl.bash $DIR_COMPL
+		te "Copying system"
+		cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		cp -af uninstall.sh "$TUI_DIR_SYSTEM"
+		cp -af tui_compl.bash "$DIR_COMPL"
 		
-		bin/tui-title "Copying templates"
-		bin/tui-cp -qf templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
+		te "Copying templates"
+		cp -aRf templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
 		
-		bin/tui-title "Copying lists"
-		bin/tui-cp -qf lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
+		te "Copying lists"
+		cp -aRf lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
 		RET=$?
 		
 		if [ ${RET:-1} -eq 0 ]
-		then	bin/tui-header "" "Status Report" ""
-			bin/tui-status $RET "Installation successfull" && \
-			bin/tui-yesno "Do you want to configure TUI now?" && tui config
+		then	bin/tui-printf -T "" "Status Report" ""
+			bin/tui-printf -S $RET "Installation successfull" && \
+				bin/tui-printf -E "If you install TUI as dependency, you may skip this step." && \
+				bin/tui-yesno "Do you want to configure TUI now?" && \
+				bin/tui config || exit $RET
 		else	te "Installation failed...  ;("
 			t2 "CHROOT was:" "$CHROOT"
 			t2 "PREFIX was:" "$PREFIX"
@@ -187,6 +191,21 @@
 #
 #	Action & Display
 #
+	case "$1" in
+	"-h"|"--help")
+		cat <<-EOF
+		${0##*/} ($script_version) for TUI by Arjuna
+		This script will install Text User Interface (TUI)
+		
+		Set these variables before you execute ${0##*/} for custom installation.
+		CHROOT	Set this variable as prefix for <CHROOT>/etc/tui
+		PREFIX	Set this variable as prefix for <CHROOT>/<PREFIX>/share/tui
+		PROJECT Set this variable as \$HOME\<PROJECT>
+		
+		EOF
+		exit 99
+		;;
+	esac
 	while true;do
 		clear
 		tmp_str=$(
