@@ -9,12 +9,12 @@ _tui_module()
 	#	Variables
 	#
 		local cur prev OPTS DIR
+		DIR="/usr/share/tui/themes/"
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		OPTS="-h"
-		ARGS="reset reset-yes theme"
-		DIR="/usr/share/tui/themes/"
+		ARGS="provides reset reset-yes theme"
 	#
 	#	Action
 	#
@@ -24,7 +24,7 @@ _tui_module()
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
-		[rt]*)	COMPREPLY=( $(compgen -W "${ARGS[*]}" -- $cur) )
+		[prt]*)	COMPREPLY=( $(compgen -W "${ARGS[*]}" -- $cur) )
 			return 0
 			;;
 		#*)	COMPREPLY=( $(compgen -W "${OPTS[*]} ${ARGS[*]}" -- $cur) )
@@ -46,7 +46,7 @@ _tui_module()
 					;;
 			esac
 			;;
-		tui)	COMPREPLY=( $( compgen -W "reset reset-yes theme" -- "$cur" ) ) 
+		tui)	COMPREPLY=( $(compgen -W "${ARGS[*]}" -- $cur) )
 			return 0
 			;;
 		reset*)	return 0;;
