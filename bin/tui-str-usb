@@ -48,6 +48,7 @@
 		\rWhere options are:
 		\r\t-h\tThis screen
 		\r\t-a\tAutoselect entry if only one was found
+		\r
 		\r"
 	targetusb=""
 	devDisk=/dev/disk/by-id
@@ -56,7 +57,7 @@
 #
 #	Variable handling
 #
-	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts h opt
 	do	case "$opt" in
 		h)	echo -e "$help_text"

@@ -38,15 +38,16 @@
 	# higher number, and more and more in another script..lol
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
-		\rUsage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]"
+		\rUsage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]
+"
 	count=${#@}
 #
 #	Display
 #	
 	if [ -z "$1" ] 
-	then	tui-status 1 "Usage: tui-status [option] ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]" 
+	then	printf "%s\n\n" "Usage: tui-status [option] ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]"
 		exit 1
-	elif [ "$1" = "-h" ]
+	elif [ "$1" = "-h" ] || [ "$1" = "--help" ]
 	then
 	#
 	#	Fill array according to return value
@@ -72,6 +73,7 @@ Interpreted errorlevels are:\n"
 Where options are:
 	-h	This screen
 	-r	Return on line, dont do a newline.
+
 "
 		exit $RET_HELP
 	else	# The actual action ;)

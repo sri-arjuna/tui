@@ -58,6 +58,7 @@ Where options are:
 #
 #	Catching Arguments
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "hvt:" opt
 	do 	case $opt in
 		h)	printf "$help_text"

@@ -35,7 +35,7 @@
 #
 #	Variables
 #
-	TITLE="Project Browser"
+	TITLE="Text User Interface"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	help_text="
@@ -71,6 +71,7 @@ Where options are:
 	-q(uiet)		Does not show header, title, footer
 	-S(show pos-line)	Forces the 'Location/Position' line to be shown when calling scripts
 	-X(eXecute)	SHELL	Which shell to use to execute scripts, default bash
+
 "
 #
 # 	Default Interface:
@@ -183,6 +184,7 @@ Where options are:
 #
 #	Catching Arguments
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "hL:T:U:P:D:F:p:ns:mb:c:d:qX:S" name
 	do 	case $name in
 		h|help)		printf "$help_text"

@@ -52,6 +52,7 @@ Where options are:
 	-c		Writes the VALUE, and stores VALUENAME in capital chars
 	-s		Writes the VALUE, and stores VALUENAME in lower chars
 	-v		Prints a status message wether or not the value could be saved
+
 "
 	OPT=""
 	VALUE=""
@@ -66,6 +67,7 @@ Where options are:
 #	Catching Arguments
 #
 	[ -z "$2" ] && printf "$help_text" && exit 1
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "icslhv" name
 	do 	case $name in
 		c)	CAPS=true
@@ -80,7 +82,7 @@ Where options are:
 			exit 0
 			;;
 		h)	printf "$help_text"
-			exit $RET_HELP
+			exit 99
 			;;
 		v)	beVerbose=true
 			;;

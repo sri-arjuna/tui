@@ -57,6 +57,7 @@
 #	Catching Arguments
 #
 	hadOpts=false
+	[ "--help" = "$1" ] && showHelp && exit 99
 	while getopts "hv" opt
 	do	case "$opt" in
 		h)	showHelp

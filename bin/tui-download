@@ -52,7 +52,7 @@
 #
 	#[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	case "$1" in
-	"-h")	echo -e "$help_text" ; exit $RET_HELP
+	"-h"|"--help")	printf "$help_text" ; exit $RET_HELP
 		;;
 	"")	unset ARGS[@]
 		ARGS[0]=$(tui-read "Enter url to download:")

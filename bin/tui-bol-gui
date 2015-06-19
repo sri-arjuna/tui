@@ -64,8 +64,7 @@
 #
 #	Catching Arguments
 #
-	# A ':' after a char indicates that this option requires an argument
-	# Get access to the passed value of the argument by using $OPTARG
+	[ "--help" = "$1" ] && help_screen && exit 99
 	while getopts "hv" opt
 	do 	case $opt in
 		h)	help_screen

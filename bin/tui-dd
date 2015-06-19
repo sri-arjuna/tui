@@ -38,6 +38,7 @@ Usage: $ME SOURCE TARGET
 Writes SOURCE to TARGET
 
 SOURCE and TARGET can be, a partition, disk, directory, file
+
 "
 #
 #	Variable handling
@@ -48,7 +49,7 @@ SOURCE and TARGET can be, a partition, disk, directory, file
 		>"$TUI_FILE_TEMP" || \
 		touch "$TUI_FILE_TEMP"
 	case "$SOURCE" in
-	-h)	printf "$help_text"
+	"-h"|"--help")	printf "$help_text"
 		exit $RET_HELP
 	esac
 	case "$TARGET" in

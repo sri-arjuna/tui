@@ -33,7 +33,7 @@
 #
 #	Display
 #
-	if [ -z "$1" ] || [ "-h" = "$1" ]
+	if [ -z "$1" ] || [ "-h" = "$1" ]  || [ "--help" = "$1" ]
 	then	echo -e "$help_text"
 		RET=99
 	elif [ -d "$1" ]

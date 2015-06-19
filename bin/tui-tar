@@ -40,6 +40,7 @@
 		\r\t-x\tExtract tarball
 		\r
 		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
+		\r
 		\r"
 	
 	FILE_TEMP="$TUI_DIR_TEMP/tui-tar.status"
@@ -53,6 +54,7 @@
 #
 #	Variable handling
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts hbvx opt
 	do	case "$opt" in
 		h)	echo -e "$help_text" ; exit $RET_HELP

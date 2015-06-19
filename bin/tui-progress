@@ -127,6 +127,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 #	Catching Arguments
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "c:CB:bi:lm:rh" name
 	do 	case $name in
 		B)	BAR="$OPTARG"

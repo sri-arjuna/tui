@@ -54,6 +54,7 @@
 #	Variable handling
 #
 	opts=""
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts hfdlq opt
 	do	case "$opt" in
 		d)	showBar=false

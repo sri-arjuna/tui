@@ -37,6 +37,7 @@
 	help_text="
 $ME ($script_version)
 Usage: 	$ME [options] [arguments]
+
 "
 #
 #	Project related variables
@@ -55,7 +56,7 @@ Usage: 	$ME [options] [arguments]
 #
 #	Catching Arguments
 #
-	#[ -z $1 ] && printf "$help_text" && exit $RET_HELP
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "h" name
 	do 	case $name in
 		h|help)
@@ -70,6 +71,7 @@ Usage: 	$ME [options] [arguments]
 #	Display & Action
 #
 	
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	tui-printf -H "$ME ($script_version)" "$(date +'%F %T')"
 	tui-printf -T "$TITLE"
 	tui-printf -E "Starting with basic required configuration"

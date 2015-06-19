@@ -68,7 +68,8 @@ Where options are:
 #
 #	Catching arguments
 #
-	[ -z "$2" ] && printf "$help_text" && exit $RET_FAIL
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
+	[ -z "$2" ] && printf "$help_text" && exit 1
 	while getopts "hedtpus:v" opt
 	do 	case $opt in
 		h)	printf "$help_text"

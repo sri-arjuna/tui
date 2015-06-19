@@ -53,7 +53,7 @@
 	showRegular=false
 	showLong=false
 	showtotal=false
-	LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
+	#LS=$(locate "ls"|$GREP /ls$ | $GREP /bin/ | head -n 1)
 	COUNTER=0
 	tui-progress -r
 	
@@ -61,6 +61,7 @@
 #	Variable handling
 #
 	opts=""
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts hfdlq opt
 	do	case "$opt" in
 		d)	showBar=false

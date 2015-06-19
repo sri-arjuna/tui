@@ -36,6 +36,7 @@
 			"	Prints two strings left and right" \
 			"	Prints three strings left, centred and right" \
 			""
+		exit 99
 		;;
 	*)	[ "-" = "${1:0:1}" ] && \
 		leadingDASHdummy="--" || \

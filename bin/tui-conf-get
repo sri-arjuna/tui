@@ -57,7 +57,8 @@ Where options are:
 #
 #	Catching Arguments
 #
-	[ -z "$2" ] && printf "$help_text" && exit $RET_HELP
+	[ -z "$2" ] && printf "$help_text" && exit 99
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "ilh" name
 	do 	case $name in
 		i)	OPT="-i"
@@ -66,7 +67,7 @@ Where options are:
 			exit 0
 			;;
 		h)	printf "$help_text"
-			exit $RET_HELP
+			exit 99
 			;;
 		esac
 	done

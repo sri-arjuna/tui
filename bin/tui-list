@@ -56,11 +56,11 @@ Where options are:
 	-r(oman)		Use roman letters instead of numbers (up to 3000 valid)
 	-n(um)			User regular numbers for counting
 	-v(erbose)		Print cancel option 0.
+
 "
 #	-r(oman)		Use roman letters as numbers
 
-	#[ -z $1 ] && printf "$help_text" && exit $RET_FAIL	## Uncomment to exit with help if nothing is passed
-	# A ':' after a char indicates that this option requires an argument
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "ahnr12v" opt
 	do 	case $opt in
 		h)	printf "$help_text"

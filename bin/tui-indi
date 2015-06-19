@@ -35,8 +35,10 @@
 		\rwhile [ true ]
 		\rdo\t$ME
 		\rdone
+		\r
 		\r"
-	[ "-h" = "$1" ] && printf "$help_text" && exit 
+	[ "-h" = "$1" ] && printf "$help_text" && exit 99
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	indicator=( "-" "\\" "|" "/" )
 #
 #	Prepare

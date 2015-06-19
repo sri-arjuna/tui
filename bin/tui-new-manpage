@@ -46,6 +46,7 @@ Where options are:
 #
 #	Variable handling
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	tui-title "$TITLE ($script_version)"
 	while getopts "ham" name
 	do 	case $name in

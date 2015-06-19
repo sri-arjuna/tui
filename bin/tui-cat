@@ -48,10 +48,12 @@ Options:
 		-d(elay) NUM	Sets delay to NUM seconds, enables typewriter automaticly
 		-t(ypewriter	Prints char by char with a default delay of $DELAY
 		-T(itle)	Enables title printing per file output
+
 "
 #
 #	Getting options
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts hd:tT opt
 	do	case $opt in
 		h)	echo "$help_text"

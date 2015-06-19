@@ -75,6 +75,7 @@ Files:
 --------------------------------------
 Log:		$LOG
 Tempdir:	$TEMP
+
 "
 #
 #	Functions
@@ -96,6 +97,7 @@ Tempdir:	$TEMP
 #
 #	Catching Arguments
 #
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "cdhLl:qvw:" opt
 	do 	case $opt in
 		h)	printf "$help_text"

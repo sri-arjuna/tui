@@ -63,6 +63,7 @@ Where options are:
 #	Catching Arguments
 #
 	# Get access to the passed value of the argument by using $OPTARG
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts h opt
 	do 	case $opt in
 		h)	printf "$help_text"

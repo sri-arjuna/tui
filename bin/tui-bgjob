@@ -42,6 +42,7 @@
 		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
 		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) ir uses.
 		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
+		\r
 		\r"
 	CHECKFILE=false
 	SIZE_ORG=0
@@ -53,6 +54,7 @@
 #
 	[ -z "$3" ] && printf "$help_text" && exit $RET_HELP
 	BG_RET="-1"
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "he:f:s:" opt
 	do 	case $opt in
 		h)	printf "$help_text"

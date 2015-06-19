@@ -50,6 +50,7 @@ Usage: 		$ME [options] MSG
 Examples:	$ME \"What is your favorite color?\"
 		password=\$($ME -p \"Enter your password:\")
 	-n	does not accept empty strings
+
 "
 	doPassword=""
 	noEmpty=false
@@ -57,6 +58,7 @@ Examples:	$ME \"What is your favorite color?\"
 #	Variable handling
 #
 	[ -z "$1" ] && set "$TUI_INPUT_CHAR_READ" # printf "$help_text" && exit $RET_HELP
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "hp" opt;do
 	case "$opt" in
 	"h")	printf "$help_text" ; exit $RET_HELP
