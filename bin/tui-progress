@@ -18,7 +18,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tui_rc" || tui
+	source "$HOME/.tuirc" || . tuirc
 	. "$TUI_FILE_CONF_COMMANDS"
 	for d in "$TUI_DIR_THEMES" "$TUI_DIR_USER_THEMES"
 	do	[ -f "$d/$TUI_THEME" ] && . "$d/$TUI_THEME" && break
@@ -28,8 +28,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.06.05
-	script_version=1.0
+#	Changed:	2015.06.19
+	script_version=1.0.1
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -96,7 +96,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		$doBar && [ ! -z "$MAX" ] && tmp="BAR"
 		echo ${tmp:-DASH}
 	}
-	reset_temp() { # ID
+	reset_tmp() { # ID
 	# Resets the counter according to passed ID
 	#
 		if $hasID
@@ -157,14 +157,14 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	MESSAGE="$1"
 	TYPE=$(simple_status)
 	if $hasID
-	then	TMPFILE="$TUI_DIR_CACHE/tui-progress_ids.tmp"
-	else	TMPFILE="$TUI_DIR_CACHE/tui-progress_default.tmp"
+	then	TMPFILE="$TUI_DIR_TEMP/tui-progress_ids.tmp"
+	else	TMPFILE="$TUI_DIR_TEMP/tui-progress_default.tmp"
 	fi
 #
 #	Something quick?
 #
 	$doReset && \
-		reset_temp && \
+		reset_tmp && \
 		exit 0
 #
 #	Prepare required tasks from options
@@ -173,7 +173,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	DASH|NUM)
 		# Create initial tempfile if none exists
 		if [ ! -f "$TMPFILE" ]
-		then	if tui-bol-dir "$TUI_DIR_CACHE" 
+		then	if tui-bol-dir "$TUI_DIR_TEMP" 
 			then	touch "$TMPFILE"
 			fi
 			reset_tmp || exit 1

@@ -32,7 +32,7 @@
 #
 #	Check for the environment to load
 #
-	source "$HOME/.tui_rc" || . tui
+	source "$HOME/.tuirc" || . tuirc
 	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done

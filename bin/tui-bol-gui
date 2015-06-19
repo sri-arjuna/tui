@@ -20,7 +20,7 @@
 # ------------------------------------------------------------------------
 #
 	#source tui
-	. "$HOME/.tui_rc"
+	. "$HOME/.tuirc" || . tuirc
 	. "$TUI_FILE_CONF_COMMANDS"
 #
 #	File:		tui-bol-gui
@@ -28,9 +28,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.05.21
-	script_version=0.2
-	TITLE="tui-bol-gui"
+#	Changed:	2015.06.19
+	script_version=0.4
 #	Description:	Returns true if user is in GUI mode.
 #
 #
@@ -50,7 +49,6 @@
 	# 
 		cat <<-HELP_SCREEN
 		$ME ($script_version)
-		${TITLE^}
 		Usage: 		$ME [options]
 		Returns true if user is in a graphical environment
 		
@@ -75,6 +73,7 @@
 			;;
 		v)	beVerbose=true
 			hadOpts=true
+			shift
 			;;
 		*)	printf "$help_text" ; exit $?	;;
 		esac

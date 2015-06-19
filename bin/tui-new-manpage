@@ -20,9 +20,10 @@
 #
 #	Variable defaults
 #
-	source $HOME/.tui_rc
-	source $TUI_FILE_USER
-	source $TUI_FILE_USER_SETTINGS
+	
+	source "$HOME/.tuirc" || . tuirc
+	source "$TUI_FILE_USER"
+	source "$TUI_FILE_USER_SETTINGS"
 	script_version=0.5
 	ME="${0##*/}"
 	help_text="

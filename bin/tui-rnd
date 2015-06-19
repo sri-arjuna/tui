@@ -48,7 +48,7 @@ Note:	MAX is limited to integer size (32767)
 #	Catching Arguments
 #
 	case "$1" in
-	-h|--help)
+	"-h"|"--help")
 		printf "$help_text"
 		exit 99
 		;;

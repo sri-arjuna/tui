@@ -21,9 +21,9 @@
 #	Variable defaults
 #
 	#source tui
-	source $HOME/.tui_rc
-	source $TUI_FILE_USER
-	source $TUI_FILE_USER_SETTINGS
+	source "$HOME/.tuirc" || . tuirc
+	source "$TUI_FILE_USER"
+	source "$TUI_FILE_USER_SETTINGS"
 	script_version=1.4
 	ME="${0##*/}"
 	help_text="

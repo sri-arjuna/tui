@@ -24,9 +24,9 @@
 #	Variables
 #
 	BORDER_RIGHT=""
-	source "$HOME/.tui_rc" && \
+	source "$HOME/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" && \
-		. "$TUI_DIR_THEMES/$TUI_THEME"  || . tui	# This first call would create the RC if its missing.
+		. "$TUI_DIR_THEMES/$TUI_THEME"  || . tuirc	# This first call would create the RC if its missing.
 	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
 	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 	WIDTH=$[ $(tput cols) - ( 2 * ${#BORDER_LEFT} ) - 2 ]

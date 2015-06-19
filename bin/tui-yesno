@@ -23,7 +23,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tui_rc" || . tui
+	source "$HOME/.tuirc" || . tuirc
 	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
 	do	source "$f"
 	done
@@ -64,7 +64,7 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 		printf "$help_text" && \
 		exit $RET_HELP
 	case "$1" in
-	"-h")	printf "$help_text" ; exit $RET_HELP
+	"-h"|"--help")	printf "$help_text" ; exit $RET_HELP
 		;;
 	esac
 	$select_read_numbers && \

@@ -20,13 +20,13 @@
 #
 #	Variable defaults
 #
-	source "$HOME/.tui_rc" && \
+	source "$HOME/.tuirc" && \
 		. "$TUI_DIR_CONF/apps.conf" && \
 		. "$TUI_FILE_CONF_APPS" && \
 		. "$TUI_DIR_CONF/commands.conf" && \
 		. "$TUI_DIR_CONF/settings.conf" && \
 		. "$TUI_FILE_CONF_SETTINGS"  || \
-		. tui	# This first call would create the RC if its missing.
+		. tuirc	# This first call would create the RC if its missing.
 	
 	script_version=0.4
 	ME="$(basename $0)"
@@ -41,8 +41,8 @@
 		\r
 		\r"
 	
-	FILE_TEMP="$TUI_DIR_CACHE/$ME.status"
-	FILE_CMD="$TUI_DIR_CACHE/bgjob"
+	FILE_TEMP="$TUI_DIR_TEMP/$ME.status"
+	FILE_CMD="$TUI_DIR_TEMP/bgjob"
 	TMP=$TUI_FILE_TEMP
 	touch $TMP
 	umask 022 $FILE_CMD $FILE_TEMP

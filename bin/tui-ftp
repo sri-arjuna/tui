@@ -20,13 +20,13 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tui_rc" && \
+	source "$HOME/.tuirc" && \
 		. "$TUI_DIR_CONF/apps.conf" && \
 		. "$TUI_DIR_CONF/commands.conf" && \
 		. "$TUI_DIR_CONF/settings.conf" && \
 		. "$TUI_FILE_CONF_APPS" && \
 		. "$TUI_FILE_CONF_SETTINGS" || \
-		. tui	# This first call would create the RC if its missing.
+		. tuirc	# This first call would create the RC if its missing.
 	
 #
 #	File:		tui-ftp
@@ -49,7 +49,7 @@
 	CONFIG_DIR="$HOME/.config/tui"		# Configuration directory
 	CONFIG="$CONFIG_DIR/apps.conf"			# Configuration file
 	LOG="$CONFIG_DIR/$ME.log"			# Logfile
-	TEMPFILE="$TUI_DIR_CACHE/$ME.tmp"		# Tempfile
+	TEMPFILE="$TUI_DIR_TEMP/$ME.tmp"		# Tempfile
 #
 #	Variable defaults (options)
 #

@@ -17,9 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	source $HOME/.tuirc 2>/dev/zero	|| source $HOME/.tui_rc
-	source $TUI_FILE_USER
-	source $TUI_FILE_USER_SETTINGS
+	source "$HOME/.tuirc" || . tuirc
+	source "$TUI_FILE_USER"
+	source "$TUI_FILE_USER_SETTINGS"
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -132,6 +132,26 @@ Usage: 	$ME [options] [arguments]
 		done
 	fi
 # Create the structure	
+	# Optional
+	if tui-yesno "Make more changes?"
+	then	tui-title "$INFO" "Leave empty for default values, use 1 space for empty fields" "$INFO"
+		APP_FOLDERS=$(tui-read "What is the new caption for folders:")
+		APP_FILES=$(tui-read "What is the new caption for files:")
+		APP_USER_LABEL=$(tui-read "What is the new caption for upper right top line:")
+	fi
+	
+	if ${default_new_browser_manpage_create:-true}
+	then	case "${default_new_browser_manpage_type:-application}" in
+		application)	var_opt="-a"	;;
+		*)		var_opt=""	;;
+		esac
+		tui-bol-dir -v "$APP_BASE/man"
+		${0/browser/manpage} $varOpt "$APP_BASE/man/$APP_FILE"
+	fi
+	
+	source "$TUI_DIR_TEMPLATES/browser" > "$APP_BASE/$APP_FILE"
+	chmod +x "$APP_BASE/$APP_FILE"
+	tui-filemgr "$APP_BASE"
 	
 
 	exit 0

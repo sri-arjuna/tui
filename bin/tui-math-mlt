@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tui_rc" || . tui
+	source "$HOME/.tuirc" || . tuirc
 	source "$TUI_FILE_CONF_COMMANDS"
 #
 #	File:		tui-math-add

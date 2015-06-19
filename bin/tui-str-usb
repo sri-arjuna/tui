@@ -23,14 +23,14 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tui_rc" && \
+	source "$HOME/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" && \
 		. "$TUI_FILE_CONF_COLORS" && \
 		. "$TUI_FILE_CONF_STATUS" && \
 		. "$TUI_FILE_CONF_SYSTEM"  && \
 		. "$TUI_FILE_CONF_SETTINGS"  && \
 		. "$TUI_FILE_USER_SETTINGS"  || \
-		. tui
+		. tuirc
 	# If there is a user theme directory, use that one instead
 	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
 	. "$TUI_DIR_THEMES/$TUI_THEME" 

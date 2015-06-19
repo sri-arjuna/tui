@@ -20,11 +20,11 @@
 #
 #	Variable defaults
 #
-	#TUI_FILE_TEMP=$(tui-conf-get $HOME/.tui_rc TUI_FILE_TEMP) || . tui 1>/dev/zero 2>/dev/zero
-	. $HOME/.tui_rc  && \
+	#TUI_FILE_TEMP=$(tui-conf-get $HOME/.tuirc TUI_FILE_TEMP) || . tuirc 1>/dev/zero 2>/dev/zero
+	. $HOME/.tuirc  && \
 		. $TUI_DIR_CONF/commands.conf || \
-		. tui >/dev/zero
-	script_version=0.7
+		. tuirc >/dev/zero
+	script_version=0.7.1
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
@@ -43,7 +43,7 @@
 #
 	# Check file
 	if [ ! -f "$TUI_FILE_TEMP" ]
-	then 	tui-bol-dir "$TUI_DIR_CACHE"
+	then 	tui-bol-dir "$TUI_DIR_TEMP"
 		touch "$TUI_FILE_TEMP"
 		echo 0 > "$TUI_FILE_TEMP"
 	fi

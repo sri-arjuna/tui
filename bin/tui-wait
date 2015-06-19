@@ -36,7 +36,7 @@ Examples:	$ME 2m
 #	Argument handling
 #
 	case "$1" in
-	-h|--help|"")	printf "$help_text"
+	"-h"|"--help"|"")	printf "$help_text"
 			exit 1
 			;;
 	-v)		beVerbose=true

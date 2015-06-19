@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	source "$HOME/.tui_rc" || . tui
+	source "$HOME/.tuirc" || . tuirc
 	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 	do	[ -f "$f" ] && source "$f"
 	done
@@ -38,7 +38,7 @@
 		\r
 		\r"
 	
-	FILE_TEMP="$TUI_DIR_CACHE/$ME.$$.status"
+	FILE_TEMP="$TUI_DIR_TEMP/$ME.$$.status"
 	DEST=""
 	showBar=true
 	doExtract=false

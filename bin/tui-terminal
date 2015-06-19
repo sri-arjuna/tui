@@ -20,7 +20,7 @@
 #
 #	System defaults
 #
-	source "$HOME/.tui_rc" || . tui
+	source "$HOME/.tuirc" || . tuirc
 	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done
@@ -54,7 +54,7 @@
 #
 	#[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
 	case "$1" in
-	"-h"|"--help"|"")
+	"-h"|"--help")
 		printf '%s\n' \
 			"$ME ($script_version)" \
 			"Usage: $ME \"<cmd>\"" \

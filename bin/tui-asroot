@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tui_rc" || . tui
+	source "$HOME/.tuirc" || . tuirc
 	for f in $TUI_FILE_{CONF,USER}_{COMMANDS,SETTINGS}
 	do	[ -f "$f" ] && source "$f"
 	done

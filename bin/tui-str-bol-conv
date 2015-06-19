@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source $HOME/.tui_rc
+	source $HOME/.tuirc || . tuirc
 #
 #	File:		tui-str-bol-conv
 #	Author: 	sea

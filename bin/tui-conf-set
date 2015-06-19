@@ -17,9 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	source "$HOME/.tui_rc" && \
+	source "$HOME/.tuirc" && \
 		. "$TUI_DIR_CONF/commands.conf" || \
-		. tui	# This first call would create the RC if its missing.
+		. tuirc	# This first call would create the RC if its missing.
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

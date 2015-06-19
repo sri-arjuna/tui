@@ -19,9 +19,9 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tui_rc" && \
+	source "$HOME/.tuirc" && \
 		. "$TUI_DIR_CONF/commands.conf" || \
-		. tui	# This first call would create the RC if its missing.
+		. tuirc	# This first call would create the RC if its missing.
 #
 #	File:		tui-str-extension
 #	Author: 	Simon Arjuna Erat (sea)
