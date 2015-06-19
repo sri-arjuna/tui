@@ -68,7 +68,7 @@
 			do	[ -d "$tryout" ] && TUI_DIR_TEMP="$tryout" && break
 			done
 			
-			[ -z "$SCRIPTS" && \
+			[ -z "$SCRIPTS" ] && \
 				for tryout in "$HOME/.local/bin" "$HOME/bin"
 				do	[ -d "$tryout" ] && TUI_DIR_USER_SCRIPTS="$tryout" && break
 				done || \
@@ -87,10 +87,15 @@
 			if [ $UID -eq 0 ]
 			then	THM=default-red
 				TCACHE=/tmp
+				CHROOT="${CHROOT:-/}"
+				PREFIX="${PREFIX:-/usr}"
 			else	THM=default
 				TCACHE=$HOME/.cache
+				CHROOT="${CHROOT:-$HOME/.local}"
+				PREFIX="${PREFIX:-$HOME/.local}"
 			fi
 			TUI_DIR_TEMP=${TUI_DIR_TEMP:-$TCACHE}
+			
 			TUI_DIR_SYSTEM=${TUI_PREFIX:-/usr}/share/tui
 			TC="${TUI_CHROOT:-/}"
 			
@@ -104,6 +109,10 @@
 				# If you need to change something, change the top DIR variables first,
 				# so all later variable definitions apply that change automaticly.
 				#
+				[ -z "\$TUI_ROOT" ] && \\
+				 	TUI_ROOT="${TC%/}"
+				[ -z "\$TUI_PREFIX" ] && readonly \\
+				 	TUI_PREFIX="$PREFIX"
 				
 				TUIRC_SYS
 			fi
@@ -140,6 +149,8 @@
 			 	TUI_DIR_DOCS="\$TUI_PREFIX/share/doc/tui"
 			[ -z "\$TUI_DIR_MANPAGES" ] && readonly \\
 			 	TUI_DIR_MANPAGES="\$TUI_PREFIX/share/man/man1"
+			[ -z "\$TUI_DIR_BIN" ] && readonly \\
+			 	TUI_DIR_BIN="\$TUI_PREFIX/bin"
 			
 			
 			
@@ -296,7 +307,7 @@
 #
 #	Load Environment	:	System wide / defaults
 #
-	source "$TRC" && printf "." > /dev/stderr
+	source "$TRC" && printf "." #> /dev/stderr
 	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	source "$f" && printf "." > /dev/stderr
 	done

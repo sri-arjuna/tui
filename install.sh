@@ -24,9 +24,10 @@
 #
 #	Internals
 #
-	script_version=0.8.7
+	script_version=0.8.8
 	TRC=$HOME/.tuirc	# This exists for all users, incl root
 	TRC_SYS="/etc/tuirc"	# This contains the installation paths, only created if installed as root!
+	isUpdate=false
 #
 #	Variables
 #
@@ -48,16 +49,15 @@
 		isUpdate=true
 		# Get only the system paths if available:
 		[ -f "$TRC_SYS" ] && source "$TRC_SYS" || source "$TRC"
-		catched_root="$TUI_ROOT"
-		catched_prefix="${TUI_ROOT%/}/${TUI_PREFIX/\/}"
+		catched_root="$TUI_ROOT" ## "${TUI_ROOT%/}"
+		catched_prefix="$TUI_PREFIX"
 		catched_project="$TUI_DIR_PROJECTS"
 		catched_scripts="$TUI_DIR_USER_SCRIPTS"
 	else	# Its a fresh installation
 		isUpdate=false
 		catched_root="${CHROOT:-$SUGGESTED_ROOT}"
-		[ -z "$CHROOT$PREFIX" ] && \
-			catched_prefix="${PREFIX:-$SUGGESTED_PREFIX}" || \
-			catched_prefix="${CHROOT}/usr"
+		[ -z "$CHROOT" ] && catched_root="$SUGGESTED_ROOT" || catched_root="$CHROOT"
+		[ -z "$PREFIX" ] && catched_prefix="$SUGGESTED_PREFIX" || catched_prefix="$PREFIX"
 		catched_project="${PROJECT:-$SUGGESTED_PROJECT}"
 		catched_scripts="$SCRIPTS"
 	fi
@@ -143,16 +143,17 @@
 		else	te "You're a regular user, so a custom installation is recomended."
 			te "Note this makes things complicate if your scripts shall be used as root, with sudo, or by other users!"
 			te "Recomended Installation as user:"
-			te "${bluef}${whiteb}CHROOT=/ PREFIX=/usr PROJECT=\$HOME/prjs SCRIPTS=\$HOME/path/to/scripts $0$reset"
+			te "${bluef}${whiteb}CHROOT=\$HOME/.local PREFIX=\$HOME/.local [PROJECT=\$HOME/prjs] [SCRIPTS=\$HOME/path/to/scripts] $0$reset"
 			te
 		fi
 		t2 "Installation root:" 	"$catched_root"
-		t2 "Installation prefix:" 	"$catched_prefix"
+		t2 "Installation prefix:" 	"$catched_root/${catched_prefix/$catched_root/}"
 		[ 0 -ne $UID ] && t2 "User projects:"	"$catched_project"
 		[ 0 -ne $UID ] && t2 "User scripts:"	"$catched_scripts"
 		te
+		t2 "User config will be installed to:" "${TUI_DIR_USER:-$HOME/.config/tui}/"
 		t2 "Binary files will be installed to:" "$catched_prefix/bin/"
-		t2 "Config files will be installed to:" "$catched_root/etc/tui/"
+		t2 "Default config will be installed to:" "$catched_root/etc/tui/"
 		t2 "Application data will be installed to:" "$catched_prefix/share/tui/"
 		t2 "Bash-completion will be installed to:" "$DIR_COMPL"
 		te
@@ -161,8 +162,8 @@
 		t2 "New scripts will be saved to:" "$catched_scripts"
 		te
 		# If it is NOT an update, and user doesnt want to contiue, to change paths perhaps, exit with success.
-		exit
-		! $isUpdate && ! yesno "Do you want to continue?" && exit 0
+		#! $isUpdate &&
+		! yesno "Do you want to continue?" && exit 0
 		
 		install_tui
 	}
@@ -170,44 +171,84 @@
 	# Create the user RC file with the set installation paths
 	# Then copy the files to their paths
 		[ ! -f bin/tui ] && te && te "You must be in the directory of $0" && exit 1
-		te;te
+		te
 		if $isUpdate
 		then	tt "Updating now..."
-			source "$TRC"
+			source "$TRC" 1>/dev/zero
 		else	tt "Installing now..."
 			te "* Creating system paths..."
-			mkdir -p mkdir -p $catched_root $catched_prefix
-			DIR_COMPL $TUI_DIR_{CONF,DOCS,MANPAGES,LOGS,LIST,SYSTEM,TEMPLATES,THEMES,USER,TEMP}
-			mkdir -p $TUI_DIR_USER_{LOGS,SCRIPTS,MANPAGES,TEMPLATES,THEMES}
-		
+			# Make sure initial variables contain data:
+			TUI_DIR_BIN="${TUI_DIR_BIN:-$catched_root/${catched_prefix/$catched_root}/bin}"/
+			TUI_DIR_THEMES="${TUI_DIR_THEMES:-$catched_root/${catched_prefix/$catched_root}/share/tui/themes}/"
+			TUI_DIR_DOCS="${TUI_DIR_DOCS:-$catched_root/${catched_prefix/$catched_root}/share/doc/tui}/"
+			TUI_DIR_MANPAGES="${TUI_DIR_MANPAGES:-$catched_root/${catched_prefix/$catched_root}/share/man/man1}"
+			TUI_DIR_SYSTEM="${TUI_DIR_SYSTEM:-$catched_root/${catched_prefix/$catched_root}/share/tui}"
+			TUI_DIR_TEMPLATES="${TUI_DIR_TEMPLATES:-$catched_root/${catched_prefix/$catched_root}/share/tui/templates}"
+			TUI_DIR_USER="${TUI_DIR_USER:-$HOME/.config/tui}/"
+			
+			for t_dir in 	"$catched_root" "$catched_prefix" \
+					$DIR_COMPL $TUI_DIR_{BIN,CONF,DOCS,MANPAGES,LOGS,LIST,SYSTEM,TEMPLATES,THEMES,USER,TEMP} \
+					$TUI_DIR_USER_{LOGS,SCRIPTS,MANPAGES,TEMPLATES,THEMES}
+			do	if [ ! -d "$t_dir" ] 
+				then	printf "%s" "Creating: $t_dir :: "
+					mkdir -p "$t_dir" 
+					printf "%s\n" "$?"
+				else	echo "Skipped: $t_dir"
+				fi
+			done
+			
+			
 			printf '%s\n' "* Writing RC file ($TRC)"
-			CHROOT="$catched_root" PREFIX="$catched_prefix" PROJECT="$catched_project" SCRIPT="$catched_scripts" . bin/tuirc
+			CHROOT="$catched_root" PREFIX="$catched_prefix" PROJECT="$catched_project" SCRIPT="$catched_scripts" . bin/tuirc >/dev/zero
+			
 		fi
 		
+		# Ok, me load the variables now 3 times...
+		#[ -f /etc/tuirc ] && source /etc/tuirc
+		source ~/.tuirc 2>/dev/zero
+		#source bin/tuirc
+		#echo $TUI_DIR_BIN
+		#echo but still empty?
+		
+		te
 		te "* Copying binaries..."
-		cp -a bin/tui* "${TUI_DIR_BIN:-/usr/bin}"/
+	#	cd bin
+	#	set -x
+	#	cp -aurf -t "${TUI_DIR_BIN:-/usr/bin}"/ *
+	#	ls /usr/bin/tui*
+		
+		cp -aurf bin/* "$TUI_DIR_BIN"/
+	#	ls /usr/bin/tui*
+		
+	#	cp -aurf  * -t "$TUI_DIR_BIN"
+	#	ls /usr/bin/tui*
+	#	cd ..
+	#	set +x
 		
 		te "* Copying configuration (system)..."
-		cp -a conf.etc/* "${TUI_DIR_CONF:-/etc/tui}"
+		cp -au conf.etc/* "$TUI_DIR_CONF"/
 		te "* Copying configuration (user)..."
-		cp -a conf.home/* "${TUI_DIR_USER:-$HOME/.config/tui}"
+		cp -au conf.home/* "$TUI_DIR_USER"/
 		
 		te "* Copying themes..."
-		cp -aR themes/* "${TUI_DIR_THEMES:-/usr/share/tui/themes}"
+		cp -aRu themes/* "$TUI_DIR_THEMES"/
 		
-		te "Copying documentation"
-		cp -aR docs/* "${TUI_DIR_DOCS:-/usr/share/doc/tui}"
+		te "* Copying documentation"
+		cp -aRfu docs/* "$TUI_DIR_DOCS"/
 		
-		te "Copying system"
-		cp -aR conf.{etc,home} "${TUI_DIR_SYSTEM:-/usr/share/tui}"
+		te "* Copying manpages"
+		cp -aRf docs/* "$TUI_DIR_MANPAGES"/
+		
+		te "* Copying system"
+		cp -aR conf.{etc,home} "$TUI_DIR_SYSTEM"
 		cp -af uninstall.sh "$TUI_DIR_SYSTEM"
 		cp -af tui_compl.bash "$DIR_COMPL"
 		
-		te "Copying templates"
-		cp -aRf templates/* "${TUI_DIR_TEMPLATES:-/usr/share/tui/templates}"
+		te "* Copying templates"
+		cp -aRf templates/* "$TUI_DIR_TEMPLATES"/
 		
-		te "Copying lists"
-		cp -aRf lists/* "${TUI_DIR_LIST:-/usr/share/tui/lists}"
+		te "* Copying lists"
+		cp -aRf lists/* "$TUI_DIR_LIST"
 		RET=$?
 		
 		if [ ${RET:-1} -eq 0 ]
@@ -217,9 +258,9 @@
 				bin/tui-yesno "Do you want to configure TUI now?" && \
 				bin/tui config || exit $RET
 		else	te "Installation failed...  ;("
-			t2 "CHROOT was:" "$CHROOT"
-			t2 "PREFIX was:" "<\$CHROOT>$PREFIX"
-			t2 "USER was:"   "$USER"
+			t2 "CHROOT was:" "<$CHROOT>"
+			t2 "PREFIX was:" "\$CHROOT/<$PREFIX>"
+			t2 "USER was:"   "<$USER>"
 			t2 "Probably an expected path was not found."
 		fi
 		exit $RET
