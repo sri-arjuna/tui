@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.8.2
-Release:     1%{?dist}
+Version:     0.8.3
+Release:     0%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -73,6 +73,15 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Sat Jun 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.3
+- Changed:   Completed RC change
+- Changed:   Names: tui -> tuirc, tui-browser -> tui, tui-psm -> tui-bgjob-mgr
+- Changed:   All commands accept now '--help'
+- Fixed:     tui-asroot, successfully starts 'su' if required
+- Updated:   tui-asroot, -m 'MSG' prompts withs 'MSG'
+- Fixed:     tui-select -a, automaticly returns a value if there is only 1
+- Updated:   bash-completion
+
 * Fri Jun 12 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.2-1
 - Changed:   Made install script faster again
 - Fixed:     tui-new-browser, figured had to update tui-read

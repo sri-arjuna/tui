@@ -30,11 +30,12 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tuirc" || . tuirc
-	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
-	do	source "$f"
-	done
-	source "$TUI_FILE_USER_SETTINGS"
+	source "$HOME/.tuirc" && \
+		for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
+		do	source "$f"
+		done && \
+		source "$TUI_FILE_USER_SETTINGS" || . tuirc
+	
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
 	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
@@ -47,7 +48,7 @@
 #	Variables
 #	
 	ME=${0##*/}
-	script_version=0.8.1
+	script_version=0.9.0
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -108,8 +109,8 @@ Where options are:
 	ARGS=("${@}")
 	len=${#ARGS[@]}
 	$AUTO && \
-		[ $len -eq 1 ] && \
-		printf '%s\n' "$ARGS" > /dev/stdout && \
+		[ $# -eq 1 ] && \
+		printf '%s\n' "$ARGS" >&1 && \
 		exit 0
 	$select_read_numbers && \
 		cmd="read -n ${#len}" || \

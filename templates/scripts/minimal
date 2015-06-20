@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source tui
+source tuirc
 
 cat > "$DEST" << EOF
-#!/usr/bin/env bash
+#!/usr/bin/env  $USER_SHELL
 # File: 	${DEST##*/}
 # Description:	
 # $DEFAULT_LICENSE $(date +'%Y') by $USER_NAME ($USER_EMAIL)

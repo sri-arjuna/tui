@@ -23,13 +23,13 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.06.02
+#	Changed:	2015.06.20
 	script_version=2.2
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
 #
-	TUI_VERSION=0.8.2
+	TUI_VERSION=0.8.3
 	TRC="$HOME/.tuirc"	# User default
 	TRC_SYS="/etc/tuirc"	# Only available if root installed tui
 #

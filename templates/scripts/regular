@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source tui
+source tuirc
 
 cat > "$DEST" << EOF
 #!/usr/bin/env bash
@@ -23,10 +23,7 @@ cat > "$DEST" << EOF
 #
 # ------------------------------------------------------------------------
 #
-	source "\$HOME/.tui_rc" || . tui
-	for config in \$TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,USER,SETTINGS,STATUS,SYSTEM}
-	do	[ -f "\$config" ] && source "$config"
-	done
+	source tuirc
 #
 #	File:		${DEST##*/}
 #	Author: 	$USER_NAME
@@ -34,7 +31,7 @@ cat > "$DEST" << EOF
 #	License:	$DEFAULT_LICENSE
 #	Created:	$(date +'%Y.%m.%d')
 #	Changed:	$(date +'%Y.%m.%d')
-	script_version=0.0.1
+	script_version=0.1
 	TITLE="${DEST##*/}"
 #	Description:	Text TODO
 #

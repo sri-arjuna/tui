@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source tui
+source tuirc
 cat > "$DEST" << EOF
 #!/usr/bin/env $USER_SHELL
 EOF
