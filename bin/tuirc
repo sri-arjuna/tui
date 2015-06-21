@@ -159,6 +159,8 @@
 			#
 			#	Paths	:	Used to run the System
 			#
+			[ -z "\$TUI_DIR_LOG" ] && readonly \\
+			 	TUI_DIR_LOG="\$TUI_ROOT/var/log"
 			[ -z "\$TUI_DIR_LOGS" ] && readonly \\
 			 	TUI_DIR_LOGS="\$TUI_ROOT/var/logs"
 			[ -z "\$TUI_DIR_TEMPLATES" ] && readonly \\
