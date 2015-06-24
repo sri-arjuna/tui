@@ -37,7 +37,7 @@
 	do	source "$f"
 	done
 	# If there is a user theme directory, use that one instead
-	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
+	if [ -d "$TUI_DIR_USER_THEMES" ] && [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
 	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
 	else	. "$TUI_DIR_THEMES/$TUI_THEME" 
 	fi

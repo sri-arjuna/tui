@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+shopt -s expand_aliases
 #
 # Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
@@ -313,6 +314,8 @@
 	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	source "$f" && printf "." > /dev/stderr
 	done
+	source "$TUI_DIR_CONF/shorts.conf"
+	source "$TUI_DIR_CONF/shorts-alias.conf"
 #
 #	Load Environment	:	User settings
 #
@@ -445,6 +448,32 @@
 				done
 				[ $task = apps ] && for t in EDITOR BROWSER FILEMGR;do tui-echo "${t^}" "\$${t}_$(tui-bol-gui && printf GUI || printf CLI)";done
 			done
+			
+			tui-echo;tui-press
+			tui-printf -T "Variables provided by shorts.conf (\$TUI_DIR_CONF/shorts.conf)"
+			for entry in $($GREP "=" "$TUI_DIR_CONF/shorts.conf"|$GREP -v ^"#")
+			do	tui-echo "${entry/=*}"	"$(echo ${entry/*=})" 	#""
+			done
+			
+			tui-echo;tui-press
+			tui-printf -T "Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)"
+			tui-printf -S 111 "Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file."
+		#	for entry in $($GREP "=" "$TUI_DIR_CONF/shorts-alias.conf")
+		#	do	set -x
+		#		var="${entry/=*}"
+		#		val="${entry/*=}"
+		#		set +x
+		#		tui-echo \
+		#			"$var" \
+		#			"$val" \
+		#			""
+		#	done
+			
+			while 	IFS='=	'
+				read al var val
+			do	echo "$al $var $val" | $GREP -q "#" || \
+					tui-echo "$var" "$val" #"" #"($al)"
+			done<"$TUI_DIR_CONF/shorts-alias.conf"
 			
 			tui-echo
 			tui-status 0 "Showed what TUI $1"
