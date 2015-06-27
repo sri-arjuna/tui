@@ -34,8 +34,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.01.28
-#	Changed:	2015.01.30
-	script_version=0.3.4-ALPHA
+#	Changed:	2015.06.27
+	script_version=0.3.5-ALPHA
 	TITLE="TUI handler for FTP tasks"
 #	Description:	A smiple handler for FTP commands.
 #
@@ -381,7 +381,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 				DEFAULT_DIR="$LOC"
 			
 			$beVerbose && \
-				tui-printf "Generate downloadlist: $REM to $LOC" "[  $(tui-indi)   ]"
+				tui-progress "Generate downloadlist: $REM to $LOC"
 			
 			echo "$LCD $LOC" >> "$TEMPFILE"
 			echo "$GET $REM" >> "$TEMPFILE"
@@ -411,7 +411,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 				DEFAULT_DIR="$REM"
 			
 			$beVerbose && \
-				tui-printf "Generate uploadlist: $LOC to $REM" "[  $(tui-indi)   ]"
+				tui-progress "Generate uploadlist: $LOC to $REM"
 			
 			echo "$CD $REM" >> "$TEMPFILE"
 			echo "$PUT $LOC $REM/$(basename $LOC)" >> "$TEMPFILE"
