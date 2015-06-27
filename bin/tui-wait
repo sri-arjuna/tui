@@ -23,7 +23,7 @@
 #	Help text
 #
 	ME=tui-wait
-	script_version=0.5.1
+	script_version=0.6
 	beVerbose=false
 	help_text="
 $ME ($script_version)
@@ -100,9 +100,13 @@ Examples:	$ME 2m
 				minutes="00:" || \
 				minutes=""
 		fi
-		if [ $secs -gt 0 ] 
+		#minutes=${minutes:-0}
+		if [ $secs -lt 59 ] && [ -z "$minutes" ] && [ -z "$hours" ]
+		then	[ 0 -eq ${secs:0:1} ] && \
+				secs=${secs/0}
+		elif [ ! -z "$minutes" ] 
 		then	[ ${#secs} -eq 1 ] && secs="0${secs}"
-		else	secs="00"
+		#else	secs="00"
 		fi
 		[ $hours -gt 0 ] && hours="$hours:" || hours=""
 		# Output
