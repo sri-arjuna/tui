@@ -28,7 +28,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.6
+	script_version=0.7
 	ME="${0##*/}"
 #
 #	Check for the environment to load
@@ -53,7 +53,20 @@
 #	Variable handling
 #
 	#[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
+	showVersion() { 
+	cat <<-EOF
+		GNU TUI - $ME, Version $script_version
+		Copyright (C) 2013 Free Software Foundation, Inc.
+		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+		This is free software; you are free to change and redistribute it.
+		There is NO WARRANTY, to the extent permitted by law.
+	EOF
+	}
 	case "$1" in
+	"--version")	showVersion
+			exit 0
+			;;
 	"-h"|"--help")
 		printf '%s\n' \
 			"$ME ($script_version)" \
@@ -65,18 +78,21 @@
 	esac
 	ARGS="${@}"
 	
-	# Fill the fallback, to avoid empty calls
-	TERMINAL="${TERMINAL:-$TERM}"
-	case $TERMINAL in
+	# Handle 'known' terminal emulators
+	case "$TERMINAL" in
 	gnome-terminal|lxterminal|vte|[eipx]term)
-				[ -z "$1" ] && opt="" || opt="-e "	;;
-	termit)			[ -z "$1" ] && opt="" || opt="-c "	;;
-	*)			[ -z "$1" ] && opt="" || opt="-e "
+		[ -z "$1" ] && opt="" || opt="-e "	;;
+	termit)
+		[ -z "$1" ] && opt="" || opt="-c "	;;
+	*)	# Handle 'unknown' terminal emulators, assuming defaults
+		[ -z "$1" ] && opt="" || opt="-e "
+		# Fill the fallback, to avoid empty calls
+		TERMINAL="${TERMINAL:-xterm}"
 		tui-echo "$TERMINAL: Using 'default' option \"$opt\", please report your terminal ($TERMINAL) and its command execution option." > /dev/stderr
 		;;
 	esac
 #
 #	Display
 #
-	$TERMINAL $opt ${ARGS[@]}
+	$TERMINAL $opt "${ARGS[@]}"
 	

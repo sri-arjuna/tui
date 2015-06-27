@@ -26,6 +26,17 @@
 		\rUsage: $ME [-v] /path/to/check
 		\rReturns 0 if '/path/to/check' was found or could be created
 		\r"
+	showVersion() { 
+	cat <<-EOF
+		GNU TUI - $ME, Version $script_version
+		Copyright (C) 2013 Free Software Foundation, Inc.
+		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+		This is free software; you are free to change and redistribute it.
+		There is NO WARRANTY, to the extent permitted by law.
+	EOF
+	}
+	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	[ "-v" = "$1" ] && \
 		beVerbose=true && \
 		shift || \

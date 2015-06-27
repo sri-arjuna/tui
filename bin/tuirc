@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
+#X='() { function a a>\' bash -c echo; [ -e echo ] && echo "gehackt" >/dev/zero
+env x='() { :;}; exit 1' bash -c "exit 0"
+[ 1 -eq $? ] && printf '%s\n' "Your BASH is vulnerable to shellshock, please update/patch BASH first." "Aborting..." && return 1
 shopt -s expand_aliases
+return
 #
 # Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.

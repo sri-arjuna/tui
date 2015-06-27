@@ -74,6 +74,17 @@
 	# A ':' after a char indicates that this option requires an argument
 	# Get access to the passed value of the argument by using $OPTARG
 	[ "--help" = "$1" ] && help_screen && exit 99
+	showVersion() { 
+	cat <<-EOF
+		GNU TUI - $ME, Version $script_version
+		Copyright (C) 2013 Free Software Foundation, Inc.
+		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+		This is free software; you are free to change and redistribute it.
+		There is NO WARRANTY, to the extent permitted by law.
+	EOF
+	}
+	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "hcCdoty" opt
 	do 	case $opt in
 		h)	help_screen
