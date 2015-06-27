@@ -23,13 +23,15 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tuirc" || . tuirc
-	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
-	do	source "$f"
-	done
-	source "$TUI_FILE_USER_SETTINGS"
+	if source "$HOME/.tuirc
+	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
+		do	source "$f"
+		done
+		source "$TUI_FILE_USER_SETTINGS"
+	else	source tuirc
+	fi
 	# If there is a user theme directory, use that one instead
-	[ -f "$TUI_DIR_USER_THEMES"/* ] && \
+	[ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ] && \
 		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
 		use_DIR_THEME="$TUI_DIR_THEMES"
 	. "$use_DIR_THEME/$TUI_THEME" 
@@ -39,8 +41,8 @@
 #
 #	Variable defaults
 #
-	script_version=0.8.1
-	ME="$(basename $0)"
+	script_version=0.9.0
+	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"
 		\rReturns on user press of: o,j,s,y
@@ -57,17 +59,65 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 	fi
 
 "
+	# Check for read capabilities if not set yet
+	if [ -z "$bash_read_numbers" ]
+	then	LC_ALL=C $READ --help 2>&1 | $GREP -v bash > "$TUI_FILE_TEMP"
+		beVerbose=""
+		# Be verbose, but only as root
+		tui-bol-root && \
+			conf="$TUI_FILE_CONF_SETTINGS" && \
+			beVerbose="-v" || \
+			conf="$TUI_FILE_USER_SETTINGS"
+		# 'read-header'
+		printf '%s\n' "#\n#\tRead capabilities\n#" >> "$conf"
+		# Delimiter	
+		$GREP -q "\[-d" "$TUI_FILE_TEMP"
+		ret=$(tui-str-bol-conv -t $?)
+		tui-conf-set $beVerbose "$conf" "bash_read_delimiter" "$ret"
+		# Input
+		$GREP -q "\[-i" "$TUI_FILE_TEMP"
+		ret=$(tui-str-bol-conv -t $?)
+		tui-conf-set $beVerbose "$conf" "bash_read_input" "$ret"
+		# Prompt
+		$GREP -q "\[-p" "$TUI_FILE_TEMP"
+		ret=$(tui-str-bol-conv -t $?)
+		tui-conf-set $beVerbose "$conf" "bash_read_prompt" "$ret"
+		# Numbers
+		$GREP -q "\[-n" "$TUI_FILE_TEMP"
+		ret=$(tui-str-bol-conv -t $?)
+		tui-conf-set $beVerbose "$conf" "bash_read_numbers" "$ret"
+		# Timeout
+		$GREP -q "\[-t" "$TUI_FILE_TEMP"
+		ret=$(tui-str-bol-conv -t $?)
+		tui-conf-set $beVerbose "$conf" "bash_read_timeout" "$ret"
+		
+		# Load these new settings now
+		source "$conf"
+	fi
 #
 #	Variable handling
 #
-	[ -z "$1" ] && \
-		printf "$help_text" && \
-		exit $RET_HELP
 	case "$1" in
-	"-h"|"--help")	printf "$help_text" ; exit $RET_HELP
+	"")	printf "$help_text"
+		exit $RET_HELP
+		;;
+	"--version")
+		cat <<-EOF
+			GNU TUI - $ME, Version $script_version
+			Copyright (C) 2013 Free Software Foundation, Inc.
+			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+			This is free software; you are free to change and redistribute it.
+			There is NO WARRANTY, to the extent permitted by law.
+		EOF
+		exit 0
+		;;
+	"-h"|"--help")
+		printf "$help_text"
+		exit $RET_HELP
 		;;
 	esac
-	$select_read_numbers && \
+	$bash_read_numbers && \
 		cmd="read -n1" || \
 		cmd="read"
 #
