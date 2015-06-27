@@ -678,7 +678,7 @@ _tui_log()
 			;;
 		esac
 	}	
-_tui_math()
+_tui_verbose()
 	{
 	#
 	#	Variables
@@ -845,7 +845,7 @@ _tui_str_bol_conv()
 			;;
 		esac
 	}
-_tui_str_encrypt()
+_tui_str_hash()
 	{
 	#
 	#	Variables
@@ -985,12 +985,6 @@ complete -F _tui_asroot tui-asroot
 complete -F _tui_justhelp tui-bol-root
 complete -F _tui_bol_dir tui-bol-dir
 complete -F _tui_bol_dir tui-bol-gui
-complete -F _tui_math tui-math-add
-complete -F _tui_math tui-math-div
-complete -F _tui_math tui-math-mlt
-complete -F _tui_math tui-math-pwer
-complete -F _tui_math tui-math-sub
-complete -F _tui_justhelp tui-math-sqr
 complete -F _tui_conf_editor tui-conf-editor
 complete -F _tui_conf_get tui-conf-get
 complete -F _tui_conf_set tui-conf-set
@@ -1000,7 +994,7 @@ complete -F _tui_justhelp tui-new-browser
 complete -F _tui_justhelp tui-press
 complete -F _tui_justhelp tui-rnd
 complete -F _tui_str_bol_conv tui-str-bol-conv
-complete -F _tui_str_encrypt tui-str-encrypt
+complete -F _tui_str_hash tui-str-hash
 complete -F _tui_justhelp tui-str-extension
 complete -F _tui_justhelp tui-str-genfilename
 complete -F _tui_str_usb tui-str-usb
@@ -1017,7 +1011,7 @@ complete -F _tui_justhelp tui-download
 complete -F _tui_justhelp tui-edit
 complete -F _tui_justhelp tui-terminal
 complete -F _tui_justhelp tui-filemgr
-complete -F _tui_math tui-wait
+complete -F _tui_verbose tui-wait
 
 # Advanced
 complete -F _tui_install tui-install
