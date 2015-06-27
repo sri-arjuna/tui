@@ -21,45 +21,42 @@
 #	System defaults
 #
 	source "$HOME/.tuirc" || . tuirc
-	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
+	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done
 	
 #
 #	Variable defaults
 #
-	script_version=0.7
+	script_version=0.8
 	ME="${0##*/}"
-	
-	help_text="$ME ($script_version)
-		\rUsage: $ME [options] 
-		\
-		\r"
 #
 #	Variable handling
 #
-	[ -z "$1" ] && printf "$help_text" && exit $RET_HELP
+	# Get the mode
+	tui-bol-gui && \
+		MODE=gui || \
+		MODE=cli
 	for A in "${@}";do
-	showVersion() { 
-	cat <<-EOF
-		GNU TUI - $ME, Version $script_version
-		Copyright (C) 2013 Free Software Foundation, Inc.
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
 	case "$1" in
-	"--version")	showVersion
+	"--version")	cat <<-EOF
+				GNU TUI - $ME, Version $script_version
+				Copyright (C) 2013 Free Software Foundation, Inc.
+				License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+				This is free software; you are free to change and redistribute it.
+				There is NO WARRANTY, to the extent permitted by law.
+			EOF
 			exit 0
 			;;
 	"-h"|"--help"|"")
+		## 'URL2' ..."
 		printf '%s\n' \
 			"$ME ($script_version)" \
-			"Usage: $ME [options] 'URL1' 'URL2' ..." \
+			"Usage: $ME [options] 'URL'" \
+			"-c	Force CLI mode" \
 			"" \
-			"	Opens provided URL/s in \$BROWSER_[CLI,GUI]" \
+			"	Opens provided URL in \$BROWSER_[CLI,GUI]" \
 			""
 		exit $RET_HELP
 		;;
@@ -68,15 +65,11 @@
 		;;
 	esac
 	done
-	ARGS=($(echo "${@}"))
-	# Get the mode
-	tui-bol-gui && \
-		MODE=gui || \
-		MODE=cli
+	#ARGS=($(echo "${@}"))
 #
 #	Functions
 #
-	GetAvailableApp() { # gui|cli
+	GetAvailableApp() {
 	# Returns the first found browser for either GUI or CLI
 	#
 		#[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
@@ -91,25 +84,31 @@
 #	Display
 #
 	if [ -z "$BROWSER" ]
-	then	case $MODE in
-		cli)	BROWSER=$(which $BROWSER_CLI 2>/dev/zero)	;;
-		gui)	BROWSER=$(which $BROWSER_GUI 2>/dev/zero)	;;
+	then	case "$MODE" in
+		cli)	BROWSER=$(which "$BROWSER_CLI" 2>/dev/zero)
+			wasFound=$?
+			;;
+		gui)	BROWSER=$(which "$BROWSER_GUI" 2>/dev/zero)
+			wasFound=$?
+			;;
 		esac
-		export BROWSER
+		#export BROWSER
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
 	if ! which $BROWSER 2>/dev/zero 1>/dev/zero
 	then 	# The EDITOR is not available, search for default
-		BROWSER=$(GetAvailableApp $MODE)
+		BROWSER=$(GetAvailableApp)
 		[ $MODE = cli ] && \
 			var=BROWSER_CLI || \
 			var=BROWSER_GUI
 		[ -z "$BROWSER" ] && \
 			tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && \
 			exit 1
+		# It was found, so save it
 		tui-conf-set -v "$CONF" "$var" "$BROWSER"
 	fi
 	
-	for A in "${ARGS[@]}";do
-		$BROWSER "$A"
-	done
+	#for A in "${ARGS[@]}";do
+	#	$BROWSER "$A"
+		$BROWSER "$1"	# Dont get spammy
+	#done
