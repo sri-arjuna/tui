@@ -30,7 +30,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.8
+	script_version=0.8.5
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] [/path/to/]directory]
@@ -105,7 +105,7 @@
 				pid=$!
 				#while ps | $GREP -q tar 
 				while ps | $GREP -q $pid
-				do	tui-printf "Reading $FOLDER..." "[  $(tui-indi)   ]"
+				do	tui-progress "Reading $FOLDER..."
 					sleep 0.3
 				done
 				list_tarball=( $(cat "$TUI_FILE_TEMP.2") )
@@ -174,7 +174,7 @@
 					tmp_size="0 btytes"
 				if $showBar
 				then	tui-progress -bm $org_size -i $$ -c $tmp_size "Compressing $THIS ($tmp_display_size)"
-				else	tui-printf "Compressing..." "$THIS ($tmp_display_size)" "[  $(tui-indi)   ]"
+				else	tui-progress "Compressing..." "$THIS ($tmp_display_size)"
 				fi
 				sleep 0.7
 			done
