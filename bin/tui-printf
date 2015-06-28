@@ -338,26 +338,13 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #	Passing color escape sequences increases the chars required, but lowers the chars shown
 #	This part is to fix this part for the alignment
 #
-	if $doStatus
-	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
-		case $NUM_ID in
-		0|1|2|3|10|11|127|130)	# These are colored
-			pos_three_adder=21	;;
-		4|5|6|7|99|111)		# These are not
-			pos_three_adder=-1	;;
-		esac
-		pos_third_num=$(( $pos_cle_num + $pos_three_adder - ${#THIRD} ))
-		POS_THIRD="\033[${pos_third_num}G"
-	else	string=$(printf '%s' "$THIRD")
-		pos_third_num=$(( $pos_cle_num - 1 - ${#string} ))
-		# Fix one position place if there was a %
-		# Need to improve, if multiple '%' occours
-		echo "$THIRD" | $GREP -q '%' && \
-			pos_third_num=$(( $pos_third_num + 1 ))
-		POS_THIRD="\033[${pos_third_num}G"
-	fi
+	
 	# Calculate mising positions and generate output strings
 	case $ARGS_COUNT in
+	0)	if $doStatus
+		then	set ""
+		fi
+		;;
 	1)	if $doTitle #&& ! $doStatus
 		then	SECOND="$FIRST"
 			FIRST=" "
@@ -381,7 +368,18 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				num=$(( $long - $short + 1 ))
 			pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
 			POS_THIRD="\033[${pos_third_num}G"
-		#else	echo it is status
+		else	#echo it is status
+			chkval=$(printf "${SECOND}")
+			short=${#chkval}
+
+			[ $short -eq $long ] && \
+				num=-1 || \
+				num=$(( $long - $short + 1 ))
+
+			half=$(( ${#chkval} / 2 ))
+			pos_center_num=$(( $(( $center - $half )) + $(( $num / 2 ))  ))
+			POS_CENTER="\033[${pos_center_num}G"
+
 		fi
 		;;
 	3)	long=${#SECOND}
@@ -406,6 +404,36 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		POS_THIRD="\033[${pos_third_num}G"
 		;;
 	esac
+	if $doStatus
+	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
+		case $NUM_ID in
+		0|1|2|3|10|11|127|130)	# These are colored, was 21
+			pos_three_adder=3	;;
+		4|5|6|7|99|111)		# These are not
+			pos_three_adder=0	;;
+		esac
+		long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
+	else	long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
+		# Fix one position place if there was a %
+		# Need to improve, if multiple '%' occours
+		echo "$THIRD" | $GREP -q '%' && \
+			pos_third_num=$(( $pos_third_num + 1 ))
+		POS_THIRD="\033[${pos_third_num}G"
+	fi
 #
 #	Generat output strings
 #
@@ -430,4 +458,4 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		printf  "${POS_CENTER}$SECOND"
 	fi
 	[ -z "$THIRD" ]  || printf "${POS_THIRD}$THIRD"
-	printf "${END}"1
+	printf "${END}"
