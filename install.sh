@@ -1,4 +1,53 @@
 #!/usr/bin/env bash
+#
+#	Do known security issue checks, 
+#	according to:	https://en.wikipedia.org/wiki/Shellshock_%28software_bug%29
+	vulnerable=0
+#
+#	CVE-2014-6271
+#
+	env x='() { :;}; exit 1' bash -c "exit 0"
+	vulnerable=$(( $vulnerable + $? ))
+#
+#	Patch: CVE-2014-7169 for CVE-2014-6271
+#
+	#{
+		env X='() { (a)=>\' sh -c "echo date"; [ ! -f echo ]
+		vulnerable=$(( $vulnerable + $(( 2 * $? )) ))
+	#}
+	case "$vulnerable" in
+	0)	[ -z "$BASH_VERSION" ] && echo "Fatal error: \$BASH_VERSION not found!" && exit 1
+		B_MAJOR=${BASH_VERSION:0:1}
+		B_MINOR=${BASH_VERSION:2:1}
+		if  ( [ 4 -eq $B_MAJOR ] && [ 3 -gt $B_MINOR ] ) || [ 4 -gt $B_MAJOR ]
+		then	printf '%s\n' \
+				"Please update BASH." \
+				"Version 4.3.39a or higher is recomended." \
+				"You have installed: $BASH_VERSION"
+			ret=1
+		elif ( [ 4 -eq $B_MAJOR ] && [ 3 -ge $B_MINOR ] )
+		then	if [ 27 -ge $(echo ${BASH_VERSION:4:2}|tr -d [:alpha:]) ]
+			then	ret=0
+			else	ret=1
+				printf '%s\n' \
+				"Please update BASH." \
+				"Version 4.3.39a or higher is recomended." \
+				"You have installed: $BASH_VERSION"
+			fi
+		else	ret=0
+		fi
+		;;
+	1)	printf '%s\n' "Your are vulnerable to: CVE-2014-6271"
+		ret=1
+		;;
+	2)	printf '%s\n' "Your are vulnerable to: CVE-2014-7169"
+		ret=1
+		;;
+	3)	printf '%s\n' "Your are vulnerable to: CVE-2014-6271 and CVE-2014-7169"
+		ret=1
+		;;
+	esac
+	[ 0 -eq $ret ] || exit 1
 # ------------------------------------------------------------------------
 #
 # Copyright (c) 2015 by Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
@@ -24,7 +73,7 @@
 #
 #	Internals
 #
-	script_version=0.8.8
+	script_version=0.8.9
 	TRC=$HOME/.tuirc	# This exists for all users, incl root
 	TRC_SYS="/etc/tuirc"	# This contains the installation paths, only created if installed as root!
 	isUpdate=false
