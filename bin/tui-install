@@ -29,8 +29,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.06.09
-	script_version=0.6.2
+#	Changed:	2015.06.27
+	script_version=0.7.0
 	TITLE="Install packages"
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
@@ -47,15 +47,16 @@ $ME ($script_version)
 ${TITLE^}
 Usage: 		$ME [options] PACKAGES
 Examples:	$ME PACKAGE
-		$ME -v some packages
-		$ME -vl /path/to/logfile.log LIST OF PACKAGES
+		$ME -
+		$ME -q pkg1 pkg2
+		$ME -l /path/to/logfile.log LIST OF PACKAGES
 Where options are:
 	-h(elp) 		This screen
 	-------------------------------------------------------
 	-b(ased)		Prints on what the distro is based on and exit
 	-d(istro)		Prints the distro name and exit
 	-l(og)		ARG	Writes and entry to ARG wheter installation was sucessfull or not
-	-v(erbose)		Use a line for each package
+	-q(uiet)		Install all at once, will fail if not all packages are available
 
 "
 #
@@ -63,7 +64,7 @@ Where options are:
 #
 	#source /etc/profile.d/tui.sh
 	doLog=false
-	verbose=false
+	verbose=true
 	LOG=""
 #
 #	Functions
@@ -71,20 +72,21 @@ Where options are:
 	distro() { #
 	# Should print the name of the distro
 	#
-        	e=/etc
-		SF="release version"    # Search For
-        
-        	results=$(for a in $SF;do ls $e|$GREP $a;done)
-		resultsFiles=$(for each in $results;do [ -f "$e/$each" ] && printf "$each ";done)
-        
-		for each in $resultsFiles
-		do      tmp=$(cat "$e/$each")
-			if [ ! "cpe" = "${tmp:0:3}" ]
-			then    strcat=$(cat "$e/$each")
-			    	[ ! "" = "$strcat" ] && output="$strcat"
-			fi
-		done
-		printf "$(printf $strcat|$AWK {'printf $1'})"
+        	if [ ! -f /etc/os-release ]
+		then	tui-conf-get /etc/os-release NAME #>&1
+		else	e=/etc
+			SF="release version"    # Search For
+
+			results=$(for a in $SF;do ls $e|$GREP $a;done)
+			resultsFiles=$(for each in $results;do [ -f "$e/$each" ] && printf "$each ";done)
+
+			for each in $resultsFiles
+			do      strcat="$(grep -i ^id= $e/$each)"
+				[ ! -z "$strcat" ] && break
+			done
+			#printf "$(printf $strcat|$AWK {'printf $1'})"
+			printf "$(printf ${strcat/*=}|$SED s,'"','',g)"
+		fi
 	}
 	based() { #
 	# Returns arch, debian, redhat or unkown
@@ -141,7 +143,7 @@ Where options are:
 			;;
 		l)	dolog=true
 			LOG="$OPTARG" 	;;
-		v)	verbose=true	;;
+		q)	verbose=false	;;
 		*)	printf "$help_text" ; exit $?	;;
 		esac
 	done
@@ -155,7 +157,8 @@ Where options are:
 	[ 0 -ne $UID ] && \
 		tui-echo "$ME requires root access!" "$FAIL" && \
 		exit 1
-
+	tui-printf -E "Installing as dependency:" "$(echo $@)"
+	tui-yesno "Continue?" || exit 0
 	# Get the right installer
 	case $(based) in
 	arch)		APP=pacman	;;
