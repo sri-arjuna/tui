@@ -19,24 +19,23 @@
 #
 # ------------------------------------------------------------------------
 #
-	#source tui
-	. "$HOME/.tuirc" || . tuirc
-	. "$TUI_FILE_CONF_COMMANDS"
+	source "$HOME/.tuirc" && \
+		. "$TUI_FILE_CONF_COMMANDS" || \
+		. tuirc
 #
 #	File:		tui-bol-gui
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.06.19
-	script_version=0.4
+#	Changed:	2015.06.27
+	script_version=0.5
 #	Description:	Returns true if user is in GUI mode.
 #
 #
 #	Script Environment
 #
 	ME="${0##*/}"				# Basename of tui-bol-gui
-	ME="${ME/.sh/}"				# Cut off .sh extension
 #
 #	Variable defaults (options)
 #
@@ -52,12 +51,16 @@
 		Usage: 		$ME [options]
 		Returns true if user is in a graphical environment
 		
-		Examples:	$ME 
-				$ME -v
+		Examples:	$ME -v
+		
+		 		if $ME
+		 		then	echo 'in gui'
+		 		else	echo 'on tty'
+		 		fi
 		
 		Where options are:
 			-h(elp) 		This screen
-			-v(erbose)		Enables the scripts verbosity
+			-v(erbose)		Prints the name of the Desktop Environment (DE) or Window Manager (WM)
 		
 		HELP_SCREEN
 	}
@@ -92,9 +95,8 @@
 #	Display & Action
 #
 	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-	if [ ! "" = "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other term/in/ator's
-	then	$beVerbose && \
-			echo "$DE" && \
-			exit 0 || exit 0
+	if [ ! -z "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other term/in/ator's
+	then	$beVerbose && echo "$DE"
+		exit 0
 	else	exit 1
 	fi
