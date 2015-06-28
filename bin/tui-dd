@@ -55,7 +55,7 @@ SOURCE and TARGET can be, a partition, disk, directory, file
 	showVersion() { 
 	cat <<-EOF
 		GNU $ME, Version $script_version
-		Copyright (C) 2013 Free Software Foundation, Inc.
+		Copyright (C) 2015 Simon Arjuna Erat
 		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 		This is free software; you are free to change and redistribute it.
