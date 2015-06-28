@@ -349,7 +349,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		pos_third_num=$(( $pos_cle_num + $pos_three_adder - ${#THIRD} ))
 		POS_THIRD="\033[${pos_third_num}G"
 	else	string=$(printf '%s' "$THIRD")
-		echo näd da
 		pos_third_num=$(( $pos_cle_num - 1 - ${#string} ))
 		# Fix one position place if there was a %
 		# Need to improve, if multiple '%' occours
