@@ -22,7 +22,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.06.03
+#	Changed:	2015.06.27
 #
 #	Variables to display
 #	Diffrent for GUI or CLI
@@ -34,19 +34,20 @@
 #
 #	Variable defaults
 #
-	script_version=1.5
+	script_version=1.6
 	# higher number, and more and more in another script..lol
 	ME="${0##*/}"
-	help_text="$ME ($script_version)
-		\rUsage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]
+	help_text="Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]
+Where options are:
+	-h	This screen
+	-r	Return on line, dont do a newline.
 "
-	count=${#@}
 #
 #	Display
 #	
 	showVersion() { 
 	cat <<-EOF
-		GNU TUI - $ME, Version $script_version
+		GNU $ME, Version $script_version
 		Copyright (C) 2013 Free Software Foundation, Inc.
 		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -55,15 +56,9 @@
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	if [ -z "$1" ] 
-	then	printf "%s\n\n" "Usage: tui-status [option] ERRORLEVEL [ \"Message to user\" [\"Optional centered message\"]"
-		exit 1
-	elif [ "$1" = "-h" ] || [ "$1" = "--help" ]
-	then
-	#
-	#	Fill array according to return value
-	#	This is just required for the help output
-	#
+	if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]
+	then	#	Fill array according to return value
+		#	This is just required for the help output
 		unset retvalue[@]
 		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
 		retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
@@ -71,47 +66,31 @@
 		retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
 		retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
 		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
+		retvalue[127]="$TUI_NFOUND";	retvalue[130]="$TUI_CANC"
 		
 		printf "$help_text
 
 Interpreted errorlevels are:\n"
-		for num in $(seq 0 1 120)
+		for num in $(seq 0 1 130)
 		do	str="${retvalue[$num]}"
 			[ ! "" = "$(printf '%s' $str)" ] && \
 				printf "\t$num \tor \$RET_$(printf ${STATUS_TEXT[$num]})\t = \t$str  =\t\$TUI_$(printf ${STATUS_TEXT[$num]})\n"
 		done
-		printf "
-Where options are:
-	-h	This screen
-	-r	Return on line, dont do a newline.
-
-"
+		
 		exit $RET_HELP
-	else	# The actual action ;)
-		#set -x
-		R=""
-		while getopts r opt
-		do	case $opt in	
-			r)	R="r"
-				shift	;;
-			esac
-		done
-		#shift $(($OPTIND - 1))
-		
-		# TODO : i could do a check, so TUI_WORK (4) would automaticly have a 'return line'
-		if [ -z "$1" ]
-		then	printf "$help_text"
-			exit $RET_HELP
-		fi
-		
-		#check=$(echo "$1" | tr -d [:digit:])
-		check=$(echo "$1" | tr -d '[:digit:]')
-		if [ -z "$check" ] 	# && [ ! -z "$1" ] # && echo $1 | grep -q [0-9]
-		then	echo "all numbers:: $1" > /dev/zero
-		else	echo "First argument $1 ($check) is not numeric!" > /dev/stderr
-			exit 1
-		fi
-		
-		tui-printf -${R}S "${@}"
 	fi
+	R=""
+	while getopts r opt
+	do	case $opt in	
+		r)	R="r"
+			shift	;;
+		esac
+	done
+	check=$(echo "$1" | tr -d '[:digit:]')
+	if [ ! -z "$check" ]
+	then	echo "First argument $1 ($check) is not numeric!" > /dev/stderr
+		exit 1
+	fi
+
+	tui-printf -${R}S "${@}"
 	exit $1
