@@ -18,15 +18,15 @@
 #
 # ------------------------------------------------------------------------
 	source "$HOME/.tuirc" && \
-		. "$TUI_DIR_CONF/commands.conf" || \
+		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc	# This first call would create the RC if its missing.
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.05.15
-	script_version=1.2
+#	Changed:	2015.06.27
+	script_version=1.3
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -34,7 +34,6 @@
 	RET_HELP=99
 	TITLE="Save values to conf files"
 	ME="${0##*/}"
-	ME_DIR="${0/${0##/*/}}"
 	help_text="
 $ME ($script_version)
 $TITLE
@@ -70,7 +69,7 @@ Where options are:
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
-		GNU TUI - $ME, Version $script_version
+		GNU $ME, Version $script_version
 		Copyright (C) 2013 Free Software Foundation, Inc.
 		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -172,6 +171,15 @@ Where options are:
 	fi
 	
 	# Return true if replaced string was found
+	if $beVerbose
+	then	$GREP $Q "$str_checker" "$CONFFILE"
+		tui-status $? "Saved in \"${CONFFILE##*/}\"" "$VARNAME=$str_checker"
+		exit $?
+	else	$GREP $Q "$str_checker" "$CONFFILE"
+		exit $?
+	fi
+	exit 1
+	# Due to remove ?
 	if $GREP $Q "$str_checker" "$CONFFILE"
 	then	# Success, visual-report only if verbose is enabled
 		$beVerbose && tui-status 0 "Saved in \"${CONFFILE##*/}\"" "$VARNAME=$str_checker"
