@@ -23,8 +23,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.06.03
-	script_version=2.1
+#	Changed:	2015.06.27
+	script_version=2.2
 #	Description:	The absolute core display function for TUI
 #
 #	Variables
@@ -33,13 +33,16 @@
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	source "$HOME/.tuirc" || . tuirc
+	# $TUI_FILE_CONF_STATUS is loaded only upon need, see lineno: ~162
 	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 	do	source "$f"
 	done
 	# If there is a user theme directory, use that one instead
-	if [ -d "$TUI_DIR_USER_THEMES" ] && [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
-	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
-	else	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	if [ -f "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}" ]
+	then	# User has a custom theme
+		source "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}"
+	else	# This should always work, absolute default anyway
+		source "$TUI_DIR_THEMES/${TUI_THEME:-default}"
 	fi
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
@@ -90,18 +93,15 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Catching Arguments
 #
-	showVersion() { 
-	cat <<-EOF
-		GNU TUI - $ME, Version $script_version
-		Copyright (C) 2013 Free Software Foundation, Inc.
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
 	case "$1" in
-	"--version")	showVersion
+	"--version")	cat <<-EOF
+				GNU $ME, Version $script_version
+				Copyright (C) 2013 Free Software Foundation, Inc.
+				License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+				This is free software; you are free to change and redistribute it.
+				There is NO WARRANTY, to the extent permitted by law.
+			EOF
 			exit 0
 			;;
 	"-h"|"--help")
@@ -126,7 +126,8 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			"" 
 		exit 99
 		;;
-	"-")	# Read pipe
+	"-")	# Read pipe, expect one line
+		# tui-cat, or at least tui-echo is expected to be used for multiple lines
 		read LEFT CENTER RIGHT 
 		set "$LEFT" "$CENTER" "$RIGHT"
 		;;
@@ -168,6 +169,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
 		retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
 		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
+		retvalue[127]="$TUI_NFOUND";	retvalue[130]="$TUI_CANC"
 		
 		# Make arguments in order
 		case $ARGS_COUNT in
@@ -332,6 +334,29 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	pos_third_num=""
 	POS_CENTER=""
 	POS_THIRD=""
+#
+#	Passing color escape sequences increases the chars required, but lowers the chars shown
+#	This part is to fix this part for the alignment
+#
+	if $doStatus
+	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
+		case $NUM_ID in
+		0|1|2|3|10|11|127|130)	# These are colored
+			pos_three_adder=21	;;
+		4|5|6|7|99|111)		# These are not
+			pos_three_adder=-1	;;
+		esac
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - ${#THIRD} ))
+		POS_THIRD="\033[${pos_third_num}G"
+	else	string=$(printf '%s' "$THIRD")
+		echo näd da
+		pos_third_num=$(( $pos_cle_num - 1 - ${#string} ))
+		# Fix one position place if there was a %
+		# Need to improve, if multiple '%' occours
+		echo "$THIRD" | $GREP -q '%' && \
+			pos_third_num=$(( $pos_third_num + 1 ))
+		POS_THIRD="\033[${pos_third_num}G"
+	fi
 	# Calculate mising positions and generate output strings
 	case $ARGS_COUNT in
 	1)	if $doTitle #&& ! $doStatus
@@ -348,33 +373,37 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	2)	! $doStatus && \
 			THIRD="$SECOND" && \
 			SECOND=""
+		long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
 		;;
-	3)	center=$(( $WIDTH / 2 ))
-		half=$(( ${#SECOND} / 2 ))
-		pos_center_num=$(( $center - $half  ))
+	3)	long=${#SECOND}
+		center=$(( $WIDTH / 2 ))
+		chkval=$(printf "${SECOND}")
+		short=${#chkval}
+		
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		
+		half=$(( ${#chkval} / 2 ))
+		pos_center_num=$(( $(( $center - $half )) + $(( $num / 2 ))  ))
 		POS_CENTER="\033[${pos_center_num}G"
-		#SECOND="${POS_CENTER}$SECOND"
+		long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
 		;;
 	esac
-#
-#	Passing color escape sequences increases the chars required, but lowers the chars shown
-#	This part is to fix this part for the alignment
-#
-	if $doStatus
-	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
-		case $NUM_ID in
-		0|1|2|3|10|11)	pos_three_adder=21	;;	# These are colored
-		4|5|6|7|99|111)	pos_three_adder=-1	;;	# These are not
-		esac
-		pos_third_num=$(( $pos_cle_num + $pos_three_adder - ${#THIRD} ))
-		POS_THIRD="\033[${pos_third_num}G"
-	else	pos_third_num=$(( $pos_cle_num - 1 - ${#THIRD} ))
-		# Fix one position place if there was a %
-		# Need to improve, if multiple '%' occours
-		echo "$THIRD" | $GREP -q '%' && \
-			pos_third_num=$(( $pos_third_num + 1 ))
-		POS_THIRD="\033[${pos_third_num}G"
-	fi
 #
 #	Generat output strings
 #
@@ -399,4 +428,4 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		printf  "${POS_CENTER}$SECOND"
 	fi
 	[ -z "$THIRD" ]  || printf "${POS_THIRD}$THIRD"
-	printf "${END}"
+	printf "${END}"1
