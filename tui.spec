@@ -1,5 +1,5 @@
 Name:        tui
-Version:     0.8.3
+Version:     0.8.5
 Release:     0%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
@@ -73,6 +73,26 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Sat Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.5
+- Changed:   All commands support: --help and --verbose
+- Changed:   tui-bol-gui, updated helpscreen
+- Changed:   tui-conf-get, double output is now a single line
+- Prepared:  tui-read, tui-yesno, tui-select,
+-            set 'read' abilities if missing
+- Removed:   tui-indi, tui-math-add, tui-math-sub, tui-math-sqr,
+-            tui-math-pwr, tui-math-div, tui-math-mlt
+- Renamed:   tui-str-encrypt --> tui-str-hash
+- Renamed:   tui-psm --> tui-bgjob-mgr (will it survive?)
+- Changed:   tui-web, tui-terminal, take only 1 argument
+- Changed:   tui-wait, number display
+- Changed:   tui-str-genfilename, reduced code
+- Changed:   tui-status, added exit codes 127 & 130
+- Changed:   tui-install, now asks before it installs
+- Changed:   tui-printf, now prints (better) aligned colorized strings
+- Changed:   bash completion, adjusted to removals and renamings
+- Added:     conf.etc/shorts.conf & conf.etc/shorts-alias.conf
+-            They provide short variables and aliases
+
 * Sat Jun 20 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.3
 - Changed:   Completed RC change
 - Changed:   Names: tui -> tuirc, tui-browser -> tui, tui-psm -> tui-bgjob-mgr
