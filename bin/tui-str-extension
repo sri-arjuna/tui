@@ -20,7 +20,7 @@
 # ------------------------------------------------------------------------
 #
 	source "$HOME/.tuirc" && \
-		. "$TUI_DIR_CONF/commands.conf" || \
+		. "$TUI_FILE_CONF_COMMAND" || \
 		. tuirc	# This first call would create the RC if its missing.
 #
 #	File:		tui-str-extension
@@ -28,8 +28,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.06
-#	Changed:	2015.05.11
-	script_version=0.4
+#	Changed:	2015.06.27
+	script_version=0.5
 	TITLE="tui-str-extension"
 #	Description:	Simply returns the extension of passed file
 #
@@ -57,18 +57,21 @@
 #	Catching Arguments
 #
 	hadOpts=false
-	[ "--help" = "$1" ] && showHelp && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU TUI - $ME, Version $script_version
-		Copyright (C) 2013 Free Software Foundation, Inc.
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	case "$1" in
+	"--help"|"")	showHelp
+			exit 99
+			;;
+	"--version")	cat <<-EOF
+				GNU $ME, Version $script_version
+				Copyright (C) 2013 Free Software Foundation, Inc.
+				License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+				This is free software; you are free to change and redistribute it.
+				There is NO WARRANTY, to the extent permitted by law.
+			EOF
+			exit 0
+			;;
+	esac
 	while getopts "hv" opt
 	do	case "$opt" in
 		h)	showHelp
@@ -80,7 +83,6 @@
 		esac
 	done
 	$hadOpts && shift $(($OPTIND - 1))
-	[ -z "$1" ] && showHelp && exit 99
 #
 #	Action & Display
 #
@@ -88,8 +90,6 @@
 	# Workaround for tarballs...
 	echo "$1" | $GREP -q ".tar" && \
 		TAR="tar." || TAR=""
-	
-	tar="$(echo )"
 	if [ "$ext" = "$1" ]
 	then	echo ""
 	else 	echo "$TAR$ext"
