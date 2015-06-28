@@ -23,8 +23,8 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source "$HOME/.tuirc
-	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
+	if source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS}
 		do	source "$f"
 		done
 		source "$TUI_FILE_USER_SETTINGS"
