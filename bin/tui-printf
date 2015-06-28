@@ -369,17 +369,20 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			SECOND="${POS_CENTER}$SECOND"
 		fi
 		;;
-	2)	! $doStatus && \
-			THIRD="$SECOND" && \
+	2)	if ! $doStatus
+		then	THIRD="$SECOND"
 			SECOND=""
-		long=${#THIRD}
-		chkval=$(printf "${THIRD}")
-		short=${#chkval}
-		[ $short -eq $long ] && \
-			num=-1 || \
-			num=$(( $long - $short + 1 ))
-		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
-		POS_THIRD="\033[${pos_third_num}G"
+			long=${#THIRD}
+			# New pos
+			chkval=$(printf "${THIRD}")
+			short=${#chkval}
+			[ $short -eq $long ] && \
+				num=-1 || \
+				num=$(( $long - $short + 1 ))
+			pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+			POS_THIRD="\033[${pos_third_num}G"
+		#else	echo it is status
+		fi
 		;;
 	3)	long=${#SECOND}
 		center=$(( $WIDTH / 2 ))
