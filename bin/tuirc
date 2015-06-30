@@ -30,7 +30,7 @@ shopt -s expand_aliases
 #
 #	Variables	:	Default
 #
-	TUI_VERSION=0.8.3
+	TUI_VERSION=0.8.6
 	TRC="$HOME/.tuirc"	# User default
 	TRC_SYS="/etc/tuirc"	# Only available if root installed tui
 #
