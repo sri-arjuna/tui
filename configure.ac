@@ -1,0 +1,18 @@
+AC_PREREQ([2.69])
+AC_INIT([TUI], [0.9.0], [erat.simon@gmail.com])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AC_CONFIG_FILES([
+ Makefile
+ bin/Makefile
+ docs/Makefile
+ docs/samples/Makefile
+ conf.etc/Makefile
+ conf.home/Makefile
+ lists/Makefile
+ man/Makefile
+ templates/Makefile
+ templates/manpage/Makefile
+ templates/scripts/Makefile
+ themes/Makefile
+])
+AC_OUTPUT
