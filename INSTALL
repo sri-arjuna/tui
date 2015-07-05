@@ -1,1 +1,25 @@
-/usr/share/automake-1.15/INSTALL
+INSTALL
+-------
+
+1. The installation procedure is very simple, first log in as root, and change to the base source 
+directory.
+	su
+	cd /usr/src
+
+2. Clone the source code into a subdirectory and change to it.
+	git clone https://github.com/sri-arjuna/tui.git
+	cd tui
+
+3. Use the autotools behaviour
+	./configure [--prefix=/] && make && make install
+
+
+
+UNINSTALL
+---------
+1. Change to the source dir as root.
+	su
+	cd /usr/src/tui
+
+2. Use the autotools behaviour
+	make uninstall
