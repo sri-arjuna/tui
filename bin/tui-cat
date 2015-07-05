@@ -24,7 +24,7 @@
 #	Variables
 #
 	BORDER_RIGHT=""
-	source "$HOME/.tuirc" && \
+	source /etc/tuirc && source "$HOME/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" && \
 		. "$TUI_DIR_THEMES/$TUI_THEME"  || . tuirc	# This first call would create the RC if its missing.
 	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell

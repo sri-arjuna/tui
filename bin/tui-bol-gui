@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tuirc" && \
+	source /etc/tuirc && source "$HOME/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc
 #

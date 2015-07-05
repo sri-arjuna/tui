@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.01.23
-	script_version=0.5.1
+#	Changed:	2015.07.05
+	script_version=0.5.2
 #	Description:	Prints a random number between 0 and 100.
 #			Prints a random number up to MAX.
 #			Prints a random bumber between MAX and MIN.

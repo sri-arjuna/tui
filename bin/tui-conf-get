@@ -17,8 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	source "$HOME/.tuirc" && \
-		. "$TUI_DIR_CONF/commands.conf" || \
+	source /etc/tuirc && \
+		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc	# This first call would create the RC if its missing.
 	
 #

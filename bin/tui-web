@@ -20,7 +20,7 @@
 #
 #	System defaults
 #
-	source "$HOME/.tuirc" || . tuirc
+	source /etc/tuirc
 	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done

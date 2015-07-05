@@ -27,7 +27,7 @@
 #	Variables to display
 #	Different for GUI or CLI
 #
-	source "$HOME/.tuirc" || . tuirc
+	source /etc/tuirc
 	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done

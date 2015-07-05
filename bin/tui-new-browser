@@ -17,9 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	source "$HOME/.tuirc" || . tuirc
-	source "$TUI_FILE_USER"
-	source "$TUI_FILE_USER_SETTINGS"
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

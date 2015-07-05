@@ -18,6 +18,10 @@
 #
 # ------------------------------------------------------------------------
 #
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 #
 #	Variable defaults
 #
@@ -26,12 +30,6 @@
 #	STABLE:	2015.01.20	Updated to check for curl/wget
 #	Unstable: 2015.01.31    Doh, you changed it!
 #
-	source "$HOME/.tuirc" && \
-		. "$TUI_DIR_CONF/apps.conf" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" || \
-		. tuirc	# This first call would create the RC if its missing.
-	
 	script_version=0.7.3
 	ME="$(basename $0)"
 	help_text="\r$ME ($script_version)

@@ -32,10 +32,10 @@
 #
 #	Check for the environment to load
 #
-	source "$HOME/.tuirc" || . tuirc
-	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
-	do	[ -f "$f" ] && source "$f"
-	done
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 	# Get the mode
 	tui-bol-gui && \
 		MODE=gui || \

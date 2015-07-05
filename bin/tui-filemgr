@@ -25,14 +25,10 @@
 #
 #	Check for the environment to load
 #
-	source "$HOME/.tuirc" && \
-		. "$TUI_FILE_CONF_APPS" && \
-		. "$TUI_FILE_CONF_COMMANDS" && \
-		. "$TUI_FILE_CONF_SETTINGS" && \
-		. "$TUI_FILE_USER_APPS" && \
-		. "$TUI_FILE_USER_SETTINGS" || \
-		. tuirc	# This first call would create the RC if its missing.
-	
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 	help_text="$ME ($script_version)
 		\rUsage: $ME LOCATION1 [/path/to/]LOCATION2 [../]LOCATION3 ...
 		\rOpens provided LOCATION/s in the file manager.

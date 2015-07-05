@@ -16,17 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
-# ------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 #
 #	Variable defaults
 #
-	source "$HOME/.tuirc" && \
-		. "$TUI_DIR_CONF/apps.conf" && \
-		. "$TUI_DIR_CONF/commands.conf" && \
-		. "$TUI_DIR_CONF/settings.conf" && \
-		. "$TUI_DIR_USER/apps.conf" && \
-		. "$TUI_FILE_CONF_SETTINGS" || \
-		. tuirc	# This first call would create the RC if its missing.
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 	#cat "$TUI_FILE_CONF_APPS"
 	script_version=0.7
 	ME="$(basename $0)"

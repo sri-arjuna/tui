@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tuirc" || . tuirc
+	source /etc/tuirc
 	. "$TUI_FILE_CONF_COMMANDS"
 #
 #	File:		tui-str-hash

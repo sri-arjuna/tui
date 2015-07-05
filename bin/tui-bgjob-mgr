@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	. tuirc 2>/dev/zero
+	source /etc/tuirc && source "$HOME/.tuirc"
 #	File:		tui-psm
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

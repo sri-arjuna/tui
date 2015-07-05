@@ -30,11 +30,10 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tuirc" && \
-		for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS,SYSTEM}
-		do	source "$f"
-		done && \
-		source "$TUI_FILE_USER_SETTINGS" || . tuirc
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 	
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]

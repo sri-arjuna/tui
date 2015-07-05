@@ -32,7 +32,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source "$HOME/.tuirc" || . tuirc
+	source /etc/tuirc
 	# $TUI_FILE_CONF_STATUS is loaded only upon need, see lineno: ~162
 	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 	do	source "$f"

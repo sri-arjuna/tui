@@ -18,11 +18,10 @@
 #
 # ------------------------------------------------------------------------
 #
-	source "$HOME/.tuirc" || . tuirc
-	. "$TUI_FILE_CONF_COMMANDS"
-	for d in "$TUI_DIR_THEMES" "$TUI_DIR_USER_THEMES"
-	do	[ -f "$d/$TUI_THEME" ] && . "$d/$TUI_THEME" && break
-	done
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	. tuirc	# This first call would create the RC if its missing.
+	fi
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
