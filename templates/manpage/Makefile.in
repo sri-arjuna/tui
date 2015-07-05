@@ -219,7 +219,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-manpagedir = $(datadir)/templates/manpage
+manpagedir = $(datadir)/@PACKAGE@//templates/manpage
 manpage_DATA = application  minimal
 all: all-am
 
@@ -233,9 +233,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign templates/manpage/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu templates/manpage/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign templates/manpage/Makefile
+	  $(AUTOMAKE) --gnu templates/manpage/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

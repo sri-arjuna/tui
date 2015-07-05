@@ -1,2 +1,2 @@
-usrtpldir = $(sysconfig)/conf.home
+usrtpldir = $(sysconfig)/@PACKAGE@/
 usrtpl_DATA = *conf

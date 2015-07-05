@@ -24,8 +24,8 @@ shopt -s expand_aliases
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.06.20
-	script_version=2.2
+#	Changed:	2015.07.05
+	script_version=2.3
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
@@ -69,11 +69,10 @@ shopt -s expand_aliases
 			do	[ -d "$tryout" ] && TUI_DIR_TEMP="$tryout" && break
 			done
 			
-			[ -z "$SCRIPTS" ] && \
-				for tryout in "$HOME/.local/bin" "$HOME/bin"
-				do	[ -d "$tryout" ] && TUI_DIR_USER_SCRIPTS="$tryout" && break
-				done || \
-				TUI_DIR_USER_SCRIPTS="$SCRIPTS"
+			for tryout in "$HOME/.local/bin" "$HOME/bin"
+			do	[ -d "$tryout" ] && TUI_DIR_USER_SCRIPTS="$tryout" && break
+			done
+			
 			for tryout in "$HOME/.local/man/man1"
 			do	[ -d "$tryout" ] && TUI_DIR_USER_MANPAGES="$tryout" && break || tryout=""
 			done
@@ -84,39 +83,16 @@ shopt -s expand_aliases
 			[ -z "$TUI_DIR_USER_MANPAGES" ] && \
 				[  "$HOME/.local/bin" = "$TUI_DIR_USER_SCRIPTS" ] && \
 				TUI_DIR_USER_MANPAGES="$HOME/.local/man/man1"
+			
 			# Set initial default values per user / root
 			if [ $UID -eq 0 ]
 			then	THM=default-red
 				TCACHE=/tmp
-				CHROOT="${CHROOT:-/}"
-				PREFIX="${PREFIX:-/usr}"
 			else	THM=default
 				TCACHE=$HOME/.cache
-				CHROOT="${CHROOT:-$HOME/.local}"
-				PREFIX="${PREFIX:-$HOME/.local}"
 			fi
 			TUI_DIR_TEMP=${TUI_DIR_TEMP:-$TCACHE}
 			
-			TUI_DIR_SYSTEM=${TUI_PREFIX:-/usr}/share/tui
-			TC="${TUI_CHROOT:-/}"
-			
-			if [ 0 -eq ${UID} ]
-			then	cat > "$TRC_SYS" <<-TUIRC_SYS
-				#$TRC
-				# This file is not ment to be changed manualy!
-				# Any change of this file may result in an unusable TUI.
-				# Do changes at your own risk!
-				#
-				# If you need to change something, change the top DIR variables first,
-				# so all later variable definitions apply that change automaticly.
-				#
-				[ -z "\$TUI_ROOT" ] && \\
-				 	TUI_ROOT="${TC%/}"
-				[ -z "\$TUI_PREFIX" ] && readonly \\
-				 	TUI_PREFIX="$PREFIX"
-				
-				TUIRC_SYS
-			fi
 			
 			cat > "$TRC" <<-TUI_RC
 			#$TRC
@@ -134,73 +110,21 @@ shopt -s expand_aliases
 			#
 			 	TUI_THEME=$THM
 			#
-			#	Paths	:	Used by the Installation-Script (install/update)
-			#
-			[ -z "\$TUI_ROOT" ] && \\
-			 	TUI_ROOT="${TC%/}"
-			[ -z "\$TUI_PREFIX" ] && readonly \\
-			 	TUI_PREFIX="$PREFIX"
-			[ -z "\$TUI_DIR_CONF" ] && readonly \\
-			 	TUI_DIR_CONF="\$TUI_ROOT/etc/tui"
-			[ -z "\$TUI_DIR_SYSTEM" ] && readonly \\
-			 	TUI_DIR_SYSTEM="\$TUI_PREFIX/share/tui"
-			
-			
-			[ -z "\$TUI_DIR_DOCS" ] && readonly \\
-			 	TUI_DIR_DOCS="\$TUI_PREFIX/share/doc/tui"
-			[ -z "\$TUI_DIR_MANPAGES" ] && readonly \\
-			 	TUI_DIR_MANPAGES="\$TUI_PREFIX/share/man/man1"
-			[ -z "\$TUI_DIR_BIN" ] && readonly \\
-			 	TUI_DIR_BIN="\$TUI_PREFIX/bin"
-			
-			
-			
-			[ -z "\$TUI_DIR_USER" ] && readonly \\
-			 	TUI_DIR_USER="$XDG_CONFIG_DIR/tui"
-			#
-			#	Paths	:	Used to run the System
-			#
-			[ -z "\$TUI_DIR_LOG" ] && readonly \\
-			 	TUI_DIR_LOG="\$TUI_ROOT/var/log"
-			[ -z "\$TUI_DIR_LOGS" ] && readonly \\
-			 	TUI_DIR_LOGS="\$TUI_ROOT/var/logs"
-			[ -z "\$TUI_DIR_TEMPLATES" ] && readonly \\
-			 	TUI_DIR_TEMPLATES="\$TUI_DIR_SYSTEM/templates"
-			[ -z "\$TUI_DIR_THEMES" ] && readonly \\
-			 	TUI_DIR_THEMES="\$TUI_DIR_SYSTEM/themes"
-			[ -z "\$TUI_DIR_TEMP" ] && readonly \\
-			 	TUI_DIR_TEMP="${TUI_DIR_TEMP}"
-			[ -z "\$TUI_DIR_LIST" ] && readonly \\
-			 	TUI_DIR_LIST="${TUI_DIR_SYSTEM}/lists"
-			#
 			#	Paths	:	That are about the User
 			#
-			[ -z "\$TUI_DIR_USER_LOGS" ] && readonly \\
+			readonly \\
+			 	TUI_DIR_USER="${XDG_CONFIG_DIR:-\$HOME/.config}/tui"
+			readonly \\
 			 	TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
-			[ -z "\$TUI_DIR_USER_SCRIPTS" ] && readonly \\
+			readonly \\
 			 	TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
-			[ -z "\$TUI_DIR_USER_MANPAGES" ] && readonly \\
+			readonly \\
 			 	TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
-			[ -z "\$TUI_DIR_USER_TEMPLATES" ] && readonly \\
+			readonly \\
 			 	TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
-			[ -z "\$TUI_DIR_USER_THEMES" ] && readonly \\
+			readonly \\
 			 	TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
-			#
-			#	Files
-			#	Direct access to the most important configuration files for the System
-			#
-			[ -z "\$TUI_FILE_CONF_APPS" ] && readonly \\
-			 	TUI_FILE_CONF_APPS="\$TUI_DIR_CONF/apps.conf"
-			[ -z "\$TUI_FILE_CONF_COLORS" ] && readonly \\
-			 	TUI_FILE_CONF_COLORS="\$TUI_DIR_CONF/colors.conf"
-			[ -z "\$TUI_FILE_CONF_COMMANDS" ] && readonly \\
-			 	TUI_FILE_CONF_COMMANDS="\$TUI_DIR_CONF/commands.conf"
-			[ -z "\$TUI_FILE_CONF_SETTINGS" ] && readonly \\
-			 	TUI_FILE_CONF_SETTINGS="\$TUI_DIR_CONF/settings.conf"
-			[ -z "\$TUI_FILE_CONF_STATUS" ] && readonly \\
-			 	TUI_FILE_CONF_STATUS="\$TUI_DIR_CONF/status.conf"
-			[ -z "\$TUI_FILE_CONF_SYSTEM" ] && readonly \\
-			 	TUI_FILE_CONF_SYSTEM="\$TUI_DIR_CONF/tui.conf"
+			
 			#
 			#	Files	:	User specific configuration files
 			#
@@ -310,12 +234,11 @@ shopt -s expand_aliases
 #
 #	Load Environment	:	System wide / defaults
 #
-	source "$TRC" && printf "." #> /dev/stderr
-	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
-	do	source "$f" && printf "." > /dev/stderr
+	source "$TRC_SYS" #&& printf "." #> /dev/stderr
+	source "$TRC" #&& printf "." #> /dev/stderr
+	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS}
+	do	source "$f" #&& printf "." > /dev/stderr
 	done
-	source "$TUI_DIR_CONF/shorts.conf"
-	source "$TUI_DIR_CONF/shorts-alias.conf"
 #
 #	Load Environment	:	User settings
 #

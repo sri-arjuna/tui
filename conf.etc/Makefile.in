@@ -219,7 +219,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-usrtpldir = $(sysconfig)/conf.home
+usrtpldir = $(sysconfig)/@PACKAGE@/
 usrtpl_DATA = *conf
 all: all-am
 
@@ -233,9 +233,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign conf.etc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu conf.etc/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign conf.etc/Makefile
+	  $(AUTOMAKE) --gnu conf.etc/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

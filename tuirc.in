@@ -1,0 +1,40 @@
+#
+#	This file provides the default directories,
+#	required to created the user his own tuirc file.
+#
+	prefix=@prefix@
+	readonly \
+		TUI_DIR_CONF=@sysconfdir@/@PACKAGE@
+	readonly \
+		TUI_DIR_SYSTEM=@datarootdir@/@PACKAGE@
+#
+#	Paths	:	Used to run TUI
+#
+	TUI_DIR_LOG=@localstatedir@/log
+	readonly \
+		TUI_DIR_TEMPLATES="$TUI_DIR_SYSTEM/templates"
+	readonly \
+		TUI_DIR_THEMES="$TUI_DIR_SYSTEM/themes"
+	readonly \
+		TUI_DIR_LIST="${TUI_DIR_SYSTEM}/lists"
+	readonly \
+		TUI_DIR_TEMP="${TUI_DIR_TEMP}"
+#
+#	Files
+#	Direct access to the most important configuration files for the System
+#
+	readonly \
+		TUI_FILE_CONF_APPS="$TUI_DIR_CONF/apps.conf"
+	readonly \
+		TUI_FILE_CONF_COLORS="$TUI_DIR_CONF/colors.conf"
+	readonly \
+		TUI_FILE_CONF_COMMANDS="$TUI_DIR_CONF/commands.conf"
+	readonly \
+		TUI_FILE_CONF_SETTINGS="$TUI_DIR_CONF/settings.conf"
+	readonly \
+		TUI_FILE_CONF_STATUS="$TUI_DIR_CONF/status.conf"
+	readonly \
+		TUI_FILE_CONF_SHORTS="$TUI_DIR_CONF/shorts.conf"
+	readonly \
+		TUI_FILE_CONF_ALIAS="$TUI_DIR_CONF/shorts-alias.conf"
+	

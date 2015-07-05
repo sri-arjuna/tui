@@ -1,4 +1,4 @@
 SUBDIRS = manpage scripts
 
-tpldir = $(datadir)/templates
+tpldir = $(datadir)/@PACKAGE@/templates
 tpl_DATA = browser

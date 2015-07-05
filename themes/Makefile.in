@@ -219,7 +219,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-thmdir = $(datadir)/themes
+thmdir = $(datadir)/@PACKAGE@//themes
 thm_DATA = default* dot* floating mono witch*
 all: all-am
 
@@ -233,9 +233,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign themes/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu themes/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign themes/Makefile
+	  $(AUTOMAKE) --gnu themes/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

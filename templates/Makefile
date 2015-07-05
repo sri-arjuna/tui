@@ -268,7 +268,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /usr/local
+prefix = /
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
@@ -280,7 +280,7 @@ top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
 SUBDIRS = manpage scripts
-tpldir = $(datadir)/templates
+tpldir = $(datadir)/tui/templates
 tpl_DATA = browser
 all: all-recursive
 
@@ -294,9 +294,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign templates/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu templates/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign templates/Makefile
+	  $(AUTOMAKE) --gnu templates/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

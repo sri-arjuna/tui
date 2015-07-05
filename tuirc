@@ -1,0 +1,20 @@
+#
+#	This file provides the default directories,
+#	required to created the user his own tuirc file.
+#
+	prefix=/
+	TUI_DIR_CONF=${prefix}/etc/tui
+	TUI_DIR_SYSTEM=${prefix}/share/tui
+#
+#	Paths	:	Used to run TUI
+#
+	
+	TUI_DIR_LOG=${prefix}/var/log
+	readonly \
+		TUI_DIR_TEMPLATES="$TUI_DIR_SYSTEM/templates"
+	readonly \
+		TUI_DIR_THEMES="$TUI_DIR_SYSTEM/themes"
+	readonly \
+		TUI_DIR_LIST="${TUI_DIR_SYSTEM}/lists"
+	readonly \
+		TUI_DIR_TEMP="${TUI_DIR_TEMP}"

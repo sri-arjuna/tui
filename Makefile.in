@@ -96,7 +96,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = tuirc
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -152,8 +152,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(compldir)"
-DATA = $(compl_DATA)
+am__installdirs = "$(DESTDIR)$(compldir)" "$(DESTDIR)$(trcdir)"
+DATA = $(compl_DATA) $(trc_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -183,7 +183,8 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-am__DIST_COMMON = $(srcdir)/Makefile.in install-sh missing
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/tuirc.in AUTHORS \
+	COPYING ChangeLog INSTALL NEWS README install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -299,10 +300,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = gnu
 SUBDIRS = bin docs conf.etc conf.home lists man templates themes
 compldir = $(datadir)/bash-completion/completions
-compl_DATA = @PACKAGE_TARNAME@_compl.bash
+compl_DATA = @PACKAGE@_compl.bash
+trcdir = /etc
+trc_DATA = @PACKAGE@rc
 all: all-recursive
 
 .SUFFIXES:
@@ -312,15 +315,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign Makefile
+	  $(AUTOMAKE) --gnu Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -339,6 +342,8 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
+tuirc: $(top_builddir)/config.status $(srcdir)/tuirc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-complDATA: $(compl_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(compl_DATA)'; test -n "$(compldir)" || list=; \
@@ -360,6 +365,27 @@ uninstall-complDATA:
 	@list='$(compl_DATA)'; test -n "$(compldir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(compldir)'; $(am__uninstall_files_from_dir)
+install-trcDATA: $(trc_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(trc_DATA)'; test -n "$(trcdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(trcdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(trcdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(trcdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(trcdir)" || exit $$?; \
+	done
+
+uninstall-trcDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(trc_DATA)'; test -n "$(trcdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(trcdir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -660,7 +686,7 @@ check: check-recursive
 all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(compldir)"; do \
+	for dir in "$(DESTDIR)$(compldir)" "$(DESTDIR)$(trcdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -714,7 +740,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-complDATA
+install-data-am: install-complDATA install-trcDATA
 
 install-dvi: install-dvi-recursive
 
@@ -760,7 +786,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-complDATA
+uninstall-am: uninstall-complDATA uninstall-trcDATA
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -775,10 +801,11 @@ uninstall-am: uninstall-complDATA
 	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-complDATA
+	install-trcDATA installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
+	tags-am uninstall uninstall-am uninstall-complDATA \
+	uninstall-trcDATA
 
 .PRECIOUS: Makefile
 

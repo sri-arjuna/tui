@@ -1,2 +1,2 @@
-manpagedir = $(datadir)/templates/manpage
+manpagedir = $(datadir)/@PACKAGE@//templates/manpage
 manpage_DATA = application  minimal

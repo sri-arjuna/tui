@@ -1,2 +1,2 @@
-usrtpldir = $(datadir)/conf.home
+usrtpldir = $(datadir)/@PACKAGE@/conf.home
 usrtpl_DATA = *conf
