@@ -90,10 +90,10 @@ Where options are:
 		exit $?
 	elif ${useSudo:-false} && which sudo 2>/dev/zero 1>/dev/zero
 	then	tui-echo "${MSG:-Password for $USER}"
-		${SUDO:-sudo} "${1}" #; echo \$?  > /dev/stdout > $TMP"
+		${SUDO:-sudo} "${1}" 	>/dev/stderr	#; echo \$?  > /dev/stdout > $TMP"
 		exit $?
 	else	tui-echo "${MSG:-Please provide root password.}"
-		su -c "${1}" # ; echo \$? > /dev/stdout > $TMP"
+		su -c "${1}" 		>/dev/stderr	# ; echo \$? > /dev/stdout > $TMP"
 		exit $?
 	fi
 	exit 1
