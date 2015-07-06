@@ -7,6 +7,7 @@ AC_CONFIG_FILES([
  bin/Makefile
  docs/Makefile
  docs/samples/Makefile
+ docs/tex/Makefile
  conf.etc/Makefile
  conf.home/Makefile
  lists/Makefile

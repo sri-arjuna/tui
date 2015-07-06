@@ -1,0 +1,200 @@
+This is tui.info, produced by makeinfo version 5.2 from tui.texi.
+
+This manual is for TUI (version 0.9.0, 2015.06.15) Copyright (C)
+2011-2015 Simon Arjuna Erat TUI is licensed as GPLv3.  The manual is
+licensed as GFDL.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included in
+     the section entitled "GNU Free Documentation License".
+
+
+File: tui.info,  Node: Top,  Next: Introduction to TUI,  Up: (dir)
+
+TUI - GNU Project - Free Software Foundation (FSF)
+**************************************************
+
+This manual is for TUI (version 0.9.0, 2015.06.15).
+
+   main page text juhuuu
+
+* Menu:
+
+* Introduction to TUI :: 
+* Installation ::
+* Usage :: 
+* Commands :: 
+
+
+File: tui.info,  Node: Introduction to TUI,  Next: Installation,  Prev: Top,  Up: Top
+
+1 Introduction to TUI
+*********************
+
+TUI is a bash framework to write scripts with a Text User Interface.
+
+   It is a command based framework which wraps the task (executed
+command name represents task or description) into an adaptive Text User
+Interface (TUI). It is a framework to be used in the shell or shell
+scripts, though the usage of scripts is recommended to preserve the
+interface feeling.  It aims to simplify the task of script writing and
+meanwhile reward the scripter and the final user with a TUI.
+
+   This said, when executed alone, a single tui-<command>, it doesn't
+look that much like an interface.  However, as soon you append a few
+tui-echo after another or use tui-cat to print a small text file to the
+screen, you will feel the difference.
+
+   --- REPLACE somewhere else --
+
+   It was the core display part of another script-dream I have, and it
+took me almost 2.5 years until i figured that extracting all these
+displaying functions, provide its very own project.  TUI was born, a
+command based framework to give scripts an interface like feeling.  Many
+script authors write their collection of code helpers, display features
+or task assistants.  As such functions, they have to copy them to each
+of the scripts, and manually maintain and adjust the function inside
+that script, or update all those scripts just to be sure that function
+is updated.
+
+   TUI jumps in here, providing a 3-Way-Interface between the Author of
+a script, the System (and its installed software) and the User who is
+executing it.
+
+   You as the author of the script, don't have to worry about software
+the user has installed, instead you call: tui-edit, tui-filemgr, tui-web
+or tui-terminal (GUI only), or which distribution the user is using,
+simply call tui-install to cover package manager installations from
+Arch, over *BSD and Debian to Fedora/Red-Hat or s
+
+   It brings together the best of both worlds, the power of the console
+and the convenience of a graphical environment.
+
+   'tui' is meant to make a directory a simple but highly configurable
+script menu, and display its sub-directories as sections and browse
+among the tree structure, with its entrance point as root.  All the
+other commands, are merely the code helpers, display tools, list
+library, variable providers, gathered as commands for easy availability,
+so you can access them straight forward like any command in your
+scripts.
+
+   But in fact, TUI is tui"
+
+   But sadly, it is often the case that they call an application/command
+that is not installed on the system executing the script, most of the
+times this happens when people want to open a text file or an URL from a
+script.
+
+   It is thought to be usable straight from the command line.
+
+   It actually is a dependency of its own, as the most powerful tool
+provided by TUI, is tui.  All the commands are just required to fit into
+'tui', so that the scripts it executes provide the same
+interface/heavier.
+
+   It aims to be usable with as less options and arguments as possible,
+but still enable you to modify its behaving when scripting.
+
+
+File: tui.info,  Node: Installation,  Next: Usage,  Prev: Introduction to TUI,  Up: Top
+
+2 Installation
+**************
+
+A basic installation procedure looks like:
+         ./configure
+         make
+         su -c "make install"
+
+   By default this will install TUI using the default prefix /usr/local,
+so the binaries will be available in PREFIX/bin.  You may change that by
+passing -prefix=/usr, as in:
+         ./configure --prefix=/usr
+         make
+         su -c "make install"
+
+2.1 Configuration
+=================
+
+There are 3 basic types of configuration applicable to TUI.
+
+2.1.1 Visual
+------------
+
+Theme - End user defines which theme matches best
+
+2.1.2 Application
+-----------------
+
+Editor, File- and Web-browser, Terminals
+
+2.1.3 System
+------------
+
+Other configuration files
+
+2.2 Idea / Usage
+================
+
+bli bla blub
+
+
+File: tui.info,  Node: Usage,  Next: Commands,  Prev: Installation,  Up: Top
+
+3 Usage
+*******
+
+3.1 Syntax and Variables
+========================
+
+Some explanation and examples
+
+
+File: tui.info,  Node: Commands,  Prev: Usage,  Up: Top
+
+4 Commands
+**********
+
+4.1 Display Commands
+====================
+
+Some explanation and examples as well
+
+4.1.1 tui-printf
+----------------
+
+     	Syntax: tui-printf [options] [arguments]
+     	Where options are:
+     	-h|--help	Helpscreen
+
+   Description:
+Descriptional text
+
+   bold
+
+   italic
+
+   SMALL CAPS
+
+   slanted
+
+   typewriter
+
+   Examples:
+     	for FILENAME in *
+     	do	tui-printf "Loading file: $FILENAME"
+     	done
+
+
+
+Tag Table:
+Node: Top630
+Node: Introduction to TUI963
+Node: Installation4132
+Node: Usage4976
+Node: Commands5155
+
+End Tag Table

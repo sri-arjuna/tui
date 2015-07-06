@@ -1,0 +1,28 @@
+@example
+	Syntax: tui-printf [options] [arguments] 
+	Where options are:
+	-h|--help	Helpscreen
+@end example
+
+Description: @*
+Descriptional text
+
+@b {bold}
+
+@i {italic}
+
+@sc {small caps}
+
+@slanted {slanted}
+
+@t {typewriter}
+
+
+
+
+@b {Examples:}
+@example
+	for FILENAME in *
+	do	tui-printf "Loading file: $FILENAME"
+	done
+@end example

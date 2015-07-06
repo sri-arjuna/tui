@@ -6,9 +6,9 @@ For installation please see [./docs/INSTALL.md](./docs/INSTALL.md)
 For configuration please see [./docs/CONFIG.md](./docs/CONFIG.md)
 
 
-1. What is SWARM?
+1. What is tui?
 -----------------
-SWARM (Shell Wrapper And Runtime Modificator), is a command based framework
+tui (Shell Wrapper And Runtime Modificator), is a command based framework
 to enable scripts to provide an interface-like feeling, while also eases some
 repeative tasks for developers or the author of such scripts.
 
@@ -20,12 +20,12 @@ and use 2 colors to provide a header (top, outer) and title (sub,inner) visualy 
 defined by a theme changable per user preference.
 
 While this is accomplished with just 4 commands, the real benefit comes with all the other commands,
-which generally do what their name describes and are already using the wrapping  and alignment provided by SWARM.
+which generally do what their name describes and are already using the wrapping  and alignment provided by tui.
 
 Beeing a modern console tool, it also takes advantage of beeing within a GUI enviornment.
-**swarm-status NUM ["STRING"]** will prodive ANSI chars for a nicer view instead of textual based information otherwise.
-Also, when invoking external commands with **swarm-{edit,filemgr,web}** it will use the per-user prefered
-application set in $SWARM\_FILE\_USER\_APPS according to wether the script is executed in a terminal window or a tty.
+**tui-status NUM ["STRING"]** will prodive ANSI chars for a nicer view instead of textual based information otherwise.
+Also, when invoking external commands with **tui-{edit,filemgr,web}** it will use the per-user prefered
+application set in $tui\_FILE\_USER\_APPS according to wether the script is executed in a terminal window or a tty.
 However, there is no mouse interaction, as the focus of its purpose is the console or a headless device, such as a server or Raspery Pi.
 
 2. Dependcies
@@ -53,18 +53,18 @@ Which it requires **bash** to execute its commands, at some certain circumstance
 Saying, as it is command based, it can be used by every scripting language available.
 
 
-**swarm-terminal** beeing some kind of exception here, as it will only work in a GUI enviornment, 
+**tui-terminal** beeing some kind of exception here, as it will only work in a GUI enviornment, 
 but this will also start the prefered terminal window of the user, 
 with its last list entry **xterm** ment as last fallback option.
 
 As it is command based and uses a dash (-) to seperate descriptors, it is possible to group some tasks.
-Those are swarm-bol-\*, swarm-conf-\*, swarm-math-\*, swarm-str-\*, which are considered coding helpers.
+Those are tui-bol-\*, tui-conf-\*, tui-math-\*, tui-str-\*, which are considered coding helpers.
 
 There are three special cases:
 
-*	swarm-install, is ment to install packages distro-independant, so the scripter doesnt have to care wether its apt-get, emerge, dnf, pacman, pkg or zypper
-*	swarm-printf, does not accecpt string formating as its origin name
-*	swarm-psm, is the only abrevihation, background script manager
+*	tui-install, is ment to install packages distro-independant, so the scripter doesnt have to care wether its apt-get, emerge, dnf, pacman, pkg or zypper
+*	tui-printf, does not accecpt string formating as its origin name
+*	tui-psm, is the only abrevihation, background script manager
 
 
 It also attempts to reduce required user interaction to a minimum, 

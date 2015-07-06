@@ -1,0 +1,25 @@
+Syntax: @example 
+tui-echo [options] [arguments] 
+@end example
+
+Where options are:
+@example
+-h|--help	Helpscreen
+...
+@end example
+
+Description: @*
+Descriptional text
+@b bold
+@end b
+@i italic
+@sc small caps
+@slanted slanted
+@t typewriter
+
+
+
+Examples:
+@example
+tui-echo 
+@end example

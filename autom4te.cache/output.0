@@ -2312,7 +2312,7 @@ END
   fi
 fi
 
-ac_config_files="$ac_config_files Makefile tuirc bin/Makefile docs/Makefile docs/samples/Makefile conf.etc/Makefile conf.home/Makefile lists/Makefile man/Makefile templates/Makefile templates/manpage/Makefile templates/scripts/Makefile themes/Makefile"
+ac_config_files="$ac_config_files Makefile tuirc bin/Makefile docs/Makefile docs/samples/Makefile docs/tex/Makefile conf.etc/Makefile conf.home/Makefile lists/Makefile man/Makefile templates/Makefile templates/manpage/Makefile templates/scripts/Makefile themes/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3036,6 +3036,7 @@ do
     "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
     "docs/Makefile") CONFIG_FILES="$CONFIG_FILES docs/Makefile" ;;
     "docs/samples/Makefile") CONFIG_FILES="$CONFIG_FILES docs/samples/Makefile" ;;
+    "docs/tex/Makefile") CONFIG_FILES="$CONFIG_FILES docs/tex/Makefile" ;;
     "conf.etc/Makefile") CONFIG_FILES="$CONFIG_FILES conf.etc/Makefile" ;;
     "conf.home/Makefile") CONFIG_FILES="$CONFIG_FILES conf.home/Makefile" ;;
     "lists/Makefile") CONFIG_FILES="$CONFIG_FILES lists/Makefile" ;;

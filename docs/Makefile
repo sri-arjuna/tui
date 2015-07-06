@@ -279,7 +279,7 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-SUBDIRS = samples 
+SUBDIRS = samples tex
 doc_DATA = LICENSE README.md
 all: all-recursive
 
