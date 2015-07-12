@@ -1,3 +1,7 @@
 2015.07.05 - 0.8.5-GNU-RC1
 * Changed first time usage backend
 
+2015.07.09 - 0.8.8-GNU-RC3
+* Fixed first time usage.
+* Brought some order into the basic docs
+* Still writing/fixing texinfo manual

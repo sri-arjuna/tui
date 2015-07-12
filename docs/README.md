@@ -1,9 +1,8 @@
-README - 0.7.0
-==============
+README - TUI - 0.8.8-GNU-RC3
+============================
 
-
-TUI - a (line based) Text User Interface framework
----------------------------------
+A 'Text User Interface' framework for scripts
+-------------------------------------------
 
 
 Description / What is it?:
@@ -25,7 +24,41 @@ The core display commands are:
 * tui-cat
 * tui-list
 
+With the basic user interactions like:
+
+* tui-read
+* tui-select
+* tui-yesno
+
+As it is command based and uses a dash (-) to seperate descriptors, it is possible to group some tasks.
+Those are tui-bol-\*, tui-conf-\*, tui-str-\*, which are considered coding helpers.
+
+There are some special cases:
+
+*	tui-install, is ment to install packages distro-independant, so the scripter doesnt have to care wether its apt-get, emerge, dnf, pacman, pkg or zypper
+*	tui-printf, does not accecpt string formating as its origin name
+*	tui-bgjob-mgr, is the only abrevihation, backgroundjob script manager (displaying which of a list of scripts are already executedd with success/failure, currently running or still todo.
+*	tui-terminal beeing some kind of exception here, as it will only work in a GUI enviornment, but this will also start the prefered terminal window of the user, with its last list entry **xterm** ment as last fallback option.
+
+
+
+Purpose & usage:
+-----------------
+
+In todays world, everything is about presenting. There are many tasks that can be faster accomplished using a script rather than writing an application for it as others require to use it.
+
+This said, it is known many end-users dont like the terminal screen. That is usualy because the commands in terminals have their output not very well structured, usualy just text-by-text-by-newline-by-text.
+
+This is if you need/want/have to provide scripts for users to use, and make it (a little) easier for them to 'read' the terminal, without to have to write 'presentation' handlers.
+
+Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui, same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
+
+Now in the combination with tui-edit, you dont even need to source tuirc to have tui-edit open the given filename with your favorite editor.
+
+
+
 Default behaviour:
+------------------
 Prints left and right border according to selected theme, and colors tui-header and tui-title.
 Each of the core display commands prints up to 3 strings to align output.
 While tui-title prints a single string centered, the others will print if left.
@@ -39,7 +72,7 @@ Please see its helpscreen or manpage or the examples for more details.
 There are several tools that work with their or passed return/exit codes.
 tui-yesno beeing one of them as it returns no visible value, just its exit code changes from 0 for yes, to 1 for no.
 
-	if tui-yesno
+	if tui-yesno "Some question?"
 	then	tui-echo "Do this" "$list"
 	else	tui-status 4 "Skipped"
 	fi
@@ -49,12 +82,20 @@ There are also tools that expect the returned value to be stored as a string var
 	A="Some Entries"
 	B="With whitespaces"
 	while [ ! "$MENU" = Quit ]
-	do	MENU=$(tui-select Quit "$A" "$B")
+	do	MENU=$(tui-select -1 Quit "$A" "$B")
 		case "$MENU" in
 		"$A")	echo todo	;;
 		"$B"	echo todo	;;
 		esac
 	done
+
+Also be sure to compare the exit codes of:
+
+	tui-status 1 fail
+	echo $?
+	
+	tui-printf -S 4 Skipping
+	echo $?
 
 As an application/package it is a dependency, not a standalone application, it also requires bash to be installed, however your script could be _anyhting_ from bash to zsh.
 
@@ -62,7 +103,8 @@ It is not ment that 'endusers' (have to) care about TUI, its ment that a scripte
 
 It provides you with commands named similar to their GNU originals or by its task and warps its output with TUI.
 
-_Either think of TUI as a simpler zenity/curses, or as a metapher: If your script is a php-website then tui is html._
+_Either think of TUI as a simpler zenity/curses, or as a **metapher**: If your script is a php-website then tui is html._ (it is not ment to be used for websites!)
+
 
 
 Description / Helpers:
@@ -84,81 +126,24 @@ Eventhough ther are only 4 core commands for display use, there are 29 additiona
 
 
 
------------
+Dependcies
+-------------
 
+Its dependency list is quite short.
+As the goal was to be as minimalistic as possible regarding its dependencies, 
+and beeing as 'linux-philosophy-close-as-possible' as i understand it.
 
-Core Functions / Purpose:
-------------------------
-* tui-echo (actualy uses printf with a trailing '\n' for compability reason)
-* tui-printf (Keeps writing on current line, replacing previous tui-printf outputs)
-* tui-header (Prints the whole line blue background, with white font :: default)
-* tui-title (Prints borders 'normal', between white background and blue font :: default)
+Origin:
+	Everything is a file.
+And my addition:
+	Every file is text.
 
-Each of these commands can display up to 3 strings.
-For all, but without tui-title, the alignemt goes:
-	1 String  = 1) left
-	2 Strings = 1) left 2) right
-	3 Strings = 1) left 2) center 3) right
+So i decided to write everything as scripts, which enables me the stay almost dependency-less to match a minimalistic apporoach.
 
-See [this preview]()
-
-For tui-title it is:
-1 String = 1) center
-More Strings like the others...
-
-Thus, the commands have alignmends to the: left, center and the right.
-So each command that is supposed to just display strings,
-may be passed up to 3 strings at a time, or empty.
-
-
-
-Configuration Files:
---------------------
-
-**/etc/tui/**
-	apps.conf
-	colors.conf
-	commands.conf
-	status.conf
-	tui.conf
-	
-**HOME/.config/tui/**
-	apps.conf
-	user.conf
-
-apps.conf stores the variables for your default applications used by their specific tui-APP command (tui-edit).
-
-commands.conf stores which awk, grep or sed is used tui - internaly and systemwide only.
-
-
-
-Purpose & usage:
-------------
-In todays world, everything is about presenting.
-There are many tasks that can be faster accomplished
-using a script rather than writing an application for
-it as others require to use it.
-
-This said, it is known many end-users dont like the terminal screen.
-That is usualy because the commands in terminals have their
-output not very well structured, usualy just text-by-text-by-newline-by-text.
-
-This is if you need/want/have to provide scripts for users to use,
-and make it (a little) easier for them to 'read' the terminal,
-without to have to write 'presentation' handlers.
-
-
-Also inspired by the use of credentials files for the use of mounting a Network Attached Storage (NAS),
-i wanted to reuse my name and email easily without
-having to rename each and every script if i decide to use another email adress or homepage.
-Or if my new scripts shall be another LICENSE_TEXT.
-Each of the command aims to be a 1 line output.
-Surrounded with a customable border layout.
-
-Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui,
-same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
-
-Now in the combination with tui-edit, you dont even need to source tui
-to have tui-edit open the given filename with your favorite editor.
-
+*	bash
+*	coreutils
+*	awk
+*	grep
+*	sed
+*	sudo (optional)
 

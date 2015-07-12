@@ -2,7 +2,7 @@
 #	This file provides the default directories,
 #	required to created the user his own tuirc file.
 #
-	prefix=/
+	prefix=/usr
 	readonly \
 		TUI_DIR_CONF=${prefix}/etc/tui
 	readonly \
