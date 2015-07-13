@@ -23,7 +23,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero
 	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
@@ -58,6 +58,7 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 	fi
 
 "
+	answer=""
 #
 #	Check for read capabilities if not set yet
 #
@@ -100,17 +101,19 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 		exit $RET_HELP
 		;;
 	esac
-	$bash_read_numbers && \
-		cmd="read -n1" || \
-		cmd="read"
+	
 #
 #	Display
 #
-	tui-printf "$1" > /dev/stderr
-	printf "\r$BORDER_LEFT $1 (y/n) " > /dev/stderr
-	$cmd answer 
-	#printf "\r"  > /dev/stderr
-	tui-echo "$1 (y/n)" "$answer"  > /dev/stderr
+	while ! echo "${answer,,}" | $GREP -q ^[yoijsYOJIS] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
+	do	tui-printf "$1" > /dev/stderr
+		printf "\r$BORDER_LEFT $1 (y/n) " > /dev/stderr
+		$bash_read_numbers && \
+			read -n1 answer || \
+			read answer
+	done
+	printf "\r"  > /dev/stderr
+	tui-echo "$1 (y/n)  " "$answer"  > /dev/stderr
 	case "$answer" in
 	    y|o|j|s|Y|O|J|S)
 	    		# First letter of the meaning "yes" in these languages:

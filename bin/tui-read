@@ -26,7 +26,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi

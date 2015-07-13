@@ -30,7 +30,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi
@@ -135,9 +135,10 @@ Where options are:
 	# Repeat input while invalid
 	invalid=true
 	todo=false
+	NUM=""
 	while $invalid
 	do	# Reset input line
-		printf "\r${BORDER_LEFT} >   \r${BORDER_LEFT} > " >&2
+		printf "\r${BORDER_LEFT} >      \r${BORDER_LEFT} > " >&2
 		invalid=false
 		
 		# Get input
@@ -146,7 +147,9 @@ Where options are:
 			$cmd NUM
 		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
-		[ 0 -eq $NUM ] && exit 1
+		echo "$NUM" | $GREP '^\?' && invalid=true && continue
+		echo "${NUM,,}" | tr -d [:digit:] | $GREP -q [0-9] && invalid=true && continue
+		[ 0 -eq "${NUM/^\[\[[ABCD]/0}" ] 2>/dev/zero && exit 1
 		if ! echo "$NUM" | $GREP -q ^[0-9] 
 		then	NUM="" 
 			invalid=true 

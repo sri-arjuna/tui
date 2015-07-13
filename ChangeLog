@@ -8,4 +8,5 @@
 
 2015.07.13 - 0.8.9-GNU-RC4
 * Automatic html & info generation and install is working now
-* 
+* Fixed bash_read_* abilities in tui-read, tui-select and tui-yesno
+* Fixed arrow issue with tui-select and tui-yesno

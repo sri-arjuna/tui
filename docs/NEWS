@@ -1,3 +1,12 @@
+2015.07.13
+----------
+Fixed some serious (visual) issues upon first usage.
+
+
 2015.07.11
 ----------
-The new installation method is using the automake tools (./configure && make && sudo make install), for a better alignment with install procedure of other GNU/Linux projects.
+The new installation method is using the automake tools
+
+	./configure && make && sudo make install)
+
+for a better alignment with install procedure of other GNU/Linux projects.

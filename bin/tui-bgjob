@@ -23,7 +23,7 @@
 #
 #	Variable defaults
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "$HOME/.tuirc"  2>/dev/zero || source tuirc
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi

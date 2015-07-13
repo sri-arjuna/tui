@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source /etc/tuirc && source "$HOME/.tuirc" && \
+	source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero && \
 		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc
 #
@@ -28,7 +28,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.06.27
+#	Changed:	2015.07.13
 	script_version=0.5
 #	Description:	Returns true if user is in GUI mode.
 #
