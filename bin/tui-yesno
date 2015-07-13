@@ -59,41 +59,25 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 	fi
 
 "
-	# Check for read capabilities if not set yet
-	if [ -z "$bash_read_numbers" ]
-	then	LC_ALL=C $READ --help 2>&1 | $GREP -v bash > "$TUI_FILE_TEMP"
-		beVerbose=""
-		# Be verbose, but only as root
-		tui-bol-root && \
-			conf="$TUI_FILE_CONF_SETTINGS" && \
-			beVerbose="-v" || \
-			conf="$TUI_FILE_USER_SETTINGS"
-		# 'read-header'
-		printf '%s\n' "#\n#\tRead capabilities\n#" >> "$conf"
-		# Delimiter	
-		$GREP -q "\[-d" "$TUI_FILE_TEMP"
-		ret=$(tui-str-bol-conv -t $?)
-		tui-conf-set $beVerbose "$conf" "bash_read_delimiter" "$ret"
-		# Input
-		$GREP -q "\[-i" "$TUI_FILE_TEMP"
-		ret=$(tui-str-bol-conv -t $?)
-		tui-conf-set $beVerbose "$conf" "bash_read_input" "$ret"
-		# Prompt
-		$GREP -q "\[-p" "$TUI_FILE_TEMP"
-		ret=$(tui-str-bol-conv -t $?)
-		tui-conf-set $beVerbose "$conf" "bash_read_prompt" "$ret"
-		# Numbers
-		$GREP -q "\[-n" "$TUI_FILE_TEMP"
-		ret=$(tui-str-bol-conv -t $?)
-		tui-conf-set $beVerbose "$conf" "bash_read_numbers" "$ret"
-		# Timeout
-		$GREP -q "\[-t" "$TUI_FILE_TEMP"
-		ret=$(tui-str-bol-conv -t $?)
-		tui-conf-set $beVerbose "$conf" "bash_read_timeout" "$ret"
-		
-		# Load these new settings now
-		source "$conf"
-	fi
+#
+#	Check for read capabilities if not set yet
+#
+	LC_ALL=C $READ --help 2>&1 | $GREP -v bash > "$TUI_FILE_TEMP"
+	# Delimiter	
+	$GREP -q "\[-d" "$TUI_FILE_TEMP"
+	bash_read_delimiter=$(tui-str-bol-conv -t $?)
+	# Input
+	$GREP -q "\[-i" "$TUI_FILE_TEMP"
+	bash_read_input=$(tui-str-bol-conv -t $?)
+	# Prompt
+	$GREP -q "\[-p" "$TUI_FILE_TEMP"
+	bash_read_prompt=$(tui-str-bol-conv -t $?)
+	# Numbers
+	$GREP -q "\[-n" "$TUI_FILE_TEMP"
+	bash_read_numbers=$(tui-str-bol-conv -t $?)
+	# Timeout
+	$GREP -q "\[-t" "$TUI_FILE_TEMP"
+	bash_read_timeout=$(tui-str-bol-conv -t $?)
 #
 #	Variable handling
 #

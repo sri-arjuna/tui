@@ -12,7 +12,7 @@ It is a command based framework which wraps the task (executed command name repr
 It is a framework to be used in the shell or shell scripts, though the usage of scripts is recomended to preserve the interface feeling.
 It aims to simplify the task of script writing and mainwhile reward the scripter and the final user with a TUI.
 
-This said, when executed alone, a single tui-<command>, it doesnt look that interface'ish.
+This said, when executed alone, a single tui-\<command\>, it doesnt look that interface'ish.
 However, as soon you append a few tui-echo after another or use tui-cat to print a small textfile to the screen, you will feel the difference.
 
 The core display commands are:

@@ -3,38 +3,37 @@
 #	required to created the user his own tuirc file.
 #
 	prefix=@prefix@
-	readonly \
+	[ -z "$TUI_DIR_CONF" ] && readonly \
 		TUI_DIR_CONF=@sysconfdir@/@PACKAGE@
-	readonly \
+	[ -z "$TUI_DIR_SYSTEM" ] && readonly \
 		TUI_DIR_SYSTEM=@datarootdir@/@PACKAGE@
 #
 #	Paths	:	Used to run TUI
 #
 	TUI_DIR_LOG=@localstatedir@/log
-	readonly \
+	[ -z "$TUI_DIR_TEMPLATES" ] && readonly \
 		TUI_DIR_TEMPLATES="$TUI_DIR_SYSTEM/templates"
-	readonly \
+	[ -z "$TUI_DIR_THEMES" ] && readonly \
 		TUI_DIR_THEMES="$TUI_DIR_SYSTEM/themes"
-	readonly \
+	[ -z "$TUI_DIR_LIST" ] && readonly \
 		TUI_DIR_LIST="${TUI_DIR_SYSTEM}/lists"
-	readonly \
-		TUI_DIR_TEMP="${TUI_DIR_TEMP}"
+	TUI_DIR_TEMP="${TUI_DIR_TEMP}"
 #
 #	Files
 #	Direct access to the most important configuration files for the System
 #
-	readonly \
+	[ -z "$TUI_FILE_CONF_APPS" ] && readonly \
 		TUI_FILE_CONF_APPS="$TUI_DIR_CONF/apps.conf"
-	readonly \
+	[ -z "$TUI_FILE_CONF_COLORS" ] && readonly \
 		TUI_FILE_CONF_COLORS="$TUI_DIR_CONF/colors.conf"
-	readonly \
+	[ -z "$TUI_FILE_CONF_COMMANDS" ] && readonly \
 		TUI_FILE_CONF_COMMANDS="$TUI_DIR_CONF/commands.conf"
-	readonly \
+	[ -z "$TUI_FILE_CONF_SETTINGS" ] && readonly \
 		TUI_FILE_CONF_SETTINGS="$TUI_DIR_CONF/settings.conf"
-	readonly \
+	[ -z "$TUI_FILE_CONF_STATUS" ] && readonly \
 		TUI_FILE_CONF_STATUS="$TUI_DIR_CONF/status.conf"
-	readonly \
+	[ -z "$TUI_FILE_CONF_SHORTS" ] && readonly \
 		TUI_FILE_CONF_SHORTS="$TUI_DIR_CONF/shorts.conf"
-	readonly \
+	[ -z "$TUI_FILE_CONF_ALIAS" ] && readonly \
 		TUI_FILE_CONF_ALIAS="$TUI_DIR_CONF/shorts-alias.conf"
 	
