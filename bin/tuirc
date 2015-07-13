@@ -24,13 +24,13 @@ shopt -s expand_aliases
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.07.05
-	script_version=2.3
+#	Changed:	2015.07.13
+	script_version=2.4
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
 #
-	TUI_VERSION=0.8.6
+	TUI_VERSION=0.8.9
 	TRC="$HOME/.tuirc"	# User default
 	TRC_SYS="/etc/tuirc"	# Only available if root installed tui
 #
@@ -153,7 +153,7 @@ shopt -s expand_aliases
 			LOADLIST
 		}
 		writeconf_trc
-		. "$TRC"
+		source "$TRC" 2>/dev/zero
 		writeconf_loadlist
 		
 		# Verify all dirs are created, could be so easy...
@@ -234,8 +234,8 @@ shopt -s expand_aliases
 #
 #	Load Environment	:	System wide / defaults
 #
-	source "$TRC_SYS" #&& printf "." #> /dev/stderr
-	source "$TRC" #&& printf "." #> /dev/stderr
+	source "$TRC_SYS" 2>/dev/zero	# Load tui system path
+	source "$TRC" 	  2>/dev/zero	# Load tui user paths
 	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS}
 	do	source "$f" #&& printf "." > /dev/stderr
 	done
@@ -250,8 +250,7 @@ shopt -s expand_aliases
 		[ ! -z "$f" ] && \
 			[ ! "#" = "${f:0:1}" ] && \
 			[ -f "$TUI_DIR_USER/$f" ] && \
-			source "$TUI_DIR_USER/$f"  && \
-			printf "." > /dev/stderr
+			source "$TUI_DIR_USER/$f"
 	done<"$TUI_FILE_USER_LOADLIST"
 	# Make apps not require *_CLI or *_GUI
 	if tui-bol-gui
@@ -301,8 +300,24 @@ shopt -s expand_aliases
 			do	tui-printf -S $n "n = $n"
 			done
 			
-			tui-bol-gui && tui-terminal "tui-conf-editor /etc/default/grub"
-			
+			[ -f /etc/default/grub ] && \
+				tui-bol-gui && \
+				tui-terminal "tui-conf-editor /etc/default/grub"
+			;;
+		samples)
+			cd "${TUI_DIR_SYSTEM/tui/doc\/tui}/samples"
+			MENU=show
+			while 	tui-title "TUI - Samples"
+				item=$(tui-select Quit *)
+				[ ! "Quit" = "$MENU" ]
+			do
+				clear
+				tui-title "File: $item"
+				tui-cat "$item"
+				tui-header "" "Executing $item" ""
+				tui-press
+				bash "$item"
+			done
 			;;
 		reset-yes)
 			MODE=reset
