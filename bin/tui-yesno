@@ -25,23 +25,22 @@
 	# create the RC and load all variable if RC is not present yet.
 	if source /etc/tuirc && source "$HOME/.tuirc"
 	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS}
-		do	source "$f"
+		do	[ -f "$f" ] && source "$f"
 		done
-		source "$TUI_FILE_USER_SETTINGS"
 	else	source tuirc
 	fi
 	# If there is a user theme directory, use that one instead
 	[ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ] && \
 		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
 		use_DIR_THEME="$TUI_DIR_THEMES"
-	. "$use_DIR_THEME/$TUI_THEME" 
+	source "$use_DIR_THEME/$TUI_THEME" 
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 #
 #	Variable defaults
 #
-	script_version=0.9.0
+	script_version=0.9.0a
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"

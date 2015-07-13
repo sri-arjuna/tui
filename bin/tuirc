@@ -112,18 +112,18 @@ shopt -s expand_aliases
 			#
 			#	Paths	:	That are about the User
 			#
-			readonly \\
-			 	TUI_DIR_USER="${XDG_CONFIG_DIR:-\$HOME/.config}/tui"
-			readonly \\
-			 	TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
-			readonly \\
-			 	TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
-			readonly \\
-			 	TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
-			readonly \\
-			 	TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
-			readonly \\
-			 	TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
+			 	readonly \\
+			 		TUI_DIR_USER="${XDG_CONFIG_DIR:-\$HOME/.config}/tui"
+			 	readonly \\
+			 		TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
+			 	readonly \\
+			 		TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
+			 	readonly \\
+			 		TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
+			 	readonly \\
+			 		TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
+			 	readonly \\
+			 		TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
 			
 			#
 			#	Files	:	User specific configuration files
