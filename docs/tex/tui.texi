@@ -151,7 +151,7 @@ Calling
 will bring up a screen to select which conf file to edit.
 
 @subsection Apps
-@slated {$TUI_FILE_USER_CONF}
+@slanted {$TUI_FILE_USER_CONF}
 Upon first call, you will probably see the values listed as variable names with a '$'-prefix.
 This setting will use the system defaults set in /etc/tui/apps.conf.
 If you are calling the above command as root, you will edit the system defaults, and not the user preferences.
@@ -163,7 +163,7 @@ This file defines the order in which the user configs are read.
 You may add custom entries, but be aware these functions or values will not be available if you share your scripts using them.
 
 @subsection Settings
-@slated {$TUI_FILE_USER_SETTINGS}
+@slanted {$TUI_FILE_USER_SETTINGS}
 Here, the behaviour or default values for tui-commands is defined.
 
 
@@ -180,9 +180,10 @@ Some explanation and examples
 @c @node Commands
 @c @chapter Commands
 
-@part Commands
+@c @node Commands
 
-@section Display Commands
+@node Display Commands
+@chapter Display Commands
 Some explanation and examples as well
 @detailmenu
 @c * tui-printf ::
