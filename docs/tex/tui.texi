@@ -50,11 +50,10 @@ main page text juhuuu
 @menu
 * Introduction to TUI :: 
 * Installation ::
-* Usage :: 
-* Commands :: 
-@c * Display Commands :: The definition of Interface
-@c * Interactive Commands :: Convenience for author and user
-@c * Advanced Commands :: Tools for crazy lazy geeks with great ambitions
+@c * Commands :: 
+* Display Commands :: The definition of Interface
+* Interactive Commands :: Convenience for author and user
+* Advanced Commands :: Tools for the crazy lazy geeks with great ideas
 @end menu
 @contents
 
@@ -64,20 +63,19 @@ main page text juhuuu
 @chapter Introduction to TUI
 @i {TUI is a bash framework to write scripts with a Text User Interface.}
 
-It is a command based framework which wraps the task (executed command name represents task or description) into an adaptive Text User Interface (TUI).
-It is a framework to be used in the shell or shell scripts, though the usage of scripts is recommended to preserve the interface feeling.
-It aims to simplify the task of script writing and meanwhile reward the scripter and the final user with a TUI.
-
-This said, when executed alone, a single tui-<command>, it doesn't look that much like an interface.
-However, as soon you append a few tui-echo after another or use tui-cat to print a small text file to the screen, you will feel the difference.
-
-
-
----- REPLACE somewhere else ---
+It is a command based framework which wraps the task (executed command name represents task or 
+description) into an adaptive Text User Interface (TUI).
+It is a framework to be used in the shell or shell scripts, though the usage of scripts is recommended 
+to preserve the interface feeling.
 
 It was the core display part of another script-dream I have, and it took me almost 2.5 years 
 until i figured that extracting all these displaying functions, provide its very own project.
 TUI was born, a command based framework to give scripts an interface like feeling.
+
+This said, when executed alone, a single tui-<command>, it doesn't look that much like an interface.
+However, as soon you append a few tui-echo after another or use tui-cat to print a small text file to
+the screen, you will feel the difference.
+
 Many script authors write their collection of code helpers, display features or task assistants.
 As such functions, they have to copy them to each of the scripts, 
 and manually maintain and adjust the function inside that script, 
@@ -86,86 +84,103 @@ or update all those scripts just to be sure that function is updated.
 TUI jumps in here, providing a 3-Way-Interface between the Author of a script, 
 the System (and its installed software) and the User who is executing it.
 
+In fact, TUI is tui!
 
+'tui' is meant to make a directory a simple but highly configurable script menu, and display its 
+sub-directories as sections and browse among the tree structure, with its entrance point as root.
+All the other commands, are merely the code helpers, display tools, list library, variable providers,
+gathered as commands for easy availability, so you can access them straight forward like any command 
+in your scripts.
 
 You as the author of the script, don't have to worry about software the user has installed, 
-instead you call: tui-edit, tui-filemgr, tui-web or tui-terminal (GUI only), 
-or which distribution the user is using, simply call tui-install to cover package manager installations from Arch, over *BSD and Debian to Fedora/Red-Hat or s
+instead you call: tui-edit, tui-filemgr, tui-web or tui-terminal (tui-terimnal is GUI only), 
+or which distribution the user is using, simply call tui-install to cover package manager 
+installations from Arch, over *BSD and Debian to Fedora/Red-Hat to Slackware or Tizen.
 
 
-It brings together the best of both worlds, the power of the console and the convenience of a graphical environment.
-
-
-'tui' is meant to make a directory a simple but highly configurable script menu, and display its sub-directories as sections and browse among the tree structure, with its entrance point as root.
-All the other commands, are merely the code helpers, display tools, list library, variable providers, gathered as commands for easy availability, so you can access them straight forward like any command in your scripts.
-
-But in fact, TUI is tui''
-
-
-But sadly, it is often the case that they call an application/command that is not installed on the system executing the script, most of the times this happens when people want to open a text file or an URL from a script.
-
-
-
-
-It is thought to be usable straight from the command line.
-
-It actually is a dependency of its own, as the most powerful tool provided by TUI, is tui.
-All the commands are just required to fit into 'tui', so that the scripts it executes provide the same interface/heavier.
-
-It aims to be usable with as less options and arguments as possible, but still enable you to modify its behaving when scripting.
+It brings together the best of two worlds, the power of the console and the convenience of a graphical
+environment.
 
 
 @comment ## --------------------------------------------------------------- ##
 @node Installation
 @chapter Installation
 @pindex Intro
+After getting the source code like:
+@example
+    su
+    cd /usr/src
+    git clone https://github.com/sri-arjuna/tui.git
+    cd tui
+@end example
+
 A basic installation procedure looks like:
 @example
-    ./configure 
+    ./configure --prefix=/
     make
-    su -c "make install"
+    make install
 @end example
 	
 By default this will install TUI using the default prefix /usr/local, so the binaries will be available in PREFIX/bin.
-You may change that by passing --prefix=/usr, as in:
+
+This way, uninstall is very easy:
 @example
-    ./configure --prefix=/usr
-    make
-    su -c "make install"
+    su
+    cd /usr/src/tui
+    make uninstall
 @end example
 
 @section Configuration
-There are 3 basic types of configuration applicable to TUI.
+Is done either by the (End-)User, the applications installed and the system the user is using.
+Default themes are 'default' for the user, and 'default-red' for root.
 
-@subsection Visual
-Theme - End user defines which theme matches best
+First and for the most, you can change the theme.
+A theme defines the left and right border, the font and background color of tui-header and tui-title,
+as well as the input character for tui-select.
 
-@subsection Application
-Editor, File- and Web-browser, Terminals
+Application invokes by either one of tui-edit, tui-filemgr, tui-web or tui-terminal which will search through
+a list of known applications, diverted by cli or gui abilities if the default applications are not found.
+If you have WINE installed, it may happend that 'notepad' is started as editor rather than 'scribes'.
 
-@subsection System
-Other configuration files
+If your favorite application is missing on its list, please contact the author of TUI to append it/them.
+
+Calling
+@example
+    tuirc config
+@end example
+will bring up a screen to select which conf file to edit.
+
+@subsection Apps
+@slated {$TUI_FILE_USER_CONF}
+Upon first call, you will probably see the values listed as variable names with a '$'-prefix.
+This setting will use the system defaults set in /etc/tui/apps.conf.
+If you are calling the above command as root, you will edit the system defaults, and not the user preferences.
+CURLWGET will be 'curl' or 'wget' if found, if neither is found, tui-download will ask to install either one.
+
+@subsection Loadlist
+Can only be edited, but should not be changed or expaned.
+This file defines the order in which the user configs are read.
+You may add custom entries, but be aware these functions or values will not be available if you share your scripts using them.
+
+@subsection Settings
+@slated {$TUI_FILE_USER_SETTINGS}
+Here, the behaviour or default values for tui-commands is defined.
 
 
-@section Idea / Usage
-bli bla blub
-@comment ## --------------------------------------------------------------- ##
-@node Usage
-@chapter Usage
-@comment ## --------------------------------------------------------------- ##
+@section Idea
+In todays world, everything is about presenting. There are many tasks that can be faster accomplished using a script rather than writing an application for it as others require to use it.
+This said, it is known many end-users dont like the terminal screen. That is usualy because the commands in terminals have their output not very well structured, usualy just text-by-text-by-newline-by-text.
+This is if you need/want/have to provide scripts for users to use, and make it (a little) easier for them to 'read' the terminal, without to have to write 'presentation' handlers.
+Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui, same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
+Now in the combination with tui-edit, you dont even need to source tuirc to have tui-edit open the given filename with your favorite editor.
 
 @section Syntax and Variables
 Some explanation and examples
 
-@comment ## --------------------------------------------------------------- ##
-@part First Steps
+@c @node Commands
+@c @chapter Commands
 
-
-
-@comment ## --------------------------------------------------------------- ##
-@node Commands
-@chapter Commands
-
+@part Commands
 
 @section Display Commands
 Some explanation and examples as well
@@ -181,7 +196,6 @@ Some explanation and examples as well
 @end detailmenu
 
 @subsection tui-printf
-@pindex Commands
 @include tui-printf.texi
 
 
