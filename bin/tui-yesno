@@ -40,7 +40,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.0a
+	script_version=0.9.0b
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME \"Question:\"
@@ -105,7 +105,7 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 #
 #	Display
 #
-	while ! echo "${answer,,}" | $GREP -q ^[yoijsYOJIS] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
+	while ! echo "${answer,,}" | $GREP -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
 	do	tui-printf "$1" > /dev/stderr
 		printf "\r$BORDER_LEFT $1 (y/n) " > /dev/stderr
 		$bash_read_numbers && \

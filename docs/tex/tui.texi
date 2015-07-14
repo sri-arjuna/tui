@@ -50,7 +50,7 @@ main page text juhuuu
 @menu
 * Introduction to TUI :: 
 * Installation ::
-@c * Commands :: 
+* Configuration :: 
 * Display Commands :: The definition of Interface
 * Interactive Commands :: Convenience for author and user
 * Advanced Commands :: Tools for the crazy lazy geeks with great ideas
@@ -105,7 +105,6 @@ environment.
 @comment ## --------------------------------------------------------------- ##
 @node Installation
 @chapter Installation
-@pindex Intro
 After getting the source code like:
 @example
     su
@@ -130,7 +129,8 @@ This way, uninstall is very easy:
     make uninstall
 @end example
 
-@section Configuration
+@node Configuration
+@chapter Configuration
 Is done either by the (End-)User, the applications installed and the system the user is using.
 Default themes are 'default' for the user, and 'default-red' for root.
 
@@ -150,20 +150,18 @@ Calling
 @end example
 will bring up a screen to select which conf file to edit.
 
-@subsection Apps
-@slanted {$TUI_FILE_USER_CONF}
+@section Apps / @sc {$TUI_FILE_USER_CONF}
 Upon first call, you will probably see the values listed as variable names with a '$'-prefix.
 This setting will use the system defaults set in /etc/tui/apps.conf.
 If you are calling the above command as root, you will edit the system defaults, and not the user preferences.
 CURLWGET will be 'curl' or 'wget' if found, if neither is found, tui-download will ask to install either one.
 
-@subsection Loadlist
+@section Loadlist
 Can only be edited, but should not be changed or expaned.
 This file defines the order in which the user configs are read.
 You may add custom entries, but be aware these functions or values will not be available if you share your scripts using them.
 
-@subsection Settings
-@slanted {$TUI_FILE_USER_SETTINGS}
+@section Settings / @sc {$TUI_FILE_USER_SETTINGS}
 Here, the behaviour or default values for tui-commands is defined.
 
 
@@ -174,30 +172,41 @@ This is if you need/want/have to provide scripts for users to use, and make it (
 Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui, same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
 Now in the combination with tui-edit, you dont even need to source tuirc to have tui-edit open the given filename with your favorite editor.
 
-@section Syntax and Variables
-Some explanation and examples
 
-@c @node Commands
-@c @chapter Commands
-
-@c @node Commands
+@part Commands
 
 @node Display Commands
 @chapter Display Commands
-Some explanation and examples as well
-@detailmenu
-@c * tui-printf ::
-@c * tui-echo ::
-@c * tui-title ::
-@c * tui-header :: 
+Usualy scripts not only summarizes several commands into a single file, it also enables us to display 'selected information'.
+
+So lets start with the 4 core elements:
+
+tui-printf, replace current printed line (no tailing new line)
+
+
+* tui-echo, print output and go new line
+
+* tui-header, fills the full line with (default) blue background and will write with white font.
+
+* tui-title, fills the inlay border with (default) white background and will write with blue font.
+
+
+
 @c * tui-status :: 
 @c * tui-progress :: 
 @c * tui-list :: 
 @c * tui-cat :: 
-@end detailmenu
 
-@subsection tui-printf
-@include tui-printf.texi
+
+
+
+@node Interactive Commands
+d
+
+
+@node Advanced Commands
+
+d
 
 
 @bye

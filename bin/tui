@@ -26,7 +26,12 @@
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
-	source /etc/tuirc && source "$HOME/.tuirc"  2>/dev/zero || source tuirc
+	source tuirc
+	if [ $# -lt 1 ]
+	then	clear
+		tui-yesno "Do you want to learn about tui?" && tui-wait 5s "Please call ${fnt_bold}tuirc${c_reset} next time..." &&  tuirc || tui-status 1 "Please call: 'tui --help'"
+		exit $?
+	fi
 	script_version=0.9.1a
 #	[ 0 -eq $UID ] && \
 #		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \

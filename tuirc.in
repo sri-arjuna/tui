@@ -2,9 +2,9 @@
 #	This file provides the default directories,
 #	required to created the user his own tuirc file.
 #
-	prefix=@prefix@
 	[ -z "$TUI_DIR_CONF" ] && readonly \
 		TUI_DIR_CONF=@sysconfdir@/@PACKAGE@
+	prefix=@prefix@
 	[ -z "$TUI_DIR_SYSTEM" ] && readonly \
 		TUI_DIR_SYSTEM=@datarootdir@/@PACKAGE@
 #

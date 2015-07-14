@@ -304,6 +304,7 @@ shopt -s expand_aliases
 				tui-bol-gui && \
 				tui-terminal "tui-conf-editor /etc/default/grub"
 			;;
+		info)	info tui ; exit ;;
 		samples)
 			cd "${TUI_DIR_SYSTEM/tui/doc\/tui}/samples"
 			MENU=show
@@ -459,13 +460,13 @@ shopt -s expand_aliases
 		tui-printf -E "Calling $ME like this gives you an impression on how your future scripts could look like."
 		tui-printf -E
 		tui-printf -E "If you are looking for the commands of TUI, try this:" "tui-<hit-tab>"
-		tui-printf -E "If you are a developer, i highly recomand to read:" "man tui"
-		tui-printf -E "And to check the provided variables, see ${TUI_FONT_BOLD}tui provides${TUI_RESET}"
+		tui-printf -E "If you are a developer, i highly recomand to read:" "man tui // ${TUI_FONT_BOLD}info tui${TUI_RESET}"
+		tui-printf -E "And to check the provided variables, see:" "${TUI_FONT_BOLD}tui provides${TUI_RESET}"
 		tui-printf -E
 		tui-printf -E "There are some sample scripts to get you started:" "$TUI_DIR_DOCS/samples"
 		tui-printf -E "To create a new script in $TUI_DIR_USER_SCRIPTS, type:" "tui-new-script [-emrst] [./]SCRIPTNAME"
 		tui-printf -E
-		tui-printf -E "Arguments to this command are:" "config provides reset reset-yes theme"
+		tui-printf -E "Arguments to this command are:" "config info provides samples reset reset-yes theme"
 		tui-printf -E 
 		tui-yesno "Configure it now?" || exit 0
 		ConfigTUI
