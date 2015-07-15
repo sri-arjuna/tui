@@ -19,16 +19,16 @@
 # ------------------------------------------------------------------------
 #
 	if source /etc/tuirc && source "$HOME/.tuirc"
-	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do [ -f "$f" ] && source "$f";done
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.06.19
-	script_version=1.0.1
+#	Changed:	2015.07.14
+	script_version=1.0.2
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
@@ -52,9 +52,9 @@
 	longBar=false	# Show (& calc) the STATUS (procent)
 	hasID=false
 	# opts
-	MAX=
-	VAL=
-	CURRENT=
+	MAX=""
+	VAL=""
+	CURRENT=""
 	BAR='='
 	# Display
 	PROGRESS=""
@@ -93,12 +93,12 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		tmp=""
 		[ ! -z "$MAX" ] && tmp="NUM"
 		$doBar && [ ! -z "$MAX" ] && tmp="BAR"
-		echo ${tmp:-DASH}
+		echo "${tmp:-DASH}"
 	}
 	reset_tmp() { # ID
 	# Resets the counter according to passed ID
 	#
-		if $hasID
+		if "$hasID"
 		then	tui-conf-set "$TMPFILE" "$ID" 1
 		else	echo 1 > "$TMPFILE"
 		fi
@@ -108,19 +108,19 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	# Saves VAL in the tempfile according to passed id
 	#
 		[ -z "$1" ] && return 1
-		if $hasID
-		then	tui-conf-set "$TMPFILE" "$ID" $1
-		else	echo $1 > "$TMPFILE"
+		if "$hasID"
+		then	tui-conf-set "$TMPFILE" "$ID" "$1"
+		else	echo "$1" > "$TMPFILE"
 		fi
 	}
 	read_tmp() { 
 	# Reads VAL in the tempfile according to passed id
 	# Returns VAL
-		if $hasID
+		if "$hasID"
 		then	tui-conf-get "$TMPFILE" "$ID"
-			return $?
+			return "$?"
 		else	cat "$TMPFILE"
-			return $?
+			return "$?"
 		fi
 	}
 #
@@ -156,25 +156,26 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		m)	MAX="$OPTARG"
 			hadOpts=true		;;
 		h)	printf "$help_text"
-			exit $RET_HELP		;;
+			exit "${RET_HELP:-111}"		;;
 		r)	doReset=true
 			hadOpts=true		;;
 		esac
 	done
-	$hadOpts && shift $(($OPTIND - 1))
+	"$hadOpts" && shift $(($OPTIND - 1))
 #
 #	Check for all required options
 #	
 	MESSAGE="$1"
 	TYPE=$(simple_status)
-	if $hasID
+	TUI_DIR_TEMP="${TUI_DIR_TEMP:-/tmp}"
+	if "$hasID"
 	then	TMPFILE="$TUI_DIR_TEMP/tui-progress_ids.tmp"
 	else	TMPFILE="$TUI_DIR_TEMP/tui-progress_default.tmp"
 	fi
 #
 #	Something quick?
 #
-	$doReset && \
+	"$doReset" && \
 		reset_tmp && \
 		exit 0
 #
@@ -190,15 +191,15 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			reset_tmp || exit 1
 		fi
 		[ -z "$VAL" ] && \
-			VAL=$(read_tmp) && \
+			VAL="$(read_tmp)" && \
 			doSave=true || \
 			doSave=false
 		;;
 	BAR)	if [ -z "$VAL" ]
 		then	# Kind of a workaround
-			VAL=$(read_tmp)
+			VAL="$(read_tmp)"
 			#VAL=$(( $VAL + 1 ))
-			save_tmp $(( $VAL + 1 ))
+			save_tmp "$(( $VAL + 1 ))"
 		fi
 		if [ -z "$MAX" ] || [ -z "$VAL" ]  #|| [ ! $MAX -gt 1 ]
 		then	# Improper handling
@@ -211,47 +212,46 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 #
 	case "${TYPE}" in
 	DASH)	# Regular animated dash
-		[ $VAL -gt 3 ] && VAL=0
+		[ "$VAL" -gt 3 ] && VAL=0
 		STATUS="[  ${INDI[$VAL]}   ]"
 		;;
 	NUM)	# Show incrementing number
-		[ $VAL -gt $MAX ] && \
+		[ "$VAL" -gt "$MAX" ] && \
 			echo "$ME: Should have called \"${TUI_FONT_BOLD}$ME -r\" first!${TUI_FONT_RESET}" >&2
 			#echo "$ME:$LINENO: Error - \"v$VAL -gt m$MAX\"" >&2
 		STATUS="[ $VAL / $MAX ]"
 		;;
 	BAR)	# Show procent only if wanted
 		fixer_fix=0
-		if $longBar
-		then	# Show also procent
-			procent=$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )
-			[ -z "$MESSAGE" ] && fixer_fix=8	# Does this depend on $WIDTH?
+		if "$longBar"
+		then	# Show also procent ($STATUS)
+			procent="$( echo $MAX $VAL | $AWK '{print (100/$1*$2) }' )"
+			[ -z "$MESSAGE" ] && fixer_fix=0 || fixer_fix=5	# Does this depend on $WIDTH?
 			
 			# How many procent?
-			pro=${procent/.*/}
-			[ $pro -gt 100 ] && \
+			pro="${procent/.*/}"
+			[ "$pro" -gt 100 ] && \
 				pro=100
-			[ $pro -ne 100 ] && \
-				cent=$( while IFS="." read P C;do [ -z "$C" ] && echo 00 || echo $C;done<<<$procent) && \
-				cent=${cent:0:2} || \
+			[ "$pro" -ne 100 ] && \
+				cent="$( while IFS='.' read P C;do [ -z "$C" ] && echo 00 || echo $C;done<<<$procent)" && \
+				cent="${cent:0:2}" || \
 				cent=00
 			case ${#pro} in
 			1)	fixer=13 ;;
 			2)	fixer=14 ;;
 			3)	fixer=15 ;;
 			esac
-			fixer=$(( $fixer - $fixer_fix ))
-			length=$(( $WIDTH - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - 7 - ${fixer:-5}  ))
-			STATUS="[ ${pro}.${cent}%% ]"
+			length=$(( $WIDTH - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - 5 - ${fixer} - $fixer_fix  ))
+			#STATUS="[ ${pro}.${cent}%% ]"		# Nope
+			STATUS="[ ${pro}.${cent}%% ] ]\]"	# Ok, what?
 			len=$( echo $length $procent | $AWK '{print ($1/100*$2) }' )
 		else	STATUS=""
 			[ -z "$MESSAGE" ] && fixer_fix=7	# Does this depend on $WIDTH?
 			# The length that is available to print bars
 			[ -z "$MESSAGE" ] && \
-				fixer=10 || \
+				fixer=16 || \
 				fixer=14
-			fixer=$(( $fixer - $fixer_fix ))
-			length=$(( $WIDTH - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - $fixer ))
+			length=$(( $WIDTH - (2 * ${#BORDER_LEFT}) - 2 - ${#MESSAGE} - ${fixer} - $fixer_fix ))
 			len=$( echo $length $MAX $VAL | $AWK '{print ($1/$2*$3) }' )
 		fi
 		bars=$(printf '%*s' ${len/.*})
@@ -278,7 +278,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	BAR)	if $longBar
 		then	[ -z "$MESSAGE" ] && \
 				tui-printf "${PROGRESS}" "$STATUS" || \
-				tui-printf "$MESSAGE" "${PROGRESS}" "$STATUS"
+				tui-printf "$MESSAGE" "${PROGRESS}${STATUS}"
 		else	[ -z "$MESSAGE" ] && \
 				tui-printf "${PROGRESS}" || \
 				tui-printf "$MESSAGE" "${PROGRESS}"

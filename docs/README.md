@@ -3,6 +3,10 @@ README - TUI - 0.8.8-GNU-RC3
 
 A 'Text User Interface' framework for scripts
 -------------------------------------------
+See the [News](docs/NEWS) for news
+See the [Chagelog](ChangeLog) for the latest changes
+See the [Install page](docs/INSTALL.md) for help with (de-)installation.
+See the [License](docs/LICENSE) for copyright/copyleft related information.
 
 
 Description / What is it?:

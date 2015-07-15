@@ -10,3 +10,5 @@
 * Automatic html & info generation and install is working now
 * Fixed bash_read_* abilities in tui-read, tui-select and tui-yesno
 * Fixed arrow issue with tui-select and tui-yesno
+* tui-progress, several alignment issues
+* first release of tui info/html accomplished

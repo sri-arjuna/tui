@@ -1,6 +1,18 @@
+2015.07.15
+----------
+Configure and learn about TUI using 'tuirc'.
+
+I want to keep the 'docs' dynamic.
+Even as the initial texinfo file is accomplished, samples for all commands are still on the task list.
+Some are already available.
+
+See either 'tuirc html' or 'tuirc info' for general information on the usage of TUI.
+See 'tuirc samples' for some more detailed and practical instructions.
+
+
 2015.07.13
 ----------
-Fixed some serious (visual) issues upon first usage.
+Fixed some seriously (only visual) annoying issues upon first usage.
 
 
 2015.07.11
@@ -10,3 +22,12 @@ The new installation method is using the automake tools
 	./configure && make && sudo make install)
 
 for a better alignment with install procedure of other GNU/Linux projects.
+
+
+2015.06.30
+----------
+NAME CHANGES!!!!
+tui 		-> tuirc
+tui-browser 	-> tui
+tui-psm		-> tui-bgjob-mgr
+tui-str-encrypt	-> tui-str-hash
