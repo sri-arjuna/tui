@@ -19,13 +19,13 @@
 # ------------------------------------------------------------------------
 #
 	if source /etc/tuirc && source "$HOME/.tuirc"
-	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	then	for f in "$TUI_FILE_USER" $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi
 #
 #	Variable defaults
 #
-	script_version=1.4
+	script_version=1.5
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -37,12 +37,10 @@ Examples:	$ME fileA.sh			# Creates a script in ~/bin or ~/.local/bin if existing
 		$ME -s /opt/bin/fileB.sh	# Creates a standalone application script in /opt/bin
 Where options are:
 	-h		This screen
-	-e(mpty)	Creates an empty script (default)
-	-s(tandalone)	Creates a standalone application script template
-	-r(egular)	Creates a same as default (no option), but less pre-sets
-	-t(ool)		Creates a template optimized for quiet and verbose mode
-	-m(inimal)	Creates a minimal header
-	-M(odul)	Creates a 'modul' kind of script for inside tui-browser
+	-b(asic)	Creates an empty script, with preset comment-identions (shell = $USER_SHELL)
+	-e(mpty)	Creates an empty script (default) (shell = $USER_SHELL)
+	-f(ull)		Creates a standalone application script template (bash only)
+	-r(egular)	Creates a same as default (no option), but less pre-sets (bash only)
 	
 "
 	DEST=""
@@ -64,15 +62,13 @@ Where options are:
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	tui-title "$TITLE ($script_version)"
-	while getopts "hsrtmMe" name
+	while getopts "hfrbe" name
 	do 	case $name in
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
-		s)	SCRIPT="standalone"	;;
+		f)	SCRIPT="full"	;;
 		r)	SCRIPT="regular"	;;
-		t)	SCRIPT="tool"		;;
-		m)	SCRIPT="minimal"	;;
-		m)	SCRIPT="modul"	;;
+		b)	SCRIPT="basic"		;;
 		e)	SCRIPT="empty"		;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
@@ -82,18 +78,22 @@ Where options are:
 #	Display
 #
 	if [ -z "$1" ]
-	then	DEST=$(tui-read "Enter the filename:")
-		if [ "$DEST" = "${DEST##*/}" ]
+	then	# No filename passed
+		DEST=$(tui-read "Enter the filename:")
+		if [ "${DEST}" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
 			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
 		else	DEST="$1"
-			tui-bol-dir -v "$(dirname $DEST)"
+			#tui-bol-dir -v "$(dirname "$DEST")"
 		fi
-	else	if [ "$1" = "$(basename $1)" ]
-		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST/$1"
+	else	# There is a name passed
+		if [ "$1" = "${1##*/}" ]
+		then	# Has no path - incl no leading ./
+			DEST="$TUI_DIR_USER_SCRIPTS/$1"
 			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
-		else	DEST="$1"
-			tui-bol-dir -v "$(dirname $DEST)"
+		else	# Has a path or leading ./
+			DEST="$1"
+			#tui-bol-dir -v "$TUI_DIR_USER_SCRIPTS/$DEST/"
 		fi
 	fi
 	
@@ -105,9 +105,11 @@ Where options are:
 		)
 	fi
 	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
-	then	source "$TUI_DIR_TEMPLATES/scripts/$SCRIPT"
+	then	# Original templates write their output automaticly to $DEST
+		source "$TUI_DIR_TEMPLATES/scripts/$SCRIPT"
 	elif [ -f "$TUI_DIR_USER_SCRIPTS/$SCRIPT" ]
-	then	tui-cp "$TUI_DIR_USER_SCRIPTS/$SCRIPT" "$DEST"
+	then	# Just copy the user templates, as they are individual
+		tui-cp "$TUI_DIR_USER_SCRIPTS/$SCRIPT" "$DEST"
 	else	tui-status 1 "Fatal error, template \"$SCRIPT\" not found!"
 		exit 1
 	fi
@@ -117,7 +119,7 @@ Where options are:
 	else	exit $?
 	fi
 	
-	if $default_new_script_manpage_ask
+	if "$default_new_script_manpage_ask"
 	then	tui-yesno "Create a manpage too?" && \
 			tui-new-manpage "$DEST"
 	fi

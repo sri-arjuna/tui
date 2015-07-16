@@ -220,7 +220,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 scriptdir = $(datadir)/@PACKAGE@/templates/scripts
-script_DATA = empty minimal modul regular standalone tool
+script_DATA = basic empty full regular
 all: all-am
 
 .SUFFIXES:

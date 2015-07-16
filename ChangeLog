@@ -12,3 +12,6 @@
 * Fixed arrow issue with tui-select and tui-yesno
 * tui-progress, several alignment issues
 * first release of tui info/html accomplished
+
+2015.07.16 - 0.8.9a-GNU-RC4
+* Updated tuirc, tui-new-script, and its templates
