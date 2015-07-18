@@ -21,7 +21,6 @@
 #	Variable defaults
 #
 	source /etc/tuirc && \
-		source "$TUI_FILE_CONF_SYSTEM" && \
 		break_on_injections "$@" && \
 		exit 1
 	script_version=0.8.2a
@@ -63,7 +62,7 @@
 #
 #	Display
 #
-	if [ "-" = "$1" ]
+	if [ "-" = "$1" ] || [ "--" = "$1" ]
 	then	# Do pipe handling
 		while read LEFT CENTER RIGHT
 		do	set "$LEFT" "$CENTER" "$RIGHT"
