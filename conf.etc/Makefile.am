@@ -1,2 +1,2 @@
-usrtpldir = $(sysconfig)/@PACKAGE@/
-usrtpl_DATA = *conf
+tuisystemdir = $(sysconfdir)/@PACKAGE@/
+tuisystem_SCRIPTS = *conf

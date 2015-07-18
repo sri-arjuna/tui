@@ -26,13 +26,13 @@
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
-	source tuirc
+	source tuirc && source "$TUI_FILE_CONF_SYSTEM"
 	if [ $# -lt 1 ]
 	then	clear
 		tui-yesno "Do you want to learn about tui?" && tui-wait 5s "Please call ${fnt_bold}tuirc${c_reset} next time..." &&  tuirc || tui-status 1 "Please call: 'tui --help'"
 		exit $?
 	fi
-	script_version=0.9.1a
+	script_version=0.9.1b
 #	[ 0 -eq $UID ] && \
 #		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \
 #		source $PREFIX/share/tui/themes/$TUI_THEME

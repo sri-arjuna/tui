@@ -15,3 +15,6 @@
 
 2015.07.16 - 0.8.9a-GNU-RC4
 * Updated tuirc, tui-new-script, and its templates
+
+2015.07.18
+* Applied basic & general injection protection

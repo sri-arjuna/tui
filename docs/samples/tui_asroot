@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+tui-header "TUIRC - Samples"	"tui-$1"
+tui-title "Basic incovation"
+tui-$1
+
+tui-title "Example 2"
+tui-$1
+
+tui-title "Example 3"
+tui-$1
+
+tui-title "Example 4"
+tui-$1
+
+tui-title "Example 5"
+tui-$1
+
+tui-title "Example 6"
+tui-$1

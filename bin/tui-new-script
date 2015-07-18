@@ -19,13 +19,13 @@
 # ------------------------------------------------------------------------
 #
 	if source /etc/tuirc && source "$HOME/.tuirc"
-	then	for f in "$TUI_FILE_USER" $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	then	for f in "$TUI_FILE_USER" $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS,SYSTEM};do source "$f";done
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 #
 #	Variable defaults
 #
-	script_version=1.5
+	script_version=1.6
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -40,7 +40,8 @@ Where options are:
 	-b(asic)	Creates an empty script, with preset comment-identions (shell = $USER_SHELL)
 	-e(mpty)	Creates an empty script (default) (shell = $USER_SHELL)
 	-f(ull)		Creates a standalone application script template (bash only)
-	-r(egular)	Creates a same as default (no option), but less pre-sets (bash only)
+	-r(egular)	Creates the same as basic, but with some code preset (bash only)
+	-s(elect)	Select among the script names found in $TUI_DIR_USER_TEMPLATES
 	
 "
 	DEST=""
@@ -62,7 +63,7 @@ Where options are:
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	tui-title "$TITLE ($script_version)"
-	while getopts "hfrbe" name
+	while getopts "hfrbes" name
 	do 	case $name in
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
@@ -70,6 +71,12 @@ Where options are:
 		r)	SCRIPT="regular"	;;
 		b)	SCRIPT="basic"		;;
 		e)	SCRIPT="empty"		;;
+		s)	list_script=$(cd "$TUI_DIR_USER_TEMPLATES";ls)
+			[ -z "$list_script" ] && \
+				tui-printf -S 1 "No scripts found in $TUI_DIR_USER_TEMPLATES" && \
+				exit 1
+			SCRIPT=$(tui-select -a $list_script)
+			;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
 	done
@@ -79,7 +86,7 @@ Where options are:
 #
 	if [ -z "$1" ]
 	then	# No filename passed
-		DEST=$(tui-read "Enter the filename:")
+		DEST=$(tui-read "Enter the filename for a \"$SCRIPT\" script:")
 		if [ "${DEST}" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
 			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"

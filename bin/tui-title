@@ -20,7 +20,11 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.0
+	source /etc/tuirc && \
+		source "$TUI_FILE_CONF_SYSTEM" && \
+		break_on_injections "$@" && \
+		exit 1
+	script_version=0.9.0a
 	ME="${0##*/}"
 #
 #	Variable handling

@@ -30,6 +30,8 @@
 		TUI_FILE_CONF_COMMANDS="$TUI_DIR_CONF/commands.conf"
 	[ -z "$TUI_FILE_CONF_SETTINGS" ] && readonly \
 		TUI_FILE_CONF_SETTINGS="$TUI_DIR_CONF/settings.conf"
+	[ -z "$TUI_FILE_CONF_SYSTEM" ] && readonly \
+		TUI_FILE_CONF_SYSTEM="$TUI_DIR_CONF/tui.conf"
 	[ -z "$TUI_FILE_CONF_STATUS" ] && readonly \
 		TUI_FILE_CONF_STATUS="$TUI_DIR_CONF/status.conf"
 	[ -z "$TUI_FILE_CONF_SHORTS" ] && readonly \
