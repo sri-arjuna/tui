@@ -18,6 +18,14 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Init TUI environment
+#
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+#
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
@@ -32,10 +40,6 @@
 #
 #	Check for the environment to load
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
-	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
-	fi
 	# Get the mode
 	tui-bol-gui && \
 		MODE=gui || \
@@ -65,7 +69,7 @@
 			"	Opens provided FILE/s in the favorite editor according to environment." \
 			"	In multiuser or emergency stage it will open \"$EDITOR_CLI\" and in graphical stage it will open \"$EDITOR_GUI\"" \
 			""
-		exit $RET_HELP
+		exit "$RET_HELP"
 		;;
 	"-c")	MODE=cli
 		shift
@@ -79,8 +83,8 @@
 	GetAvailableApp() { # gui|cli
 	# Returns the first found editor for either GUI or CLI
 	#
-		for L in $(<$TUI_DIR_LIST/editor_${MODE});do
-			which $L 2>/dev/zero && \
+		for L in $(<"$TUI_DIR_LIST"/editor_${MODE});do
+			which "$L" 2>/dev/zero && \
 				return 0
 		done
 		return 1
@@ -90,27 +94,27 @@
 #
 	if [ -z "$EDITOR" ]
 	then	case "$MODE" in
-		cli)	EDITOR=$(which $EDITOR_CLI 2>/dev/zero )	;;
-		gui)	EDITOR=$(which $EDITOR_GUI 2>/dev/zero )	;;
+		cli)	EDITOR=$(which "$EDITOR_CLI" 2>/dev/zero )	;;
+		gui)	EDITOR=$(which "$EDITOR_GUI" 2>/dev/zero )	;;
 		esac
 		export EDITOR
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
 	if [ -z "$EDITOR" ]
 	then 	# The EDITOR is not available, search for default
-		EDITOR=$(GetAvailableApp $MODE)
-		[ $MODE = cli ] && \
+		EDITOR=$(GetAvailableApp "$MODE")
+		[ "$MODE" = cli ] && \
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
 		[ -z "$EDITOR" ] && \
 			tui-echo "No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manualy!" && \
 			exit 1
-		tui-conf-set "$TUI_FILE_USER_APPS" $var $EDITOR
+		tui-conf-set "$TUI_FILE_USER_APPS" "$var" "$EDITOR"
 	fi
 	# Open each file 'seperatly',
 	# as not all editors support to open multiple files at once
 	for A in "${ARGS[@]}";do
 		[ ! -z "$A" ] && \
-			tui-echo "Opening:" "$A" && \
-			$EDITOR "$A"
+			tui-printf -E "Opening:" "$A" && \
+			"$EDITOR" "$A"
 	done

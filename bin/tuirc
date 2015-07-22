@@ -33,6 +33,9 @@ shopt -s expand_aliases
 	TUI_VERSION=0.8.9
 	TRC="$HOME/.tuirc"	# User default
 	TRC_SYS="/etc/tuirc"	# Only available if root installed tui
+	source "$TRC_SYS" && \
+		break_on_injections "$@" && \
+		exit 1
 #
 #	Functions
 #
@@ -190,7 +193,7 @@ shopt -s expand_aliases
 	ResetTUI() { #
 	# Removes the current configuration according to user level
 	# and replaces them with default configuration.
-		YES=${YES:-false}
+		YES="${YES:-false}"
 		case "$UID" in
 		0)	# ROOT, system wide
 			RANGE="System defaults"
@@ -206,7 +209,7 @@ shopt -s expand_aliases
 		
 		[ -d "$CFG_DIR" ] || mkdir -p "$CFG_DIR"
 		cd "$CFG_DIR"
-		if [ $? -eq 0 ]  && $YES
+		if [ "$?" -eq 0 ]  && "$YES"
 		then	rm -fr *
 		else	tui-yesno "Are you sure to remove $RANGE in \"$CFG_DIR\"" || return 1
 			rm -fr *
@@ -214,7 +217,7 @@ shopt -s expand_aliases
 		
 		cd "$SRC_DIR"
 		cp *conf "$CFG_DIR"
-		return $?
+		return "$?"
 	}
 #
 #	Premiere?
@@ -275,30 +278,30 @@ shopt -s expand_aliases
 		case "$1" in
 		"-h"|"--help"|"help")
 			help_screen
-			hadOpts=true
-			exit $RET_HELP
+			hadOpts="true"
+			exit "$RET_HELP"
 			;;
 		esac
 		MODE="$1"
-		YES=false
+		YES="false"
 		case "$MODE" in
 		config)
 			ConfigTUI
-			exit $?
+			exit "$?"
 			;;
 		demo)
 			tui-header "Simple Demonstration" "of TUI commands"
 			tui-title "Lets beginn"
 			
+			set -x
 			str="one two three"
+			# No quotes wanted!
 			tui-list -2 $str
 			tui-list -2r $str
 			tui-list -1a $str
+			tui-select $str | tui-echo -
 			uname -r | tui-cat -td 0.15
 			tui-cat /etc/default/grub
-			
-			tui-select $str | tui-echo -
-			
 			
 			for n in 0 1 2 3 4 5 6 7 10 11 99 111 127 130
 			do	tui-printf -S $n "n = $n"
@@ -307,6 +310,8 @@ shopt -s expand_aliases
 			[ -f /etc/default/grub ] && \
 				tui-bol-gui && \
 				tui-terminal "tui-conf-editor /etc/default/grub"
+			set +x
+			exit 0
 			;;
 		info)	info "${TUI_DIR_SYSTEM/tui/info}/tui.info" ; exit ;;
 		html)	"$BROWSER" "${TUI_DIR_SYSTEM/tui/doc}/tui/tui.html" ; exit ;;

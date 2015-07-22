@@ -18,6 +18,11 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Init TUI environment
+#
+	source tuirc
+	break_on_injections "$@" && exit 1
+#
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
@@ -26,8 +31,7 @@
 #	Description:	A script to browse a folder recursivly,
 #			using its start dir as 'BASE' which it wont leave ".."
 #			Highly customable.
-	source tuirc && source "$TUI_FILE_CONF_SYSTEM"
-	if [ $# -lt 1 ]
+	if [ "$#" -lt 1 ]
 	then	clear
 		tui-yesno "Do you want to learn about tui?" && tui-wait 5s "Please call ${fnt_bold}tuirc${c_reset} next time..." &&  tuirc || tui-status 1 "Please call: 'tui --help'"
 		exit $?

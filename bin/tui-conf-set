@@ -17,6 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
+	source /etc/tuirc && \
+		break_on_injections "$@" && \
+		exit 1
 	source "$HOME/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc	# This first call would create the RC if its missing.

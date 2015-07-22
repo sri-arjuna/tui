@@ -18,13 +18,13 @@
 #
 # ------------------------------------------------------------------------
 #
-#	System defaults
+#	Init TUI environment
 #
-	source /etc/tuirc
-	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM}
-	do	[ -f "$f" ] && source "$f"
-	done
-	
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
 #
 #	Variable defaults
 #

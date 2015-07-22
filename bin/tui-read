@@ -18,6 +18,14 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Init TUI environment
+#
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+#
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #
@@ -26,14 +34,10 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero
-	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
-	fi
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
-	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
-	else	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	then	source "$TUI_DIR_USER_THEMES/$TUI_THEME"
+	else	source "$TUI_DIR_THEMES/$TUI_THEME" 
 	fi
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \

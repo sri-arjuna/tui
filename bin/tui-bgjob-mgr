@@ -19,7 +19,10 @@
 #
 # ------------------------------------------------------------------------
 #
-	source /etc/tuirc && source "$HOME/.tuirc"  2>/dev/zero || source tuirc
+	source /etc/tuirc && \
+		break_on_injections "$@" && \
+		exit 1
+	source "$HOME/.tuirc"  2>/dev/zero || source tuirc
 #	File:		tui-psm
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

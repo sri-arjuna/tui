@@ -18,15 +18,18 @@
 #
 # -----------------------------------------------------------------------
 #
-#	Variable defaults
+#	Init TUI environment
 #
 	if source /etc/tuirc && source "$HOME/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	else	source tuirc
 	fi
-	#cat "$TUI_FILE_CONF_APPS"
+	break_on_injections "$@" && exit 1
+#
+#	Variable defaults
+#
 	script_version=0.7
-	ME="$(basename $0)"
+	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
 Requires root rights.

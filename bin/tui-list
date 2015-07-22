@@ -19,13 +19,21 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Init TUI environment
+#
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+#
 #	File:		tui-list
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.06.03
-	script_version=1.5
+#	Changed:	2015.07.22
+	script_version=1.5a
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either arabic, roman or no number indexes.
@@ -45,8 +53,6 @@
 #	Help text
 #
 	help_text="
-$ME ($script_version)
-${TITLE^}
 Usage: 		$ME [options] [arguments]
 Examples:	$ME 
 		$ME -a one 'long string' three
@@ -73,11 +79,11 @@ Where options are:
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "ahnr12v" opt
-	do 	case $opt in
+	do 	case "$opt" in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
-		1|2)    ROWS=$opt	;;
+		1|2)    ROWS="$opt"	;;
                 a)	MODE=alpha 	;;
 		r)	MODE=roman
 			SEP=". "	;;
@@ -120,12 +126,12 @@ Where options are:
 		roman_val() { # NUM one five ten
 		# This sub does the basic 'roman' algorythm
 		#
-			N=$1
-			one=$2
-			five=$3
-			ten=$4
+			N="$1"
+			one="$2"
+			five="$3"
+			ten="$4"
 			out=""
-			case $N in
+			case "$N" in
 			0)	out+=""	;;
 			[123])	while [ $N -gt 0 ]
 				do	out+="$one"
@@ -150,7 +156,7 @@ Where options are:
 			esac
 			echo "$out"
 		}
-		while [ $len -gt 0  ]
+		while [ "$len" -gt 0  ]
 		do	# There are letters to add
 			num=${input:0:1}
 			# Do action according position
@@ -161,11 +167,11 @@ Where options are:
 			4)	output+="$(roman_val $num M ${U}V${R} ${U}X${R})"	;;
 			5)	output+="$(roman_val $num ${U}X${R} ${U}L${R} ${U}C${R})"	;;
 			*)	# Count it up
-				Tone=CI\)
-				Tfive=I\)
-				Tten=CCI\)\)
-				DEPTH=$[ $len - 3 ]	# 1 = 1000 = initial template
-				while [ $DEPTH -gt 1 ]
+				Tone="CI\)"
+				Tfive="I\)"
+				Tten="CCI\)\)"
+				DEPTH=$[ "$len" - 3 ]	# 1 = 1000 = initial template
+				while [ "$DEPTH" -gt 1 ]
 				do	Tone="C$Tone)"
 					Tfive="C$Tfive)"
 					Tten="C$Tten)"
@@ -191,9 +197,9 @@ Where options are:
 	do	DONE=$(( $DONE + 1))
 		# Do the visible counter
 		case $MODE in
-		num)	count=$DONE				;;
-		alpha)	count=$(num2char $(( $DONE - 1 )) )	;;
-		roman)	count=$(num2roman $DONE)		;;
+		num)	count="$DONE"				;;
+		alpha)	count=$(num2char $(( "$DONE" - 1 )) )	;;
+		roman)	count="$(num2roman $DONE)"		;;
 		none)	count=""				;;
 		esac
 		

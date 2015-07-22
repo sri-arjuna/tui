@@ -18,20 +18,21 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Init TUI environment
+#
 	if source /etc/tuirc && source "$HOME/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	else	source tuirc
 	fi
+	break_on_injections "$@" && exit 1
+#	Created: 2013.09.13
+#	Changed: 2015.07.22
+#
 #
 #	Variable defaults
 #
-#	STABLE: 2013.10.13	--- DONT CHANGE IT ---
-#				unless everything is STABLE & BACKED UP !!
-#	STABLE:	2015.01.20	Updated to check for curl/wget
-#	Unstable: 2015.01.31    Doh, you changed it!
-#
-	script_version=0.7.3
-	ME="$(basename $0)"
+	script_version=0.8.0
+	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
 		\rWhere options are:
@@ -45,6 +46,16 @@
 	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
 	CURLWGET=$(tui-conf-get /etc/tui/commands.conf CURLWGET)
+#
+#	Messages
+#
+	MSG_INIT_ACT="Initializing new download..."
+	MSG_ACT_ING="Downloading..."
+	MSG_ACT_ED="Downloaded"
+	MSG_NOTFOUND="Could find neither curl nor wget!"
+	MSG_SELECT="Which one to install?"
+	MSG_INSTALL_ING="Installing"
+	MSG_INSTALL_ED="Installed"
 #
 #	Variable handling
 #
@@ -88,30 +99,29 @@
 	wget)	OPT_O="-O"
 		OPT_Q="-q"
 		OPT_C="-c"	;;
-	"")	tui-status 1 "Could find neither curl nor wget!"
-		tui-echo "Which one to install?"
+	"")	tui-status 1 "$MSG_NOTFOUND"
+		tui-echo "$MSG_SELECT"
 		CURLWGET=$(tui-select curl wget)
-		which $CURLWGET 1>/dev/zero && \
+		which "$CURLWGET" 1>/dev/zero && \
 			tui-conf-set "$APPS" CURLWGET $CURLWGET || \
 			exit 1
-		tui-bol-sudo && \
-			sudo tui-install $CURLWGET || \
-			su -c "tui-install $CURLWGET" 
+		tui-asroot "tui-install $CURLWGET"
+		;;
 	esac
 	
 	for URL in "${ARGS[@]}"
-	do 	THIS="$(basename $URL)"
+	do 	THIS="${URL##*/}"
 		out_string="./$THIS"
-		tui-printf -rS 2 "Initializing new download..." #"$WORK"
+		tui-printf -rS 2 "$MSG_INIT_ACT" #"$WORK"
 		#echo "wget -qc $URL" > $FILE_CMD
 		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > $FILE_CMD
 		
-		chmod +x $FILE_CMD
-		$FILE_CMD &
+		chmod +x "$FILE_CMD"
+		"$FILE_CMD" &
 		sleep 1.5
 		#K=1024
 		
-		str_left="Downloading..."
+		str_left="$MSG_ACT_ING"
 		str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
 		str_right="[  $(tui-indi)   ]"
 		str_len=$(( ${#str_left} + ${#str_middle} + ${#str_right} + 2 ))
@@ -120,12 +130,12 @@
 		# While its found, assume its till downloading...
 		while [ ! "" = "$(ps|$GREP $CURLWGET)" ] #|| [ ! "" = "$(ps $!)" ]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
-			COLUMNS=$(tput cols)
+			COLUMNS="$(tput cols)"
 			str_middle="$THIS ($tmp_size)"
-			len=${#str_middle}
+			len="${#str_middle}"
 			#echo "$COLUMNS == $str_len"
-			diffr=$(( $(( $COLUMNS - $str_len  )) + 15 ))
-			cut=$(($len - $diffr))
+			diffr=$(( $(( "$COLUMNS" - "$str_len"  )) + 15 ))
+			cut=$(("$len" - "$diffr"))
 				
 		#set -x
 			
@@ -134,7 +144,7 @@
 			
 		#	echo "DIFFRENCE:: $diffr"
 			#if [ $str_len -gt $COLUMNS ]
-			if [ $diffr -ge 1 ]
+			if [ "$diffr" -ge 1 ]
 			then	# Needs string cutting
 				# Cut off this amount of strings. (+3 for the dots)
 			#	echo "DIFFRENCE:: "$diffr
@@ -142,7 +152,7 @@
 			#	echo " $diffr"
 			#	echo "----"
 				
-				if [ $diffr -gt $len ]
+				if [ "$diffr" -gt "$len" ]
 				then	# It makes sense to cut off pieces
 					#str_middle_corrected="${str_middle:0:( -$diffr )}"
 					str_middle_corrected="${str_middle:0:$diffr}"
@@ -157,11 +167,11 @@
 		#		str_middle_corrected="${str_middle:0:$diffr}"
 			else	# No change required / reset to original
 				str_middle_corrected="${str_middle}"
-				echo re
+				#echo re
 			fi
 			
 			tui-printf "$str_left" "${str_middle_corrected}" "[  $(tui-indi)   ]"
 			sleep 1
 		done
-		tui-status $? "Downloaded: ${THIS}"
+		tui-status $? "${MSG_ACT_ING}: ${THIS}"
 	done 

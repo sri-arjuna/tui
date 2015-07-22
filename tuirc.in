@@ -49,7 +49,10 @@
 		#echo $arg
 		ac="$((ac+=1))"
 		case "$arg" in
-		(*[';`|<&>:']*|*'$('*)
+		#(*[';`|<&>:']*|*'$('*|)	# Orginal
+		#(*[';`|<&>':-'':('']*|*'$('*)
+		#(*[';`|<&>:']*|*'$('*|'*:(*'|'*:-*')
+		(*[';´|<&>']*|*':('*|*':-'*)
 			printf "%s\n" "Aborting, injection detected! arg${ac}='$arg'"
 			return 0
 		;;
@@ -57,3 +60,18 @@
 		done
 		return 1
 	}
+	error_msg() { # $LINENO
+	# Prints an extend error message for the developers
+	# Requires LINENO to be passed.
+		LN="$1"
+		printf '%s\t%s\n' \
+				"Last Path:" "$OLDPWD" \
+				"Current Path:" "$PWD" \
+				"Pipestatus:" "$(echo ${PIPESTATUS[@]})" \
+				"Source: " "$(echo ${BASH_SOURCE[@]})" \
+				"Function:" "$(echo ${FUNCNAME[@]})" \
+				"Error raised on line number:" "$LN" \
+				"" "" >&2
+		exit 99
+	}
+	#error_msg $LINENO

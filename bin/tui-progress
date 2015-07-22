@@ -18,10 +18,13 @@
 #
 # ------------------------------------------------------------------------
 #
+#	Init TUI environment
+#
 	if source /etc/tuirc && source "$HOME/.tuirc"
-	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do [ -f "$f" ] && source "$f";done
-	else	source tuirc	# This first call would create the RC if its missing.
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc
 	fi
+	break_on_injections "$@" && exit 1
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

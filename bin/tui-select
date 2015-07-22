@@ -19,8 +19,15 @@
 #
 # ------------------------------------------------------------------------
 #
-#	A simple tool which returns the string of the selected num-id
+#	Init TUI environment
 #
+	if source /etc/tuirc && source "$HOME/.tuirc"
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+#
+#	A simple tool which returns the string of the selected num-id
 #
 #	TODO
 #		check for:  read -h 2>&1|grep "\-n"
@@ -29,12 +36,7 @@
 #
 	BORDER_RIGHT=""
 	# Source only the most required files, 
-	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero
-	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
-	fi
-	
+	# create the RC and load all variable if RC is not present yet.	
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ]
 	then	. "$TUI_DIR_USER_THEMES/$TUI_THEME"
