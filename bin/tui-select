@@ -48,7 +48,7 @@
 #
 #	Variables
 #	
-	ME=${0##*/}
+	ME="${0##*/}"
 	script_version=0.9.0a
 	counter=0
 	AUTO=false
@@ -67,21 +67,21 @@ Where options are:
 #
 #	Check for read capabilities if not set yet
 #
-	LC_ALL=C $READ --help 2>&1 | $GREP -v bash > "$TUI_FILE_TEMP"
+	LC_ALL=C "$READ" --help 2>&1 | "$GREP" -v bash > "$TUI_FILE_TEMP"
 	# Delimiter	
-	$GREP -q "\[-d" "$TUI_FILE_TEMP"
+	"$GREP" -q "\[-d" "$TUI_FILE_TEMP"
 	bash_read_delimiter=$(tui-str-bol-conv -t $?)
 	# Input
-	$GREP -q "\[-i" "$TUI_FILE_TEMP"
+	"$GREP" -q "\[-i" "$TUI_FILE_TEMP"
 	bash_read_input=$(tui-str-bol-conv -t $?)
 	# Prompt
-	$GREP -q "\[-p" "$TUI_FILE_TEMP"
+	"$GREP" -q "\[-p" "$TUI_FILE_TEMP"
 	bash_read_prompt=$(tui-str-bol-conv -t $?)
 	# Numbers
-	$GREP -q "\[-n" "$TUI_FILE_TEMP"
+	"$GREP" -q "\[-n" "$TUI_FILE_TEMP"
 	bash_read_numbers=$(tui-str-bol-conv -t $?)
 	# Timeout
-	$GREP -q "\[-t" "$TUI_FILE_TEMP"
+	"$GREP" -q "\[-t" "$TUI_FILE_TEMP"
 	bash_read_timeout=$(tui-str-bol-conv -t $?)
 #
 #	Action
@@ -106,7 +106,7 @@ Where options are:
 			;;
 		a)	AUTO=true
 			;;
-		1|2)    ROWS=$opt
+		1|2)    ROWS="$opt"
 			;;
 		v)	beVerbose=true
 			;;
@@ -150,9 +150,9 @@ Where options are:
 		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
 		echo "$NUM" | $GREP '^\?' && invalid=true && continue
-		echo "${NUM,,}" | tr -d [:digit:] | $GREP -q [0-9] && invalid=true && continue
+		echo "${NUM,,}" | tr -d [:digit:] | "$GREP" -q [0-9] && invalid=true && continue
 		[ 0 -eq "${NUM/^\[\[[ABCD]/0}" ] 2>/dev/zero && exit 1
-		if ! echo "$NUM" | $GREP -q ^[0-9] 
+		if ! echo "$NUM" | "$GREP" -q ^[0-9] 
 		then	NUM="" 
 			invalid=true 
 			tui-printf "" "" ""
