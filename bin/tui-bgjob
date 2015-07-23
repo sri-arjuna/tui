@@ -25,7 +25,7 @@
 #
 	if source /etc/tuirc && source "$HOME/.tuirc"  2>/dev/zero || source tuirc
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 	
 	script_version=0.8.5
@@ -37,10 +37,10 @@
 		\r
 		\r\t-f [/path/to/]file\tPrint the filesize of passed file
 		\r\t-s [/path/to/]orgfile\tSwitches to progressbar if $TUI_FONT_BOLD-f file$TUI_RESET is passed too
-		\r\t-e BYTESEXPECTED\tRequired to adjuet the progressbar, leave out to just print the actual file size
+		\r\t-e BYTESEXPECTED\tRequired to adjust the progressbar, leave out to just print the actual file size
 		\r
 		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
-		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) ir uses.
+		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) it uses.
 		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
 		\r
 		\r"
@@ -104,8 +104,8 @@
 	tui-printf -rS 2 "Starting job..."
 	(
 		$SHELL "$JOB" && \
-			printf 0 > /dev/stdout > "$TMP" || \
-			printf 1 > /dev/stdout > "$TMP"
+			printf 0 >&1 > "$TMP" || \
+			printf 1 >&1 > "$TMP"
 	)   & 
 	PID=$!
 #
@@ -113,30 +113,30 @@
 #
 	sleep 0.5
 	# The task is still running
-	while ps | $GREP -q $PID
+	while ps | "$GREP" -q "$PID"
 	do	# Update FileSize variable, if required
-		$CHECKFILE && \
-			FS=$($LS -l "$FILECHECK"|$AWK '{print $5}') && \
-			FS_SHOW=$($LS -lh "$FILECHECK"|$AWK '{print $5}')
-		if $CHECKFILE
-		then	if $showBar
-			then	tui-progress -lbm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
+		"$CHECKFILE" && \
+			FS=$("$LS" -l "$FILECHECK"|$AWK '{print $5}') && \
+			FS_SHOW=$("$LS" -lh "$FILECHECK"|"$AWK" '{print $5}')
+		if "$CHECKFILE"
+		then	if "$showBar"
+			then	tui-progress -lbm "$MAX_BYTES" -c "$FS" "$TXT_PROGRESS ($FS_SHOW)"
 			else	[ -z "${MAX_BYTES/0}" ] && \
 					tui-progress "$TXT_PROGRESS ($FS_SHOW)" || \
-					tui-progress -lm $MAX_BYTES -c $FS "$TXT_PROGRESS ($FS_SHOW)"
+					tui-progress -lm "$MAX_BYTES" -c "$FS "$TXT_PROGRESS ($FS_SHOW)"
 			fi
 		else	tui-progress "$TXT_PROGRESS"
 		fi
-		sleep $WAIT
+		sleep "$WAIT"
 	done
 #
 #	Report Return Code of ended bg-job
 #
-	BG_RET=$(cat "$TMP")
+	BG_RET=$(<"$TMP")
 	rm -f "$TMP"
 	if [ "$BG_RET" = "-1" ]
-	then	tui-echo "$TXT_EXIT" "Could not retrieve returnvalue" "$INFO"
-		exit $RET_INFO
-	else	tui-status $BG_RET "$TXT_EXIT"
-		exit $?
+	then	tui-echo "$TXT_EXIT" "Could not retrieve return value" "$INFO"
+		exit "$RET_INFO"
+	else	tui-status "$BG_RET" "$TXT_EXIT"
+		exit "$?"
 	fi

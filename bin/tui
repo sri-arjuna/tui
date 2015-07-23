@@ -28,9 +28,9 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
 #	Changed:	2015.07.13
-#	Description:	A script to browse a folder recursivly,
-#			using its start dir as 'BASE' which it wont leave ".."
-#			Highly customable.
+#	Description:	A script to browse a folder recursively,
+#			using its start directory as 'BASE' which it wont leave ".."
+#			Highly modifiable.
 	if [ "$#" -lt 1 ]
 	then	clear
 		tui-yesno "Do you want to learn about tui?" && tui-wait 5s "Please call ${fnt_bold}tuirc${c_reset} next time..." &&  tuirc || tui-status 1 "Please call: 'tui --help'"
@@ -54,13 +54,13 @@ Usage: 	$ME [options] [arguments]
 Where options are:
 	-h(elp)		This screen
 
-	-T(itle)	STR	Title-label (upper-left) will be labled as STR
+	-T(itle)	STR	Title-label (upper-left) will be label'd as STR
 	-U(ser) 	STR	User-label (upper-right) will be labled as STR
 	-L(ocation)  	STR	Location will be labled as STR
 	-P(osition)	STR	Position (/ some / dir) will be overwritten by STR
 	
 	-p(ath)		PATH	Will use ARG as basedir
-	-n(oclear)		Dont clear screen after menu actions
+	-n(oclear)		Don't clear screen after menu actions
 	-s(ource)	PATH	Sources the file or all files, if its a path, exports its values and prints a dot
 	-m(ode) 		Enables 'text' mode (nice looking)
 				instead of 'numeric' (easy handling, default)
@@ -70,11 +70,11 @@ Where options are:
 	-F(ile) 	STR	Files will be labled as ARG
 	
 	-- Advanced --
-	-b(lacklist)	WORD	Add a WORD to the BLACKLIST of (linux-)commands not to be executed (Textmode only)
-	-c(onfig)	FILE	Full path to configfile of the project
-	-d(efault)	STR	Changes the filename startings from 'default' to 'NAME'
+	-b(lacklist)	WORD	Add a WORD to the BLACKLIST of (linux-)commands not to be executed (Text mode only)
+	-c(onfig)	FILE	Full path to the configuration file of the project
+	-d(efault)	STR	Changes the file name string from 'default' to 'NAME'
 				These files will be hidden from the menu, and according to their
-				extension be called on diffrent purposes...
+				extension be called on different purposes...
 				default.info	- Will be shown upon folder entry
 				default.cmd	- Will be executed upon folder entry
 	-q(uiet)		Does not show header, title, footer
@@ -90,13 +90,13 @@ Where options are:
 	lbl_user="$USER_NAME @ $(date +'%F %T')"	# 0 TOP LEFT
 	lbl_location="Location:"			# 1 TOP RIGHT
 	lbl_position=""					# 1 TOP LEFT	-- unused yet
-	# Textmode only
+	# Text mode only
 	lbl_dir="Section:"
 	lbl_file="Task:"
 #
 #	Default Bool's
 #
-	doClear=true		# Wether to clear screen or not
+	doClear=true		# Whether to clear screen or not
 	doTextmode=false	# false will show the numeric mode
 	doBlacklist=false	# Will be enabled as soon "-b WORD" is passed
 	doCustomPosition=false	# Will be enabled as soon "-P WORD" is passed
@@ -107,15 +107,15 @@ Where options are:
 #	Default Strings
 #
 	menu=show
-	PWD_OLD="$PWD"	# This is where the user actualy entered the command
+	PWD_OLD="$PWD"	# This is where the user actually entered the command
 	export PWD_OLD	# Make sure one can access this from within the scripts called by tui-browser
 	CURRENT="$PWD"
 	
-	# Textmode only
+	# Text mode only
 	default_actions="delete edit execute help info new rename quit"
 	
 	# Advanced
-	BLACKLIST=""		# Default entries to ignore when entered in Textmode
+	BLACKLIST=""		# Default entries to ignore when entered in Text mode
 	declare -a CONFIG SOURCE # Configuration files to load (source & export)
 	SPECIAL_NAME="default"	# Default name of the files parsed before displaying any content
 	browser_shell="bash"	# This shell will be used to execute scripts, default bash
@@ -124,7 +124,7 @@ Where options are:
 #
 	SPECIAL_EXT="info help cmd"	# For these 3 words there will be a handling. 'help' is only textmode!
 	BASE=""				# What is the BASE for the LOCATION_DISPLAY
-	BROWSER_LIST_LOADED_VARIABLES=""	# This will contain all the variables that had been exported, to onload them when exiting without ^C.
+	BROWSER_LIST_LOADED_VARIABLES=""	# This will contain all the variables that had been exported, to unload them when exiting without ^C.
 #
 #	Pre-functions
 #
@@ -245,7 +245,7 @@ Where options are:
 		exit $?
 	fi
 	
-	# This is recquired to hide these files in the both the numeric and text mode menu
+	# This is required to hide these files in the both the numeric and text mode menu
 	HIDE_THIS="$SPECIAL_NAME.{$(for S in ${SPECIAL_EXT[@]};do printf '$S,';done)}"
 	
 	# Go to the Base, or stay where you are when no "-p PATH" was supplied
@@ -300,7 +300,7 @@ Where options are:
 					array=( "${files[@]}" )
 					;;
 				esac
-				# Dont show title if no entries available
+				# Don't show title if no entries available
 				if [ ! 0 = "${#array[@]}" ]
 				then 	tui-title "${content_title}:"
 					tui-list -n "${array[@]}"
@@ -326,7 +326,7 @@ Where options are:
 				conf="$(echo $conf)"
 				if [ -d "$conf" ]
 				then	# its a dir, source and export each of the files there
-					# Supposibly the 'sources'
+					# Supposedly the 'sources'
 					cd "$conf"
 					for f in *
 					do	CONF_LIST=""
@@ -342,7 +342,7 @@ Where options are:
 					done
 					cd "$PWD_OLD"
 				elif [ -f "$conf" ] 
-				then	# Supposibly the configs
+				then	# Supposedly the configs
 					printf "."
 					conf="$(echo $conf)"
 					var=$(tui-conf-get -l "$conf")
@@ -475,7 +475,7 @@ Where options are:
 		# Prepare heading string
 		if $doCustomPosition
 		then	POSITION="$lbl_position"
-		else	# Orginal
+		else	# Original
 			CURRENT="$PWD"
 			if [ "${BASE//$/}" = "$CURRENT" ]
 			then	CUR_STR=""
@@ -530,7 +530,7 @@ Where options are:
 			action=$(tui-read "What is your choice:")
 			action_done=false
 		#
-		#	Deside action
+		#	Decide action
 		#	
 			str="$(echo $action|$AWK '{print $1}')"
 			if [ -d "$action" ]

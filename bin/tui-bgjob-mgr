@@ -23,7 +23,7 @@
 		break_on_injections "$@" && \
 		exit 1
 	source "$HOME/.tuirc"  2>/dev/zero || source tuirc
-#	File:		tui-psm
+#	File:		tui-bgjob-mgr
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
@@ -31,7 +31,7 @@
 #	Changed:	2015.07.13
 	script_version=0.9.5
 	TITLE="Paralell Script Manager"
-#	Description:	Executes all scripts in paralell, unless LIMIT says diffrent, default 5, disabled 0
+#	Description:	Executes all scripts in parallel, unless LIMIT says different, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
 #
 #
@@ -44,10 +44,10 @@
 		ME_DIR="$(pwd)"			# Dirname of tui-bg-scripts
 	CONFIG_DIR="$TUI_DIR_USER"		# Configuration directory
 	CONFIG="$CONFIG_DIR/$ME.conf"		# Configuration file
-	TEMP="$TUI_DIR_TEMP/$ME/$$"		# Make dynamic subfolders, so multiple instances would be possible (but not recomended!)
+	TEMP="$TUI_DIR_TEMP/$ME/$$"		# Make dynamic sub folders, so multiple instances would be possible (but not recommended!)
 	tui-bol-root && \
 		LOG="$TUI_DIR_LOGS/$ME.log" || \
-		LOG="$TUI_DIR_USER_LOGS/$ME.log" # Logfile placement according to user
+		LOG="$TUI_DIR_USER_LOGS/$ME.log" # Log file placement according to user
 	LIMIT=5
 	WAIT=5
 	COUNT=false
@@ -68,7 +68,7 @@ Where options are:
 	-h(elp) 		This screen
 	-L(og)			Show the log file ($LOG)
 	-c(count)		The exit code is now the number of successfully executed scripts.
-	-l(imit)	NUM	Limits the number of paralell execeuted scripts, 5 default, 0 to disable
+	-l(imit)	NUM	Limits the number of parallel executed scripts, 5 default, 0 to disable
 	-d(el-log)		Deletes (empty) the log file ($LOG)
 	-q(uiet)		Just return the exit code, be non-verbose
 	-v(erbose)		Be verbose, starts every script in its own terminal (GUI only!)
@@ -77,7 +77,7 @@ Where options are:
 Files:
 --------------------------------------
 Log:		$LOG
-Tempdir:	$TEMP
+Temp dir:	$TEMP
 
 "
 #
@@ -95,7 +95,7 @@ Tempdir:	$TEMP
 	[ ! -e "$LOG" ] && \
 		touch $LOG && \
 		doLog "------------------------------------------" && \
-		doLog "Created logfile of $ME ($script_version)" && \
+		doLog "Created log file of $ME ($script_version)" && \
 		doLog "------------------------------------------"
 #
 #	Catching Arguments
@@ -139,7 +139,7 @@ Tempdir:	$TEMP
 			log_msg="Enabled DEBUG mode"
 			;;
 		w)	WAIT=$OPTARG
-			log_msg="Change the wait intervall to: $WAIT"
+			log_msg="Change the wait interval to: $WAIT"
 			;;
 		esac
 		# Print $log_msg to $LOG and print $log_msg to user if verbosity is enabled
@@ -150,23 +150,23 @@ Tempdir:	$TEMP
 #	Variable presets
 #
 	script_name=( "${@}" )		# Contains all files
-	MAX=${#script_name[@]}		# Max amount of scripts
+	MAX="${#script_name[@]}"		# Max amount of scripts
 	script_status=( $(for s in "${script_name[@]}";do echo "3";done) )		# Status with same counter of that file	: done(0) failed(1) running(2) todo(3)
 	script_pid=()			# PID with the same counter of that file
 	# Counters
 	RUN=0			# How many scripts are currently running
-	# Verify all scripts are executeable
+	# Verify all scripts are executable
 	for script in "${script_name[@]}";do [ -x "$script" ] || chmod +x "$script";done
 #
 #	Display & Action
 #
 	DONE=0
-	while [ $DONE -lt $MAX ]
+	while [ "$DONE" -lt "$MAX" ]
 	do	# Loop the menu
 		C=0			# Reset counters to prevent 'over counting'
 		DONE=0			# How many scripts are 'done' (regardless of status)
-		GOOD=0			# How many scripts ended succesffully
-		if ! $QUIET
+		GOOD=0			# How many scripts ended successfully
+		if ! "$QUIET"
 		then	clear
 			tui-header "$TITLE ($script_version)" "$(date +'%F %T')"
 			tui-title "Status"
@@ -180,17 +180,17 @@ Tempdir:	$TEMP
 			script="${script_name[$C]}"
 			
 			# Do action according to current status
-			case $STATUS in
+			case "$STATUS" in
 			2)	# IS PID still available?
-				pid=${script_pid[$C]} 
+				pid="${script_pid[$C]}"
 				if [ ! -z "$(echo $pid)" ]
-				then	if ! ps $pid > /dev/zero
+				then	if ! ps "$pid" > /dev/zero
 					then	# Its finished
 						read RET < "$RET_FILE"
 						[ -z "$RET" ] && RET=1
-						script_status[$C]=$RET
+						script_status[$C]="$RET"
 						((RUN--))
-						# Make logfile a bit more informative
+						# Make log file a bit more informative
 						msg="end"
 						[ $RET -eq 130 ] && msg="cancel"
 						[ $RET -eq 127 ] && msg="typo"
@@ -202,23 +202,23 @@ Tempdir:	$TEMP
 				fi
 				;;
 			3)	# Its TODO, can we start it?
-				if [ $RUN -lt $LIMIT ] || [ $LIMIT -eq 0 ]
+				if [ "$RUN" -lt "$LIMIT" ] || [ "$LIMIT" -eq 0 ]
 				then 	script_status[$C]=2
 					STATUS=2
 					((RUN++))
 					[ [./] = "${script:0:1}" ] && PRE="" || PRE="./"
 					cmd="\"${PRE}$script\" ; echo \$? > \"$RET_FILE\""
 					touch "$RET_FILE"
-					$beVerbose && \
+					"$beVerbose" && \
 						echo "$cmd" > "$TMP" && \
 						tui-terminal "$TMP" || \
 						( eval "$cmd" 1>/dev/zero ) &
-					script_pid[$C]=$!
+					script_pid[$C]="$!"
 					doLog "$script($!) ,starting"
 				fi
 				;;
 			*)	((DONE++))
-				[ $STATUS -eq 0 ] && ((GOOD++))
+				[ "$STATUS" -eq 0 ] && ((GOOD++))
 				;;
 			esac
 
