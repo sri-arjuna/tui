@@ -134,7 +134,7 @@ Examples:	$ME 2m
 			[ $hours -lt 0 ] && hours=0
 		fi
 		
-		# Actualy wait a second
+		# Actually wait a second
 		$beVerbose && printf "\n"
 		sleep 1
 	done

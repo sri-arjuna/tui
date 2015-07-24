@@ -73,9 +73,9 @@ Where options are:
 	-h(elp) 		This screen
 	-b(ar)			Enables the 'bar' mode (minimal)
 	-B(ar)	        VAL     Changes the bar-symbol to VAL
-	-c(urrent)	VAL	Required für bar-mode
-	-C(learline)		Clear the line before print a new value, recomended if you pass multiple files
-	-m(ax)		VAL	If provided, changes progressstring output to 'calculated-num / VAL '
+	-c(urrent)	VAL	Required for bar-mode
+	-C(learline)		Clear the line before print a new value, recommended if you pass multiple files
+	-m(ax)		VAL	If provided, changes progress-string output to 'calculated-num / VAL '
 	-l(ong)			Prints more info when in bar mode.
 	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
 				Should be provided if used with -m

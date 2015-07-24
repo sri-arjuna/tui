@@ -33,10 +33,10 @@
 	help_text="\rUsage: $ME [options] [/path/to/]directory]
 		\rWhere options are:
 		\r\t-h\tThis screen
-		\r\t-b\tShow progressbar
+		\r\t-b\tShow progress bar
 		\r\t-x\tExtract tarball
 		\r
-		\rIt is ment to pass foldernames to compress, it will store the tarball in current path, named like the last folder.
+		\rIt is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
 		\r
 		\r"
 	
@@ -85,7 +85,7 @@
 #
 	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
-	do 	tui-printf -rS 2 "Initializing $FOLDER..."
+	do 	tui-printf -rS 2 "Reading $FOLDER..."
 		THIS="${FOLDER##*/}"
 		PWD_ORG="$(pwd)"
 		
@@ -147,7 +147,7 @@
 			tui-status $RET "Extracted: $FOLDER"
 			RET=$?
 		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
-			tui-printf -rS 2 "Initializing $FOLDER..."
+			tui-printf -rS 2 "Reading $FOLDER..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 			cd "$(dirname $FOLDER)"
 			chmod +x "$FILE_CMD"
@@ -168,7 +168,7 @@
 			do	[ -f "$DEST" ] && \
 					tmp_display_size="$($LS -hl $DEST |$AWK '{print $5}')" && \
 					tmp_size="$($LS -l $DEST |$AWK '{print $5}')"|| \
-					tmp_size="0 btytes"
+					tmp_size="0 bytes"
 				if $showBar
 				then	tui-progress -bm $org_size -i $$ -c $tmp_size "Compressing $THIS ($tmp_display_size)"
 				else	tui-progress "Compressing..." "$THIS ($tmp_display_size)"

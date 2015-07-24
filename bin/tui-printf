@@ -33,7 +33,7 @@
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	source /etc/tuirc
-	# $TUI_FILE_CONF_STATUS is loaded only upon need, see lineno: ~162
+	# $TUI_FILE_CONF_STATUS is loaded only upon need, see line no: ~162
 	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 	do	source "$f"
 	done
@@ -64,11 +64,11 @@ Usage: 	$ME [options] [arguments]
 			1: Left
 			2: Left, Right
 			3: Left, Center, Right
-Arguments will tell $ME if and where to colorize, or if to do a linebreak.
+Arguments will tell $ME if and where to colorize, or if to do a line break.
 Options are:
 	-h(elp) 	This screen
 	-E(cho)		Simulates 'echo', prints up to 3 strings and a newline.
-	-T(itle)	Prints 1st argument centred, if more - aligment like tui-echo
+	-T(itle)	Prints 1st argument centered, if more - alignment like tui-echo
 			The inner background is colored white with blue font by default
 	-H(header)	Full line has a blue background and white font as default color
 	-S(tatus)	Does special handling with the first argument
@@ -111,10 +111,10 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 			"Usage: 	$ME [opts] [[-] | [str1] [str2] [str3]]" \
 			"" \
 			"Pass '-' to read input from pipe" \
-			"One can pass emptry strings to align the desired output." \
+			"One can pass empty strings to align the desired output." \
 			"	Prints one string on the left" \
 			"	Prints two strings left and right" \
-			"	Prints three strings left, centred and right" \
+			"	Prints three strings left, centered and right" \
 			"" \
 			"Where options are:" \
 			"	-h|--help	This screen" \
@@ -204,7 +204,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #	Verify all fit on 1 line
 #
 	if [ 25 -gt $WIDTH ]
-	then	# Screen is too small, should not happend
+	then	# Screen is too small, should not happen
 		for S in "$FIRST" "$SECOND" "$THIRD"
 		do 	[ -z "$S" ] || printf "\r%s\n" "$S"
 		done
@@ -257,7 +257,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 					tui-printf $optStyle "$NUM_ID" " " "$SECOND"
 					
 			else	# Regular output, header, title, echo, printf
-				# Treat each argument by itself - lengthness
+				# Treat each argument by itself - lengthiness
 				if [ ${#FIRST} -gt $WIDTH ]
 				then	# The first one is too long
 					[ -z "$FIRST" ] || tui-printf $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
@@ -273,7 +273,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				then	# The third one is too long
 					tui-printf $optStyleTMP "$FIRST" "$SECOND"
 					tui-printf $optStyle " " "$THIRD" ""
-				else	# Regular output, just re-arange strings
+				else	# Regular output, just re-arrange strings
 					if [ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]
 					then	tui-printf $optStyleTMP "$FIRST" "$SECOND" " "
 						tui-printf $optStyle 	" " 	"$THIRD"
@@ -288,7 +288,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		# calling itself with reduced string lengths
 		# so we can exit after this is done
 		exit
-	# else # just continue with the script below, for regular/final output handline
+	# else # just continue with the script below, for regular/final output handling
 	fi
 #
 #	Prepare Colors & Strings
@@ -325,7 +325,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 2))
 	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} ))
 	# POS_ID
-	POS_CLS="\033[0G"	# This is always 0, and therefor doesnt require a pos_id_num calculation
+	POS_CLS="\033[0G"	# This is always 0, and therefor does not require a pos_id_num calculation
 	POS_CLI="\033[${pos_cli_num}G"
 	POS_CLC="\033[${pos_clc_num}G"
 	POS_CLE="\033[${pos_cle_num}G"
@@ -339,7 +339,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #	This part is to fix this part for the alignment
 #
 	
-	# Calculate mising positions and generate output strings
+	# Calculate missing positions and generate output strings
 	case $ARGS_COUNT in
 	0)	if $doStatus
 		then	set ""
@@ -435,11 +435,11 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		POS_THIRD="\033[${pos_third_num}G"
 	fi
 #
-#	Generat output strings
+#	Generate output strings
 #
 	CL="\e[2K"
 	if $doTitle || $doHeader
-	then	# See 'man console_codes' and figure an algo to clear those fields, rather than print space
+	then	# See 'man console_codes' and figure an algorithm to clear those fields, rather than print space
 		str=$(printf '%*s' $(( $WIDTH - 4)))
 	else	str=""
 	fi

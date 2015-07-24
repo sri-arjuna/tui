@@ -55,7 +55,7 @@ shopt -s expand_aliases
 		 	-h		This screen
 		 	config		Enters directly into config mode
 		 	provides	List all variables provided by TUI
-		 	reset		Resets configuration to defaults, root will reset systemwide defaults
+		 	reset		Resets configuration to defaults, root will reset system wide defaults
 		 	reset-yes	Resets configuration without asking for verification
 		 	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
 		 
@@ -104,7 +104,7 @@ shopt -s expand_aliases
 			# Do changes at your own risk!
 			#
 			# If you need to change something, change the top DIR variables first,
-			# so all later variable definitions apply that change automaticly.
+			# so all later variable definitions apply that change automatically.
 			#
 			#	Theme
 			#	Options are: 	default, default-red, dot-blue, dot-red, \\
@@ -113,7 +113,7 @@ shopt -s expand_aliases
 			#
 			 	TUI_THEME=$THM
 			#
-			#	Paths	:	Systemwide but userspecific
+			#	Paths	:	System wide but user specific
 			#
 				TUI_DIR_TEMP="${TUI_DIR_TEMP}"
 			#
@@ -271,7 +271,7 @@ shopt -s expand_aliases
 		FILEMGR="$FILEMGR_CLI"
 	fi
 #
-#	Is there anythin to display ?
+#	Is there anything to display ?
 #
 	if [ "${0##*/}" = "tuirc" ]
 	then	# It is not sourced
@@ -291,7 +291,7 @@ shopt -s expand_aliases
 			;;
 		demo)
 			tui-header "Simple Demonstration" "of TUI commands"
-			tui-title "Lets beginn"
+			tui-title "Lets begin"
 			
 			set -x
 			str="one two three"
@@ -470,7 +470,7 @@ shopt -s expand_aliases
 		tui-printf -E "Calling $ME like this gives you an impression on how your future scripts could look like."
 		tui-printf -E
 		tui-printf -E "If you are looking for the commands of TUI, try this:" "tui-<hit-tab>"
-		tui-printf -E "If you are a developer, i highly recomand to read:" "man tui // ${TUI_FONT_BOLD}info tui${TUI_RESET}"
+		tui-printf -E "If you are a developer, i highly recommend to read:" "man tui // ${TUI_FONT_BOLD}info tui${TUI_RESET}"
 		tui-printf -E "And to check the provided variables, see:" "${TUI_FONT_BOLD}tui provides${TUI_RESET}"
 		tui-printf -E
 		tui-printf -E "There are some sample scripts to get you started:" "$TUI_DIR_DOCS/samples"

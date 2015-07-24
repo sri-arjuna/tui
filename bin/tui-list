@@ -36,7 +36,7 @@
 	script_version=1.5a
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
-#			And shows either arabic, roman or no number indexes.
+#			And shows either Arabic, roman or no number indexes.
 #
 #	Script Environment
 #
@@ -124,7 +124,7 @@ Where options are:
 		U="\033[4m"	# Underscore, multiplies with 1000
 		R="\033[0m"	# Resets the underscore
 		roman_val() { # NUM one five ten
-		# This sub does the basic 'roman' algorythm
+		# This sub does the basic 'roman' algorithm
 		#
 			N="$1"
 			one="$2"

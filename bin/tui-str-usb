@@ -40,7 +40,7 @@
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options]
-		\rSelect usb device if more than one is found
+		\rSelect USB device if more than one is found
 		\rWhere options are:
 		\r\t-h\tThis screen
 		\r\t-a\tAutoselect entry if only one was found
@@ -49,7 +49,7 @@
 	targetusb=""
 	devDisk=/dev/disk/by-id
 	tDev=""
-	AUTO=false		# Automaticly select only available option
+	AUTO=false		# Automatically select only available option
 #
 #	Variable handling
 #
@@ -111,20 +111,20 @@
 	done
 #
 #	Check for user settings for default behaviour.
-#	This is required so internal cardreaders dont get in the way, 
-#	or so you can select to (not) use it automaticly
+#	This is required so internal card readers do not get in the way, 
+#	or so you can select to (not) use it automatically
 #
 	#echo "if [ "$(echo $list|wc -l)" -eq 1 ] && [ -z "$usbAsk" ] "
 	if [ "$(echo $list|wc -w)" -eq 1 ] && [ -z "$usbAsk" ] 
 	then	# There is no setting yet, first time usage
 		tui-echo "The only device available is:" "${list}" > /dev/stderr
-		if tui-yesno "Is this a cardreader that is always listed?" > /dev/stderr
+		if tui-yesno "Is this a card reader that is always listed?" > /dev/stderr
 		then	if tui-yesno "Ignore this device in future calls?" > /dev/stderr
-			then	# Save the cardreader
+			then	# Save the card reader
 				tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbIgnore "\"$list\""
 				RET=1
-			else	tui-echo "Do you want to be asked to select this device everytime?"
-				tui-yesno "No, might result in that device beeing auto-selected!"
+			else	tui-echo "Do you want to be asked to select this device every time?"
+				tui-yesno "No, might result in that device being auto-selected!"
 				RET=$?
 			fi
 		else	RET=1

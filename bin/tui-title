@@ -45,10 +45,10 @@
 			"$ME ($script_version)" \
 			"Usage: $ME [[-] | [str1] [str2] [str3]]" \
 			"Pass '-' to read input from pipe" \
-			"One can pass emptry strings to align the desired output." \
+			"One can pass empty strings to align the desired output." \
 			"	Prints one string in the center" \
 			"	Prints two strings left and right" \
-			"	Prints three strings left, centred and right" \
+			"	Prints three strings left, centered and right" \
 			""
 		exit 99
 		;;

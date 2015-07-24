@@ -66,8 +66,8 @@
 			"$ME ($script_version)" \
 			"Usage: $ME [options] [/path/to/]FILE [../]FILE2 ..." \
 			"" \
-			"	Opens provided FILE/s in the favorite editor according to environment." \
-			"	In multiuser or emergency stage it will open \"$EDITOR_CLI\" and in graphical stage it will open \"$EDITOR_GUI\"" \
+			"	Opens provided FILE/s in the preferred editor according to environment." \
+			"	In multi-user or emergency stage it will open \"$EDITOR_CLI\" and in graphical stage it will open \"$EDITOR_GUI\"" \
 			""
 		exit "$RET_HELP"
 		;;
@@ -107,11 +107,11 @@
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
 		[ -z "$EDITOR" ] && \
-			tui-echo "No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manualy!" && \
+			tui-echo "No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manually!" && \
 			exit 1
 		tui-conf-set "$TUI_FILE_USER_APPS" "$var" "$EDITOR"
 	fi
-	# Open each file 'seperatly',
+	# Open each file 'separately',
 	# as not all editors support to open multiple files at once
 	for A in "${ARGS[@]}";do
 		[ ! -z "$A" ] && \

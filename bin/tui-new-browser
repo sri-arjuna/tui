@@ -118,7 +118,7 @@ Usage: 	$ME [options] [arguments]
 		esac
 	done
 # This is optional
-	if tui-yesno "Would you like to apply some more template configuration/tweakings?"
+	if tui-yesno "Would you like to apply some more template configuration/tweaking?"
 	then	for task in 	APP_USER_LABEL APP_FOLDERS APP_FILES  APP_INCLUDE
 		do
 			case "$task" in

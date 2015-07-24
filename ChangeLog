@@ -18,3 +18,10 @@
 
 2015.07.18
 * Applied basic & general injection protection
+
+2015.07.24
+* Spellchecked bin/* (aspell seems to forget words pretty fast, and dont know basic words such as 
+'favorite')
+* Spellchecked docs/*
+* Skipping spellcheck of manpages, they will become generated from the commands.. later on
+

@@ -32,7 +32,7 @@
 #	Changed:	2015.06.27
 	script_version=0.3.5-ALPHA
 	TITLE="TUI handler for FTP tasks"
-#	Description:	A smiple handler for FTP commands.
+#	Description:	A simple handler for FTP commands.
 #
 #	Script Environment
 #
@@ -73,22 +73,22 @@ Where options are:
 	-U(user)	NAME	Remote user
 	-P(assword)	WORD	Remote password
 	-B(atch)	FILE	Script with ftp commands to execute
-	-c(ommand) \"cmd1 ; cmd2 ... \"	List of commands to execute upon successfull login
+	-c(ommand) \"cmd1 ; cmd2 ... \"	List of commands to execute upon successful login
 
     ----Modes----
     	-a(active)		Force active mode
 	-p(assiv)		Force passiv mode
 	
     ----Upload file----
-	-f(ile) 	FILE	Localfile to upload
+	-f(ile) 	FILE	Local file to upload
 	-r(emote)	PATH	Remote path to upload the file to
 
     ---Download file----
-	-d(ownload)	FILE	Remotefile to download
-	-l(ocal)	PATH	Localpath to download file to
+	-d(ownload)	FILE	Remote file to download
+	-l(ocal)	PATH	Local path to download file to
 
 For each call, you can either only Up- or Download files or execute commands.
-NOTE: I have no idea how those batchfiles should look like, please see the according ftp commands manpage.
+NOTE: I have no idea how those batch files should look like, please see the according ftp commands man page.
 
 "
 #
@@ -165,7 +165,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 #
 	# Load default values before parsing options
 	if ! source "$CONFIG" 
-	then	# Could not source the configuuration...
+	then	# Could not source the configuration...
 		tui-status 1 "Failed to load: $CONFIG"
 	fi
 	[ -f "$LOG" ] || touch "$LOG"
@@ -216,7 +216,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			force_passiv=false
 			log_msg="Force active mode"
 			[ lftp = "$FTP" ] && \
-				tui-status 111 "Please see the manpage of $FTP, section 'Settings' to see how to ${log_msg,,}"
+				tui-status 111 "Please see the man page of $FTP, section 'Settings' to see how to ${log_msg,,}"
 			[ sftp = "$FTP" ] && \
 				tui-status 111 "$FTP does not support the enforcing of passive mode."
 			[ ftp = "$FTP" ] && ACTPAS="-A"
@@ -225,7 +225,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 			force_aktive=false
 			log_msg="Force passiv mode"
 			[ lftp = "$FTP" ] && \
-				tui-status 111 "Please see the manpage of $FTP, section 'Settings' to see how to ${log_msg,,}"
+				tui-status 111 "Please see the man page of $FTP, section 'Settings' to see how to ${log_msg,,}"
 			[ sftp = "$FTP" ] && \
 				tui-status 111 "$FTP does not support the enforcing of passive mode."
 			[ ftp = "$FTP" ] && ACTPAS="-p"
@@ -236,7 +236,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		P)	PASSWORD="$OPTARG"
 			log_msg="Set password to: *******" 		;;
 		B)	BATCHES[${#BATCHES[@]}]="$OPTARG"
-			log_msg="Added batchfile to execute: $OPTARG"
+			log_msg="Added batch file to execute: $OPTARG"
 			MENU="cmd"					;;
 		c)	COMMANDS_RAW="$OPTARG"
 			log_msg="Set commands to parse: $OPTARG"
@@ -376,7 +376,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 				DEFAULT_DIR="$LOC"
 			
 			$beVerbose && \
-				tui-progress "Generate downloadlist: $REM to $LOC"
+				tui-progress "Generate download list: $REM to $LOC"
 			
 			echo "$LCD $LOC" >> "$TEMPFILE"
 			echo "$GET $REM" >> "$TEMPFILE"
@@ -406,7 +406,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 				DEFAULT_DIR="$REM"
 			
 			$beVerbose && \
-				tui-progress "Generate uploadlist: $LOC to $REM"
+				tui-progress "Generate upload list: $LOC to $REM"
 			
 			echo "$CD $REM" >> "$TEMPFILE"
 			echo "$PUT $LOC $REM/$(basename $LOC)" >> "$TEMPFILE"
@@ -464,7 +464,7 @@ NOTE: I have no idea how those batchfiles should look like, please see the accor
 		# Generate commands according to which FTP-command is beeing used.
 		case $FTP in
 		ftp)	# Do ftp settings
-			# There is NO batchfile handling for regular 'ftp' command :(
+			# There is NO batch file handling for regular 'ftp' command :(
 			# Found an alternative handling
 			CMD="$(cat $BATCH)"
 			TMP="$TEMPFILE.$$"

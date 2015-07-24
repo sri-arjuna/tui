@@ -50,10 +50,10 @@ Examples:	$ME -l  /etc/default/grub 			| Prints a list of found variable-names
 Where options are:
 	-h		This screen
 	-i		Internal search pattern is no longer case sensitive
-	-l		Lists values vailabel in the file
+	-l		Lists values available in the file
 	-c		Writes the VALUE, and stores VALUENAME in capital chars
 	-s		Writes the VALUE, and stores VALUENAME in lower chars
-	-v		Prints a status message wether or not the value could be saved
+	-v		Prints a status message whether or not the value could be saved
 
 "
 	OPT=""
@@ -155,7 +155,7 @@ Where options are:
 	if ! $GREP "${VARNAME}=" "$CONFFILE" | $GREP $Q -v ^"#"
 	then	# Its not there yet, just append it
 		if $hadDollar
-		then	# It needs special treatement
+		then	# It needs special treatment
 			echo "$(echo $REPLACE)" >> "$CONFFILE"
 		else	# Easy handling
 			echo "${REPLACE}" >> "$CONFFILE"
@@ -163,7 +163,7 @@ Where options are:
 		fi
 	else	# Its already there, handling according to special chars
 		if $hadDollar
-		then	# It needs special treatement
+		then	# It needs special treatment
 			SEARCH="$(echo $SEARCH|$SED s,'$','\$',g)"
 			cmd="$SED s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i $CONFFILE"
 			eval "$cmd"

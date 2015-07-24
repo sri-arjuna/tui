@@ -60,7 +60,7 @@ Examples:	ret=\$($ME one two three)
 		$ME *
 Where options are:
 		-1|2		Print that many rows
-		-a		Autoselect if only one entry was found
+		-a		Auto select if only one entry was found
 		-v(erbose)		Print cancel option 0.
 
 "
@@ -181,12 +181,12 @@ Where options are:
 		fi
 	done
 	$todo && printf "\n" >&2
-	# Make 'nice to have' linebreak when read automaticly stops reading
+	# Make 'nice to have' line break when read automatically stops reading
 	if [ ${#NUM} -eq ${#len} ] 
 	then	# Only print newline character if the entered number as the longest number
 		# But not sub zero
 		[ ${NUM} -ne -1 ] && printf "\n" >&2
-	else	# Since arrays are 0 indexed, 10 becomes 9 and need speacial treatement
+	else	# Since arrays are 0 indexed, 10 becomes 9 and need special treatment
 		[ ${NUM} -eq 9 ] && printf "\n" >&2
 	fi
 	

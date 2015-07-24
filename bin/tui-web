@@ -28,7 +28,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.8
+	script_version=0.8.5
 	ME="${0##*/}"
 #
 #	Variable handling
@@ -102,7 +102,7 @@
 			var=BROWSER_CLI || \
 			var=BROWSER_GUI
 		[ -z "$BROWSER" ] && \
-			tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && \
+			tui-echo "No web browser for $MODE mode could be found, please change \"$CONF\" manually!" && \
 			exit 1
 		# It was found, so save it
 		tui-conf-set -v "$CONF" "$var" "$BROWSER"
@@ -110,5 +110,5 @@
 	
 	#for A in "${ARGS[@]}";do
 	#	$BROWSER "$A"
-		$BROWSER "$1"	# Dont get spammy
+		$BROWSER "$1"	# Do not get spammy
 	#done

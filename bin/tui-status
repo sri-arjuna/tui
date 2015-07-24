@@ -38,10 +38,10 @@
 	script_version=1.6
 	# higher number, and more and more in another script..lol
 	ME="${0##*/}"
-	help_text="Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]
+	help_text="Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centered Message\"]
 Where options are:
 	-h	This screen
-	-r	Return on line, dont do a newline.
+	-r	Return on line, do not do a newline.
 "
 #
 #	Display
@@ -71,7 +71,7 @@ Where options are:
 		
 		printf "$help_text
 
-Interpreted errorlevels are:\n"
+Interpreted error level are:\n"
 		for num in $(seq 0 1 130)
 		do	str="${retvalue[$num]}"
 			[ ! "" = "$(printf '%s' $str)" ] && \

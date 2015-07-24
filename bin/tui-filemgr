@@ -102,7 +102,7 @@
 		[ $MODE = cli ] && \
 			var=FILEMGR_CLI || \
 			var=FILEMGR_GUI
-		[ -z "$FILEMGR" ] && tui-echo "No filemanager for $MODE mode could be found, please change \"$CONF\" manualy!" && exit 1
+		[ -z "$FILEMGR" ] && tui-echo "No file manager for $MODE mode could be found, please change \"$CONF\" manually!" && exit 1
 		tui-conf-set "$TUI_FILE_USER_APPS" $var $FILEMGR
 	fi
 	

@@ -46,7 +46,7 @@ Example:	$ME -l /etc/default/grub
 Where options are:
 	-h		This screen
 	-i		Is no longer case sensitive
-	-l		Lists values vailabel in the file
+	-l		Lists values available in the file
 
 "
 	OPT=""
@@ -84,7 +84,7 @@ Where options are:
 	shift $(($OPTIND - 1))
 	CONFFILE="$1"
 	VARNAME="$2"
-	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$CONFFILE dont exist?" && exit 1
+	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$CONFFILE does not exist?" && exit 1
 #
 #	Display & Action
 #

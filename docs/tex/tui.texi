@@ -47,12 +47,12 @@ This manual is for TUI (version @value{VERSION}, @value{UPDATED}).
 
 TUI is a command based Text User Interface framework for scripts.
 
-Allthough it requires BASH to be installed, the commands can be called from other SHELLS as well.
+Although it requires BASH to be installed, the commands can be called from other SHELLS as well.
 But be aware of their differences, such as string formatting and possible exit codes as examples.
 
 @menu
 * Introduction to TUI :: 
-* Installation :: Optimal installation & deinstalllation
+* Installation :: Optimal installation & de-installation
 * Configuration :: What is where done
 * Usage :: Some basic description
 @c * Display Commands :: The definition of Interface
@@ -98,7 +98,7 @@ gathered as commands for easy availability, so you can access them straight forw
 in your scripts.
 
 You as the author of the script, don't have to worry about software the user has installed, 
-instead you call: tui-edit, tui-filemgr, tui-web or tui-terminal (tui-terimnal is GUI only), 
+instead you call: tui-edit, tui-filemgr, tui-web or tui-terminal (tui-terminal is GUI only), 
 or which distribution the user is using, simply call tui-install to cover package manager 
 installations from Arch, over *BSD and Debian to Fedora/Red-Hat to Slackware or Tizen.
 
@@ -113,7 +113,7 @@ environment.
 @node Installation
 @chapter Installation
 @section Getting the code
-It is recomended by FHS (http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSRCSOURCECODE) to save source code in /usr/src.
+It is recommended by FHS (http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSRCSOURCECODE) to save source code in /usr/src.
 @example
     su
     cd /usr/src
@@ -152,7 +152,7 @@ as well as the input character for tui-select.
 
 Application invokes by either one of tui-edit, tui-filemgr, tui-web or tui-terminal which will search through
 a list of known applications, diverted by cli or gui abilities if the default applications are not found.
-If you have WINE installed, it may happend that 'notepad' is started as editor rather than 'scribes'.
+If you have WINE installed, it may happened that 'notepad' is started as editor rather than 'scribes'.
 
 If your favorite application is missing on its list, please contact the author of TUI to append it/them.
 
@@ -169,8 +169,8 @@ If you are calling the above command as root, you will edit the system defaults,
 CURLWGET will be 'curl' or 'wget' if found, if neither is found, tui-download will ask to install either one.
 
 @section Loadlist
-Can only be edited, but should not be changed or expaned.
-This file defines the order in which the user configs are read.
+Can only be edited, but should not be changed or expanded.
+This file defines the order in which the user configuration files are read.
 You may add custom entries, but be aware these functions or values will not be available if you share your scripts using them.
 
 @section Settings / @sc {$TUI_FILE_USER_SETTINGS}
@@ -184,7 +184,7 @@ Here, the behaviour or default values for tui-commands is defined.
 
 @node Usage
 @chapter Usage
-This is a summary description of each command, grouped into different cathegories.
+This is a summary description of each command, grouped into different categories.
 
 If you are looking for @b {code samples}, try:
 @example
@@ -192,14 +192,14 @@ If you are looking for @b {code samples}, try:
 @end example
 
 @section Display Commands
-Usualy scripts not only summarizes several commands into a single file, it also enables us to display 'selected information'.
+Usually scripts not only summaries several commands into a single file, it also enables us to display 'selected information'.
 
 This handles the commands that are used to display information to the user.
 
 
 @subsection tui-printf
 This is the heart of TUI, as it provides the core functionality to display everything TUI will display.
-But usualy you will use it to update the current printed line of the previous/initial call of tui-printf.
+But usually you will use it to update the current printed line of the previous/initial call of tui-printf.
 
 It handles up to three (3) quoted strings, printing the first one on the left side.
 If there are 2 strings passed, the 2nd will be on the right side.
@@ -209,7 +209,7 @@ If there are 3 strings passed, the 2nd will be in the center, and the 3rd on the
 Like its regular counterpart @b {echo}, but provides the same output alignment as tui-printf.
 
 @subsection tui-header
-With its full line  background color, tui-header is ment - where applicable - as 'constant' header/footer of a loop based script.
+With its full line  background color, tui-header is meant - where applicable - as 'constant' header/footer of a loop based script.
 Or just as a one time application information header.
 
 @subsection tui-title
@@ -233,7 +233,7 @@ A basic tool to display small script/text files.
 It also provides a Typewriter mode, which accepts strings as well.
 
 @subsection tui-progress
-A very powerfull tool to display several kinds of different progress indications.
+A very powerful tool to display several kinds of different progress indications.
 
 From a single animated dash, simple numbering, numbering up to a max value,
 and even a progress bar with additional percent display.
@@ -241,7 +241,7 @@ and even a progress bar with additional percent display.
 @subsection tui-status
 A nice and handy tool to display the exit code of the previous condition.
 
-Allthough thought to help to display either success or failure of a task, it provides much more.
+Although thought to help to display either success or failure of a task, it provides much more.
 
 
 @comment ## --------------------------------------------------------------- ##
@@ -249,7 +249,7 @@ Allthough thought to help to display either success or failure of a task, it pro
 @section Interactive Commands
 Ever wanted to start an editor at a users computer, but he had not installed it?
 
-Dont worry, the interactive tools provide a soltution for this, and more.
+Do not worry, the interactive tools provide a solution for this, and more.
 
 @subsection tui-yesno
 One of the most used tools in TUI, a simple bool returning command showing a question to the user.
@@ -258,20 +258,20 @@ One of the most used tools in TUI, a simple bool returning command showing a que
 @subsection tui-download
 Has the user curl or wget installed, both or none?
 
-Dont worry, this tool handles this, it selects the first command found (or set in the configuration) to download.
+Do not worry, this tool handles this, it selects the first command found (or set in the configuration) to download.
 
-While it does show how much data it downloaded (filesize), it cant show a progressbar - this is in plan but very low prio.
+While it does show how much data it downloaded (filesize), it cant show a progress bar - this is in plan but very low priority.
 
 @subsection tui-edit
-So, you want the user to edit a file, but dont konw which editor he has installed?
+So, you want the user to edit a file, but do not know which editor he has installed?
 
 Call tui-edit, it looks for default editors, if none is found, it searches a list of known ones, 
 if none is found it asks the user to install one of the known ones.
 
 @subsection tui-filemgr
-So, you want the user to see some file, but dont konw which filemanager he has installed?
+So, you want the user to see some file, but do not know which file manager he has installed?
 
-Call tui-filemgr, it looks for default filemanagers, if none is found, it searches a list of known ones, 
+Call tui-filemgr, it looks for default file managers, if none is found, it searches a list of known ones, 
 if none is found it asks the user to install one of the known ones.
 
 @subsection tui-press
@@ -286,13 +286,13 @@ If your 'read' supports it, it wont require 'enter' to select an item which its 
 If you want to select item 1 out of 11, you will have to press 'enter' though.
 
 @subsection tui-terminal
-Obviously this will only work in GUI mode and will open the selected/prefered terminal emulator.
+Obviously this will only work in GUI mode and will open the selected/preferred terminal emulator.
 
 @subsection tui-wait
 Waits given time (s/m/h), counting down and showing optional message.
 
 @subsection tui-web
-Well, firefox might be a good choice, but some people dont have it installed, this takes care of it,
+Well, Firefox might be a good choice, but some people do not have it installed, this takes care of it,
 just like tui-edit, tui-filemgr, and tui-terminal.
 
 
@@ -330,7 +330,7 @@ done/fail ; true/false ; yes/no
 Returns the last string after a dot, empty if no dot is found.
 
 @subsection tui-str-genfilename
-Generates a numbered file, optinaly sets a new file extension.
+Generates a numbered file, optionally sets a new file extension.
 
 @subsection tui-str-hash
 Hashes a passed string to different sha's or md5.
@@ -394,9 +394,9 @@ This command is the core element and was the main purpose for me to write TUI.
 It is THE automated menu you were always looking for.
 
 Define a folder as your home menu, pass that folder as the '-p dir', to use as as browsable menu.
-You can even direct access scripts in subfolders straight from the command line.
+You can even direct access scripts in  copyright/copyleft related information. straight from the command line.
 
-Scripts executed by 'tui' dont have to be in BASH, though, if they are not BASH, you must set the 'SHELL' with '-x' and all files shown must be that SHELL.
+Scripts executed by 'tui' iption / What is it?: have to be in BASH, though, if they are not BASH, you must set the 'SHELL' with '-x' and all files shown must be that SHELL.
 Note, that in this case, SHELL could also be: Python or Perl, aside from ash, csh, zsh...
 
 

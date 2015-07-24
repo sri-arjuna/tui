@@ -45,7 +45,7 @@
 			If a NEW_EXTENSION is provided, it will be replacing EXT (if exists).
 			If BASENAME with either the existing EXT or the NEW_EXTENSION already exists, a number will be inserted before the file its new/old EXT.
 			If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will become its extension.
-			The number will be increased until the generated filename does not exist yet.
+			The number will be increased until the generated file name does not exist yet.
 			
 		EOF
 	}
@@ -83,7 +83,7 @@
 #
 #	Action & Display
 #
-	# Set init name check according to presets:
+	# Set the intitial name check according to presets:
 	# Currently only known special case: tar
 	NAME_INIT="${this/\.tar/}$ext"
 	
@@ -100,9 +100,9 @@
 		$beVerbose && [ $C -gt 0 ] && \
 			printf "\n%s\n" "$NAME_CHECK is available" > /dev/stderr
 		
-		# Finaly a file that does not exist yet
-		echo "$NAME_CHECK" > /dev/stdout
+		# Finally a file that does not exist yet
+		echo "$NAME_CHECK" >&1
 	else	# File does not exist, and can be used
-		echo "$NAME_INIT" > /dev/stdout
+		echo "$NAME_INIT"  >&1
 	fi
 exit 0

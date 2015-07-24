@@ -52,7 +52,7 @@ Examples:	$ME 'teststring'
 		$ME -t 384 'teststring'
 Where options are:
 	-h(elp) 		This screen
-	-t(ype)		TYPE	Pass wich type of hashion you want, default/fallback: md5sum
+	-t(ype)		TYPE	Pass which type of hashing you want, default/fallback: md5sum
 
 "
 #

@@ -29,15 +29,15 @@
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
-Creates a new script in $HOME/bin, if $HOME/.local/bin doesnt exists.
-Also asks to create a basic manpage template in the same location.
+Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.
+Also asks to create a basic man page template in the same location.
 
 Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
 Examples:	$ME fileA.sh			# Creates a script in ~/bin or ~/.local/bin if existing
 		$ME -s /opt/bin/fileB.sh	# Creates a standalone application script in /opt/bin
 Where options are:
 	-h		This screen
-	-b(asic)	Creates an empty script, with preset comment-identions (shell = $USER_SHELL)
+	-b(asic)	Creates an empty script, with preset comment-indention (shell = $USER_SHELL)
 	-e(mpty)	Creates an empty script (default) (shell = $USER_SHELL)
 	-f(ull)		Creates a standalone application script template (bash only)
 	-r(egular)	Creates the same as basic, but with some code preset (bash only)
@@ -112,7 +112,7 @@ Where options are:
 		)
 	fi
 	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
-	then	# Original templates write their output automaticly to $DEST
+	then	# Original templates write their output automatically to $DEST
 		source "$TUI_DIR_TEMPLATES/scripts/$SCRIPT"
 	elif [ -f "$TUI_DIR_USER_SCRIPTS/$SCRIPT" ]
 	then	# Just copy the user templates, as they are individual
@@ -130,5 +130,5 @@ Where options are:
 	then	tui-yesno "Create a manpage too?" && \
 			tui-new-manpage "$DEST"
 	fi
-	# Open the script AFTER the manpage... to encourage the writing of the manpages first ;)
+	# Open the script AFTER the manpage... to encourage the writing of the man pages first ;)
 	tui-edit "$DEST"

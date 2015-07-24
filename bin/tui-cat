@@ -18,7 +18,7 @@
 #
 # ------------------------------------------------------------------------
 # File		cat and typewriter
-# Description:	Simply prints a string char by char, waiting a certin delay in between.
+# Description:	Simply prints a string char by char, waiting a certain delay in between.
 # ------------------------------------------------------
 #
 #	Variables
@@ -46,7 +46,7 @@ Usage:	$ME [options] \"STRING\" ...
 Example:	$ME \"/path/to/file1\" \"/path/to/file2\" ...
 		$ME -td 0.005 \"\[/path/to/]file1\" \"string 1\" \"string 2\" \"\[/path/to/]file2\"
 Options:
-		-d(elay) NUM	Sets delay to NUM seconds, enables typewriter automaticly
+		-d(elay) NUM	Sets delay to NUM seconds, enables typewriter automatically
 		-t(ypewriter	Prints char by char with a default delay of $DELAY
 		-T(itle)	Enables title printing per file output
 
@@ -115,7 +115,7 @@ Options:
 		;;
 	typewriter)
 		for arg in "${ARGS[@]}"
-		do	# Pass every argument (each seperate STRING) by its own.
+		do	# Pass every argument (each separate STRING) by its own.
 			[ -f "$arg" ] && \
 				STRING="$(cat $arg)" && \
 				($TITLE && tui-title "File: $arg" || exit 0) || \
@@ -129,10 +129,10 @@ Options:
 			
 				printf "$BORDER_LEFT "
 				while [ $COUNT -lt $LEN ]
-				#while [ $PRINTED -lt $WIDHT ]
+				#while [ $PRINTED -lt $WIDTH ]
 				do 	char="${line:$COUNT:1}"
 					double="${line:$COUNT:2}"
-					#tripple="${line:$COUNT:3}"
+					#triple="${line:$COUNT:3}"
 					case "$double" in
 #					"\t"|"	")	char="    "
 #						;;

@@ -55,7 +55,7 @@ Where options are:
 	-------------------------------------------------------
 	-b(ased)		Prints on what the distro is based on and exit
 	-d(istro)		Prints the distro name and exit
-	-l(og)		ARG	Writes and entry to ARG wheter installation was sucessfull or not
+	-l(og)		ARG	Writes and entry to ARG whether installation was successful or not
 	-q(uiet)		Install all at once, will fail if not all packages are available
 
 "
@@ -89,7 +89,7 @@ Where options are:
 		fi
 	}
 	based() { #
-	# Returns arch, debian, redhat or unkown
+	# Returns arch, debian, redhat or unknown
 	#
     		out=""
 		if [ -f /etc/redhat-release ] 
@@ -99,7 +99,7 @@ Where options are:
 		elif [ -f /etc/debian_version ]
 		then	out=debian
 		else	out=unknown
-			# Do further checkings
+			# Do further checking
 			# Changes according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
 			which cave   1>/dev/zero 2>/dev/zero && out=exherbo
 			which emerge 1>/dev/zero 2>/dev/zero && out=gentoo
@@ -199,7 +199,7 @@ Where options are:
 		good_ones=""
 		bad_ones=""
 		count_total=1
-		# Actualy install the packages
+		# Actually install the packages
 		tui-progress -r
 		for app in ${ARGS[*]};do
 			cmd_all="$APP $cmd $app"

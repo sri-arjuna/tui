@@ -30,7 +30,7 @@
 #	Created:	2014.10.15
 #	Changed:	2015.07.13
 	script_version=0.9.5
-	TITLE="Paralell Script Manager"
+	TITLE="Parallel Script Manager"
 #	Description:	Executes all scripts in parallel, unless LIMIT says different, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
 #

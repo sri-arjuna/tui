@@ -6,11 +6,11 @@ directory.
 	su
 	cd /usr/src
 
-2. Clone the source code into a subdirectory and change to it.
+2. Clone the source code into a sub directory and change to it.
 	git clone https://github.com/sri-arjuna/tui.git
 	cd tui
 
-3. Use the autotools behaviour
+3. Use the auto-tools behaviour
 	./configure [--prefix=/] && make && make install
 
 
@@ -21,7 +21,7 @@ UNINSTALL
 	su
 	cd /usr/src/tui
 
-2. Use the autotools behaviour
+2. Use the auto-tools behaviour
 	make uninstall
 
 

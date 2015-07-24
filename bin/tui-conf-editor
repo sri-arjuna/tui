@@ -87,7 +87,7 @@ Log:		$LOG
 		VAR=stay
 		
 		while [ Back != "$VAR" ];do
-			tui-echo "Please select wich value to change:"
+			tui-echo "Please select which value to change:"
 			VAR=$(tui-select Back Edit $(tui-conf-get -l "$CONFIG"))
 		
 			doSelect=false
@@ -116,7 +116,7 @@ Log:		$LOG
 					fi
 					
 					if [ ! -z "$newval" ]
-					then	if [ 0 -eq $UID ]
+					then	if [ 0 -eq "$UID" ]
 						then	if [ password = "${VAR,,}" ] || [ pw = "${VAR,,}" ]
 							then	msg="Changed \"$VAR\" from \"*******\" to \"*******\"" 
 							else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
@@ -154,7 +154,7 @@ Log:		$LOG
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "hLl:t:" opt
-	do 	case $opt in
+	do 	case "$opt" in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
@@ -174,10 +174,10 @@ Log:		$LOG
 #	Display & Action
 #
 	show_menu=true
-	while $show_menu;do
+	while "$show_menu";do
 		clear
 		tui-header "$TITLE" "$USER_NAME @ $(date +'%F %T')"
-		case $ARGS_COUNT in
+		case "$ARGS_COUNT" in
 		0)	printf "$help_text"
 			exit $RET_HELP
 			;;

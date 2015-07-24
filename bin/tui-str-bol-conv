@@ -40,7 +40,7 @@
 #	Functions
 #
 	function help_screen() {
-	# Simply shows the helpscreen
+	# Simply shows the help screen
 	# 
 		cat <<-HELP_SCREEN
 		$ME ($script_version)

@@ -161,7 +161,7 @@
 #
 	for thisFile in "${SOURCE[@]}"
 	do
-		tui-status -r  2 "Initialize $thisFile..."
+		tui-status -r  2 "Reading $thisFile..."
 		if [ -f "$thisFile" ] 
 		then	c_opt=""
 			ORG=$(FileSize "$thisFile")
@@ -170,7 +170,7 @@
 			ORG=$(FolderSize "$thisFile")
 		else	# Skipping
 			if $showBar || $showRegular
-			then	tui-status 4 "Skiped $thisFile."
+			then	tui-status 4 "Skipped $thisFile."
 			fi
 			COUNTER=$(( $COUNTER + 1 ))
 			TOTAL=$(( $TOTAL + 1 ))
@@ -210,11 +210,11 @@
 				TOTAL=${TOTAL:-$ORG}
 			else	tui-progress "Copying $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
-				# This actualy represents the failures, TODO Error '127,130'
+				# This actually represents the failures, TODO Error '127,130'
 				cat_num=$(cat $FILE_TEMP)
 				TOTAL=$(( $TOTAL + ${cat_num:-0} ))
 			fi
-			# Since there is no visual progress, this 'waiting' is hardcoded
+			# Since there is no visual progress, this 'waiting' is hard coded
 			sleep $waiting
 		done
 
