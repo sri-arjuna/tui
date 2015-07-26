@@ -20,6 +20,8 @@
 #
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
+#	Created:	2014.05.19
+# 	Changed:	2015.07.26
 #
 #	Variable defaults
 #
@@ -28,7 +30,7 @@
 	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 	
-	script_version=0.8.5
+	script_version=0.8.6
 	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
@@ -52,7 +54,7 @@
 #
 #	Variable handling
 #
-	[ -z "$3" ] && printf "$help_text" && exit $RET_HELP
+	[ -z "$3" ] && printf "$help_text" && exit 99
 	BG_RET="-1"
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
@@ -67,7 +69,7 @@
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "he:f:s:" opt
-	do 	case $opt in
+	do 	case "$opt" in
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
@@ -78,9 +80,9 @@
 			CHECKFILE=true
 			;;
 		s)	if [ -f "$OPTARG" ]
-			then	SIZE_ORG=$($LS -l "$OPTARG"|$AWK '{print $5}')
+			then	SIZE_ORG=$("$LS" -l "$OPTARG"|"$AWK" '{print $5}')
 			else	tui-status 1 "$ME: File \"$OPTARG\" could not be found!"
-				exit $?
+				exit "$?"
 			fi
 			showBar=true
 			;;
@@ -90,10 +92,10 @@
 	JOB="$1"
 	TXT_PROGRESS="$2"
 	TXT_EXIT="$3"
-	MAX_BYTES=${MAX_BYTES:-${SIZE_ORG:-0}}
-	[ -z "$4" ] && WAIT=0.7 || WAIT="$4"
-	$CHECKFILE && \
-		[ $MAX_BYTES -gt 0 ] && \
+	MAX_BYTES="${MAX_BYTES:-${SIZE_ORG:-0}}"
+	[ -z "$4" ] && WAIT="0.7" || WAIT="$4"
+	"$CHECKFILE" && \
+		[ "$MAX_BYTES" -gt 0 ] && \
 		showBar=true || showBar=false
 #
 #	Send job to bg and get pid
@@ -103,11 +105,11 @@
 		exit 1
 	tui-printf -rS 2 "Starting job..."
 	(
-		$SHELL "$JOB" && \
+		"$SHELL" "$JOB" && \
 			printf 0 >&1 > "$TMP" || \
 			printf 1 >&1 > "$TMP"
 	)   & 
-	PID=$!
+	PID="$!"
 #
 #	While the job is running...
 #
@@ -116,14 +118,14 @@
 	while ps | "$GREP" -q "$PID"
 	do	# Update FileSize variable, if required
 		"$CHECKFILE" && \
-			FS=$("$LS" -l "$FILECHECK"|$AWK '{print $5}') && \
+			FS=$("$LS" -l "$FILECHECK"|"$AWK" '{print $5}') && \
 			FS_SHOW=$("$LS" -lh "$FILECHECK"|"$AWK" '{print $5}')
 		if "$CHECKFILE"
 		then	if "$showBar"
 			then	tui-progress -lbm "$MAX_BYTES" -c "$FS" "$TXT_PROGRESS ($FS_SHOW)"
 			else	[ -z "${MAX_BYTES/0}" ] && \
 					tui-progress "$TXT_PROGRESS ($FS_SHOW)" || \
-					tui-progress -lm "$MAX_BYTES" -c "$FS "$TXT_PROGRESS ($FS_SHOW)"
+					tui-progress -lm "$MAX_BYTES" -c "$FS" "${TXT_PROGRESS} ($FS_SHOW)"
 			fi
 		else	tui-progress "$TXT_PROGRESS"
 		fi

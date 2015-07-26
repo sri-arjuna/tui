@@ -21,13 +21,12 @@
 #
 #
 #	File:		tui-bol-root
-#	Author: 	sea
-#	Contact:	sea AT localhost.localdomain
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.16
-#	Changed:	2015.05.26
-	script_version=0.2
-	TITLE="tui-bol-root"
+#	Changed:	2015.07.26
+	script_version=0.3
 #	Description:	Returns true if current user is root
 #
 #
@@ -41,16 +40,13 @@
 	# Simply shows the help screen
 	# 
 		cat <<-HELP_SCREEN
-		$ME ($script_version)
-		${TITLE^}
 		Usage: 		$ME
+		
 		Examples:	$ME 
-				tui-status \$? \"User is root\"
+		 		tui-status \$? \"User is root\"
 		
 		Where options are:
 			-h(elp) 		This screen
-			-C(onf			Show the config menu
-			-q(uiet)		Mutes all output
 			-v(erbose)		Enables the scripts verbosity
 		
 		HELP_SCREEN
@@ -74,7 +70,7 @@
 #
 #	Action & Display
 #
-	if [ $UID -eq 0 ] || [ "$(whoami)" = "root" ]
+	if [ "${UID:-0}" -eq 0 ] || [ "$(whoami)" = "root" ]
 	then	exit 0
 	else 	exit 1
 	fi

@@ -4,9 +4,13 @@ README - TUI - 0.8.8-GNU-RC3
 A 'Text User Interface' framework for scripts
 -------------------------------------------
 See the [News](docs/NEWS) for news
+
 See the [Chagelog](ChangeLog) for the latest changes
+
 See the [Install page](docs/INSTALL.md) for help with (de-)installation.
+
 See the [License](docs/LICENSE) for copyright/copyleft related information.
+
 
 
 Description / What is it?:
@@ -64,16 +68,23 @@ Now in the combination with tui-edit, you do not even need to source tuirc to ha
 Default behaviour:
 ------------------
 Prints left and right border according to selected theme, and colors tui-header and tui-title.
+
 Each of the core display commands prints up to 3 strings to align output.
+
 While tui-title prints a single string centered, the others will print if left.
+
 If passed 2 strings, first one will be left, second will be right.
+
 If passed 3 strings, the 2nd will be centered and the third one be right.
+
 Use tui-list to print more than three string, and use -1 or -2 to force to pass only that many items to print a line.
 
 tui-printf might be irritating at first, as it does not accept the string formatting as its name-ancestor printf, but it is the absolute core display tool used in TUI, and therefor deserves that name.
+
 Please see its help screen or man page or the examples for more details.
 
 There are several tools that work with their or passed return/exit codes.
+
 tui-yesno being one of them as it returns no visible value, just its exit code changes from 0 for yes, to 1 for no.
 
 	if tui-yesno "Some question?"
@@ -134,11 +145,13 @@ Dependencies
 -------------
 
 Its dependency list is quite short.
+
 As the goal was to be as minimalist as possible regarding its dependencies, 
 and being as 'linux-philosophy-close-as-possible' as i understand it.
 
 Origin:
 	Everything is a file.
+
 And my addition:
 	Every file is text.
 

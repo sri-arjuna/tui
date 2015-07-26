@@ -26,12 +26,13 @@
 	fi
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
-#	Changed: 2015.07.22
+#	Changed: 2015.07.26
 #
 #
 #	Variable defaults
 #
-	script_version=0.8.0
+	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-$HOME/.cache}}"
+	script_version=0.8.1
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
@@ -118,7 +119,8 @@
 		
 		chmod +x "$FILE_CMD"
 		"$FILE_CMD" &
-		sleep 1.5
+		#sleep 1.5
+		sleep 0.5
 		#K=1024
 		
 		str_left="$MSG_ACT_ING"
@@ -136,38 +138,18 @@
 			#echo "$COLUMNS == $str_len"
 			diffr=$(( $(( "$COLUMNS" - "$str_len"  )) + 15 ))
 			cut=$(("$len" - "$diffr"))
-				
-		#set -x
-			
-			# If length of middle string to display is larger than columns to display it
-			# then cut of the trail of the display string
-			
-		#	echo "DIFFERENCE:: $diffr"
-			#if [ $str_len -gt $COLUMNS ]
+
+
 			if [ "$diffr" -ge 1 ]
-			then	# Needs string cutting
-				# Cut off this amount of strings. (+3 for the dots)
-			#	echo "DIFFERENCE:: "$diffr
-			#	echo "----"
-			#	echo " $diffr"
-			#	echo "----"
-				
+			then	
 				if [ "$diffr" -gt "$len" ]
 				then	# It makes sense to cut off pieces
-					#str_middle_corrected="${str_middle:0:( -$diffr )}"
 					str_middle_corrected="${str_middle:0:$diffr}"
-					#str_middle_corrected="${str_middle:0:($len - $diffr)}"
 				else	# No change required / reset to original
 					str_middle_corrected="${str_middle}"
 				fi
-		#	elif [ $diffr -le -1 ]
-		#	then	# Needs string cutting
-		#		# Cut off this amount of strings. (+3 for the dots)
-		#		echo " asd ---- awd"
-		#		str_middle_corrected="${str_middle:0:$diffr}"
 			else	# No change required / reset to original
 				str_middle_corrected="${str_middle}"
-				#echo re
 			fi
 			
 			tui-printf "$str_left" "${str_middle_corrected}" "[  $(tui-indi)   ]"
