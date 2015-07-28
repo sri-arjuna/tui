@@ -105,7 +105,7 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 #	Traps are cool!
 #
-	# TRAP FUNCTION/"COMMAND" MODE's ...
+	## TRAP FUNCTION/"COMMAND" MODE's ... ##
 	#trap cleanup INT ERR
 #
 #	Get options
@@ -122,7 +122,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		-h|--help)	show_help	;;
 		--version)	show_version	;;
 		--)		shift ; break	;;
-		--YOUROPT)	opt_str="\$OPTARG"
+		--YOUROPT)	opt_str="\$2"
 				shift
 				;;
 		esac

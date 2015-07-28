@@ -1,4 +1,4 @@
-README - TUI - 0.8.8-GNU-RC3
+README - TUI - 0.8.9-GNU-RC6
 ============================
 
 A 'Text User Interface' framework for scripts

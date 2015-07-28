@@ -25,3 +25,5 @@
 * Spellchecked docs/*
 * Skipping spellcheck of manpages, they will become generated from the commands.. later on
 
+2015.07.27 0.8.9-GNU-RC5a
+* Fixed variable in ./templates/regular
