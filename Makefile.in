@@ -302,6 +302,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = gnu
 SUBDIRS = bin docs conf.etc conf.home lists man templates themes
+EXTRA_DIST = 
 compldir = $(datadir)/bash-completion/completions
 compl_DATA = @PACKAGE@_compl.bash
 trcdir = /etc
@@ -787,8 +788,9 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-complDATA uninstall-trcDATA
-
-.MAKE: $(am__recursive_targets) install-am install-strip
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
+.MAKE: $(am__recursive_targets) install-am install-strip uninstall-am
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-cscope clean-generic \
@@ -805,10 +807,15 @@ uninstall-am: uninstall-complDATA uninstall-trcDATA
 	installdirs-am maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
 	tags-am uninstall uninstall-am uninstall-complDATA \
-	uninstall-trcDATA
+	uninstall-hook uninstall-trcDATA
 
 .PRECIOUS: Makefile
 
+
+uninstall-hook:
+	rm -fr $(sysconfdir)/@PACKAGE@
+	rm -fr $(datarootdir)/@PACKAGE@
+	rm -fr $(docdir)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

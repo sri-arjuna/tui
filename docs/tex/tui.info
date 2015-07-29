@@ -1,0 +1,622 @@
+This is tui.info, produced by makeinfo version 5.2 from tui.texi.
+
+This manual is for TUI (version 0.9.0, 2015.06.15) Copyright (C)
+2011-2015 Simon Arjuna Erat TUI is licensed as GPLv3.  The manual is
+licensed as GFDL.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included in
+     the section entitled "GNU Free Documentation License".
+
+
+File: tui.info,  Node: Top,  Next: Introduction to TUI,  Up: (dir)
+
+GNU TUI
+*******
+
+This manual is for TUI (version 0.9.0, 2015.06.15).
+
+   TUI is a command based Text User Interface framework for scripts.
+
+   Although it requires BASH to be installed, the commands can be called
+from other SHELLS as well.  But be aware of their differences, such as
+string formatting and possible exit codes as examples.
+
+* Menu:
+
+* Introduction to TUI :: 
+* Installation :: Optimal installation & de-installation
+* Configuration :: What is where done
+* Usage :: Some basic description
+* Appendix :: 
+
+
+File: tui.info,  Node: Introduction to TUI,  Next: Installation,  Prev: Top,  Up: Top
+
+1 Introduction to TUI
+*********************
+
+TUI is a bash framework to write scripts with a Text User Interface.
+
+   It is a command based framework which wraps the task (executed
+command name represents task or description) into an adaptive Text User
+Interface (TUI). It is a framework to be used in the shell or shell
+scripts, though the usage of scripts is recommended to preserve the
+interface feeling.
+
+   It was the core display part of another script-dream I have, and it
+took me almost 2.5 years until i figured that extracting all these
+displaying functions, provide its very own project.  TUI was born, a
+command based framework to give scripts an interface like feeling.
+
+   This said, when executed alone, a single tui-<command>, it doesn't
+look that much like an interface.  However, as soon you append a few
+tui-echo after another or use tui-cat to print a small text file to the
+screen, you will feel the difference.
+
+   Many script authors write their collection of code helpers, display
+features or task assistants.  As such functions, they have to copy them
+to each of the scripts, and manually maintain and adjust the function
+inside that script, or update all those scripts just to be sure that
+function is updated.
+
+   TUI jumps in here, providing a 3-Way-Interface between the Author of
+a script, the System (and its installed software) and the User who is
+executing it.
+
+   In fact, TUI is tui!
+
+   'tui' is meant to make a directory a simple but highly configurable
+script menu, and display its sub-directories as sections and browse
+among the tree structure, with its entrance point as root.  All the
+other commands, are merely the code helpers, display tools, list
+library, variable providers, gathered as commands for easy availability,
+so you can access them straight forward like any command in your
+scripts.
+
+   You as the author of the script, don't have to worry about software
+the user has installed, instead you call: tui-edit, tui-filemgr, tui-web
+or tui-terminal (tui-terminal is GUI only), or which distribution the
+user is using, simply call tui-install to cover package manager
+installations from Arch, over *BSD and Debian to Fedora/Red-Hat to
+Slackware or Tizen.
+
+   It brings together the best of two worlds, the power of the console
+and the convenience of a graphical environment.
+
+
+File: tui.info,  Node: Installation,  Next: Configuration,  Prev: Introduction to TUI,  Up: Top
+
+2 Installation
+**************
+
+2.1 Getting the code
+====================
+
+It is recommended by FHS
+(http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSRCSOURCECODE) to save
+source code in /usr/src.
+         su
+         cd /usr/src
+         git clone https://github.com/sri-arjuna/tui.git
+         cd tui
+
+2.2 A basic installation procedure looks like:
+==============================================
+
+         ./configure --prefix=/
+         make
+         make install
+
+   By default this will install TUI using the default prefix /usr/local,
+so the binaries will be available in PREFIX/bin.
+
+2.3 Uninstall
+=============
+
+         su
+         cd /usr/src/tui
+         make uninstall
+
+
+File: tui.info,  Node: Configuration,  Next: Usage,  Prev: Installation,  Up: Top
+
+3 Configuration
+***************
+
+Is done either by the (End-)User, the applications installed and the
+system the user is using.  Default themes are 'default' for the user,
+and 'default-red' for root.
+
+   First and for the most, you can change the theme.  A theme defines
+the left and right border, the font and background color of tui-header
+and tui-title, as well as the input character for tui-select.
+
+   Application invokes by either one of tui-edit, tui-filemgr, tui-web
+or tui-terminal which will search through a list of known applications,
+diverted by cli or gui abilities if the default applications are not
+found.  If you have WINE installed, it may happened that 'notepad' is
+started as editor rather than 'scribes'.
+
+   If your favorite application is missing on its list, please contact
+the author of TUI to append it/them.
+
+   Calling
+         tuirc config
+   will bring up a screen to select which conf file to edit.
+
+3.1 Apps / $TUI_FILE_USER_CONF
+==============================
+
+Upon first call, you will probably see the values listed as variable
+names with a '$'-prefix.  This setting will use the system defaults set
+in /etc/tui/apps.conf.  If you are calling the above command as root,
+you will edit the system defaults, and not the user preferences.
+CURLWGET will be 'curl' or 'wget' if found, if neither is found,
+tui-download will ask to install either one.
+
+3.2 Loadlist
+============
+
+Can only be edited, but should not be changed or expanded.  This file
+defines the order in which the user configuration files are read.  You
+may add custom entries, but be aware these functions or values will not
+be available if you share your scripts using them.
+
+3.3 Settings / $TUI_FILE_USER_SETTINGS
+======================================
+
+Here, the behaviour or default values for tui-commands is defined.
+
+
+File: tui.info,  Node: Usage,  Next: Appendix,  Prev: Configuration,  Up: Top
+
+4 Usage
+*******
+
+This is a summary description of each command, grouped into different
+categories.
+
+   If you are looking for code samples, try:
+         tuirc samples
+
+4.1 Display Commands
+====================
+
+Usually scripts not only summaries several commands into a single file,
+it also enables us to display 'selected information'.
+
+   This handles the commands that are used to display information to the
+user.
+
+4.1.1 tui-printf
+----------------
+
+This is the heart of TUI, as it provides the core functionality to
+display everything TUI will display.  But usually you will use it to
+update the current printed line of the previous/initial call of
+tui-printf.
+
+   It handles up to three (3) quoted strings, printing the first one on
+the left side.  If there are 2 strings passed, the 2nd will be on the
+right side.  If there are 3 strings passed, the 2nd will be in the
+center, and the 3rd on the right side.
+
+   This said, tui-printf provides the core display functionality for all
+the other core display commmands, such as tui-echo, tui-header,
+tui-title, tui-cat, tui-status and tui-progress.
+
+   Only the 2 optical dividers, tui-header and tui-title are colored
+according to the set theme.
+
+   Please see tui-echo for a simple example.
+
+4.1.2 tui-echo
+--------------
+
+Like its regular counterpart echo, but provides the same output
+alignment as tui-printf.
+
+   Example:
+         tui-echo
+         tui-echo one
+         tui-echo one two
+         tui-echo one two three
+
+   Which would then output as:
+         # |                                                                      | #
+         # | one                                                                  | #
+         # | one                                                              two | #
+         # | one                             two                            three | #
+
+4.1.3 tui-header
+----------------
+
+With its full line background color, tui-header is meant - where
+applicable - as 'constant' header/footer of a loop based script.  Or
+just as a one time application information header.
+
+4.1.4 tui-title
+---------------
+
+Is using the inverted colors of tui-header, having only the inlay line
+with a background.
+
+   tui-title handles the first string argument differently, as it
+centers it.  With any further string argument, it behaves like the
+others.
+
+4.1.5 tui-list
+--------------
+
+Is nice handy tool to print different kinds of list.  * no numbering *
+arabic numbering (regular) * roman numbering (from 1 to 9999) *
+alphabetic numbering
+
+   Examples Lets see how a default call handles an array containing 3
+strings
+     	array=("Some value" "Another one" "Watch out")
+     	tui-list "${array[@]}"
+
+   Looks like:
+     	# | 1) Some value               2) Another one              3) Watch out | #
+
+   Lets keep the array, and just use the roman toggle (**-r**), which
+looks like:
+     	array=("Some value" "Another one" "Watch out" "Some value" "Another one" "Watch out")
+     	tui-list -r "${array[@]}"
+     	# | I. Some value             II. Another one             III. Watch out | #
+     	# | IV. Some value              V. Another one             VI. Watch out | #
+
+   To print a list with only one colum, or just two, simply use the
+number as an option.  The option -1 is great for list with long entry
+strings.
+     	$ tui-list -1 "${array[@]}"
+     	# | Some value                                   | #
+     	# | Another one                                  | #
+     	# | Watch out                                    | #
+
+     	$ tui-list -2r "${array[@]}"
+     	# | I. Some value                II. Another one | #
+     	# | III. Watch out                  IV. a fourth | #
+
+4.1.6 tui-cat
+-------------
+
+This command simply prints the content of a file within TUI borders.
+
+   To print the content of a file, simply pass its name or full path as
+argument.
+     	tui-cat /etc/os-release
+
+   As an easter egg it also provides a typewriter mode, which accepts
+strings as well.
+     	tui-cat -t message_file.txt
+     	tui-cat -t "some string"
+     	tui-cat -d 0.5 "Message string" ~/message_file.txt "Another string" ...
+
+   One can even pipe output:
+     	echo "$(uname -a)" | tui-cat -t
+     	# | Linux cyberdyne.ocean 4.1.2-2-ARCH #1 SMP PRE| #
+     	# | EMPT Wed Jul 15 08:30:32 UTC 2015 x86_64 GNU/| #
+     	# | Linux                                        | #
+
+4.1.7 tui-progress
+------------------
+
+A very powerful tool to display several kinds of different progress
+indications.
+
+   From a single animated dash, simple numbering, numbering up to a max
+value, and even a progress bar with additional percent display.
+
+   Its default animation is an animated dash.  This setup allows to show
+an animation with an unknown maximum by either time or invokes.
+     	for entry in $list
+     	do 	tui-progress "Working with:" 	"$entry"
+     	done
+
+   Which will be seen as:
+     	# | Working with:                     entry                     [  |   ] | #
+
+   For a more professional look and feel, one needs also a bit more
+preparations:
+     	declare -a list
+     	list=$(ls)
+     	count=${#list[@]}
+     	tui-echo "Updating the file its timestamp"
+     	tui-progress -r
+
+     	for file in "${#list[@]}"
+     	do 	tui-progress -m $count "Working on file:" 	"$file"
+     		touch "$file"
+     		sleep 0.3
+     	done
+
+   Which will be shown as:
+     	# | Working on file:                     file                     7 / 20 | #
+
+
+
+
+
+4.1.8 tui-status
+----------------
+
+A nice and handy tool to display the exit code of the previous
+condition.
+
+   Although thought to help to display either success or failure of a
+task, it provides much more.
+
+4.2 Interactive Commands
+========================
+
+Ever wanted to start an editor at a users computer, but he had not
+installed it?
+
+   Do not worry, the interactive tools provide a solution for this, and
+more.
+
+4.2.1 tui-yesno
+---------------
+
+One of the most used tools in TUI, a simple bool returning command
+showing a question to the user.
+
+4.2.2 tui-download
+------------------
+
+Has the user curl or wget installed, both or none?
+
+   Do not worry, this tool handles this, it selects the first command
+found (or set in the configuration) to download.
+
+   While it does show how much data it downloaded (filesize), it cant
+show a progress bar - this is in plan but very low priority.
+
+4.2.3 tui-edit
+--------------
+
+So, you want the user to edit a file, but do not know which editor he
+has installed?
+
+   Call tui-edit, it looks for default editors, if none is found, it
+searches a list of known ones, if none is found it asks the user to
+install one of the known ones.
+
+4.2.4 tui-filemgr
+-----------------
+
+So, you want the user to see some file, but do not know which file
+manager he has installed?
+
+   Call tui-filemgr, it looks for default file managers, if none is
+found, it searches a list of known ones, if none is found it asks the
+user to install one of the known ones.
+
+4.2.5 tui-press
+---------------
+
+Does what it says, asks the user to 'press enter to continue'.
+
+4.2.6 tui-read
+--------------
+
+Well, it reads the user input
+
+4.2.7 tui-select
+----------------
+
+Select an item from passed arguments.  If your 'read' supports it, it
+wont require 'enter' to select an item which its digit count is as long
+as the digit count of the arguments passed (eg: item 10 of 99) If you
+want to select item 1 out of 11, you will have to press 'enter' though.
+
+4.2.8 tui-terminal
+------------------
+
+Obviously this will only work in GUI mode and will open the
+selected/preferred terminal emulator.
+
+4.2.9 tui-wait
+--------------
+
+Waits given time (s/m/h), counting down and showing optional message.
+
+4.2.10 tui-web
+--------------
+
+Well, Firefox might be a good choice, but some people do not have it
+installed, this takes care of it, just like tui-edit, tui-filemgr, and
+tui-terminal.
+
+4.3 Code Helpers (groups)
+=========================
+
+Small things to make your life easier, sorted by groups.
+
+4.3.1 tui-bol-dir
+-----------------
+
+Returns true if passed dir was found or could be created.  Shows
+tui-status if verbose.
+
+4.3.2 tui-bol-gui
+-----------------
+
+Returns true if the user is in GUI mode.  Returns DE name if verbose.
+
+4.3.3 tui-bol-root
+------------------
+
+Returns true if user is root.
+
+4.3.4 tui-conf-editor
+---------------------
+
+A basic tool to edit a (basic) conf file.
+
+4.3.5 tui-conf-get
+------------------
+
+Gets the value of a variable from a file.
+
+4.3.6 tui-conf-set
+------------------
+
+Set the value of a variable in a file.
+
+4.3.7 tui-str-bol-conv
+----------------------
+
+Converts '0|1|$?'  (return codes) to text.
+
+   done/fail ; true/false ; yes/no
+
+4.3.8 tui-str-extension
+-----------------------
+
+Returns the last string after a dot, empty if no dot is found.
+
+4.3.9 tui-str-genfilename
+-------------------------
+
+Generates a numbered file, optionally sets a new file extension.
+
+4.3.10 tui-str-hash
+-------------------
+
+Hashes a passed string to different sha's or md5.
+
+4.3.11 tui-str-usb
+------------------
+
+Lets the user select an USB storage and returns the device path.
+(/dev/sdx)
+
+4.4 Code Helpers (singles)
+==========================
+
+4.4.1 tui-asroot
+----------------
+
+Executes passed (quoted) command as root, uses sudo where applicable or
+set.
+
+4.4.2 tui-cp
+------------
+
+Copy a file, displays progress bar.
+
+4.4.3 tui-dd
+------------
+
+Thought to wrtie images to usb devices.
+
+   Need feedback to cover more use cases.
+
+4.4.4 tui-mv
+------------
+
+Moves a file, displays a progress bar.
+
+4.4.5 tui-tar
+-------------
+
+Tarballs a directory or file.
+
+4.5 Advanced Commands
+=====================
+
+The tools provides in this section are usualy for those who just want
+more.
+
+4.5.1 tui-bgjob
+---------------
+
+Executes a script in background.
+
+   Prints first string while running, second when done.
+
+4.5.2 tui-bgjob-mgr
+-------------------
+
+Executes multiple scripts at once.
+
+   Lets you define how many scripts shall run simultainiously.
+
+   Can run in quiet mode and return (as exit code) how many scripts were
+ended with success.
+
+4.5.3 tui-install
+-----------------
+
+Can be used to identify what distro the system is.
+
+   Is ment to install dependencies that might be found in the distro its
+repositry.
+
+4.5.4 tui-log
+-------------
+
+A tool to manage/write your custom logfiles.
+
+4.6 tui
+=======
+
+This command is the core element and was the main purpose for me to
+write TUI.
+
+   It is THE automated menu you were always looking for.
+
+   Define a folder as your home menu, pass that folder as the '-p dir',
+to use as as browsable menu.  You can even direct access scripts in
+copyright/copyleft related information.  straight from the command line.
+
+   Scripts executed by 'tui' iption / What is it?: have to be in BASH,
+though, if they are not BASH, you must set the 'SHELL' with '-x' and all
+files shown must be that SHELL. Note, that in this case, SHELL could
+also be: Python or Perl, aside from ash, csh, zsh...
+
+
+File: tui.info,  Node: Appendix,  Prev: Usage,  Up: Top
+
+5 Appendix
+**********
+
+5.1 History
+===========
+
+5.2 Idea
+========
+
+In todays world, everything is about presenting.  There are many tasks
+that can be faster accomplished using a script rather than writing an
+application for it as others require to use it.  This said, it is known
+many end-users dont like the terminal screen.  That is usualy because
+the commands in terminals have their output not very well structured,
+usualy just text-by-text-by-newline-by-text.  This is if you
+need/want/have to provide scripts for users to use, and make it (a
+little) easier for them to 'read' the terminal, without to have to write
+'presentation' handlers.  Thus user.conf in ~/.config/tui provides
+variables that may be used for any script that sources tui, same goes
+for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL
+with your set favorite applications.  Now in the combination with
+tui-edit, you dont even need to source tuirc to have tui-edit open the
+given filename with your favorite editor.
+
+
+
+Tag Table:
+Node: Top630
+Node: Introduction to TUI1220
+Node: Installation3635
+Node: Configuration4415
+Node: Usage6322
+Node: Appendix17298
+
+End Tag Table
