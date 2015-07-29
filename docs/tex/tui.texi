@@ -250,11 +250,11 @@ Is nice handy tool to print different kinds of list.
 * roman numbering (from 1 to 9999)
 * alphabetic numbering
 
-@b {Examples:}
+@b {Examples}
 Lets see how a default call handles an array containing 3 strings
 @example
 	array=("Some value" "Another one" "Watch out")
-	tui-list "${array[@]}"
+	tui-list "$@{array[@@]@}"
 @end example
 
 Looks like:
@@ -265,7 +265,7 @@ Looks like:
 Lets keep the array, and just use the roman toggle (**-r**), which looks like:
 @example
 	array=("Some value" "Another one" "Watch out" "Some value" "Another one" "Watch out")
-	tui-list -r "${array[@]}"
+	tui-list -r "$@{array[@@]@}"
 	# | I. Some value             II. Another one             III. Watch out | #
 	# | IV. Some value              V. Another one             VI. Watch out | #
 @end example
@@ -273,7 +273,7 @@ Lets keep the array, and just use the roman toggle (**-r**), which looks like:
 To print a list with only one colum, or just two, simply use the number as an option.
 The option @b {-1} is great for list with long entry strings.
 @example
-	$ tui-list -1 "${array[@]}"
+	$ tui-list -1 "$@{array[@@]@}"
 	# | Some value                                   | #
 	# | Another one                                  | #
 	# | Watch out                                    | #
@@ -281,7 +281,7 @@ The option @b {-1} is great for list with long entry strings.
 
 
 @example
-	$ tui-list -2r "${array[@]}"
+	$ tui-list -2r "$@{array[@@]@}"
 	# | I. Some value                II. Another one | #
 	# | III. Watch out                  IV. a fourth | #
 @end example
@@ -335,11 +335,11 @@ For a more professional look and feel, one needs also a bit more preparations:
 @example
 	declare -a list
 	list=$(ls)
-	count=${#list[@]}
+	count=$@{#list[@@]@}
 	tui-echo "Updating the file its timestamp"
 	tui-progress -r
 	
-	for file in "${list[@]}"
+	for file in "$@{#list[@@]@}"
 	do 	tui-progress -m $count "Working on file:" 	"$file"
 		touch "$file"
 		sleep 0.3
