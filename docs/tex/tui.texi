@@ -205,8 +205,32 @@ It handles up to three (3) quoted strings, printing the first one on the left si
 If there are 2 strings passed, the 2nd will be on the right side.
 If there are 3 strings passed, the 2nd will be in the center, and the 3rd on the right side.
 
+This said, @b {tui-printf} provides the core display functionality for all the other core display commmands,
+such as @b {tui-echo}, @b {tui-header},  @b {tui-title},  @b {tui-cat}, @b {tui-status} and  @b {tui-progress}.
+
+Only the 2 optical dividers,  @b {tui-header} and  @b {tui-title} are colored according to the set theme.
+
+Please see @b {tui-echo} for a simple example.
+
 @subsection tui-echo
 Like its regular counterpart @b {echo}, but provides the same output alignment as tui-printf.
+
+Example:
+@example
+    tui-echo    
+    tui-echo one
+    tui-echo one two
+    tui-echo one two three
+@end example
+
+Which would then output as:
+@example
+    # |                                                                      | #
+    # | one                                                                  | #
+    # | one                                                              two | #
+    # | one                             two                            three | #
+@end example
+
 
 @subsection tui-header
 With its full line  background color, tui-header is meant - where applicable - as 'constant' header/footer of a loop based script.
@@ -226,17 +250,119 @@ Is nice handy tool to print different kinds of list.
 * roman numbering (from 1 to 9999)
 * alphabetic numbering
 
+@b {Examples:}
+Lets see how a default call handles an array containing 3 strings
+@example
+	array=("Some value" "Another one" "Watch out")
+	tui-list "${array[@]}"
+@end example
+
+Looks like:
+@example
+	# | 1) Some value               2) Another one              3) Watch out | #
+@end example
+
+Lets keep the array, and just use the roman toggle (**-r**), which looks like:
+@example
+	array=("Some value" "Another one" "Watch out" "Some value" "Another one" "Watch out")
+	tui-list -r "${array[@]}"
+	# | I. Some value             II. Another one             III. Watch out | #
+	# | IV. Some value              V. Another one             VI. Watch out | #
+@end example
+
+To print a list with only one colum, or just two, simply use the number as an option.
+The option @b {-1} is great for list with long entry strings.
+@example
+	$ tui-list -1 "${array[@]}"
+	# | Some value                                   | #
+	# | Another one                                  | #
+	# | Watch out                                    | #
+@end example
+
+
+@example
+	$ tui-list -2r "${array[@]}"
+	# | I. Some value                II. Another one | #
+	# | III. Watch out                  IV. a fourth | #
+@end example
+
 
 @subsection tui-cat
-A basic tool to display small script/text files.
 
-It also provides a Typewriter mode, which accepts strings as well.
+This command simply prints the content of a file within TUI borders.
+
+To print the content of a file, simply pass its name or full path as argument.
+@example
+	tui-cat /etc/os-release 
+@end example
+
+As an easter egg it also provides a typewriter mode, which accepts strings as well.
+@example
+	tui-cat -t message_file.txt
+	tui-cat -t "some string"
+	tui-cat -d 0.5 "Message string" ~/message_file.txt "Another string" ...
+@end example
+
+One can even pipe output:
+@example
+	echo "$(uname -a)" | tui-cat -t
+	# | Linux cyberdyne.ocean 4.1.2-2-ARCH #1 SMP PRE| #
+	# | EMPT Wed Jul 15 08:30:32 UTC 2015 x86_64 GNU/| #
+	# | Linux                                        | #
+@end example
+
 
 @subsection tui-progress
 A very powerful tool to display several kinds of different progress indications.
 
 From a single animated dash, simple numbering, numbering up to a max value,
 and even a progress bar with additional percent display.
+
+Its default animation is an animated dash.
+This setup allows to show an animation with an unknown maximum by either time or invokes.
+@example
+	for entry in $list
+	do 	tui-progress "Working with:" 	"$entry"
+	done
+@end example
+
+Which will be seen as:
+@example
+	# | Working with:                     entry                     [  |   ] | #
+@end example
+
+For a more professional look and feel, one needs also a bit more preparations:
+@example
+	declare -a list
+	list=$(ls)
+	count=${#list[@]}
+	tui-echo "Updating the file its timestamp"
+	tui-progress -r
+	
+	for file in "${list[@]}"
+	do 	tui-progress -m $count "Working on file:" 	"$file"
+		touch "$file"
+		sleep 0.3
+	done
+@end example
+
+Which will be shown as:
+@example
+	# | Working on file:                     file                     7 / 20 | #
+@end example
+
+
+@example
+	
+@end example
+
+
+@example
+	
+@end example
+
+
+
 
 @subsection tui-status
 A nice and handy tool to display the exit code of the previous condition.
