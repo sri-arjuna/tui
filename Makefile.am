@@ -9,7 +9,7 @@ trcdir = /etc
 trc_DATA = @PACKAGE@rc
 
 uninstall-hook:
-	rm -fr $(sysconfdir)/@PACKAGE@
+	rmdir $(sysconfdir)/@PACKAGE@
 	rm -fr $(datarootdir)/@PACKAGE@
 	rm -fr $(docdir)
 	
