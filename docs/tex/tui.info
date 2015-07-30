@@ -339,9 +339,26 @@ preparations:
    Which will be shown as:
      	# | Working on file:                     file                     7 / 20 | #
 
+   Last but not least, the one view you do expect of a progress - a bar:
+     	cur=1
+     	max=87
+     	while [ $cur -le $max ]
+     	do	# Optionally, you could use/add '-l' to display the progress percentage.
+     		tui-progress -b -m $max -c $cur "Working on XY..."
+     		((cur++))
+     		echo ""
+     	done
+
+   Would output (each as a single line):
+     	# | Working on XY...     [                     ] | #
+     	# | Working on XY...     [=                    ] | #
+     	# | Working on XY...     [===                  ] | #
+     	# | Working on XY...     [====                 ] | #
 
 
-
+     	# | Working on XY...     [=          ][ 16.09% ] | #
+     	# | Working on XY...     [=====      ][ 45.97% ] | #
+     	# | Working on XY...     [========== ][ 98.85% ] | #
 
 4.1.8 tui-status
 ----------------
@@ -351,6 +368,30 @@ condition.
 
    Although thought to help to display either success or failure of a
 task, it provides much more.
+
+   Lets display a simple check if a file exist:
+     	[ -f filename ]
+     	tui-status $? "File exists"
+   Which would output as either of the 2 lines:
+     	# | File exists                        [  ✓   ] | #
+     	# | File exists                        [  ✗   ] | #
+
+   It could also be used for wizzard like scripts:
+     	tui-yesno "Do you want to do XY?" && ret=0 || ret=4
+     	if tui-status "$ret" "Doing XY"
+     	then	echo todo
+     	fi
+   Which would return the following output, depening on your answer:
+     	# | Do you want to do XY? (y/n)                y | #
+     	# | Doing XY                            [  ✓  ] | #
+     	todo
+
+     	# | Do you want to do XY? (y/n)                n | #
+     	# | Doing XY                            [  »   ] | #
+
+   If you start another command which takes some time before it displays
+anything, you could use:
+     	 tui-status -r 2 "Starting something" ; sleep 4 && tui-status $? "Started something now..."
 
 4.2 Interactive Commands
 ========================
@@ -365,18 +406,28 @@ more.
 ---------------
 
 One of the most used tools in TUI, a simple bool returning command
-showing a question to the user.
+showing a question to the user.  And easy for the coder to handle.
+
+   But see for yourself:
+     	tui-yesno "Show grub defaults?" && cat /etc/default/grub
+
+     	if tui-yesno "Show grub defaults?"
+     	then	cat /etc/default/grub
+     	fi
+
+     	tui-yesno "Continue (y) or close terminal window (n)?" || exit 0
 
 4.2.2 tui-download
 ------------------
 
-Has the user curl or wget installed, both or none?
+Has the user curl or wget installed, both or none?  Do not worry, this
+tool handles this, it selects the first command found (or set in the
+configuration) to download.  While it does show how much data it
+downloaded (filesize), it cant show a progress bar - this is in plan but
+very low priority.
 
-   Do not worry, this tool handles this, it selects the first command
-found (or set in the configuration) to download.
-
-   While it does show how much data it downloaded (filesize), it cant
-show a progress bar - this is in plan but very low priority.
+   Basicly one call it simply like this:
+     	tui-download "http://download.server.com/file.zip"
 
 4.2.3 tui-edit
 --------------
@@ -388,6 +439,9 @@ has installed?
 searches a list of known ones, if none is found it asks the user to
 install one of the known ones.
 
+   Usualy, one simply uses:
+     	tui-edit ./somedir/file.txt
+
 4.2.4 tui-filemgr
 -----------------
 
@@ -398,15 +452,28 @@ manager he has installed?
 found, it searches a list of known ones, if none is found it asks the
 user to install one of the known ones.
 
+   Usualy, one simply uses:
+     	tui-filemgr "$HOME/projects/this"
+
 4.2.5 tui-press
 ---------------
 
 Does what it says, asks the user to 'press enter to continue'.
 
+     	tui-press
+
+   Looks like:
+     	# | Press [ENTER] to continue     Press [ENTER] to continue | #
+
 4.2.6 tui-read
 --------------
 
 Well, it reads the user input
+
+   Usualy this is to get a string of a user, like either one of these:
+     	answer=$(tui-read "What is your hometown?")
+     	tui-read "What is your hometown?" > /tmp/answer
+   So you then can work with either the variable or the file.
 
 4.2.7 tui-select
 ----------------
@@ -416,16 +483,57 @@ wont require 'enter' to select an item which its digit count is as long
 as the digit count of the arguments passed (eg: item 10 of 99) If you
 want to select item 1 out of 11, you will have to press 'enter' though.
 
+   By default, it prints up to 3 values per line and lets you select
+among it.
+     	choice=$(tui-select 1 2 3)
+     	tui-select 1 2 3 > /tmp/choice
+
+   Either of these, look like:
+     	# | 1) 1               2) 2                 3) 3 | #
+     	# | > 2
+
+   However, if you want a only a single column, or just two, you may
+pass -1 or -2.  Specialy for long menu name selection, this can be a
+nice trick:
+
+     	choice=$(tui-select -1 1 2 3)
+   Will look like:
+     	# | 1) 1                                         | #
+     	# | 2) 2                                         | #
+     	# | 3) 3                                         | #
+     	# | >
+
+   Also there might be situation, specially if you are working with
+dynamicly generated lists, that only 1 entry is available.
+
+   You might auto select that single entry by:
+     	answer=$(tui-select -a "I'm all alone!")
+     	echo $answer
+
 4.2.8 tui-terminal
 ------------------
 
 Obviously this will only work in GUI mode and will open the
 selected/preferred terminal emulator.
 
+     	tui-terminal "tui-conf-editor $HOME/.config/user-dirs.dirs"
+
 4.2.9 tui-wait
 --------------
 
 Waits given time (s/m/h), counting down and showing optional message.
+This is good to indicate passed times, in case of a timeout or planned
+delay.
+
+   One could be crazy and wait several hours:
+     	tui-wait 5h "I need to clean up my desktop icons!"
+   Showing the full countdown:
+     	# | I need to clean up my desktop icons!                         4:59:58 | #
+
+   Or some more practical delay between an attempt:
+     	tui-wait 5m "Could not reach host, trying again in:"
+   Showing the full countdown:
+     	# | Could not reach host, trying again in:                          4:58 | #
 
 4.2.10 tui-web
 --------------
@@ -433,6 +541,8 @@ Waits given time (s/m/h), counting down and showing optional message.
 Well, Firefox might be a good choice, but some people do not have it
 installed, this takes care of it, just like tui-edit, tui-filemgr, and
 tui-terminal.
+
+     	tui-web "http://www.linux.org"
 
 4.3 Code Helpers (groups)
 =========================
@@ -442,45 +552,125 @@ Small things to make your life easier, sorted by groups.
 4.3.1 tui-bol-dir
 -----------------
 
-Returns true if passed dir was found or could be created.  Shows
-tui-status if verbose.
+Returns true if passed dir was found or could be created.  If verbose
+mode is enabled, it shows tui-status.
+
+   As in:
+     	tui-bol-dir -v bin
+   Prints output as:
+     	# | Found: bin                          [  ✓   ] | #
+
+   Likewise for a path that can be created:
+     	tui-bol-dir -v tmp
+   Prints output as:
+     	# | Created: tmp                        [  ✓   ] | #
+
+   And a path that can not be created (due to missing rights):
+     	tui-bol-dir -v /a/new/path  || exit 1
+   Prints output as:
+     	# | Created: /a/new/path                [  ✗   ] | #
 
 4.3.2 tui-bol-gui
 -----------------
 
 Returns true if the user is in GUI mode.  Returns DE name if verbose.
 
+   A basic example could be:
+     	if tui-bol-gui
+     	then	filezilla
+     	else	ftp
+     	fi
+
+   One could also display which DE the user is running:
+     	tui-echo "Your GUI/DE is:" "$(tui-bol-gui -v)"
+   Which outputs like:
+     	# | Your GUI/DE is:                      awesome | #
+
 4.3.3 tui-bol-root
 ------------------
 
 Returns true if user is root.
 
+     	tui-bol-root && \
+     		echo "You're root" || \
+     		echo "You're a regular user!"
+
 4.3.4 tui-conf-editor
 ---------------------
 
-A basic tool to edit a (basic) conf file.
+A basic tool to edit a conf file.
+
+     	su -c "tui-conf-editor /etc/default/grub"
 
 4.3.5 tui-conf-get
 ------------------
 
 Gets the value of a variable from a file.
 
+     	CFG=/etc/default/grub
+     	KEY=GRUB_TIMEOUT
+
+     	value=$(tui-conf-get $CFG $KEY)
+     	echo $value
+
 4.3.6 tui-conf-set
 ------------------
 
-Set the value of a variable in a file.
+Set the value of a variable in a file.  Similar as tui-conf-get but
+saves a value.
+
+     	CFG=/etc/default/grub
+     	KEY=GRUB_TIMEOUT
+     	VAL=3
+
+     	tui-conf-get $CFG $KEY $VAL
+
+   It also provides a verbose mode:
+     	tui-conf-get -v  $CFG $KEY $VAL
+   Which would output like:
+     	# | Saved in "grub"   GRUB_TIMEOUT=5    [  ✓   ] | #
 
 4.3.7 tui-str-bol-conv
 ----------------------
 
-Converts '0|1|$?'  (return codes) to text.
+Converts '0|1|$?'  (return codes) to text.  Like: done/fail ; true/false
+; yes/no
 
-   done/fail ; true/false ; yes/no
+   True / False
+     	[ -d /bin ]
+     	tui-str-bol-conv -t $?
+
+     	true
+
+   Yes / No
+     	[ -d /bin ]
+     	tui-str-bol-conv -y $?
+
+     	yes
+
+   Done / Fail (in caps)
+     	[ -d /bin ]
+     	tui-str-bol-conv -dC $?
+
+     	DONE
 
 4.3.8 tui-str-extension
 -----------------------
 
 Returns the last string after a dot, empty if no dot is found.
+
+     	for F in *;do
+     		EXT=$(tui-str-extension $F)
+     		echo "This file has the ext: $EXT"
+     	done
+   Could output as:
+     	This file has the ext: am
+     	This file has the ext: ac
+     	This file has the ext:
+     	This file has the ext: log
+     	This file has the ext: in
+     	This file has the ext:
+     	This file has the ext: md
 
 4.3.9 tui-str-genfilename
 -------------------------
@@ -617,6 +807,6 @@ Node: Introduction to TUI1220
 Node: Installation3635
 Node: Configuration4415
 Node: Usage6322
-Node: Appendix17298
+Node: Appendix23298
 
 End Tag Table

@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="$(basename $0)"
 	help_text="$ME ($script_version)
 		\rUsage: $ME [-v] /path/to/check
@@ -50,7 +50,7 @@
 	elif [ -d "$1" ]
 	then	$beVerbose && tui-status 0 "Found: $1"
 		RET=0
-	else	mkdir -p "$1"
+	else	mkdir -p "$1"	2>/dev/zero
 		RET=$?
 		$beVerbose && tui-status $RET "Created: $1"
 	fi

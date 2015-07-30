@@ -20,10 +20,14 @@
 * Applied basic & general injection protection
 
 2015.07.24
-* Spellchecked bin/* (aspell seems to forget words pretty fast, and dont know basic words such as 
-'favorite')
+* Spellchecked bin/* (aspell seems to forget words pretty fast, and dont know basic words such as 'favorite')
 * Spellchecked docs/*
 * Skipping spellcheck of manpages, they will become generated from the commands.. later on
 
 2015.07.27 0.8.9-GNU-RC5a
-* Fixed variable in ./templates/regular
+* Fixed variable in ./templates/scripts/regular
+
+2015.07.29 - 0.8.9-GNU-RC6
+* (un-)install hotfix
+* moved more wiki entries to texinfo
+* hotfixes: tui-bol-dir, tui-str-genfilename

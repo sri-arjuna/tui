@@ -23,7 +23,7 @@
 #	Variables
 #
 	ME=${0##*/}
-	script_version=0.5
+	script_version=0.6
 	beVerbose=false
 #
 #	Functions
@@ -79,7 +79,7 @@
 	this="$1"	# File without EXT?
 	EXT=$(tui-str-extension "$this")	# OLD
 	ext="${2:-$EXT}"	# Fill 'ext' with old EXT if its empty
-	this=${this/$EXT}
+	this=${this%%$EXT}
 #
 #	Action & Display
 #
