@@ -754,8 +754,14 @@ Could output like:
 @subsection tui-str-hash
 Hashes a passed string to different sha's or md5.
 @example
-	tui-str-hash "echo"
-	53f31a089339194f333d2e3995dbb05e
+	tui-str-hash "string"
+	b80fa55b1234f1935cea559d9efbc39a
+	
+	hash=$(tui-str-hash "string")
+	echo $hash
+	b80fa55b1234f1935cea559d9efbc39a
+	
+	echo "string" | tui-str-hash
 @end example
 
 
@@ -778,6 +784,8 @@ Upon selecting an entry, the variable DEVICE would be filled with the device pat
 
 @subsection tui-asroot
 Executes passed (quoted) command as root, uses sudo where applicable or set.
+
+
 
 @subsection tui-cp
 Copy a file, displays progress bar.

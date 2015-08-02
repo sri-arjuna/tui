@@ -20,7 +20,7 @@
 # ------------------------------------------------------------------------
 #
 	source /etc/tuirc
-	. "$TUI_FILE_CONF_COMMANDS"
+	source "$TUI_FILE_CONF_COMMANDS"
 #
 #	File:		tui-str-hash
 #	Author: 	Simon Arjuna Erat (sea)

@@ -676,17 +676,42 @@ Returns the last string after a dot, empty if no dot is found.
 -------------------------
 
 Generates a numbered file, optionally sets a new file extension.
+     	template=rawfile.raw
+     	workfile=$(tui-str-genfilename $template tpl)
+     	touch $workfile
+     	workfile=$(tui-str-genfilename $template tpl)
+     	touch $workfile
+   Could output like:
+     	ls *tpl
+     	rawfile.tpl rawfile.0.tpl rawfile.1.tpl
 
 4.3.10 tui-str-hash
 -------------------
 
 Hashes a passed string to different sha's or md5.
+     	tui-str-hash "string"
+     	b80fa55b1234f1935cea559d9efbc39a
+
+     	hash=$(tui-str-hash "string")
+     	echo $hash
+     	b80fa55b1234f1935cea559d9efbc39a
+
+     	echo "string" | tui-str-hash
 
 4.3.11 tui-str-usb
 ------------------
 
 Lets the user select an USB storage and returns the device path.
 (/dev/sdx)
+
+   To let the user select an USB device, simply invoke it like:
+     	DEVICE=$(tui-str-usb)
+   Which could be presented to the user as:
+     	# | 1) usb-Multiple_Card_Reader_058F63666485-0:0                         | #
+     	# |                           2) usb-SWISSBIT_Twist_99999999F900011d-0:0 | #
+     	# | > 2
+   Upon selecting an entry, the variable DEVICE would be filled with the
+device path (eg: /dev/sdc).
 
 4.4 Code Helpers (singles)
 ==========================
@@ -807,6 +832,6 @@ Node: Introduction to TUI1220
 Node: Installation3635
 Node: Configuration4415
 Node: Usage6322
-Node: Appendix23298
+Node: Appendix24169
 
 End Tag Table

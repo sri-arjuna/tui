@@ -19,15 +19,15 @@
 #
 # ------------------------------------------------------------------------
 #
-	source $HOME/.tuirc || . tuirc
+	source "${HOME:-/root}/.tuirc" || . tuirc
 #
 #	File:		tui-str-bol-conv
 #	Author: 	sea
 #	Contact:	sea AT localhost.localdomain
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.14
-#	Changed:	2015.05.27
-	script_version=0.2
+#	Changed:	2015.08.02
+	script_version=0.3
 	TITLE="Binary Exit Code Converter to Strings"
 #	Description:	Converts binary exit codes to strings
 #

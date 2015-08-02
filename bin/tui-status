@@ -20,11 +20,12 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM};do source "$f";done
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+	TERM="${TERM:-GNU/Linux}"
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

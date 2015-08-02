@@ -24,7 +24,7 @@
 #	Variables
 #
 	BORDER_RIGHT=""
-	source /etc/tuirc && source "$HOME/.tuirc" && \
+	source /etc/tuirc && source "${HOME:-/root}/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" && \
 		. "$TUI_DIR_THEMES/$TUI_THEME" && \
 		. "$TUI_FILE_CONF_SYSTEM" || . tuirc	# This first call would create the RC if its missing.
@@ -34,7 +34,7 @@
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
 	ME="${0##*/}"
-	script_version=0.8
+	script_version=0.8.1
 	DELAY=0.05
 	TITLE=false
 	wasPipe=false

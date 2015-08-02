@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi
@@ -26,8 +26,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.06.11
-	script_version=0.6
+#	Changed:	2015.08.02
+	script_version=0.6.1
 #	Description:	Helps to create a tui-browser project
 #
 #	Variables

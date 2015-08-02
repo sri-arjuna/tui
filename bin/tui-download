@@ -20,19 +20,19 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
-#	Changed: 2015.07.26
+#	Changed: 2015.08.02
 #
 #
 #	Variable defaults
 #
 	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-$HOME/.cache}}"
-	script_version=0.8.1
+	script_version=0.8.2
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
 		\rUsage: $ME [options] URL [URL2] ..
@@ -43,10 +43,10 @@
 	FILE_TEMP="$TUI_DIR_TEMP/tui-download.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
 	DEST=""
-	tui-bol-dir "$TUI_DIR_TEMP" > /dev/zero
+	tui-bol-dir "$TUI_DIR_TEMP "" > /dev/zero
 	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
-	CURLWGET=$(tui-conf-get /etc/tui/commands.conf CURLWGET)
+	CURLWGET=$(tui-conf-get ${TUI_FILE_CONF_COMMANDS} CURLWGET)
 #
 #	Messages
 #

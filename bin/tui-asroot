@@ -31,7 +31,7 @@
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
 #	Changed:	2015.06.27
-	script_version=0.9.0b
+	script_version=0.9.0c
 	TITLE="Run as root"
 #	Description:	Executes passed command as root
 #
@@ -85,8 +85,10 @@ Where options are:
 #	Display & Action
 #
 	#set -x
+	echo $EUID > /euid.log
 	if tui-bol-root
 	then	# When passing eg: bash /path/to/script, quotes causes a failure!
+		#eval "${@}"
 		${@}
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
@@ -94,7 +96,7 @@ Where options are:
 		"${SUDO:-sudo}" "${@}" 	>&2	#; echo \$?  > /dev/stdout > $TMP"
 		exit "$?"
 	else	tui-echo "${MSG:-Please provide root password.}"
-		su -c "${1}" 		>&2	# ; echo \$? > /dev/stdout > $TMP"
+		su -c "${@}" 		>&2	# ; echo \$? > /dev/stdout > $TMP"
 		exit "$?"
 	fi
 	#set +x

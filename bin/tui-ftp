@@ -20,7 +20,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source /etc/tuirc && source "$HOME/.tuirc" && \
+	source /etc/tuirc && source "${HOME:-/root}/.tuirc" && \
 		. $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS} || \
 		. tuirc	# This first call would create the RC if its missing.	
 #
@@ -29,8 +29,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.01.28
-#	Changed:	2015.06.27
-	script_version=0.3.5-ALPHA
+#	Changed:	2015.07.27
+	script_version=0.3.6-ALPHA
 	TITLE="TUI handler for FTP tasks"
 #	Description:	A simple handler for FTP commands.
 #

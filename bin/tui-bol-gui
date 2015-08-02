@@ -19,17 +19,18 @@
 #
 # ------------------------------------------------------------------------
 #
-	source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero && \
+	source /etc/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zero && \
 		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc
+	TERM="${TERM:-GNU/Linux}"
 #
 #	File:		tui-bol-gui
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.07.13
-	script_version=0.5
+#	Changed:	2015.08.02
+	script_version=0.6
 #	Description:	Returns true if user is in GUI mode.
 #
 #

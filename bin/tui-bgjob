@@ -25,12 +25,12 @@
 #
 #	Variable defaults
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"  2>/dev/zero || source tuirc
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"  2>/dev/zero || source tuirc
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 	
-	script_version=0.8.6
+	script_version=0.8.7
 	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)

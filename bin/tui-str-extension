@@ -19,9 +19,9 @@
 #
 # ------------------------------------------------------------------------
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
-	then	. "$TUI_FILE_CONF_COMMANDS"
-	else	. tuirc	# This first call would create the RC if its missing.
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	then	source "$TUI_FILE_CONF_COMMANDS"
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 #
 #	File:		tui-str-extension
@@ -29,8 +29,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.06
-#	Changed:	2015.06.27
-	script_version=0.5
+#	Changed:	2015.08.02
+	script_version=0.5.1
 	TITLE="tui-str-extension"
 #	Description:	Simply returns the extension of passed file
 #

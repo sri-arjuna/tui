@@ -21,7 +21,7 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi

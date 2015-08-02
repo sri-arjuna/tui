@@ -1,0 +1,19 @@
+Feedback / Suggestions wanted:
+------------------------------
+
+If you do not like the 'default' theme, or any other of the provided themes,
+you are encouraged to create your own theme - and send me for implementation.
+
+
+
+Review for fix:
+---------------
+tui-bgjob/tui-download -- errornours ~/.cache/bgjob file
+tui-str-hash -- pipe
+tui-read -- arroys
+
+
+# Finalize:
+-----------
+tui-conf-edit
+tui

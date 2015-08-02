@@ -20,7 +20,7 @@
 	source /etc/tuirc && \
 		break_on_injections "$@" && \
 		exit 1
-	source "$HOME/.tuirc" && \
+	source "${HOME:-/root}/.tuirc" && \
 		. "$TUI_FILE_CONF_COMMANDS" || \
 		. tuirc	# This first call would create the RC if its missing.
 #

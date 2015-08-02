@@ -20,7 +20,7 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi
@@ -45,7 +45,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.2a
+	script_version=1.2b
 	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
@@ -110,7 +110,7 @@ Examples:	$ME \"What is your favorite color?\"
 	tui-printf "$1" >&2
 	POS="\033[$(( ${#BORDER_LEFT} + ${#1} +3 ))G"
 	printf "\r$BORDER_LEFT $1$POS" >&2
-	if $noEmpty
+	if "$noEmpty"
 	then	while [ -z "$INPUT" ]
 		do	read ${doPassword} INPUT </dev/tty
 			[ "${INPUT:0:3}" = "^[[" ] && INPUT=""

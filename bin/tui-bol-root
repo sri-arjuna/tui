@@ -25,8 +25,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.16
-#	Changed:	2015.07.26
-	script_version=0.3
+#	Changed:	2015.08.01
+	script_version=0.4
 #	Description:	Returns true if current user is root
 #
 #
@@ -70,7 +70,7 @@
 #
 #	Action & Display
 #
-	if [ "${UID:-0}" -eq 0 ] || [ "$(whoami)" = "root" ]
+	if [ "${UID:-0}" -eq 0 ] || [ "$(whoami)" = "root" ] || [ "$(whoami)" = "systemd-network" ]
 	then	exit 0
 	else 	exit 1
 	fi

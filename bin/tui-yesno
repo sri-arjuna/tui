@@ -23,7 +23,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "$HOME/.tuirc" 2>/dev/zero
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done

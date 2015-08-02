@@ -30,8 +30,27 @@ shopt -s expand_aliases
 #
 #	Variables	:	Default
 #
+	# Check for '$HOME'
+	if [ -z "$HOME" ]
+	then	# HOME is empty, if UID is empty too, asume machine is still booting
+		if [ 0 -eq "${UID:-0}" ]
+		then	# Its root
+			known="/root /"
+			for k in $(awk  -v FS=":" '/^root/ {print $6}' /etc/passwd 2>/dev/zero) $known
+			do 	[ -d "$k" ] && HOME="$k" && break
+			done
+		else	# Its normal user
+			known="/Users /home"
+			for k in $known
+			do 	[ -d "$k" ] && HOME="$k" && break
+			done
+		fi
+	fi
+	[ -z "$HOME" ] && HOME="${k:-$(cd;pwd)}"
+	
+	# Regular definitions
 	TUI_VERSION=0.8.9
-	TRC="$HOME/.tuirc"	# User default
+	TRC="${HOME}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
 	TRC_SYS="/etc/tuirc"	# Only available if root installed tui
 	source "$TRC_SYS" && \
 		break_on_injections "$@" && \
@@ -143,8 +162,7 @@ shopt -s expand_aliases
 			 	TUI_FILE_USER_SETTINGS="\$TUI_DIR_USER/settings.conf"
 			[ -z "\$TUI_FILE_USER_LOADLIST" ] && readonly \\
 			 	TUI_FILE_USER_LOADLIST="\$TUI_DIR_USER/loadlist.conf"
-			[ -z "\$TUI_FILE_TEMP" ] && readonly \\
-			 	TUI_FILE_TEMP="${TUI_DIR_TEMP:-\$HOME/.cache}/tui.tmp~"
+			TUI_FILE_TEMP="${TUI_DIR_TEMP:-\$HOME/.cache}/tui.tmp~"
 			
 			TUI_RC
 		}

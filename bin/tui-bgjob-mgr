@@ -22,7 +22,7 @@
 	source /etc/tuirc && \
 		break_on_injections "$@" && \
 		exit 1
-	source "$HOME/.tuirc"  2>/dev/zero || source tuirc
+	source "${HOME:-/root}/.tuirc"  2>/dev/zero || source tuirc
 #	File:		tui-bgjob-mgr
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

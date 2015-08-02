@@ -20,7 +20,7 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "$HOME/.tuirc"
+	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi
@@ -28,7 +28,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.8.0
+	script_version=0.8.1
 	ME="${0##*/}"
 #
 #	Check for the environment to load

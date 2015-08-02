@@ -23,16 +23,17 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.06.27
-	script_version=2.2
+#	Changed:	2015.08.02
+	script_version=2.3
 #	Description:	The absolute core display function for TUI
 #
 #	Variables
 #
 	BORDER_RIGHT=""
+	TERM="${TERM:-GNU/Linux}"
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	source /etc/tuirc
+	source /etc/tuirc && source "${HOME:-/root}/.tuirc" || source tuirc
 	# $TUI_FILE_CONF_STATUS is loaded only upon need, see line no: ~162
 	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 	do	source "$f"
@@ -80,8 +81,8 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	FIRST=""
 	SECOND=""
 	THIRD=""
-	COLUMNS=${COLUMNS:-$(tput cols)}
-	WIDTH=$COLUMNS
+	COLUMNS="${COLUMNS:-$(tput cols)}"
+	WIDTH="${COLUMNS:-40}"
 	doEcho=false
 	doHeader=false
 	doStatus=false
@@ -203,7 +204,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 #	Verify all fit on 1 line
 #
-	if [ 25 -gt $WIDTH ]
+	if [ 25 -gt "${WIDTH:-0}" ]
 	then	# Screen is too small, should not happen
 		for S in "$FIRST" "$SECOND" "$THIRD"
 		do 	[ -z "$S" ] || printf "\r%s\n" "$S"
@@ -211,7 +212,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		exit ${NUM_ID:-0}
 	fi
 	
-	if [ $len_strings -gt $WIDTH ]
+	if [ "${len_strings:-0}" -gt "${WIDTH:-0}" ]
 	then 	# All vars are larger than the line supports
 		# Splitting required
 		case $ARGS_COUNT in
