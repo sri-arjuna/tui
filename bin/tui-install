@@ -29,8 +29,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.06.27
-	script_version=0.7.0
+#	Changed:	2015.08.02
+	script_version=0.8.0
 	TITLE="Install packages"
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
@@ -57,6 +57,7 @@ Where options are:
 	-d(istro)		Prints the distro name and exit
 	-l(og)		ARG	Writes and entry to ARG whether installation was successful or not
 	-q(uiet)		Install all at once, will fail if not all packages are available
+	-y(es)			Automatically accept the package manager questions
 
 "
 #
@@ -64,6 +65,7 @@ Where options are:
 #
 	#source /etc/profile.d/tui.sh
 	doLog=false
+	doYes=false
 	verbose=true
 	LOG=""
 #
@@ -77,11 +79,11 @@ Where options are:
 		else	e=/etc
 			SF="release version"    # Search For
 
-			results=$(for a in $SF;do ls $e|$GREP $a;done)
+			results=$(for a in $SF;do ls "$e"|"$GREP" "$a";done)
 			resultsFiles=$(for each in $results;do [ -f "$e/$each" ] && printf "$each ";done)
 
 			for each in $resultsFiles
-			do      strcat="$(grep -i ^id= $e/$each)"
+			do      strcat="$($GREP -i ^id= $e/$each)"
 				[ ! -z "$strcat" ] && break
 			done
 			#printf "$(printf $strcat|$AWK {'printf $1'})"
@@ -127,7 +129,7 @@ Where options are:
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	while getopts "bdhl:v" opt
+	while getopts "bdhl:vy" opt
 	do 	case $opt in
 		h)	printf "$help_text"
 			exit $RET_HELP
@@ -144,6 +146,7 @@ Where options are:
 		l)	dolog=true
 			LOG="$OPTARG" 	;;
 		q)	verbose=false	;;
+		y)	doYes=true	;;
 		*)	printf "$help_text" ; exit $?	;;
 		esac
 	done
@@ -158,9 +161,11 @@ Where options are:
 		tui-echo "$ME requires root access!" "$FAIL" && \
 		exit 1
 	tui-printf -E "Installing as dependency:" "$(echo $@)"
-	tui-yesno "Continue?" || exit 0
+#	if ! $doYes
+#	then	tui-yesno "Continue?" || exit 0
+#	fi
 	# Get the right installer
-	case $(based) in
+	case "$(based)" in
 	arch)		APP=pacman	;;
 	debian)		APP=apt-get	;;
 	redhat)		which dnf 1>/dev/zero 2>/dev/zero && \
@@ -171,28 +176,38 @@ Where options are:
 	exherbo)	APP=cave	;;
 	gentoo)		APP=emerge	;;
 	mac)		for APP in port brew
-			do
-				which $APP 2>/dev/zero 1>/dev/zero && break
+			do 	which "$APP" 2>/dev/zero 1>/dev/zero && break
 			done
 			;;
 	*bsd)		APP=pkg	;;
 	esac
 	
 	# Generate commands for the installer
-	cmd=""
-	case $APP in
-	yum|dnf)		cmd+=" -q -y install"	;;	
-	apt-get)	cmd="-q -y install"	;;
-	pacman)		cmd="-S --noconfirm"		;;
+	case "$APP" in
+	yum|dnf)	cmd="-q install"	;;	
+	apt-get)	cmd="-q install"	;;
+	pacman)		cmd="-S"		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (379-1056)
-	brew|port)	cmd="install -y"		;;
-	cave)		cmd="resolve -x "	;;
-	emerge)		cmd=""			;;
-	zypper)		cmd="install -y"		;;
-	pkg)		cmd="install -y"	;;
+	brew|port)	cmd="install"		;;
+	cave)		cmd="resolve -x"	;;
+#	emerge)		cmd=""			;;
+	zypper)		cmd="install"		;;
+	pkg)		cmd="install"		;;
 	esac
+#
+#	Append 'auto-yes'
+#
+	if "$doYes"
+	then	case "$APP" in
+		yum|dnf|apt-get|brew|port|zypper|pkg)
+				cmd+=" -y"		;;	
+		pacman)		cmd+=" --noconfirm"	;;
+		#emerge|cave)	echo missing		;;
+		esac
+	fi
 #	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
+	#set -x
 	if $verbose
 	then	# Is on, install each package on its own line...
 		count_good=0
@@ -206,9 +221,13 @@ Where options are:
 			app_name=$(basename $app)
 			$doLog && tui-log "$LOG" "Execute: $cmd_all"
 			
-			tui-progress -m $# "Installing: $app_name" > /dev/zero
+			tui-progress -m $# "Installing: $app_name" #> /dev/zero
 			tui-printf -rS 2 "Installing $app_name"
-			$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+			
+			if $doYes
+			then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+			else	$cmd_all && RET=0 || RET=1
+			fi
 			
 			tui-status $RET "Installed package: $app_name" && \
 				( $doLog && tui-log "$LOG" "Successfully installed: $app" ) || \
@@ -227,7 +246,10 @@ Where options are:
 		cmd_all="$APP $cmd $@"
 		$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
 		
-		$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+		if $doYes
+		then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+		else	$cmd_all
+		fi
 		[ -z "$RET" ] && RET=1
 		tui-status $RET "Installed: '${pkgs[@]}' " && \
 			 ( $doLog && tui-log "$LOG" "Successfully installed: '$pkgs'" ) || \

@@ -31,3 +31,9 @@
 * (un-)install hotfix
 * moved more wiki entries to texinfo
 * hotfixes: tui-bol-dir, tui-str-genfilename
+
+2015.08.02 - 0.8.9-GNU-RC7
+* install hotfix complete
+* major update for tui-install
+* hotfix for tui-download
+* major update to hopefully pass boot stages without error message (visual output still missing)

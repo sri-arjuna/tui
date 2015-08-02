@@ -174,7 +174,7 @@ This file defines the order in which the user configuration files are read.
 You may add custom entries, but be aware these functions or values will not be available if you share your scripts using them.
 
 @section Settings / @sc {$TUI_FILE_USER_SETTINGS}
-Here, the behaviour or default values for tui-commands is defined.
+Here, the behavior or default values for tui-commands is defined.
 
 
 
@@ -205,7 +205,7 @@ It handles up to three (3) quoted strings, printing the first one on the left si
 If there are 2 strings passed, the 2nd will be on the right side.
 If there are 3 strings passed, the 2nd will be in the center, and the 3rd on the right side.
 
-This said, @b {tui-printf} provides the core display functionality for all the other core display commmands,
+This said, @b {tui-printf} provides the core display functionality for all the other core display command's,
 such as @b {tui-echo}, @b {tui-header},  @b {tui-title},  @b {tui-cat}, @b {tui-status} and  @b {tui-progress}.
 
 Only the 2 optical dividers,  @b {tui-header} and  @b {tui-title} are colored according to the set theme.
@@ -246,7 +246,7 @@ With any further string argument, it behaves like the others.
 @subsection tui-list
 Is nice handy tool to print different kinds of list.
 * no numbering
-* arabic numbering (regular)
+* Arabic numbering (regular)
 * roman numbering (from 1 to 9999)
 * alphabetic numbering
 
@@ -270,7 +270,7 @@ Lets keep the array, and just use the roman toggle (**-r**), which looks like:
 	# | IV. Some value              V. Another one             VI. Watch out | #
 @end example
 
-To print a list with only one colum, or just two, simply use the number as an option.
+To print a list with only one column, or just two, simply use the number as an option.
 The option @b {-1} is great for list with long entry strings.
 @example
 	$ tui-list -1 "$@{array[@@]@}"
@@ -296,7 +296,7 @@ To print the content of a file, simply pass its name or full path as argument.
 	tui-cat /etc/os-release 
 @end example
 
-As an easter egg it also provides a typewriter mode, which accepts strings as well.
+As an Easter egg it also provides a typewriter mode, which accepts strings as well.
 @example
 	tui-cat -t message_file.txt
 	tui-cat -t "some string"
@@ -396,14 +396,14 @@ Which would output as either of the 2 lines:
 	# | File exists                        [  ✗   ] | #
 @end example
 
-It could also be used for wizzard like scripts:
+It could also be used for wizard like scripts:
 @example
 	tui-yesno "Do you want to do XY?" && ret=0 || ret=4
 	if tui-status "$ret" "Doing XY"
 	then	echo todo
 	fi
 @end example
-Which would return the following output, depening on your answer:
+Which would return the following output, depending on your answer:
 @example
 	# | Do you want to do XY? (y/n)                y | #
 	# | Doing XY                            [  ✓  ] | #
@@ -448,7 +448,7 @@ Has the user curl or wget installed, both or none?
 Do not worry, this tool handles this, it selects the first command found (or set in the configuration) to download.
 While it does show how much data it downloaded (filesize), it cant show a progress bar - this is in plan but very low priority.
 
-Basicly one call it simply like this:
+Basically one call it simply like this:
 @example
 	tui-download "http://download.server.com/file.zip"
 @end example
@@ -459,7 +459,7 @@ So, you want the user to edit a file, but do not know which editor he has instal
 Call tui-edit, it looks for default editors, if none is found, it searches a list of known ones, 
 if none is found it asks the user to install one of the known ones.
 
-Usualy, one simply uses:
+Usually, one simply uses:
 @example
 	tui-edit ./somedir/file.txt
 @end example
@@ -470,7 +470,7 @@ So, you want the user to see some file, but do not know which file manager he ha
 Call tui-filemgr, it looks for default file managers, if none is found, it searches a list of known ones, 
 if none is found it asks the user to install one of the known ones.
 
-Usualy, one simply uses:
+Usually, one simply uses:
 @example
 	tui-filemgr "$HOME/projects/this"
 @end example
@@ -490,7 +490,7 @@ Looks like:
 @subsection tui-read
 Well, it reads the user input
 
-Usualy this is to get a string of a user, like either one of these:
+Usually this is to get a string of a user, like either one of these:
 @example
 	answer=$(tui-read "What is your hometown?")
 	tui-read "What is your hometown?" > /tmp/answer
@@ -500,7 +500,7 @@ So you then can work with either the variable or the file.
 
 @subsection tui-select
 Select an item from passed arguments.
-If your 'read' supports it, it wont require 'enter' to select an item which its digit count is as long as the digit count of the arguments passed (eg: item 10 of 99)
+If your 'read' supports it, it wont require 'enter' to select an item which its digit count is as long as the digit count of the arguments passed (ex:: item 10 of 99)
 If you want to select item 1 out of 11, you will have to press 'enter' though.
 
 By default, it prints up to 3 values per line and lets you select among it.
@@ -516,7 +516,7 @@ Either of these, look like:
 @end example
 
 However, if you want a only a single column, or just two, you may pass @b {-1} or @b {-2}.
-Specialy for long menu name selection, this can be a nice trick:
+Specially for long menu name selection, this can be a nice trick:
 
 @example
 	choice=$(tui-select @b {-1} 1 2 3)
@@ -529,7 +529,7 @@ Will look like:
 	# | >	
 @end example
 
-Also there might be situation, specially if you are working with dynamicly generated lists, that only 1 entry is available.
+Also there might be situation, specially if you are working with dynamically generated lists, that only 1 entry is available.
 
 You might auto select that single entry by:
 @example
@@ -778,7 +778,7 @@ Which could be presented to the user as:
 	# |                           2) usb-SWISSBIT_Twist_99999999F900011d-0:0 | #
 	# | > 2
 @end example
-Upon selecting an entry, the variable DEVICE would be filled with the device path (eg: /dev/sdc).
+Upon selecting an entry, the variable DEVICE would be filled with the device path (ex:: /dev/sdc).
 
 @section Code Helpers (singles)
 
@@ -791,7 +791,7 @@ Executes passed (quoted) command as root, uses sudo where applicable or set.
 Copy a file, displays progress bar.
 
 @subsection tui-dd
-Thought to wrtie images to usb devices.
+Thought to write images to usb devices.
 
 Need feedback to cover more use cases.
 
@@ -806,28 +806,162 @@ Tarballs a directory or file.
 
 
 @section Advanced Commands
-The tools provides in this section are usualy for those who just want more.
+The tools provides in this section are usually for those who just want more.
 
 @subsection tui-bgjob
 Executes a script in background.
 
 Prints first string while running, second when done.
 
+To start a script to run in background and print a message while running:
+@example
+	tui-bgjob "/path/to/script" "Running script" "Ran Script"
+@end example
+While "Running script" is shown while the script is running, 
+the exit status of the script is show with the 2nd string "Ran Script" in the style of tui-status.
+
+While the default animation mode is the animated dash, if you are 'generating' a (larger) file, you might want to display its size:
+@example
+	tui-bgjob -f "/path/to/generated/file" "/path/to/script" "Running script" "Ran Script"
+@end example
+
+If you have a specific filesize to expect, you may change to progress bar display by supplying the expected byte size:
+@example
+	tui-bgjob -f "/path/to/generated/file" -e 4294967296 "/path/to/script" "Running script" "Ran Script"
+@end example
+
+
 @subsection tui-bgjob-mgr
 Executes multiple scripts at once. 
 
-Lets you define how many scripts shall run simultainiously.
+Lets you define how many scripts shall run simultaneously.
 
 Can run in quiet mode and return (as exit code) how many scripts were ended with success.
+
+The basic usage is plain convenience, execute all files in this folder (expecting them to be scripts!)
+@example
+	tui-bgjob-mgr *
+@end example
+This will show 'progress' of the working through all these scripts.
+However, it will just show if a script is planed to, running or how it ended.
+
+
+@boxed
+Something of importance to know is the that the wait option ("-w SECS") has influence 
+on the interval it checks if scripts have completed.
+
+The shorter the interval, the faster scripts can be processed, but it should not be set lower than 1 sec for a longer period of time.
+
+The longer the interval, the more time the CPU has to work on its jobs.
+
+
+The interval should be set to at max 50% of the slowest job expected, and should be no lower than 1 sec.
+@end boxed
+
+Runs all KSH scripts with an interval of 5 minutes between visual (and actual working-) updates.
+@example
+	tui-bgjob-mgr -w 360 *.ksh
+@end example
+
+If you have just 3 or 4 scripts to monitor, you might like this in a GUI/(D)WM environment
+@example
+	tui-bgjob-mgr -v window1.sh window2.sh window3.ksh script4.csh
+@end example
+
+
+However, when working with multiple scripts, it may occur than some scripts shall only be executed if some previous scripts were executed successfully.
+@example
+	TASK="script1.sh script2.sh script3.sh"	
+	MAX=$(echo $TASK | wc -w)
+	
+	RET=$(tui-bgjob-mgr -qc $TASK)
+	[ "$RET" -eq "$MAX" ] && \
+		./script4.sh
+@end example
+
 
 @subsection tui-install
 Can be used to identify what distro the system is.
 
-Is ment to install dependencies that might be found in the distro its repositry.
+Is meant to install dependencies that might be found in the distro its repository.
+
+Due to the nature of the different package managers used, 
+it is not yet possible to capture each package managers its own verification within TUI,
+so that output is (by default and for security) untouched.
+
+For scripts you share, it is recommend to leave the default handling as described here.
+@example
+	tui-install pluma
+@end example
+
+Could output on arch like:
+@example
+	# tui-install  pluma
+	
+	# | Installing as dependency:              pluma | #
+	resolving dependencies...
+	looking for conflicting packages...
+
+	Packages (1) pluma-1.10.2-1
+
+	Total Installed Size:  15.11 MiB
+	Net Upgrade Size:       0.00 MiB
+
+	:: Proceed with installation? [Y/n] y
+	(1/1) checking keys in keyring                    
+	(1/1) checking package integrity                  
+	(1/1) loading package files                       
+	(1/1) checking for file conflicts                 
+	(1/1) checking available disk space               
+	(1/1) reinstalling pluma                          
+	# | Installed package: pluma            [  ✓   ] | #
+@end example
+
+
+@example
+	tui-install -y pluma
+@end example
+
+Would output as slick as:
+@example
+	# | Installing as dependency:              pluma | #
+	# | Installed package: pluma            [  ✓   ] | #
+@end example
+
 
 @subsection tui-log
-A tool to manage/write your custom logfiles.
+A tool to manage/write your custom logfiles with ease.
 
+As most logfiles provides several basic information on the left side, tui-log has options for that.
+
+To create a custom logfile header, you could use:
+@example
+	echo "# Logfile for XY, created on DATE" >> "/path/to/logfile.log"
+@end example
+tui-log -e "logfile.log" "# Logfile for XY, created on DATE"
+
+Because, every writing to a logfile checks first if the current date is found in the logfile.
+
+If that is not the case, it first prints the current date before writing the passed message.
+Like this basic usage example shows:
+@example
+	rm logfile.log
+	tui-log -t logfile.log "Logfile created."
+	cat logfile.log
+	
+	#### 2015-08-02 ####
+	06:34:09 	 Logfile created.
+@end example
+
+Likewise for the other options, date (would be very repetitive, but anyway), time, pid, user ; alone or in any combination.
+@example
+	tui-log -up logfile.log "What is my name and the pid"
+	cat logfile.log
+
+	#### 2015-08-02 ####
+	06:34:09 	 Logfile created.
+	sea 3821 	 What is my name and the pid
+@end example
 
 @comment ## --------------------------------------------------------------- ##
 
@@ -842,6 +976,16 @@ You can even direct access scripts in  copyright/copyleft related information. s
 Scripts executed by 'tui' iption / What is it?: have to be in BASH, though, if they are not BASH, you must set the 'SHELL' with '-x' and all files shown must be that SHELL.
 Note, that in this case, SHELL could also be: Python or Perl, aside from ash, csh, zsh...
 
+@example
+	
+@end example
+
+
+@example
+	
+@end example
+
+
 
 @node Appendix
 @chapter Appendix
@@ -850,11 +994,11 @@ Note, that in this case, SHELL could also be: Python or Perl, aside from ash, cs
 
 
 @section Idea
-In todays world, everything is about presenting. There are many tasks that can be faster accomplished using a script rather than writing an application for it as others require to use it.
-This said, it is known many end-users dont like the terminal screen. That is usualy because the commands in terminals have their output not very well structured, usualy just text-by-text-by-newline-by-text.
+In today's world, everything is about presenting. There are many tasks that can be faster accomplished using a script rather than writing an application for it as others require to use it.
+This said, it is known many end-users don't like the terminal screen. That is usually because the commands in terminals have their output not very well structured, usually just text-by-text-by-newline-by-text.
 This is if you need/want/have to provide scripts for users to use, and make it (a little) easier for them to 'read' the terminal, without to have to write 'presentation' handlers.
 Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui, same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
-Now in the combination with tui-edit, you dont even need to source tuirc to have tui-edit open the given filename with your favorite editor.
+Now in the combination with tui-edit, you don't even need to source tuirc to have tui-edit open the given filename with your favorite editor.
 
 
 

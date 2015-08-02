@@ -29,9 +29,9 @@
 #	Changed: 2015.08.02
 #
 #
-#	Variable defaults
+#	Variable defaultsa
 #
-	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-$HOME/.cache}}"
+	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-${HOME:-/root}/.cache}}"
 	script_version=0.8.2
 	ME="${0##*/}"
 	help_text="\r$ME ($script_version)
@@ -42,11 +42,13 @@
 	ARGS=( "${@}" )
 	FILE_TEMP="$TUI_DIR_TEMP/tui-download.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
-	DEST=""
-	tui-bol-dir "$TUI_DIR_TEMP "" > /dev/zero
+	DEST="" 
+	tui-bol-dir "$TUI_DIR_TEMP"  > /dev/zero
 	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
-	CURLWGET=$(tui-conf-get ${TUI_FILE_CONF_COMMANDS} CURLWGET)
+	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
+		CURLWGET="$(echo ${LIST_APP/$CURLWGET})"
+	TERM="${TERM:-GNU/Linux}"
 #
 #	Messages
 #
@@ -86,8 +88,8 @@
 	if [ -z "$CURLWGET" ]
 	then	# Not set yet.
 		for app in $LIST_APPS;do
-			which $app 1>/dev/zero 2>/dev/zero && \
-				CURLWGET=$app && \
+			which "$app" 1>/dev/zero 2>/dev/zero && \
+				CURLWGET="$app" && \
 				break
 		done
 		#set -x
@@ -102,7 +104,7 @@
 		OPT_C="-c"	;;
 	"")	tui-status 1 "$MSG_NOTFOUND"
 		tui-echo "$MSG_SELECT"
-		CURLWGET=$(tui-select curl wget)
+		CURLWGET="$(tui-select curl wget)"
 		which "$CURLWGET" 1>/dev/zero && \
 			tui-conf-set "$APPS" CURLWGET $CURLWGET || \
 			exit 1
@@ -115,7 +117,7 @@
 		out_string="./$THIS"
 		tui-printf -rS 2 "$MSG_INIT_ACT" #"$WORK"
 		#echo "wget -qc $URL" > $FILE_CMD
-		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > $FILE_CMD
+		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > "$FILE_CMD"
 		
 		chmod +x "$FILE_CMD"
 		"$FILE_CMD" &
@@ -125,8 +127,8 @@
 		
 		str_left="$MSG_ACT_ING"
 		str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
-		str_right="[  $(tui-indi)   ]"
-		str_len=$(( ${#str_left} + ${#str_middle} + ${#str_right} + 2 ))
+		#str_right="[  $(tui-indi)   ]"
+		#str_len=$(( ${#str_left} + ${#str_middle} + ${#str_right} + 2 ))
 		
 		#set -x
 		# While its found, assume its till downloading...
@@ -134,25 +136,25 @@
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			COLUMNS="$(tput cols)"
 			str_middle="$THIS ($tmp_size)"
-			len="${#str_middle}"
+		#	len="${#str_middle}"
 			#echo "$COLUMNS == $str_len"
-			diffr=$(( $(( "$COLUMNS" - "$str_len"  )) + 15 ))
-			cut=$(("$len" - "$diffr"))
+		#	diffr=$(( $(( "$COLUMNS" - "$str_len"  )) + 15 ))
+		#	cut=$(("$len" - "$diffr"))
 
 
-			if [ "$diffr" -ge 1 ]
-			then	
-				if [ "$diffr" -gt "$len" ]
-				then	# It makes sense to cut off pieces
-					str_middle_corrected="${str_middle:0:$diffr}"
-				else	# No change required / reset to original
-					str_middle_corrected="${str_middle}"
-				fi
-			else	# No change required / reset to original
-				str_middle_corrected="${str_middle}"
-			fi
+		#	if [ "$diffr" -ge 1 ]
+		#	then	
+		#		if [ "$diffr" -gt "$len" ]
+		#		then	# It makes sense to cut off pieces
+		#			str_middle_corrected="${str_middle:0:$diffr}"
+		#		else	# No change required / reset to original
+		#			str_middle_corrected="${str_middle}"
+		#		fi
+		#	else	# No change required / reset to original
+		#		str_middle_corrected="${str_middle}"
+		#	fi
 			
-			tui-printf "$str_left" "${str_middle_corrected}" "[  $(tui-indi)   ]"
+			tui-progress "$str_left" "${str_middle_corrected}" #"[  $(tui-indi)   ]"
 			sleep 1
 		done
 		tui-status $? "${MSG_ACT_ING}: ${THIS}"
