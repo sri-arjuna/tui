@@ -18,7 +18,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in "$TUI_FILE_USER" $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS,SYSTEM};do source "$f";done
 	else	source tuirc	# This first call would create the RC if its missing.
 	fi
@@ -27,7 +27,7 @@
 #
 	script_version=1.6.1
 	ME="${0##*/}"
-	help_text="
+	help_text="$(gettext "
 $ME ($script_version)
 Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.
 Also asks to create a basic man page template in the same location.
@@ -43,25 +43,23 @@ Where options are:
 	-r(egular)	Creates the same as basic, but with some code preset (bash only)
 	-s(elect)	Select among the script names found in $TUI_DIR_USER_TEMPLATES
 	
-"
+")"
 	DEST=""
-	TITLE="sea's New script script"
+	TITLE="$(gettext 'sea New script script')"
 	SCRIPT="$default_new_script_type" # The default
 #
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text="$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	tui-title "$TITLE ($script_version)"
 	while getopts "hfrbes" name
 	do 	case $name in
@@ -73,7 +71,7 @@ Where options are:
 		e)	SCRIPT="empty"		;;
 		s)	list_script=$(cd "$TUI_DIR_USER_TEMPLATES";ls)
 			[ -z "$list_script" ] && \
-				tui-printf -S 1 "No scripts found in $TUI_DIR_USER_TEMPLATES" && \
+				tui-printf -S 1 "$(gettext 'No scripts found in') $TUI_DIR_USER_TEMPLATES" && \
 				exit 1
 			SCRIPT=$(tui-select -a $list_script)
 			;;
@@ -86,7 +84,7 @@ Where options are:
 #
 	if [ -z "$1" ]
 	then	# No filename passed
-		DEST=$(tui-read "Enter the filename for a \"$SCRIPT\" script:")
+		DEST=$(tui-read "$(gettext "Enter the filename for a \"$SCRIPT\" script:")")
 		if [ "${DEST}" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
 			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
@@ -105,10 +103,10 @@ Where options are:
 	fi
 	
 	if [ -f "$DEST" ]
-	then	tui-yesno "File $DEST exists... Overwrite?" ||  ( 
+	then	tui-yesno "$(gettext "File $DEST exists... Overwrite?")" ||  ( 
 			BACKUP="$DEST-$(date +'%F-%T').bak"
 			mv "$DEST" "$BACKUP"
-			tui-status $? "Saved original $DEST to $BACKUP"
+			tui-status $? "$(gettext "Saved original $DEST to $BACKUP")"
 		)
 	fi
 	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
@@ -117,17 +115,17 @@ Where options are:
 	elif [ -f "$TUI_DIR_USER_SCRIPTS/$SCRIPT" ]
 	then	# Just copy the user templates, as they are individual
 		tui-cp "$TUI_DIR_USER_SCRIPTS/$SCRIPT" "$DEST"
-	else	tui-status 1 "Fatal error, template \"$SCRIPT\" not found!"
+	else	tui-status 1 "$(gettext "Fatal error, template \"$SCRIPT\" not found!")"
 		exit 1
 	fi
 	[ -f "$DEST" ]
-	if tui-status $? "Saved: $DEST"
+	if tui-status $? "$(gettext 'Saved:') $DEST"
 	then	chmod +x "$DEST"
 	else	exit $?
 	fi
 	
 	if "$default_new_script_manpage_ask"
-	then	tui-yesno "Create a manpage too?" && \
+	then	tui-yesno "$(gettext 'Create a manpage too?')" && \
 			tui-new-manpage "$DEST"
 	fi
 	# Open the script AFTER the manpage... to encourage the writing of the man pages first ;)

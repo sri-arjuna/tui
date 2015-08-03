@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi
@@ -26,7 +26,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.08.02
+#	Changed:	2015.08.03
 	script_version=0.6.1
 #	Description:	Helps to create a tui-browser project
 #
@@ -34,12 +34,11 @@
 #
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
-	TITLE="Create a new TUI project"
-	help_text="
-$ME ($script_version)
+	TITLE="$(gettext 'Create a new TUI project')"
+	help_text=$(gettext "
 Usage: 	$ME [options] [arguments]
 
-"
+")
 #
 #	Project related variables
 #
@@ -58,19 +57,17 @@ Usage: 	$ME [options] [arguments]
 #	Catching Arguments
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text=$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts "h" name
-	do 	case $name in
+	do 	case "$name" in
 		h|help)
 			printf "$help_text"
 			exit $RET_HELP
@@ -86,31 +83,31 @@ Usage: 	$ME [options] [arguments]
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	tui-printf -H "$ME ($script_version)" "$(date +'%F %T')"
 	tui-printf -T "$TITLE"
-	tui-printf -E "Starting with basic required configuration"
+	tui-printf -E "$(gettext 'Starting with basic required configuration')"
 # This is required for proper placement of files
 	for task in 	APP_TITLE APP_FILE APP_BASE APP_MENU
 	do
 		case "$task" in
 		APP_TITLE)
-			Q="What is the $task, may contain spaces:"
+			Q="$(gettext "What is the $task, may contain spaces:")"
 			tui-echo "$Q"
 			TASK=$(tui-read)
 			APP_TITLE="${APP_TITLE:-${1:-Project Name}}"
 			;;
 		APP_FILE)
-			Q="What is the name of the $task to execute:"
+			Q="$(gettext "What is the name of the $task to execute:")"
 			tui-echo "$Q"
 			TASK=$(tui-read)
 			APP_FILE="${APP_FILE:-${1:-project-binary}}"
 			;;
 		APP_BASE)
-			Q="Where will \"$APP_FILE\" be stored ($default_new_browser_dir):"
+			Q="$(gettext "Where will \"$APP_FILE\" be stored ($default_new_browser_dir):")"
 			tui-echo "$Q"
 			TASK=$(tui-read)
 			APP_BASE="${APP_BASE:-${1:-$TUI_DIR_}}"
 			;;
 		APP_MENU)
-			Q="How do you want to name your ${TUI_FONT_BOLD}$APP_BASE${RESET}/<$task> directory:"
+			Q="$(gettext "How do you want to name your ${TUI_FONT_BOLD}$APP_BASE${RESET}/<$task> directory:")"
 			tui-echo "$Q"
 			TASK=$(tui-read)
 			APP_MENU="${APP_MENU:-${1:-}}"
@@ -118,27 +115,27 @@ Usage: 	$ME [options] [arguments]
 		esac
 	done
 # This is optional
-	if tui-yesno "Would you like to apply some more template configuration/tweaking?"
+	if tui-yesno "$(gettext 'Would you like to apply some more template configuration/tweaking?')"
 	then	for task in 	APP_USER_LABEL APP_FOLDERS APP_FILES  APP_INCLUDE
 		do
 			case "$task" in
 			APP_USER_LABEL)
-				Q=""
+				Q="$(gettext '')"
 				eval "$TASK=$(tui-read \"${Q:-}\")"
 				APP_USER_LABEL="${APP_USER_LABEL:-${1:-}}"
 				;;
 			APP_FOLDERS)
-				Q=""
+				Q="$(gettext '')"
 				eval "$TASK=$(tui-read \"${Q:-}\")"
 				APP_FOLDERS="${APP_FOLDERS:-${1:-}}"
 				;;
 			APP_FILES)
-				Q=""
+				Q="$(gettext '')"
 				eval "$TASK=$(tui-read \"${Q:-}\")"
 				APP_FILES="${APP_FILES:-${1:-}}"
 				;;
 			APP_INCLUDE)
-				Q=""
+				Q="$(gettext '')"
 				eval "$TASK=$(tui-read \"${Q:-}\")"
 				APP_INCLUDE="${APP_INCLUDE:-${1:-}}"
 				;;
@@ -147,11 +144,11 @@ Usage: 	$ME [options] [arguments]
 	fi
 # Create the structure	
 	# Optional
-	if tui-yesno "Make more changes?"
-	then	tui-title "$INFO" "Leave empty for default values, use 1 space for empty fields" "$INFO"
-		APP_FOLDERS=$(tui-read "What is the new caption for folders:")
-		APP_FILES=$(tui-read "What is the new caption for files:")
-		APP_USER_LABEL=$(tui-read "What is the new caption for upper right top line:")
+	if tui-yesno "$(gettext 'Make more changes?')"
+	then	tui-title "$INFO" "$(gettext 'Leave empty for default values, use 1 space for empty fields')" "$INFO"
+		APP_FOLDERS=$(tui-read "$(gettext 'What is the new caption for folders:')")
+		APP_FILES=$(tui-read "$(gettext 'What is the new caption for files:')")
+		APP_USER_LABEL=$(tui-read "$(gettext 'What is the new caption for upper right top line:')")
 	fi
 	
 	if ${default_new_browser_manpage_create:-true}

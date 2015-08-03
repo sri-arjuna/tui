@@ -20,7 +20,7 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi
@@ -28,17 +28,18 @@
 #
 #	Variable defaults
 #
-	script_version=0.8.6
+	script_version=0.8.9
 	ME="${0##*/}"
-	help_text="\rUsage: $ME [options] [/path/to/]directory]
-		\rWhere options are:
-		\r\t-h\tThis screen
-		\r\t-b\tShow progress bar
-		\r\t-x\tExtract tarball
-		\r
-		\rIt is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
-		\r
-		\r"
+	help_text="$(gettext "
+Usage: $ME [options] [/path/to/]directory
+Where options are:
+	-h	This screen
+	-b	Show progress bar
+	-x	Extract tarball
+
+It is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
+
+")"
 	
 	FILE_TEMP="$TUI_DIR_TEMP/tui-tar.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
@@ -48,21 +49,22 @@
 	showBar=false
 	doExtract=false
 	beVerbose=false
+	READING="$(gettext 'Reading')"
+	COMPRESSING="$(gettext 'Compressing')"
+	COMPRESSED="$(gettext 'Compressed')"
 #
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text="$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts hbvx opt
 	do	case "$opt" in
 		h)	echo -e "$help_text" ; exit $RET_HELP
@@ -85,7 +87,7 @@
 #
 	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
-	do 	tui-printf -rS 2 "Reading $FOLDER..."
+	do 	tui-printf -rS 2 "$READING..."
 		THIS="${FOLDER##*/}"
 		PWD_ORG="$(pwd)"
 		
@@ -93,7 +95,7 @@
 		if $doExtract
 		then	if [ -f "$FOLDER" ]
 			then	size_tarball=$($LS -l "$FOLDER"|$AWK '{print $5}')
-				[ -z "$size_tarball" ] && tui-echo "Failure reading $FOLDER!" && exit
+				[ -z "$size_tarball" ] && tui-echo "$(gettext 'Failure reading') $FOLDER!" && exit
 				
 				#list_tarball=($(tar tf "$FOLDER"))
 				touch "$TUI_FILE_TEMP".2
@@ -102,7 +104,7 @@
 				pid=$!
 				#while ps | $GREP -q tar 
 				while ps | $GREP -q $pid
-				do	tui-progress "Reading $FOLDER..."
+				do	tui-progress "$READING $FOLDER..."
 					sleep 0.3
 				done
 				list_tarball=( $(cat "$TUI_FILE_TEMP.2") )
@@ -141,13 +143,13 @@
 					done
 					RET=$(cat $TUI_FILE_TEMP)
 				fi
-			else	tui-echo "$FOLDER is not a file or could not be found!"
+			else	tui-echo "$FOLDER $(gettext 'is not a file or could not be found!')"
 			fi
 
-			tui-status $RET "Extracted: $FOLDER"
+			tui-status $RET "$(gettext 'Extracted:') $FOLDER"
 			RET=$?
 		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
-			tui-printf -rS 2 "Reading $FOLDER..."
+			tui-printf -rS 2 "$READING..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
 			cd "$(dirname $FOLDER)"
 			chmod +x "$FILE_CMD"
@@ -170,14 +172,14 @@
 					tmp_size="$($LS -l $DEST |$AWK '{print $5}')"|| \
 					tmp_size="0 bytes"
 				if $showBar
-				then	tui-progress -bm $org_size -i $$ -c $tmp_size "Compressing $THIS ($tmp_display_size)"
-				else	tui-progress "Compressing..." "$THIS ($tmp_display_size)"
+				then	tui-progress -bm $org_size -i $$ -c $tmp_size "$COMPRESSING $THIS ($tmp_display_size)"
+				else	tui-progress "$COMPRESSING..." "$THIS ($tmp_display_size)"
 				fi
 				sleep 0.7
 			done
 			cd "$PWD_ORG"
 			[ -f "$DEST" ]
-			tui-status $? "Compressed: $DEST"
+			tui-status $? "$COMPRESSED: $DEST"
 			RET=$?
 		fi
 	done 

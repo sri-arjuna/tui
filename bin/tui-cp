@@ -159,18 +159,22 @@
 #
 #	Display
 #
+	#set -x
+	#echo $TARGET
 	for thisFile in "${SOURCE[@]}"
 	do
-		tui-status -r  2 "Reading $thisFile..."
-		if [ -f "$thisFile" ] 
-		then	c_opt=""
-			ORG=$(FileSize "$thisFile")
-		elif [ -d "$thisFile" ]
+		thisFile="$(printf $thisFile)"
+		tui-status -r  2 "Reading ${thisFile##*/}..."
+		if [ -d "$thisFile" ]
 		then	c_opt="-r"
 			ORG=$(FolderSize "$thisFile")
+		elif [ -f "$thisFile" ] 
+		then	c_opt=""
+			ORG=$(FileSize "$thisFile")
 		else	# Skipping
+			ls -l $(dirname $thisFile)
 			if $showBar || $showRegular
-			then	tui-status 4 "Skipped $thisFile."
+			then	tui-status 4 "Skipped \"${thisFile##*/}\"."
 			fi
 			COUNTER=$(( $COUNTER + 1 ))
 			TOTAL=$(( $TOTAL + 1 ))
@@ -194,7 +198,7 @@
 				display_trgt="${TARGET##*/}"
 		fi
 		
-		( cp $c_opt "$thisFile" "$TARGET" ; echo $? > $FILE_TEMP ) &
+		( cp $c_opt "$thisFile" "$TARGET" ; echo "$?" > "$FILE_TEMP" ) &
 		pid=$!
 
 		sleep $waiting
@@ -220,9 +224,9 @@
 
 		# Final Message
 		if $showRegular
-		then	tui-status $(cat "$FILE_TEMP") "Copied $display_trgt"
+		then	tui-status $(<"$FILE_TEMP") "Copied $display_trgt"
 		elif $showBar
-		then	tui-status $(cat "$FILE_TEMP") "Copied $display_trgt"
+		then	tui-status $(<"$FILE_TEMP") "Copied $display_trgt"
 		#else
 		elif $showtotal
 		then	TOTAL=${TOTAL:-0}
@@ -230,7 +234,9 @@
 			#showtotal=true
 		fi
 	done
+	#set +x
 	$showtotal && tui-status  $(cat "$FILE_TEMP") "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
-	RET=$(cat "$FILE_TEMP")
-	rm -f "$FILE_TEMP"
+	[ -f "$FILE_TEMP" ] && \
+		RET=$(<"$FILE_TEMP") && \
+		rm -f "$FILE_TEMP" || RET=1
 	exit $RET

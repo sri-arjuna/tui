@@ -70,7 +70,7 @@ Where options are:
 	-F(ile) 	STR	Files will be labled as ARG
 	
 	-- Advanced --
-	-b(lacklist)	WORD	Add a WORD to the BLACKLIST of (linux-)commands not to be executed (Text mode only)
+	-b(lacklist)	WORD	Add a WORD to the BLACKLIST of (GNU/Linux-)commands not to be executed (Text mode only)
 	-c(onfig)	FILE	Full path to the configuration file of the project
 	-d(efault)	STR	Changes the file name string from 'default' to 'NAME'
 				These files will be hidden from the menu, and according to their

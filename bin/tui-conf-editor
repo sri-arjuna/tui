@@ -24,8 +24,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
-#	Changed:	2015.05.01
-	source tuirc
+#	Changed:	2015.08.03
+	source tuirc && source gettext.sh
 	script_version=0.8
 #	Description:	Basic configuration file editor
 #
@@ -33,7 +33,6 @@
 #	Script Environment
 #
 	ME="${0##*/}"				# Basename of tui-config-editor
-	TITLE="$ME ($script_version)"
 	LOG="$TUI_DIR_LOG/tui.log"		# Set default logfile
 #
 #	Variable defaults (options)
@@ -42,9 +41,7 @@
 #
 #	Help text
 #
-	help_text="
-$ME ($script_version)
-${TITLE^}
+	help_text="$(gettext "
 Usage: 		$ME [options] [arguments]
 Examples:	$ME 
 		$ME /etc/tui/tui.conf
@@ -60,8 +57,21 @@ Files:
 Script:		$ME
 Log:		$LOG
 
-"
-
+")"
+# TODO :: -o OPTNAME opt1 opt2 ... Disables the scan of a file, but provides OPTNAME\'s
+#
+#	Messages
+#
+	MSG_FILE_SELECT="$(gettext 'Please select the configuration to edit:')"
+	MSG_FILE_DONT_EXIST="$(gettext '$CONFIG: Does not exist.')"
+	MSG_CONF_VAR_SELECT="$(gettext 'Please select which variable to change:')"
+	MSG_CONF_VAR_CHANGE="$(gettext 'Do you want to change this?')"
+	MSG_CONF_VAL_SELECT="$(gettext 'Please select the new value:')"
+	MSG_CONF_VAL_CURRENT="$(gettext 'Currently '$VAR' is set to '$VAL'.')"
+	MSG_CONF_VAL_TYPE="$(gettext 'Please type the new value:')"
+#
+#	Functions
+#
 	doLog() { # "MESSAGE STRING"
 	# Prints: Time & "Message STRING"
 	# See 'tui-log -h' for more info
@@ -73,7 +83,7 @@ Log:		$LOG
 	#	Check for config file
 		CONFIG="$1"
 		[ ! -f "$CONFIG" ] && \
-			tui-echo "$CONFIG: Does not exist." "$TUI_FAIL" && \
+			tui-echo "$MSG_FILE_DONT_EXIST" "$TUI_FAIL" && \
 			return 1
 		
 		# Preview
@@ -87,14 +97,14 @@ Log:		$LOG
 		VAR=stay
 		
 		while [ Back != "$VAR" ];do
-			tui-echo "Please select which value to change:"
+			tui-echo "$MSG_CONF_VAR_SELECT"
 			VAR=$(tui-select Back Edit $(tui-conf-get -l "$CONFIG"))
 		
 			doSelect=false
 			msg=""
 			newval=""
 			
-			case $VAR in
+			case "$VAR" in
 			Back) 	break				;;
 			Edit)	tui-edit "$CONFIG"		;;
 			*)	VAL=$(tui-conf-get "$CONFIG" "$VAR")
@@ -107,12 +117,12 @@ Log:		$LOG
 						selection="on off"
 						;;
 				esac
-				tui-echo "Currently '$VAR' is set to '$VAL'."
-				if tui-yesno "Do you want to change this?"
+				tui-echo "$MSG_CONF_VAL_CURRENT"
+				if tui-yesno "$MSG_CONF_VAR_CHANGE"
 				then 	if $doSelect
-					then	tui-echo "Please select the new value:"
+					then	tui-echo "$MSG_CONF_VAL_SELECT"
 						newval=$(tui-select $selection)
-					else	newval=$(tui-read "Please type the new value:")
+					else	newval=$(tui-read "$MSG_CONF_VAL_TYPE")
 					fi
 					
 					if [ ! -z "$newval" ]
@@ -142,17 +152,15 @@ Log:		$LOG
 #	Catching Arguments
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text=$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts "hLl:t:" opt
 	do 	case "$opt" in
 		h)	printf "$help_text"
@@ -186,16 +194,16 @@ Log:		$LOG
 			break
 			;;
 		*)	tui-title "$TITLE"
-			tui-echo "Please select the configuration to edit:"
+			tui-echo "$MSG_FILE_SELECT"
 			config="$(tui-select Back ${ARGS[@]})"
 			case "$config" in
 			Back) 	show_menu=false
 				break
 				return 0
 				;;
-			*)	tui-title "Configuration: $config"
+			*)	tui-title "$(gettext 'Configuration:') $config"
 				ConfigMenu "$config"
-				tui-echo "Please select the configuration to edit:"
+				tui-echo "$MSG_FILE_SELECT"
 				;;
 			esac
 			;;

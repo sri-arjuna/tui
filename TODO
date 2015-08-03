@@ -4,15 +4,18 @@ Feedback / Suggestions wanted:
 If you do not like the 'default' theme, or any other of the provided themes,
 you are encouraged to create your own theme - and send me for implementation.
 
+GNU
+---
+gettext, where applicable - commands that require interaction....
 
 
 Review for fix:
 ---------------
-tui-bgjob/tui-download -- errornours ~/.cache/bgjob file
-tui-str-hash -- pipe
-tui-read -- arrows
+
+
 
 # Finalize:
 -----------
 tui-conf-edit
 tui
+samples

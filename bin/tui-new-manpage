@@ -18,16 +18,16 @@
 #
 # ------------------------------------------------------------------------
 #
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi
 #
 #	Variable defaults
 #
-	script_version=0.5.1
+	script_version=0.8.9
 	ME="${0##*/}"
-	help_text="
+	help_text=$(gettext "
 $ME ($script_version)
 Creates a new man page in $HOME/bin, if $HOME/.local/bin does not exists.
 Also asks to create a basic man page template in the same location.
@@ -40,25 +40,23 @@ Where options are:
 	-a(pplication)	Create a full application manpage template
 	-m(inimal)	Creates a minimal manpage template
 	
-"
+")
 	DEST=""
-	TITLE="sea's New manpage script"
+	TITLE="$(gettext 'sea\'s New manpage script"')
 	SHELL_EXT=""
 #
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text=$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	tui-title "$TITLE ($script_version)"
 	while getopts "ham" name
 	do 	case $name in
@@ -94,11 +92,11 @@ Where options are:
 	
 	DEST="${DEST/.1/}.1"
 	if [ -f "$DEST" ]
-	then	tui-yesno "File $DEST exists... Overwrite?" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
-		tui-status $? "Overwrite file: $DEST"
+	then	tui-yesno "$(gettext 'File $DEST exists... Overwrite?')" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
+		tui-status $? "$(gettext 'Overwrite file: $DEST')"
 	fi
 	source $TUI_DIR_TEMPLATES/manpage/$SHELL_EXT > "$DEST"
-	tui-status $? "Saved: $(printf $DEST)"
+	tui-status $? "$(gettext 'Saved:') $(printf $DEST)"
 	# Open the script AFTER the manpage... to encourage the writing of the manpage
 	#set -x
 	tui-edit "$DEST"

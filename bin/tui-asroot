@@ -19,7 +19,7 @@
 #
 # ------------------------------------------------------------------------
 #
-	source /etc/tuirc
+	source /etc/tuirc && source gettext.sh
 	for f in $TUI_FILE_CONF_{COMMANDS,SETTINGS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done
@@ -30,9 +30,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.06.27
+#	Changed:	2015.08.03
 	script_version=0.9.0c
-	TITLE="Run as root"
 #	Description:	Executes passed command as root
 #
 #
@@ -46,32 +45,35 @@
 #
 	beVerbose=false
 #
+#	Translate strings
+#
+	MSG_ROOT="$(gettext 'Please provide root password.')"
+	MSG_SUDO=$(gettext "Password for $USER")
+#
 #	Help text
 #
-	help_text="
+	help_text="$(gettext "
 Usage: 		$ME 'command'
 Examples:	$ME 'cat /etc/cryptab'
 		$ME -m 'Provide password to show crypttab' 'cat /etc/cryptab'
 Where options are:
 	-h(elp) 		This screen
 	-m(essage)	MSG	Prints 'MSG' before asking for a password
-"
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+")
+	version_text=$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
 #
 #	Catching Arguments
 #
 	# Get access to the passed value of the argument by using $OPTARG
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts hm: opt
 	do 	case $opt in
 		h)	printf "$help_text"
@@ -85,17 +87,17 @@ Where options are:
 #	Display & Action
 #
 	#set -x
-	echo $EUID > /euid.log
+	#echo $EUID > /euid.log
 	if tui-bol-root
 	then	# When passing eg: bash /path/to/script, quotes causes a failure!
 		#eval "${@}"
 		${@}
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
-	then	tui-echo "${MSG:-Password for $USER}"
-		"${SUDO:-sudo}" "${@}" 	>&2	#; echo \$?  > /dev/stdout > $TMP"
+	then	tui-echo "${MSG:-$MSG_SUDO}" >&2
+		"${SUDO:-sudo}" ${@} 	>&2	#; echo \$?  > /dev/stdout > $TMP"
 		exit "$?"
-	else	tui-echo "${MSG:-Please provide root password.}"
+	else	tui-echo "${MSG:-$MSG_ROOT}"
 		su -c "${@}" 		>&2	# ; echo \$? > /dev/stdout > $TMP"
 		exit "$?"
 	fi

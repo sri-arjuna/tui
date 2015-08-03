@@ -21,31 +21,32 @@
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	Created:	2014.05.19
-# 	Changed:	2015.07.26
+# 	Changed:	2015.08.03
 #
 #	Variable defaults
 #
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"  2>/dev/zero || source tuirc
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"  2>/dev/zero || source tuirc
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc	# This first call would create the RC if its missing.
 	fi
 	
-	script_version=0.8.7
+	script_version=0.8.9
 	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
-	help_text="\r$ME ($script_version)
-		\rUsage: $ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
-		\rNOTE:\t'Progress String' may contain shell escaped commands.
-		\r
-		\r\t-f [/path/to/]file\tPrint the filesize of passed file
-		\r\t-s [/path/to/]orgfile\tSwitches to progressbar if $TUI_FONT_BOLD-f file$TUI_RESET is passed too
-		\r\t-e BYTESEXPECTED\tRequired to adjust the progressbar, leave out to just print the actual file size
-		\r
-		\rExecutes SCRIPTFILE and prints 'Progress String' while running.
-		\rPrints 'Exit String' when done, regardless of exit code (0,1,?) it uses.
-		\rWAIT is optional wait time between updates, default is 0.7 (seconds).
-		\r
-		\r"
+	help_text="$(gettext "
+$ME ($script_version)
+Usage:	$ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
+NOTE:	'Progress String' may contain shell escaped commands.
+
+	-f [/path/to/]file\tPrint the filesize of passed file
+	-s [/path/to/]orgfile\tSwitches to progressbar if -f file is passed too
+	-e BYTESEXPECTED\tRequired to adjust the progressbar, leave out to just print the actual file size
+
+Executes SCRIPTFILE and prints 'Progress String' while running.
+Prints 'Exit String' when done, regardless of exit code (0,1,?) it uses.
+WAIT is optional wait time between updates, default is 0.7 (seconds).
+
+")"
 	CHECKFILE=false
 	SIZE_ORG=0
 	showBAR=false
@@ -57,17 +58,15 @@
 	[ -z "$3" ] && printf "$help_text" && exit 99
 	BG_RET="-1"
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text=$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts "he:f:s:" opt
 	do 	case "$opt" in
 		h)	printf "$help_text"
@@ -81,7 +80,7 @@
 			;;
 		s)	if [ -f "$OPTARG" ]
 			then	SIZE_ORG=$("$LS" -l "$OPTARG"|"$AWK" '{print $5}')
-			else	tui-status 1 "$ME: File \"$OPTARG\" could not be found!"
+			else	tui-status 1 "$(gettext "$ME: File \"$OPTARG\" could not be found!")"
 				exit "$?"
 			fi
 			showBar=true
@@ -101,9 +100,9 @@
 #	Send job to bg and get pid
 #
 	[ ! -f "$JOB" ] && \
-		tui-printf -rS 1 "Failed, job: $JOB not found!" && \
+		tui-printf -rS 1 "$(gettext "Failed, job: $JOB not found!")" && \
 		exit 1
-	tui-printf -rS 2 "Starting job..."
+	tui-printf -rS 2 "$(gettext 'Starting job...')"
 	(
 		"$SHELL" "$JOB" && \
 			printf 0 >&1 > "$TMP" || \
@@ -137,7 +136,7 @@
 	BG_RET=$(<"$TMP")
 	rm -f "$TMP"
 	if [ "$BG_RET" = "-1" ]
-	then	tui-echo "$TXT_EXIT" "Could not retrieve return value" "$INFO"
+	then	tui-echo "$TXT_EXIT" "$(gettext 'Could not retrieve return value')" "$INFO"
 		exit "$RET_INFO"
 	else	tui-status "$BG_RET" "$TXT_EXIT"
 		exit "$?"

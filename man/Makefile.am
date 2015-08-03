@@ -1,1 +1,1 @@
-man_MANS = *1
+man1_MANS = *1

@@ -20,25 +20,25 @@
 #
 #	Init TUI environment
 #
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
-#	Changed: 2015.08.02
+#	Changed: 2015.08.03
 #
 #
 #	Variable defaultsa
 #
 	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-${HOME:-/root}/.cache}}"
-	script_version=0.8.2
+	script_version=0.8.9
 	ME="${0##*/}"
-	help_text="\r$ME ($script_version)
-		\rUsage: $ME [options] URL [URL2] ..
-		\rWhere options are:
-		\r\t-h\tThis screen
-		\r"
+	help_text="$(gettext "
+Usage: $ME [options] URL [URL2] ..
+Where options are:
+	-h\tThis screen
+")"
 	ARGS=( "${@}" )
 	FILE_TEMP="$TUI_DIR_TEMP/tui-download.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
@@ -62,19 +62,16 @@
 #
 #	Variable handling
 #
-	#[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text="$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
 	case "$1" in
-	"--version")	showVersion
+	"--version")	printf "$version_text"
 			exit 0
 			;;
 	"-h"|"--help")	printf "$help_text" ; exit $RET_HELP
@@ -115,45 +112,22 @@
 	for URL in "${ARGS[@]}"
 	do 	THIS="${URL##*/}"
 		out_string="./$THIS"
+		
 		tui-printf -rS 2 "$MSG_INIT_ACT" #"$WORK"
-		#echo "wget -qc $URL" > $FILE_CMD
 		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > "$FILE_CMD"
 		
 		chmod +x "$FILE_CMD"
 		"$FILE_CMD" &
-		#sleep 1.5
 		sleep 0.5
-		#K=1024
 		
 		str_left="$MSG_ACT_ING"
 		str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
-		#str_right="[  $(tui-indi)   ]"
-		#str_len=$(( ${#str_left} + ${#str_middle} + ${#str_right} + 2 ))
 		
-		#set -x
 		# While its found, assume its till downloading...
 		while [ ! "" = "$(ps|$GREP $CURLWGET)" ] #|| [ ! "" = "$(ps $!)" ]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			COLUMNS="$(tput cols)"
 			str_middle="$THIS ($tmp_size)"
-		#	len="${#str_middle}"
-			#echo "$COLUMNS == $str_len"
-		#	diffr=$(( $(( "$COLUMNS" - "$str_len"  )) + 15 ))
-		#	cut=$(("$len" - "$diffr"))
-
-
-		#	if [ "$diffr" -ge 1 ]
-		#	then	
-		#		if [ "$diffr" -gt "$len" ]
-		#		then	# It makes sense to cut off pieces
-		#			str_middle_corrected="${str_middle:0:$diffr}"
-		#		else	# No change required / reset to original
-		#			str_middle_corrected="${str_middle}"
-		#		fi
-		#	else	# No change required / reset to original
-		#		str_middle_corrected="${str_middle}"
-		#	fi
-			
 			tui-progress "$str_left" "${str_middle_corrected}" #"[  $(tui-indi)   ]"
 			sleep 1
 		done

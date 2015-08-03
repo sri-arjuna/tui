@@ -846,7 +846,7 @@ This will show 'progress' of the working through all these scripts.
 However, it will just show if a script is planed to, running or how it ended.
 
 
-@boxed
+@indentedblock
 Something of importance to know is the that the wait option ("-w SECS") has influence 
 on the interval it checks if scripts have completed.
 
@@ -856,7 +856,7 @@ The longer the interval, the more time the CPU has to work on its jobs.
 
 
 The interval should be set to at max 50% of the slowest job expected, and should be no lower than 1 sec.
-@end boxed
+@end indentedblock
 
 Runs all KSH scripts with an interval of 5 minutes between visual (and actual working-) updates.
 @example

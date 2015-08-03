@@ -27,8 +27,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.03.26
-#	Changed:	2015.06.27
-	script_version=0.3
+#	Changed:	2015.08.02
+	script_version=0.4
 	TITLE="tui-str-hash"
 #	Description:	hashing text on the fly
 #
@@ -50,6 +50,7 @@ ${TITLE^}
 Usage: 		$ME [options] arguments
 Examples:	$ME 'teststring'
 		$ME -t 384 'teststring'
+		cat /tmp/password.txt | $ME -
 Where options are:
 	-h(elp) 		This screen
 	-t(ype)		TYPE	Pass which type of hashing you want, default/fallback: md5sum
@@ -97,12 +98,24 @@ Where options are:
 #
 #	Display & Action
 #
-	for A in "${@}"
-	do	$beVerbose && tui-title "hashing: \"$A\""
-		for T in $TOOLS
-		do	str=$(echo -e "$A" | $T | $AWK '{print $1}')
-			$beVerbose && \
-				tui-echo "$T:" "$str" || \
-				echo "$str"
+	if [ "-" = "$1" ] || [ "--" = "$1" ]
+	then	# Do pipe handling
+		while read stream
+		do 	$beVerbose && tui-title "hashing: \"$A\""
+			for T in $TOOLS
+			do	str=$(echo -e "$stream" | $T | $AWK '{print $1}')
+				$beVerbose && \
+					tui-echo "$T:" "$str" || \
+					echo "$str"
+			done
 		done
-	done
+	else	for A in "${@}"
+		do	$beVerbose && tui-title "hashing: \"$A\""
+			for T in $TOOLS
+			do	str=$(echo -e "$A" | $T | $AWK '{print $1}')
+				$beVerbose && \
+					tui-echo "$T:" "$str" || \
+					echo "$str"
+			done
+		done
+	fi

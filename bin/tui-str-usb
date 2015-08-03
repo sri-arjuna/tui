@@ -23,7 +23,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS,STATUS};do source "$f";done
 	else	. tuirc	# This first call would create the RC if its missing.
 	fi
@@ -36,16 +36,16 @@
 #
 #	Variable defaults
 #
-	script_version=0.7a
+	script_version=0.8.9
 	ME="${0##*/}"
-	help_text="\r$ME ($script_version)
-		\rUsage: $ME [options]
-		\rSelect USB device if more than one is found
-		\rWhere options are:
-		\r\t-h\tThis screen
-		\r\t-a\tAutoselect entry if only one was found
-		\r
-		\r"
+	help_text="$(gettext "
+Usage: $ME [options]
+Select USB device if more than one is found
+Where options are:
+	-h	This screen
+	-a	Autoselect entry if only one was found
+
+")"
 	targetusb=""
 	devDisk=/dev/disk/by-id
 	tDev=""
@@ -54,17 +54,15 @@
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	version_text="$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
+	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts h opt
 	do	case "$opt" in
 		h)	echo -e "$help_text"
@@ -97,7 +95,7 @@
 #	Display
 #
 	# Make sure there is something available
-	msg="Please connect an USB device..."
+	msg="$(gettext 'Please connect an USB device...')"
 	left="$BORDER_LEFT $msg"
 	list=""
 	sleeper=0.0001
@@ -117,30 +115,30 @@
 	#echo "if [ "$(echo $list|wc -l)" -eq 1 ] && [ -z "$usbAsk" ] "
 	if [ "$(echo $list|wc -w)" -eq 1 ] && [ -z "$usbAsk" ] 
 	then	# There is no setting yet, first time usage
-		tui-echo "The only device available is:" "${list}" > /dev/stderr
-		if tui-yesno "Is this a card reader that is always listed?" > /dev/stderr
-		then	if tui-yesno "Ignore this device in future calls?" > /dev/stderr
+		tui-echo "$(gettext 'The only device available is:')" "${list}" >&2
+		if tui-yesno "$(gettext 'Is this a card reader that is always listed?')" >&2
+		then	if tui-yesno "$(gettext 'Ignore this device in future calls?')" >&2
 			then	# Save the card reader
 				tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbIgnore "\"$list\""
 				RET=1
-			else	tui-echo "Do you want to be asked to select this device every time?"
-				tui-yesno "No, might result in that device being auto-selected!"
+			else	tui-echo "$(gettext 'Do you want to be asked to select this device every time?')" >&2
+				tui-yesno "$(gettext No, might result in that device being auto-selected!')" >&2
 				RET=$?
 			fi
 		else	RET=1
 		fi
-		tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbAsk $(tui-str-bol-conv -t $RET)  > /dev/stderr
+		tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbAsk "$(tui-str-bol-conv -t $RET)"  >&2
 		source "$TUI_FILE_USER_SETTINGS"
 		[ -z "$usbIgnore" ] || exit 1
 	fi
 #
 #	Ask now or not?
 #
-	if $usbAsk
-	then	$AUTO && \
-			targetUsb=$(tui-select -a $list) || \
-			targetUsb=$(tui-select $list)
-	else	targetUsb=$(tui-select -a $list)
+	if "$usbAsk"
+	then	"$AUTO" && \
+			targetUsb="$(tui-select -a $list)" || \
+			targetUsb="$(tui-select $list)"
+	else	targetUsb="$(tui-select -a $list)"
 	fi
-	tDev=$(readlink -f $devDisk/$targetUsb)
-	echo $tDev
+	tDev="$(readlink -f $devDisk/$targetUsb)"
+	echo "$tDev" >&1

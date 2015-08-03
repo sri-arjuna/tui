@@ -23,8 +23,9 @@
 #	Help text
 #
 	ME=tui-wait
-	script_version=0.6
+	script_version=0.8.9
 	beVerbose=false
+	source gettext.sh
 	help_text="
 $ME ($script_version)
 Usage: 		$ME TIME [MSG]
@@ -37,14 +38,15 @@ Examples:	$ME 2m
 #	Argument handling
 #
 	case "$1" in
-	"--version")	cat <<-EOF
-				GNU $ME, Version $script_version
-				Copyright (C) 2015 Simon Arjuna Erat
-				License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	"--version")	version_text="$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-				This is free software; you are free to change and redistribute it.
-				There is NO WARRANTY, to the extent permitted by law.
-			EOF
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
+			printf "$version_text"
 			exit 0
 			;;
 	"-h"|"--help"|"")	printf "$help_text"
@@ -62,7 +64,7 @@ Examples:	$ME 2m
 	[ -z "$TIME" ] && printf "$help_text" && exit 1
 	[ -z "$UNIT" ] && UNIT=s
 	[ -z "$2" ] && \
-		MSG="Time left:" || \
+		MSG="$(gettext 'Time left:')" || \
 		MSG="$2"
 	hours=0
 	minutes=0
@@ -71,7 +73,7 @@ Examples:	$ME 2m
 	s)	seconds="$TIME"	;;
 	m)	minutes="$TIME"	;;
 	h)	hours="$TIME"	;;
-	*)	tui-status 1 "Please use either (s)econds, (m)inutes, or (h)ours"
+	*)	tui-status 1 "$(gettext 'Please use either (s)econds, (m)inutes, or (h)ours')"
 	esac
 #
 #	Functions

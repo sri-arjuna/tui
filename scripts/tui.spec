@@ -1,6 +1,6 @@
 Name:        tui
-Version:     0.8.5
-Release:     0%{?dist}
+Version:     0.8.9
+Release:     8%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -24,15 +24,15 @@ or describes its task with its name.
 %setup -q -c %{name}-%{version}
 
 %build
-# nothing to do
+cd %name
+%configure --prefix=/usr
+make
+
 
 %install
 # Clean buildroot
 rm -rf       %{buildroot}
-# Remove non-used files to reduce package size
-rm -fr  %{name}/build-rpm-%{name}.sh \
-        %{name}/install.sh \
-        %{name}/uninstall.sh
+cd %name
 # Prepare directories
 mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_mandir}/man1 \
@@ -40,22 +40,12 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_sysconfdir}/profile.d/ \
                      %{buildroot}%{_datarootdir}/%{name}/themes \
                      %{buildroot}%{_docdir}/%{name} \
-                     %{buildroot}%{_datadir}/bash-completion/completions
-# Move the executeables
-rm -fr %{name}/screenshots
-mv %{name}/bin/*     %{buildroot}%{_bindir}/
-mv %{name}/%{name}_compl.bash %{buildroot}%{_datadir}/bash-completion/completions
-# Copy system defaults to system
-echo "PREFIX=/usr" >> %{name}/conf.etc/tui.conf
-cp %{name}/conf.etc/*    %{buildroot}%{_sysconfdir}/%{name}/
-# Move system defaults to app dir
-mv %{name}/conf.etc    %{buildroot}%{_datarootdir}/%{name}/
-cp %{name}/conf.home/*  %{buildroot}%{_datarootdir}/%{name}/
-mv %{name}/templates    %{buildroot}%{_datarootdir}/%{name}/
-mv %{name}/themes       %{buildroot}%{_datarootdir}/%{name}/
-mv %{name}/docs/*       %{buildroot}%{_docdir}/%{name}
-mv %{name}/man/*.1      %{buildroot}%{_mandir}/man1
-
+                     %{buildroot}%{_datarootdir}/info \
+		     %{buildroot}%{_datadir}/bash-completion/completions
+# Actual install
+make install DESTDIR=$RPM_BUILD_ROOT 
+# Dont know why this gets created...
+rm -f $RPM_BUILD_ROOT/%{_datarootdir}/info/dir
 
 %clean
 rm -rf %{buildroot}
@@ -63,17 +53,24 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)   
 %doc %{_docdir}/%{name}/
+%{_sysconfdir}/%{name}rc
 %{_mandir}/man1/%{name}*.1.gz
 %{_datarootdir}/%{name}/
-%{_bindir}/%{name}
-%{_bindir}/%{name}-*
+%{_datarootdir}/info/%{name}.info.gz
+%{_bindir}/%{name}*
 
 %config
+%{_sysconfdir}/%{name}rc
 %{_sysconfdir}/%{name}/
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
-* Sat Jan 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.5
+* Sun Aug 02 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.9
+- Name changes: tui -> tuirc ; tui-browser -> tui
+- Name changes: tui-psm -> tui-bgjob-mgr
+- Removed: tui-indi, tui-math-*
+
+* Sat Jun 27 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.5
 - Changed:   All commands support: --help and --verbose
 - Changed:   tui-bol-gui, updated helpscreen
 - Changed:   tui-conf-get, double output is now a single line

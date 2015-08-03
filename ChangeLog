@@ -37,3 +37,9 @@
 * major update for tui-install
 * hotfix for tui-download
 * major update to hopefully pass boot stages without error message (visual output still missing)
+
+2015.08.03 - 0.8.9-GNU-RC8
+* Applied gettext: tui-asroot, tui-bgjob, tui-conf-editor, tui-cp, tui-download,
+*			tui-new-browser, tui-new-script, tui-new-manpage, 
+*			tui-read, tui-select, tui-str-usb, tui-tar, tui-wait
+
