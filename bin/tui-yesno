@@ -23,7 +23,7 @@
 	BORDER_RIGHT=""
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
-	if source /etc/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
@@ -42,13 +42,8 @@
 #
 	script_version=0.9.0b
 	ME="${0##*/}"
-	help_text="$ME ($script_version)
-		\rUsage: $ME \"Question:\"
-		\rReturns on user press of: o,j,s,y
-		\r"
 	ARGS_COUNT=$#
-	help_text="
-$ME ($script_version)
+	help_text="$(gettext "
 Usage: 	$ME \"Question\"
 
 Example: (Accepts: 'y,o,j,s', denies everything else)
@@ -57,7 +52,7 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 	else echo no
 	fi
 
-"
+")
 	answer=""
 #
 #	Check for read capabilities if not set yet
@@ -86,14 +81,15 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 		exit $RET_HELP
 		;;
 	"--version")
-		cat <<-EOF
-			GNU $ME, Version $script_version
-			Copyright (C) 2015 Simon Arjuna Erat
-			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+		version_text="$(gettext "
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-			This is free software; you are free to change and redistribute it.
-			There is NO WARRANTY, to the extent permitted by law.
-		EOF
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+")"
+		printf "$version_text"
 		exit 0
 		;;
 	"-h"|"--help")
