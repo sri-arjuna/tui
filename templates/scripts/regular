@@ -28,10 +28,8 @@ cat > "$DEST" << EOF
 #
 #
 #
-#
 #	TUI
 #
-	source gettext.sh
 	source tuirc
 	script_name="\${0##*/}"
 	script_name="\${script_name/.sh/}"
@@ -48,20 +46,11 @@ cat > "$DEST" << EOF
 		script_dir="\$(dirname \$0)" || \\
 		script_dir="\$(pwd)"
 	LOG="\$TUI_DIR_LOGS/\${script_name}.log"
-	TMP="\${TMPDIR}/\${script_name}-$$.tmp~"
+	TMP="\${TMPDIR}/\${script_name}-\$\$.tmp~"
 #
-#	Variable Defaults
+#	Variable Defaults & Inits
 #
 	default_var="default value"
-#
-#	Variable Inits
-#
-	var=""
-#
-#	Messages to translate:
-#	(help & version texts are separate)
-#
-	MSG_XY="\$(gettext 'Hello world!')"
 #
 #	Functions
 #
@@ -92,7 +81,7 @@ Options:
 	show_version() {
 	# Prints the version of the script
 	# and exits
-		MSG_TR_VERSION="GNU \$script_name, Version \$script_version
+		MSG_TR_VERSION="\$script_name, Version \$script_version
 Copyright (C) $(date +'%Y') $USER_NAME
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -106,7 +95,7 @@ There is NO WARRANTY, to the extent permitted by law.
 #	Traps are cool!
 #
 	## TRAP FUNCTION/"COMMAND" MODE's ... ##
-	#trap cleanup INT ERR
+	trap cleanup ERR EXIT INT QUIT TERM
 #
 #	Get options
 #
@@ -114,7 +103,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	GETOPT=\$(getopt \\
 		--options	"h" \\
 		--longoptions	"help,version,YOUROPT:" \\
-		--name 		"\${0##*/}" -- "\${@}" \\
+		--name 		"\${0##*/}" -- "\${@}"
 	)
 	eval set -- "\$GETOPT"
 	while true
@@ -123,7 +112,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		--version)	show_version	;;
 		--)		shift ; break	;;
 		--YOUROPT)	opt_str="\$2"
-				shift
+				shift 2
 				;;
 		esac
 	done
@@ -132,7 +121,7 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 	tui-header "\$script_name (\$script_version)" "\$(date +'%F %T')"
 	tui-title "\$script_title"
-	tui-echo "\$MSG_XY"
+	tui-echo "Hello world!"
 #
 # 	Clean up & exit
 #
