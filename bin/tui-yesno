@@ -45,7 +45,6 @@
 #
 	script_version=0.9.0c
 	ME="${0##*/}"
-	ARGS_COUNT=$#
 	MSG_TR_YESNO="$(gettext 'y/n')"
 	MSG_TR_help_text="$(eval_gettext '
 Usage: 	$ME \"Question\"
@@ -58,11 +57,13 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 
 ')"
 	answer=""
-	GREP="${GREP:-grep}"
+	GREP="${GREP:-\grep}"
+	READ="${READ:-\read}"
+	
 #
 #	Check for read capabilities if not set yet
 #
-	LC_ALL=C $READ --help 2>&1 | "$GREP" -v bash > "$TUI_FILE_TEMP"
+	LC_ALL=C "$READ" --help 2>&1 | "$GREP" -v bash > "$TUI_FILE_TEMP"
 	# Delimiter	
 	"$GREP" -q "\[-d" "$TUI_FILE_TEMP"
 	bash_read_delimiter="$(tui-str-bol-conv -t $?)"
@@ -109,9 +110,9 @@ There is NO WARRANTY, to the extent permitted by law.
 	while ! echo "${answer,,}" | "$GREP" -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
 	do	tui-printf "$1" >&2
 		printf "\r$BORDER_LEFT $1 (y/n) " >&2
-		$bash_read_numbers && \
-			read -n1 answer || \
-			read answer
+		"$bash_read_numbers" && \
+			"$READ" -n1 answer || \
+			"$READ" answer
 	done
 	printf "\r"   >&2
 	tui-echo "$1 ($MSG_TR_YESNO) " "$answer"  >&2

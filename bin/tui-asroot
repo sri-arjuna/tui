@@ -79,9 +79,9 @@ There is NO WARRANTY, to the extent permitted by law.
 	[ "--help" = "$1" ] && printf "$MSG_TR_HELP" && exit 99
 	[ "--version" = "${1,,}" ] && printf "$MSG_TR_VERSION" && exit 0
 	while getopts hm: opt
-	do 	case $opt in
+	do 	case "$opt" in
 		h)	printf "$MSG_TR_HELP"
-			exit $RET_HELP
+			exit "$RET_HELP"
 			;;
 		m)	MSG="$OPTARG"
 			shift 2

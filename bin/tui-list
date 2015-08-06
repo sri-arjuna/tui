@@ -26,14 +26,19 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+
 #
 #	File:		tui-list
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.06
-#	Changed:	2015.07.22
-	script_version=1.5a
+#	Changed:	2015.08.06
+	script_version=1.6
 	TITLE="tui-list"
 #	Description:	Lists entries of a folder, or passed list
 #			And shows either Arabic, roman or no number indexes.
@@ -52,10 +57,10 @@
 #
 #	Help text
 #
-	help_text="
+	help_text="$(eval_gettext '
 Usage: 		$ME [options] [arguments]
 Examples:	$ME 
-		$ME -a one 'long string' three
+		$ME -a one "long string" three
 Where options are:
 	-h(elp) 		This screen
 	-a(lpha)		Use letters instead of numbers
@@ -63,28 +68,29 @@ Where options are:
 	-n(um)			User regular numbers for counting
 	-v(erbose)		Print cancel option 0.
 
-"
+')"
 #	-r(oman)		Use roman letters as numbers
 
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+'
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "ahnr12v" opt
 	do 	case "$opt" in
 		h)	printf "$help_text"
-			exit $RET_HELP
+			exit "$RET_HELP"
 			;;
 		1|2)    ROWS="$opt"	;;
-                a)	MODE=alpha 	;;
+                a)	MODE=alpha
+			SEP=") "	;;
 		r)	MODE=roman
 			SEP=". "	;;
 		n)	MODE=num
@@ -93,23 +99,23 @@ Where options are:
 		# *)	printf "$help_text" ; exit $?	;;
 		esac
 	done
-	shift $(($OPTIND - 1))
+	shift "$(($OPTIND - 1))"
 	[ -z "$1" ] && \
 		while IFS= read -r ARG
 		do	set -- "$@" "$ARG"
 		done
 	ARGS=( "${@}")			# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
-	COLUMNS=$(tput cols)
+	COLUMNS="$(tput cols)"
 #
 #	Functions
 #
 	num2char() { # NUM
 	# Returns a letter string: a-z
 	# Or: aa-az ba-bz, etc
-		num=$1
+		num="$1"
 		out=""
-		[ $num -gt 700 ] && \
+		# Quoting these echo's will break the output
+		[ "$num" -gt 700 ] && \
 			list=( $(echo {a..z} {a..z}{a..z} {a..z}{a..z}{a..z} ))	|| \
 			list=( $(echo {a..z} {a..z}{a..z} )) 	# Be fast for letters in range..
 		out="${list[$num]}"
@@ -118,9 +124,9 @@ Where options are:
 	num2roman() { # NUM
 	# Returns NUM in roman letters
 	#
-		input=$1	# input num
+		input="$1"	# input num
 		output=""	# Clear output string
-		len=${#input}	# Initial length to count down
+		len="${#input}"	# Initial length to count down
 		U="\033[4m"	# Underscore, multiplies with 1000
 		R="\033[0m"	# Resets the underscore
 		roman_val() { # NUM one five ten
@@ -133,23 +139,23 @@ Where options are:
 			out=""
 			case "$N" in
 			0)	out+=""	;;
-			[123])	while [ $N -gt 0 ]
+			[123])	while [ "$N" -gt 0 ]
 				do	out+="$one"
-					N=$(($N-1))
+					N="$(($N-1))"
 				done
 				;;
 			4)	out+="$one$five"	;;
 			5)	out+="$five"	;;
 			[678])	out+="$five"
-				N=$(($N-5))
-				while [ $N -gt 0 ]
+				N="$(($N-5))"
+				while [ "$N" -gt 0 ]
 				do	out+="$one"
 					N=$(($N-1))
 				done
 				;;
-			9)	while [ $N -lt 10 ]
+			9)	while [ "$N" -lt 10 ]
 				do	out+="$one"
-					N=$(($N+1))
+					N="$(($N+1))"
 				done
 				out+="$ten"
 				;;
@@ -158,9 +164,9 @@ Where options are:
 		}
 		while [ "$len" -gt 0  ]
 		do	# There are letters to add
-			num=${input:0:1}
+			num="${input:0:1}"
 			# Do action according position
-			case $len in
+			case "$len" in
 			1)	output+="$(roman_val $num I V X)"	;;
 			2)	output+="$(roman_val $num X L C)"	;;
 			3)	output+="$(roman_val $num C D M)"	;;
@@ -170,17 +176,17 @@ Where options are:
 				Tone="CI\)"
 				Tfive="I\)"
 				Tten="CCI\)\)"
-				DEPTH=$[ "$len" - 3 ]	# 1 = 1000 = initial template
+				DEPTH="$(( $len - 3 ))"	# 1 = 1000 = initial template
 				while [ "$DEPTH" -gt 1 ]
 				do	Tone="C$Tone)"
 					Tfive="C$Tfive)"
 					Tten="C$Tten)"
-					DEPTH=$(($DEPTH-1))
+					DEPTH="$(($DEPTH-1))"
 				done
 				output+="$(roman_val $num $Tone $Tfive $Tten  )"
 				;;
 			esac
-			input=${input:1} ; len=${#input}
+			input="${input:1}" ; len="${#input}"
 		done
 		printf "$output"
 	}
@@ -190,40 +196,40 @@ Where options are:
 	unset OUT[@]
 	OUT[0]=""
 	shown=false
-	MAX=$(( $ROWS - 1 ))
+	MAX="$(( $ROWS - 1 ))"
 	CUR=0
 	DONE=0
 	for OPT in "${ARGS[@]}"
-	do	DONE=$(( $DONE + 1))
+	do	DONE="$(( $DONE + 1))"
 		# Do the visible counter
-		case $MODE in
+		case "$MODE" in
 		num)	count="$DONE"				;;
-		alpha)	count=$(num2char $(( "$DONE" - 1 )) )	;;
+		alpha)	count="$(num2char $(( $DONE - 1 )) )"	;;
 		roman)	count="$(num2roman $DONE)"		;;
 		none)	count=""				;;
 		esac
 		
 		# Add the string to array, or print array
-		if [ $CUR -le $MAX ]
+		if [ "$CUR" -le "$MAX" ]
 		then	len=0
 			for O in "${OUT[@]}";do len=$[ $len + ${#O} ];done
-			sum=$[ $len + 2  + ( ${#BORDER_LEFT} * 2 ) ]
+			sum="$(( $len + 2  + ( ${#BORDER_LEFT} * 2 ) ))"
 			
-			if [ $sum -lt $COLUMNS ]
-			then	OUT[$CUR]="${count}${SEP}${OPT}"
+			if [ "$sum" -lt "$COLUMNS" ]
+			then	OUT["$CUR"]="${count}${SEP}${OPT}"
 				shown=false
-				CUR=$(( $CUR + 1 ))
+				CUR="$(( $CUR + 1 ))"
 			else	tui-echo "${OUT[@]}" >&2
 				CUR=0 && unset OUT[@] 
 				[ -z "$OPT" ] && shown=true
-				OUT[$CUR]="${count}${SEP}$OPT"
-				CUR=$(( $CUR + 1 ))
+				OUT["$CUR"]="${count}${SEP}${OPT}"
+				CUR="$(( $CUR + 1 ))"
 			fi
 		else 	tui-echo "${OUT[@]}" >&2
 			CUR=0 && unset OUT[@] 
 			[ -z "$OPT" ] && shown=true
-			OUT[$CUR]="${count}${SEP}$OPT"
-			CUR=$(( $CUR + 1 ))
+			OUT["$CUR"]="${count}${SEP}$OPT"
+			CUR="$(( $CUR + 1 ))"
 		fi
 	done
 	# Print unprinted

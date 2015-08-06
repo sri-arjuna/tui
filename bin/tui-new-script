@@ -106,10 +106,11 @@ There is NO WARRANTY, to the extent permitted by law.
 	then	tui-yesno "$(eval_gettext "File $DEST exists... Overwrite?")" ||  ( 
 			BACKUP="$DEST-$(date +'%F-%T').bak"
 			mv "$DEST" "$BACKUP"
-			tui-status $? "$(eval_gettext "Saved original $DEST to $BACKUP")"
+			tui-status "$?" "$(eval_gettext "Saved original $DEST to $BACKUP")"
 		)
 	fi
-set -x
+	
+	# Check where provided template path is
 	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
 	then	# Original templates write their output automatically to $DEST
 		source "$TUI_DIR_TEMPLATES/scripts/$SCRIPT"
@@ -117,10 +118,10 @@ set -x
 	then	# Just copy the user templates, as they are individual
 		tui-cp "$TUI_DIR_USER_TEMPLATES/$SCRIPT" "$DEST"
 	else	tui-status 1 "$(eval_gettext "Fatal error, template \"$SCRIPT\" not found!")"
-		set +x
 		exit 1
 	fi
-set +x
+	
+	# Did it get created
 	[ -f "$DEST" ]
 	if tui-status $? "$(gettext 'Saved script:') $DEST"
 	then	chmod +x "$DEST"

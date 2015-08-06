@@ -43,3 +43,9 @@
 *			tui-new-browser, tui-new-script, tui-new-manpage, 
 *			tui-read, tui-select, tui-str-usb, tui-tar, tui-wait
 
+2015.08.06 - 0.8.9-GNU-RC9
+* gettext & other updates:
+*	tui-asroot, tui-list, tui-new-script, tui-select, tui-yesno, tuirc
+* injection protection: updated some default values in 'conf.*/*' files
+* REMOVING QUOTES THAT CAUSE ERRORS!
+* Updated 'full' and 'regular' template scripts

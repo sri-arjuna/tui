@@ -70,6 +70,7 @@ Where options are:
 #
 #	Check for read capabilities if not set yet
 #
+	READ="${READ:-\read}"
 	LC_ALL=C "$READ" --help 2>&1 | "$GREP" -v bash > "$TUI_FILE_TEMP"
 	# Delimiter	
 	"$GREP" -q "\[-d" "$TUI_FILE_TEMP"
@@ -113,7 +114,7 @@ There is NO WARRANTY, to the extent permitted by law.
 			;;
 		esac
 	done
-	shift $(($OPTIND - 1))
+	shift "$(($OPTIND - 1))"
 	[ -z "$ROWS" ] || ROWS="$ROWS"
 	
 	# This many digits to read at max
@@ -145,9 +146,9 @@ There is NO WARRANTY, to the extent permitted by law.
 		invalid=false
 		
 		# Get input
-		$wasPipe && \
-			$cmd NUM </dev/tty || \
-			$cmd NUM
+		"$wasPipe" && \
+			"$cmd" NUM </dev/tty || \
+			"$cmd" NUM
 		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
 		echo "$NUM" | $GREP '^\?' && invalid=true && continue
@@ -159,24 +160,23 @@ There is NO WARRANTY, to the extent permitted by law.
 			tui-printf "" "" ""
 			continue
 		fi
-		#NUM=$(echo "$NUM"|$GREP -v '[')
-		NUM=$(echo "$NUM")
-		[ -z "$NUM" ] && NUM="" && invalid=true && continue
+		
+		[ -z "$(echo $NUM)" ] && invalid=true && continue
 		
 		# It is a number in range?
-		if [ "" = "$(echo "$NUM"|tr -d [:digit:])" ] && [ "${#NUM}" -ne 0 ]
+		if [ "" = "$(echo $NUM|tr -d [:digit:])" ] && [ "${#NUM}" -ne 0 ]
 		then	# This some solves the selection of the last item....
-			[ $NUM -eq ${#ARGS[@]} ] && NUM=0
+			[ "$NUM" -eq "${#ARGS[@]}" ] && NUM=0
 			
 			# Clear input if NUM is too high
-			if [ $NUM -gt $[ $len - 1 ] ]
+			if [ "$NUM" -gt "$(( $len - 1 ))" ]
 			then	invalid=true
 				printf "\r$BORDER_LEFT >   \r$BORDER_LEFT >" >&2
 			else	[ "$NUM" -eq 0 ] && todo=true
 			fi
 			
 			# Array starts at 0 --> Fails if quotes
-			NUM=$(( $NUM - 1 ))
+			NUM="$(( $NUM - 1 ))"
 		else 	# Clear input if NUM is NOT numeric
 			printf "\r${BORDER_LEFT} >   \r${BORDER_LEFT} > " >&2
 		fi
