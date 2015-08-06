@@ -24,8 +24,8 @@ shopt -s expand_aliases
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.07.13
-	script_version=2.4
+#	Changed:	2015.08.06
+	script_version=2.5
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
@@ -66,19 +66,17 @@ shopt -s expand_aliases
 	function help_screen () { #
 	# Prints some basic usage
 	#
-		cat <<-SCREEN
-		TUI $TUI_VERSION ($ME: $script_version)
-		$TITLE
-		Usage: 	$ME [config|reset[-yes]|theme] (source tui)
-		Where options are:
-		 	-h		This screen
-		 	config		Enters directly into config mode
-		 	provides	List all variables provided by TUI
-		 	reset		Resets configuration to defaults, root will reset system wide defaults
-		 	reset-yes	Resets configuration without asking for verification
-		 	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
-		 
-		SCREEN
+		eval_gettext '
+Usage: 	tuirc [config|reset[-yes]|theme] (source tui)
+Where options are:
+	-h		This screen
+	config		Enters directly into config mode
+	provides	List all variables provided by TUI
+	reset		Resets configuration to defaults, root will reset system wide defaults
+	reset-yes	Resets configuration without asking for verification
+	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
+
+'
 	}
 	function first_time() { #
 	# Prepare all variables and write conf files
@@ -91,7 +89,7 @@ shopt -s expand_aliases
 			do	[ -d "$tryout" ] && TUI_DIR_TEMP="$tryout" && break
 			done
 			
-			for tryout in "$HOME/.local/bin" "$HOME/bin"
+			for tryout in "$HOME/.local/bin" "$HOME/bin" "$HOME/local/bin"
 			do	[ -d "$tryout" ] && TUI_DIR_USER_SCRIPTS="$tryout" && break
 			done
 			
@@ -111,9 +109,9 @@ shopt -s expand_aliases
 			then	THM=default-red
 				TCACHE=/tmp
 			else	THM=default
-				TCACHE=$HOME/.cache
+				TCACHE="${HOME:-~}/.cache"
 			fi
-			TUI_DIR_TEMP=${TUI_DIR_TEMP:-$TCACHE}
+			TUI_DIR_TEMP="${TUI_DIR_TEMP:-$TCACHE}"
 			
 			
 			cat > "$TRC" <<-TUI_RC
@@ -185,7 +183,7 @@ shopt -s expand_aliases
 		#tui-bol-dir $(tui-conf-get -l "$TRC"|grep "_DIR_")
 		for item in $TUI_PREFIX $TUI_DIR_CONF $TUI_DIR_DOCS $TUI_DIR_SYSTEM $TUI_DIR_USER_LOGS \
 				$TUI_DIR_THEMES $TUI_DIR_TEMP $TUI_DIR_USER_SCRIPTS $TUI_DIR_USER_MANPAGES
-		do	[ -d "$item" ] ||  ( mkdir -p "$item" ; echo "Created: $item" > /dev/stderr )
+		do	[ -d "$item" ] ||  ( mkdir -p "$item" ; echo "$eval_gettext 'Created: $item')" >&2 )
 		done
 	}
 	ConfigTUI() { #
@@ -199,9 +197,9 @@ shopt -s expand_aliases
 		if [ 0 -eq "$UID" ] 
 		then 	# thisconf="${TUI_DIR_CONF/\/\//\/}"
 			thisconf="$TUI_DIR_CONF"
-			MSG_MENU_title="TUI config - System Wide"
+			MSG_MENU_title="$(gettext 'TUI config - System Wide')"
 		else	thisconf="$TUI_DIR_USER"
-			MSG_MENU_title="TUI config - Personal for $USER_NAME"
+			MSG_MENU_title="$(eval_gettext 'TUI config - Personal for $USER_NAME')"
 		fi
 		
 		# Show & Edit files
@@ -214,12 +212,12 @@ shopt -s expand_aliases
 		YES="${YES:-false}"
 		case "$UID" in
 		0)	# ROOT, system wide
-			RANGE="System defaults"
+			RANGE="$(gettext 'System defaults')"
 			CFG_DIR="$TUI_DIR_CONF"
 			SRC_DIR="$TUI_DIR_SYSTEM/conf.etc"
 			;;
 		*)	# USER, personal only
-			RANGE="Personal settings"
+			RANGE="$(gettext 'Personal settings')"
 			CFG_DIR="$TUI_DIR_USER"
 			SRC_DIR="$TUI_DIR_SYSTEM"
 			;;
@@ -229,7 +227,7 @@ shopt -s expand_aliases
 		cd "$CFG_DIR"
 		if [ "$?" -eq 0 ]  && "$YES"
 		then	rm -fr *
-		else	tui-yesno "Are you sure to remove $RANGE in \"$CFG_DIR\"" || return 1
+		else	tui-yesno "$(eval_gettext 'Are you sure to remove $RANGE in \"$CFG_DIR\"?')" || return 1
 			rm -fr *
 		fi
 		
@@ -277,6 +275,11 @@ shopt -s expand_aliases
 			[ -f "$TUI_DIR_USER/$f" ] && \
 			source "$TUI_DIR_USER/$f"
 	done<"$TUI_FILE_USER_LOADLIST"
+	# As these are essential for TUI to work properly, 
+	# do a fallback check, if any of these should be empty
+	AWK="${AWK:-\awk}"
+	GREP="${GREP:-\grep}"
+	SED="${SED:-\sed}"
 	# Make apps not require *_CLI or *_GUI
 	if tui-bol-gui
 	then	# Its GUI
@@ -293,57 +296,54 @@ shopt -s expand_aliases
 #
 	if [ "${0##*/}" = "tuirc" ]
 	then	# It is not sourced
+		# So we load gettext env
+		source gettext.sh
+		TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+		TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+		export TEXTDOMAIN TEXTDOMAINDIR
+		
+		hello_date="$(date +%F)"
+		hello_time="$(date +%T)"
+		MSG_TR_HELLO_USER="$(eval_gettext 'Hello $USER_NAME, it is ${hello_time} on ${hello_date}')"
+			
+		
 		case "$1" in
 		"-h"|"--help"|"help")
 			help_screen
-			hadOpts="true"
 			exit "$RET_HELP"
 			;;
 		esac
 		MODE="$1"
 		YES="false"
 		case "$MODE" in
+		--version|version)
+			version_text="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+			printf "$version_text"
 		config)
 			ConfigTUI
 			exit "$?"
-			;;
-		demo)
-			tui-header "Simple Demonstration" "of TUI commands"
-			tui-title "Lets begin"
-			
-			set -x
-			str="one two three"
-			# No quotes wanted!
-			tui-list -2 $str
-			tui-list -2r $str
-			tui-list -1a $str
-			tui-select $str | tui-echo -
-			uname -r | tui-cat -td 0.15
-			tui-cat /etc/default/grub
-			
-			for n in 0 1 2 3 4 5 6 7 10 11 99 111 127 130
-			do	tui-printf -S $n "n = $n"
-			done
-			
-			[ -f /etc/default/grub ] && \
-				tui-bol-gui && \
-				tui-terminal "tui-conf-editor /etc/default/grub"
-			set +x
-			exit 0
 			;;
 		info)	info "${TUI_DIR_SYSTEM/tui/info}/tui.info" ; exit ;;
 		html)	"$BROWSER" "${TUI_DIR_SYSTEM/tui/doc}/tui/tui.html" ; exit ;;
 		samples)
 			cd "${TUI_DIR_SYSTEM/tui/doc\/tui}/samples"
 			MENU=show
-			while 	tui-title "TUI - Samples"
-				item=$(tui-select Quit *)
-				[ ! "Quit" = "$MENU" ]
+			while 	tui-title "$(gettext 'TUI - Samples')"
+				MSG_TR_QUIT="$(gettext 'Quit')"
+				item=$(tui-select "$MSG_TR_QUIT" *)
+				[ ! "$MSG_TR_QUIT" = "$MENU" ]
 			do
 				clear
-				tui-title "File: $item"
+				tui-title "$(eval_gettext 'File: $item')"
 				tui-cat "$item"
-				tui-header "" "Executing $item" ""
+				tui-header "" "$(eval_gettext 'Executing $item')" ""
 				tui-press
 				bash "$item"
 			done
@@ -353,20 +353,22 @@ shopt -s expand_aliases
 			YES=true
 			;;
 		theme)	if [ -z "$2" ]
-			then	tui-echo "TUI_THEME is set to:" "${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
+			then	tui-echo "$(gettext 'TUI_THEME is set to:')" \
+					"${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
 				exit $?
 			else	tui-conf-set -v "$TRC" "TUI_THEME" "$2"
 				exit $?
 			fi
 			;;
-		info)	tui-status 111 "Please use: ${TUI_FONT_BOLD}tui provides${TUI_RESET}"
+		info)	tui-status 111 "$(eval_gettext 'Please use: ${TUI_FONT_BOLD}tuirc provides${TUI_RESET}')"
 			exit $?
 			;;
 		provides)
-			tui-printf -H "TUI ($TUI_VERSION) by sea" "Hello $USER_NAME, it is $(date +%T) on $(date +%F)"
-			tui-printf -T "Text User Interface - Framework for Scripts"
+			tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION) by sea')" \
+					"$MSG_TR_HELLO_USER"
+			tui-printf -T "$(gettext 'Text User Interface - Framework for Scripts')"
 			
-			tui-printf -T "Variables provided by sourcing TUI ($TRC)"
+			tui-printf -T "$(gettext 'Variables provided by sourcing TUI') ($TRC)"
 			for foundVar in ${!TUI_THEME*} ${!TUI_PREFIX*} ${!TUI_DIR_*} ${!TUI_FILE_*} 
 			do	tui-printf -E \
 					"$foundVar" \
@@ -374,29 +376,29 @@ shopt -s expand_aliases
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "Variables provided by apps.conf (\$TUI_FILE_CONF_APPS)"
+			tui-printf -T "$(gettext 'Variables provided by apps.conf') (\$TUI_FILE_CONF_APPS)"
 			for foundVar in ${!EDITOR_*} ${!FILEMGR_*} ${!BROWSER_*} ${!TERMINAL*} ${!CURLWGET*}
 			do	tui-printf -E \
 					"$foundVar" \
 					"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
 			done
 			
-			tui-printf -T "Variables provided by settings.conf (\$TUI_FILE_CONF_SETTINGS)"
+			tui-printf -T "$(gettext 'Variables provided by settings.conf') (\$TUI_FILE_CONF_SETTINGS)"
 			for txt in $(tui-conf-get -l $TUI_FILE_CONF_SETTINGS);do
 				val="\$${txt}"
 				tui-printf -E "$txt" "$(eval echo $val)"
 			done
 			
-			tui-printf -T "Variables provided by commands.conf (\$TUI_FILE_CONF_COMMANDS)"
+			tui-printf -T "$(gettext 'Variables provided by commands.conf') (\$TUI_FILE_CONF_COMMANDS)"
 			for txt in $(tui-conf-get -l $TUI_FILE_CONF_COMMANDS);do
 				val="\$${txt}"
 				tui-printf -E "$txt" "$(eval echo $val)"
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "Variables provided by colors.conf (\$TUI_FILE_CONF_COLORS)"
-			tui-printf -E "Be aware that using TUI_COLOR_* currently causes alignment issues." "$TUI_INFO"
-			tui-printf -E "Any escape sequence for that matter." "$TUI_INFO"
+			tui-printf -T "$(gettext 'Variables provided by colors.conf') (\$TUI_FILE_CONF_COLORS)"
+			tui-printf -E "$(gettext 'Be aware that using TUI_COLOR_* currently causes alignment issues.')" "$TUI_INFO"
+			tui-printf -E "$(gettext 'Any escape sequence for that matter.')" "$TUI_INFO"
 			for foundVar in ${!TUI_FONT_*} ${!TUI_COLOR_*}
 			do	tui-printf -E \
 					"$foundVar" \
@@ -405,7 +407,7 @@ shopt -s expand_aliases
 			tui-printf -E "TUI_RESET" "${TUI_RESET}TEXT"
 			
 			tui-echo;tui-press
-			tui-printf -T "Variables provided by status.conf (\$TUI_FILE_CONF_STATUS)"
+			tui-printf -T "$(gettext 'Variables provided by status.conf') (\$TUI_FILE_CONF_STATUS)"
 			for txt in ${STATUS_TEXT[@]};do
 				val="\$TUI_${txt}"
 				tui-echo "TUI_$txt" "$(eval echo $val)"
@@ -417,7 +419,7 @@ shopt -s expand_aliases
 			done
 			
 			tui-echo;tui-press
-			tui-printf -H "Variables provided by sourcing TUI (User specific)"
+			tui-printf -H "$(gettext 'Variables provided by sourcing TUI (User specific)')"
 			for task in user apps sets
 			do	list=""
 				case $task in
@@ -438,14 +440,14 @@ shopt -s expand_aliases
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "Variables provided by shorts.conf (\$TUI_DIR_CONF/shorts.conf)"
+			tui-printf -T "$(gettext 'Variables provided by shorts.conf') (\$TUI_DIR_CONF/shorts.conf)"
 			for entry in $($GREP "=" "$TUI_DIR_CONF/shorts.conf"|$GREP -v ^"#")
 			do	tui-echo "${entry/=*}"	"$(echo ${entry/*=})" 	#""
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)"
-			tui-printf -S 111 "Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file."
+			tui-printf -T "$(eval_gettext 'Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)')"
+			tui-printf -S 111 "$(eval_gettext 'Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file.')"
 		#	for entry in $($GREP "=" "$TUI_DIR_CONF/shorts-alias.conf")
 		#	do	set -x
 		#		var="${entry/=*}"
@@ -464,7 +466,7 @@ shopt -s expand_aliases
 			done<"$TUI_DIR_CONF/shorts-alias.conf"
 			
 			tui-echo
-			tui-status 0 "Showed what TUI $1"
+			tui-status 0 "$(gettext 'Showed what TUI provides')"
 			#if tui-yesno "Do you want to see the commands too?"
 			#then	#tui-printf -H "Dont forget about the commands"
 			#	tui-printf -T "They're in $TUI_PREFIX/bin"
@@ -483,19 +485,26 @@ shopt -s expand_aliases
 #
 #	Display & Action
 #
-		tui-printf -H "TUI ($TUI_VERSION) by sea" "Hello $USER_NAME, it is $(date +%T) on $(date +%F)"
-		tui-printf -T "Text User Interface - Framework for Scripts"
-		tui-printf -E "Calling $ME like this gives you an impression on how your future scripts could look like."
+		tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION) by sea')" \
+				"$MSG_TR_HELLO_USER"
+		tui-printf -T "$(gettext 'Text User Interface - Framework for Scripts')"
+		tui-printf -E "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"
 		tui-printf -E
-		tui-printf -E "If you are looking for the commands of TUI, try this:" "tui-<hit-tab>"
-		tui-printf -E "If you are a developer, i highly recommend to read:" "man tui // ${TUI_FONT_BOLD}info tui${TUI_RESET}"
-		tui-printf -E "And to check the provided variables, see:" "${TUI_FONT_BOLD}tui provides${TUI_RESET}"
+		tui-printf -E 	"$(gettext 'If you are looking for the commands of TUI, try this:')" \
+				"$(gettext 'tui-<hit-tab>')"
+		tui-printf -E 	"$(gettext 'If you are a developer, i highly recommend to read:')" \
+				"$(eval_gettext 'man tui[rc] // ${TUI_FONT_BOLD}info tui${TUI_RESET}')"
+		tui-printf -E 	"$(gettext 'And to check the provided variables, see:')" \
+				"${TUI_FONT_BOLD}tuirc provides${TUI_RESET}"
 		tui-printf -E
-		tui-printf -E "There are some sample scripts to get you started:" "$TUI_DIR_DOCS/samples"
-		tui-printf -E "To create a new script in $TUI_DIR_USER_SCRIPTS, type:" "tui-new-script [-emrst] [./]SCRIPTNAME"
+		tui-printf -E 	"$(gettext 'There are some sample scripts to get you started:')" \
+				"$TUI_DIR_DOCS/samples"
+		tui-printf -E 	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
+				"tui-new-script [-emrst] [./]SCRIPTNAME"
 		tui-printf -E
-		tui-printf -E "Arguments to this command are:" "config html info provides samples reset reset-yes theme"
+		tui-printf -E 	"$(gettext 'Arguments to this command are:')" \
+				"config html info provides reset reset-yes samples  theme"
 		tui-printf -E 
-		tui-yesno "Configure it now?" || exit 0
+		tui-yesno "$(gettext 'Configure it now?')" || exit 0
 		ConfigTUI
 	fi

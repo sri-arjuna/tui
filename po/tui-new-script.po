@@ -1,0 +1,73 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-06 18:37+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-new-script:30
+#, sh-format
+msgid ""
+"\n"
+"$ME ($script_version)\n"
+"Creates a new script in \\$HOME/bin, if \\$HOME/.local/bin does not exists.\n"
+"Also asks to create a basic man page template in the same location.\n"
+"\n"
+"Usage:  \t$ME [options] [path/to/]FILENAME # Creates the file in that "
+"location\n"
+"Examples:\t$ME fileA.sh\t\t\t# Creates a script in ~/bin or ~/.local/bin if "
+"existing\n"
+"\t\t$ME -s /opt/bin/fileB.sh\t# Creates a standalone application script in /"
+"opt/bin\n"
+"Where options are:\n"
+"\t-h\t\tThis screen\n"
+"\t-b(asic)\tCreates an empty script, with preset comment-indention (shell = "
+"$USER_SHELL)\n"
+"\t-e(mpty)\tCreates an empty script (default) (shell = $USER_SHELL)\n"
+"\t-f(ull)\t\tCreates a standalone application script template (bash only)\n"
+"\t-r(egular)\tCreates the same as basic, but with some code preset (bash "
+"only)\n"
+"\t-s(elect)\tSelect among the script names found in $TUI_DIR_USER_TEMPLATES\n"
+"\t\n"
+msgstr ""
+
+#: bin/tui-new-script:48
+msgid "sea New script script"
+msgstr ""
+
+#: bin/tui-new-script:54
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-new-script:74
+msgid "No scripts found in"
+msgstr ""
+
+#: bin/tui-new-script:125
+msgid "Saved script:"
+msgstr ""
+
+#: bin/tui-new-script:131
+msgid "Create a manpage as well?"
+msgstr ""

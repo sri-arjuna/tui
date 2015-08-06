@@ -26,6 +26,9 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	A simple tool which returns the string of the selected num-id
 #
@@ -49,21 +52,21 @@
 #	Variables
 #	
 	ME="${0##*/}"
-	script_version=0.9.0b
+	script_version=0.9.0c
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
-	help_text="$(gettext "
+	help_text="$(gettext '
 $ME ($script_version)
-Usage: 		$ME [options] LIST 'of items' ..
+Usage: 		$ME \[options\] item1 item2 ..
 Examples:	ret=\$($ME one two three)
 		$ME *
 Where options are:
 		-1|2		Print that many rows
 		-a		Auto select if only one entry was found
-		-v(erbose)		Print cancel option 0.
+		-v(erbose)	Print cancel option 0.
 
-")"
+')"
 #
 #	Check for read capabilities if not set yet
 #
@@ -88,14 +91,14 @@ Where options are:
 #
 	ROWS=""
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(gettext "
+	version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")"
+')"
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts "12hav" opt
 	do	case "$opt" in
@@ -172,8 +175,8 @@ There is NO WARRANTY, to the extent permitted by law.
 			else	[ "$NUM" -eq 0 ] && todo=true
 			fi
 			
-			# Array starts at 0
-			NUM=$(( "$NUM" - 1 ))
+			# Array starts at 0 --> Fails if quotes
+			NUM=$(( $NUM - 1 ))
 		else 	# Clear input if NUM is NOT numeric
 			printf "\r${BORDER_LEFT} >   \r${BORDER_LEFT} > " >&2
 		fi

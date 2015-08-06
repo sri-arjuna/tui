@@ -1,0 +1,212 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-06 18:23+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tuirc:69
+#, sh-format
+msgid ""
+"\n"
+"Usage: \ttuirc [config|reset[-yes]|theme] (source tui)\n"
+"Where options are:\n"
+"\t-h\t\tThis screen\n"
+"\tconfig\t\tEnters directly into config mode\n"
+"\tprovides\tList all variables provided by TUI\n"
+"\treset\t\tResets configuration to defaults, root will reset system wide "
+"defaults\n"
+"\treset-yes\tResets configuration without asking for verification\n"
+"\ttheme [THEME]\tIf no THEME is passed, returns which is currently active, "
+"otherwise sets theme of the current user to THEME.\n"
+"\n"
+msgstr ""
+
+#: bin/tuirc:200
+msgid "TUI config - System Wide"
+msgstr ""
+
+#: bin/tuirc:202
+#, sh-format
+msgid "TUI config - Personal for $USER_NAME"
+msgstr ""
+
+#: bin/tuirc:215
+msgid "System defaults"
+msgstr ""
+
+#: bin/tuirc:220
+msgid "Personal settings"
+msgstr ""
+
+#: bin/tuirc:230
+#, sh-format
+msgid "Are you sure to remove $RANGE in \\\"$CFG_DIR\\\"?"
+msgstr ""
+
+#: bin/tuirc:307
+#, sh-format
+msgid "Hello $USER_NAME, it is ${hello_time} on ${hello_date}"
+msgstr ""
+
+#: bin/tuirc:320
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tuirc:338
+msgid "TUI - Samples"
+msgstr ""
+
+#: bin/tuirc:339
+msgid "Quit"
+msgstr ""
+
+#: bin/tuirc:344
+#, sh-format
+msgid "File: $item"
+msgstr ""
+
+#: bin/tuirc:346
+#, sh-format
+msgid "Executing $item"
+msgstr ""
+
+#: bin/tuirc:356
+msgid "TUI_THEME is set to:"
+msgstr ""
+
+#: bin/tuirc:363
+#, sh-format
+msgid "Please use: ${TUI_FONT_BOLD}tuirc provides${TUI_RESET}"
+msgstr ""
+
+#: bin/tuirc:367 bin/tuirc:488
+#, sh-format
+msgid "TUI ($TUI_VERSION) by sea"
+msgstr ""
+
+#: bin/tuirc:369 bin/tuirc:490
+msgid "Text User Interface - Framework for Scripts"
+msgstr ""
+
+#: bin/tuirc:371
+msgid "Variables provided by sourcing TUI"
+msgstr ""
+
+#: bin/tuirc:379
+msgid "Variables provided by apps.conf"
+msgstr ""
+
+#: bin/tuirc:386
+msgid "Variables provided by settings.conf"
+msgstr ""
+
+#: bin/tuirc:392
+msgid "Variables provided by commands.conf"
+msgstr ""
+
+#: bin/tuirc:399
+msgid "Variables provided by colors.conf"
+msgstr ""
+
+#: bin/tuirc:400
+msgid "Be aware that using TUI_COLOR_* currently causes alignment issues."
+msgstr ""
+
+#: bin/tuirc:401
+msgid "Any escape sequence for that matter."
+msgstr ""
+
+#: bin/tuirc:410
+msgid "Variables provided by status.conf"
+msgstr ""
+
+#: bin/tuirc:422
+msgid "Variables provided by sourcing TUI (User specific)"
+msgstr ""
+
+#: bin/tuirc:443
+msgid "Variables provided by shorts.conf"
+msgstr ""
+
+#: bin/tuirc:449
+#, sh-format
+msgid ""
+"Aliases provided by shorts-alias.conf (\\$TUI_DIR_CONF/shorts-alias.conf)"
+msgstr ""
+
+#: bin/tuirc:450
+#, sh-format
+msgid ""
+"Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when "
+"sourcing this conf file."
+msgstr ""
+
+#: bin/tuirc:469
+msgid "Showed what TUI provides"
+msgstr ""
+
+#: bin/tuirc:491
+msgid ""
+"Calling tuirc like this gives you an impression on how your future scripts "
+"could look like."
+msgstr ""
+
+#: bin/tuirc:493
+msgid "If you are looking for the commands of TUI, try this:"
+msgstr ""
+
+#: bin/tuirc:494
+msgid "tui-<hit-tab>"
+msgstr ""
+
+#: bin/tuirc:495
+msgid "If you are a developer, i highly recommend to read:"
+msgstr ""
+
+#: bin/tuirc:496
+#, sh-format
+msgid "man tui[rc] // ${TUI_FONT_BOLD}info tui${TUI_RESET}"
+msgstr ""
+
+#: bin/tuirc:497
+msgid "And to check the provided variables, see:"
+msgstr ""
+
+#: bin/tuirc:500
+msgid "There are some sample scripts to get you started:"
+msgstr ""
+
+#: bin/tuirc:502
+#, sh-format
+msgid "To create a new script in $TUI_DIR_USER_SCRIPTS, type:"
+msgstr ""
+
+#: bin/tuirc:505
+msgid "Arguments to this command are:"
+msgstr ""
+
+#: bin/tuirc:508
+msgid "Configure it now?"
+msgstr ""

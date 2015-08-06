@@ -29,6 +29,9 @@
 		done
 	else	source tuirc
 	fi
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 	# If there is a user theme directory, use that one instead
 	[ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ] && \
 		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
@@ -40,10 +43,11 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.0b
+	script_version=0.9.0c
 	ME="${0##*/}"
 	ARGS_COUNT=$#
-	help_text="$(gettext "
+	MSG_TR_YESNO="$(gettext 'y/n')"
+	MSG_TR_help_text="$(eval_gettext '
 Usage: 	$ME \"Question\"
 
 Example: (Accepts: 'y,o,j,s', denies everything else)
@@ -52,68 +56,70 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 	else echo no
 	fi
 
-")
+')"
 	answer=""
+	GREP="${GREP:-grep}"
 #
 #	Check for read capabilities if not set yet
 #
-	LC_ALL=C $READ --help 2>&1 | $GREP -v bash > "$TUI_FILE_TEMP"
+	LC_ALL=C $READ --help 2>&1 | "$GREP" -v bash > "$TUI_FILE_TEMP"
 	# Delimiter	
-	$GREP -q "\[-d" "$TUI_FILE_TEMP"
-	bash_read_delimiter=$(tui-str-bol-conv -t $?)
+	"$GREP" -q "\[-d" "$TUI_FILE_TEMP"
+	bash_read_delimiter="$(tui-str-bol-conv -t $?)"
 	# Input
-	$GREP -q "\[-i" "$TUI_FILE_TEMP"
-	bash_read_input=$(tui-str-bol-conv -t $?)
+	"$GREP" -q "\[-i" "$TUI_FILE_TEMP"
+	bash_read_input="$(tui-str-bol-conv -t $?)"
 	# Prompt
-	$GREP -q "\[-p" "$TUI_FILE_TEMP"
-	bash_read_prompt=$(tui-str-bol-conv -t $?)
+	"$GREP" -q "\[-p" "$TUI_FILE_TEMP"
+	bash_read_prompt="$(tui-str-bol-conv -t $?)"
 	# Numbers
-	$GREP -q "\[-n" "$TUI_FILE_TEMP"
-	bash_read_numbers=$(tui-str-bol-conv -t $?)
+	"$GREP" -q "\[-n" "$TUI_FILE_TEMP"
+	bash_read_numbers="$(tui-str-bol-conv -t $?)"
 	# Timeout
-	$GREP -q "\[-t" "$TUI_FILE_TEMP"
-	bash_read_timeout=$(tui-str-bol-conv -t $?)
+	"$GREP" -q "\[-t" "$TUI_FILE_TEMP"
+	bash_read_timeout="$(tui-str-bol-conv -t $?)"
 #
 #	Variable handling
 #
 	case "$1" in
-	"")	printf "$help_text"
-		exit $RET_HELP
+	"")	printf "$MSG_TR_help_text"
+		exit "$RET_HELP"
 		;;
 	"--version")
-		version_text="$(gettext "
+		MSG_TR_version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")"
-		printf "$version_text"
+')"
+		printf "$MSG_TR_version_text"
 		exit 0
 		;;
 	"-h"|"--help")
-		printf "$help_text"
-		exit $RET_HELP
+		printf "$MSG_TR_help_text"
+		exit "$RET_HELP"
 		;;
 	esac
 	
 #
 #	Display
 #
-	while ! echo "${answer,,}" | $GREP -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
-	do	tui-printf "$1" > /dev/stderr
-		printf "\r$BORDER_LEFT $1 (y/n) " > /dev/stderr
+	while ! echo "${answer,,}" | "$GREP" -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
+	do	tui-printf "$1" >&2
+		printf "\r$BORDER_LEFT $1 (y/n) " >&2
 		$bash_read_numbers && \
 			read -n1 answer || \
 			read answer
 	done
-	printf "\r"  > /dev/stderr
-	tui-echo "$1 (y/n)  " "$answer"  > /dev/stderr
+	printf "\r"   >&2
+	tui-echo "$1 ($MSG_TR_YESNO) " "$answer"  >&2
 	case "$answer" in
 	    y|o|j|s|Y|O|J|S)
 	    		# First letter of the meaning "yes" in these languages:
 			# English, Français, Deutsch, Italiano
+			# Need a better code for more languages, like jpn, arabic, krylic, serb, etc..
 			exit 0    ;;
 	    *)          exit 1    ;;
 	esac

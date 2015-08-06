@@ -27,9 +27,9 @@
 #
 	script_version=1.6.1
 	ME="${0##*/}"
-	help_text="$(gettext "
+	help_text="$(eval_gettext '
 $ME ($script_version)
-Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.
+Creates a new script in \$HOME/bin, if \$HOME/.local/bin does not exists.
 Also asks to create a basic man page template in the same location.
 
 Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
@@ -43,7 +43,7 @@ Where options are:
 	-r(egular)	Creates the same as basic, but with some code preset (bash only)
 	-s(elect)	Select among the script names found in $TUI_DIR_USER_TEMPLATES
 	
-")"
+')"
 	DEST=""
 	TITLE="$(gettext 'sea New script script')"
 	SCRIPT="$default_new_script_type" # The default
@@ -51,14 +51,14 @@ Where options are:
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(gettext "
+	version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")"
+')"
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	tui-title "$TITLE ($script_version)"
 	while getopts "hfrbes" name
@@ -103,29 +103,32 @@ There is NO WARRANTY, to the extent permitted by law.
 	fi
 	
 	if [ -f "$DEST" ]
-	then	tui-yesno "$(gettext "File $DEST exists... Overwrite?")" ||  ( 
+	then	tui-yesno "$(eval_gettext "File $DEST exists... Overwrite?")" ||  ( 
 			BACKUP="$DEST-$(date +'%F-%T').bak"
 			mv "$DEST" "$BACKUP"
-			tui-status $? "$(gettext "Saved original $DEST to $BACKUP")"
+			tui-status $? "$(eval_gettext "Saved original $DEST to $BACKUP")"
 		)
 	fi
+set -x
 	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
 	then	# Original templates write their output automatically to $DEST
 		source "$TUI_DIR_TEMPLATES/scripts/$SCRIPT"
-	elif [ -f "$TUI_DIR_USER_SCRIPTS/$SCRIPT" ]
+	elif [ -f "$TUI_DIR_USER_TEMPLATES/$SCRIPT" ]
 	then	# Just copy the user templates, as they are individual
-		tui-cp "$TUI_DIR_USER_SCRIPTS/$SCRIPT" "$DEST"
-	else	tui-status 1 "$(gettext "Fatal error, template \"$SCRIPT\" not found!")"
+		tui-cp "$TUI_DIR_USER_TEMPLATES/$SCRIPT" "$DEST"
+	else	tui-status 1 "$(eval_gettext "Fatal error, template \"$SCRIPT\" not found!")"
+		set +x
 		exit 1
 	fi
+set +x
 	[ -f "$DEST" ]
-	if tui-status $? "$(gettext 'Saved:') $DEST"
+	if tui-status $? "$(gettext 'Saved script:') $DEST"
 	then	chmod +x "$DEST"
 	else	exit $?
 	fi
 	
 	if "$default_new_script_manpage_ask"
-	then	tui-yesno "$(gettext 'Create a manpage too?')" && \
+	then	tui-yesno "$(gettext 'Create a manpage as well?')" && \
 			tui-new-manpage "$DEST"
 	fi
 	# Open the script AFTER the manpage... to encourage the writing of the man pages first ;)
