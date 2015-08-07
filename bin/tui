@@ -44,7 +44,7 @@
 #
 #	Variables
 #
-	TITLE="Text User Interface"
+	TITLE="$(gettext 'Text User Interface')"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	help_text="
