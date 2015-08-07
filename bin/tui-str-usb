@@ -25,11 +25,15 @@
 	# create the RC and load all variable if RC is not present yet.
 	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS,STATUS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 	# If there is a user theme directory, use that one instead
 	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
-	. "$TUI_DIR_THEMES/$TUI_THEME" 
+	source "$TUI_DIR_THEMES/$TUI_THEME" 
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
@@ -38,14 +42,14 @@
 #
 	script_version=0.8.9
 	ME="${0##*/}"
-	help_text="$(gettext "
+	help_text="$(eval_gettext '
 Usage: $ME [options]
 Select USB device if more than one is found
 Where options are:
 	-h	This screen
 	-a	Autoselect entry if only one was found
 
-")"
+')"
 	targetusb=""
 	devDisk=/dev/disk/by-id
 	tDev=""
@@ -54,14 +58,14 @@ Where options are:
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(gettext "
+	version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")"
+')"
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts h opt
 	do	case "$opt" in
@@ -72,7 +76,7 @@ There is NO WARRANTY, to the extent permitted by law.
 			;;
 	esac
 	done
-	shift $(($OPTIND -1))
+	shift "$(($OPTIND -1))"
 #
 #	Functions
 #
@@ -80,15 +84,15 @@ There is NO WARRANTY, to the extent permitted by law.
 	# Returns string of NUM space chars
 	#
 		C=0 ; out=""
-		while [ $C -lt $1 ];do out+=" ";let C++;done
+		while [ "$C" -lt "$1" ];do out+=" ";let C++;done
 		printf "$out"
 	}
 	getlist() { # 
 	# Lists the contend of $devDisk, limits the output to usb items and removes partition entries
 	# If there is something to ignore, that one will be hidden too
 		if [ -z "$usbIgnore" ] 
-		then	$LS $devDisk | $GREP usb | $GREP -v part
-		else	$LS $devDisk | $GREP usb | $GREP -v part | $GREP -v "$usbIgnore"
+		then	"$LS" "$devDisk" | "$GREP" usb | "$GREP" -v part
+		else	"$LS" "$devDisk" | "$GREP" usb | "$GREP" -v part | "$GREP" -v "$usbIgnore"
 		fi
 	}
 #
@@ -122,7 +126,7 @@ There is NO WARRANTY, to the extent permitted by law.
 				tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbIgnore "\"$list\""
 				RET=1
 			else	tui-echo "$(gettext 'Do you want to be asked to select this device every time?')" >&2
-				tui-yesno "$(gettext No, might result in that device being auto-selected!')" >&2
+				tui-yesno "$(gettext 'No, might result in that device being auto-selected!')" >&2
 				RET=$?
 			fi
 		else	RET=1

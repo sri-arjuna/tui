@@ -17,21 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bin/tui-yesno:48
-msgid "y/n"
-msgstr ""
-
-#: bin/tui-yesno:49
+#: bin/tui-wait:32
 #, sh-format
 msgid ""
 "\n"
-"Usage: \t$ME \\\"Question\\\"\n"
+"$ME ($script_version)\n"
+"Usage: \t\t$ME TIME [MSG]\n"
+"Examples:\t$ME 2m\n"
+"\t\t$ME 1h \\\"Until somewhat happens\\\"\n"
+"\t\t$ME -v 5 countdown\n"
 "\n"
-"Example: (Accepts: y,o,j,s, denies everything else)\n"
-"\tif $ME Do"
 msgstr ""
 
-#: bin/tui-yesno:90
+#: bin/tui-wait:44
 #, sh-format
 msgid ""
 "\n"
@@ -42,4 +40,12 @@ msgid ""
 "\n"
 "This is free software; you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-wait:70
+msgid "Time left:"
+msgstr ""
+
+#: bin/tui-wait:79
+msgid "Please use either (s)econds, (m)inutes, or (h)ours"
 msgstr ""

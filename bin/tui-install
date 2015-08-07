@@ -23,14 +23,18 @@
 	for f in $TUI_FILE_CONF_{COMMANDS,STATUS}
 	do	[ -f "$f" ] && source "$f"
 	done
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	File:		tui-install
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.08.02
-	script_version=0.8.0
+#	Changed:	2015.08.06
+	script_version=0.8.1
 	TITLE="Install packages"
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
@@ -42,7 +46,7 @@
 #
 #	Help text
 #
-	help_text="
+	help_text="$(gettext '
 $ME ($script_version)
 ${TITLE^}
 Usage: 		$ME [options] PACKAGES
@@ -59,7 +63,7 @@ Where options are:
 	-q(uiet)		Install all at once, will fail if not all packages are available
 	-y(es)			Automatically accept the package manager questions
 
-"
+')"
 #
 #	Variables
 #
@@ -119,14 +123,15 @@ Where options are:
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+'
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "bdhl:vy" opt
@@ -158,9 +163,9 @@ Where options are:
 #	Display & Action
 #
 	[ 0 -ne $UID ] && \
-		tui-echo "$ME requires root access!" "$FAIL" && \
+		tui-echo "$(eval_gettext '$ME requires root access!')" "$FAIL" && \
 		exit 1
-	tui-printf -E "Installing as dependency:" "$(echo $@)"
+	tui-printf -E "$(gettext 'Installing as dependency:')" "$(echo $@)"
 #	if ! $doYes
 #	then	tui-yesno "Continue?" || exit 0
 #	fi
@@ -208,6 +213,11 @@ Where options are:
 #	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
 	#set -x
+	MSG_TR_WORD_INSTALLED="$(gettext 'Intalled')"
+	MSG_TR_WORD_INSTALLING="$(gettext 'Intalling')"
+	MSG_TR_WORD_INSTALLED_SUCCESS="$(gettext 'Successfully installed')"
+	MSG_TR_WORD_INSTALLED_FAILED="$(gettext 'Failed to install')"
+	
 	if $verbose
 	then	# Is on, install each package on its own line...
 		count_good=0
@@ -218,11 +228,11 @@ Where options are:
 		tui-progress -r
 		for app in ${ARGS[*]};do
 			cmd_all="$APP $cmd $app"
-			app_name=$(basename $app)
-			$doLog && tui-log "$LOG" "Execute: $cmd_all"
+			app_name="$(basename $app)"
+			$doLog && tui-log "$LOG" "$(gettext 'Execute:') $cmd_all"
 			
-			tui-progress -m $# "Installing: $app_name" #> /dev/zero
-			tui-printf -rS 2 "Installing $app_name"
+			tui-progress -m $# "$MSG_TR_WORD_INSTALLING: $app_name" #> /dev/zero
+			tui-printf -rS 2 "$MSG_TR_WORD_INSTALLING $app_name"
 			
 			if $doYes
 			then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
@@ -230,29 +240,30 @@ Where options are:
 			fi
 			
 			tui-status $RET "Installed package: $app_name" && \
-				( $doLog && tui-log "$LOG" "Successfully installed: $app" ) || \
-				( $doLog && tui-log "$LOG" "Failed to install: $app" )
+				( $doLog && tui-log "$LOG" "$MSG_TR_WORD_INSTALLED_SUCCESS: $app" ) || \
+				( $doLog && tui-log "$LOG" "$MSG_TR_WORD_INSTALLED_FAILED: $app" )
 			[ 0 -eq $RET ] && \
 				good_ones+=" $app_name" && ((count_good++)) || \
 				bad_ones+=" $app_name"
 			((count_total++))
 		done
+		ERR_NO=$[ "$count_total" - "$count_good" ]
 		[ -z "$bad_ones" ] && \
-			tui-echo "There were $[ $count_total - $count_good ] errors, namely these:" "$bad_ones"
+			tui-echo "$(eval_gettext 'There were $ERR_NO errors, namely these:')" "$bad_ones"
 	else	# Do all in one bunch, but shorten the names to display
 		all_pkgs=""
 		for a in "${@}";do all_pkgs+=" $(basename $a)";done
-		tui-printf -rS 2 "Installing $all_pkgs"
+		tui-printf -rS 2 "$MSG_TR_WORD_INSTALLING $all_pkgs"
 		cmd_all="$APP $cmd $@"
-		$doLog && tui-log "$LOG" "Trying to execute: $cmd_all"
+		$doLog && tui-log "$LOG" "$(gettext 'Trying to execute'): $cmd_all"
 		
-		if $doYes
+		if "$doYes"
 		then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
 		else	$cmd_all
 		fi
 		[ -z "$RET" ] && RET=1
-		tui-status $RET "Installed: '${pkgs[@]}' " && \
-			 ( $doLog && tui-log "$LOG" "Successfully installed: '$pkgs'" ) || \
-			 ( $doLog && tui-log "$LOG" "Failed to install: '$pkgs'" )
+		tui-status $RET "$MSG_TR_WORD_INSTALLED: '${pkgs[@]}' " && \
+			 ( $doLog && tui-log "$LOG" "$MSG_TR_WORD_INSTALLED_SUCCESS: '$pkgs'" ) || \
+			 ( $doLog && tui-log "$LOG" "$MSG_TR_WORD_INSTALLED_FAILED: '$pkgs'" )
 	fi
-	exit $RET
+	exit "$RET"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-07 05:53+0200\n"
+"POT-Creation-Date: 2015-08-07 05:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,21 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bin/tui-yesno:48
-msgid "y/n"
+#: bin/tui-press:40
+msgid "Press [ENTER] to continue"
 msgstr ""
 
-#: bin/tui-yesno:49
-#, sh-format
-msgid ""
-"\n"
-"Usage: \t$ME \\\"Question\\\"\n"
-"\n"
-"Example: (Accepts: y,o,j,s, denies everything else)\n"
-"\tif $ME Do"
-msgstr ""
-
-#: bin/tui-yesno:90
+#: bin/tui-press:48
 #, sh-format
 msgid ""
 "\n"
@@ -42,4 +32,5 @@ msgid ""
 "\n"
 "This is free software; you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
+"\n"
 msgstr ""

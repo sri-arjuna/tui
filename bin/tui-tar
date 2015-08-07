@@ -25,12 +25,15 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	Variable defaults
 #
-	script_version=0.8.9
+	script_version=0.8.9a
 	ME="${0##*/}"
-	help_text="$(gettext "
+	help_text="$(eval_gettext '
 Usage: $ME [options] [/path/to/]directory
 Where options are:
 	-h	This screen
@@ -39,7 +42,7 @@ Where options are:
 
 It is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
 
-")"
+')"
 	
 	FILE_TEMP="$TUI_DIR_TEMP/tui-tar.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
@@ -56,14 +59,14 @@ It is designed to pass directory names to compress, it will store the tarball in
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(gettext "
+	version_text="$eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")"
+')"
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts hbvx opt
 	do	case "$opt" in
@@ -80,8 +83,8 @@ There is NO WARRANTY, to the extent permitted by law.
 			;;
 		esac
 	done
-	shift $(($OPTIND - 1))
-	ARGS=(${@})
+	shift "$(($OPTIND - 1))"
+	ARGS=("${@}")
 #
 #	Display
 #

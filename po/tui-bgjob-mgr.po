@@ -1,0 +1,159 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-07 06:11+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-bgjob-mgr:37
+msgid "Background Job Manager"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:68
+#, sh-format
+msgid ""
+"\n"
+"Usage: \t\t$ME [options] [arguments]\n"
+"Examples:\t$ME ./script1 /some/path/script2\n"
+"\t\t$ME -c script[1-9]\n"
+"Where options are:\n"
+"\t-h(elp) \t\tThis screen\n"
+"\t-L(og)\t\t\tShow the log file ($LOG)\n"
+"\t-c(count)\t\tThe exit code is now the number of successfully executed "
+"scripts.\n"
+"\t-l(imit)\tNUM\tLimits the number of parallel executed scripts, 5 default, "
+"0 to disable\n"
+"\t-d(el-log)\t\tDeletes (empty) the log file ($LOG)\n"
+"\t-q(uiet)\t\tJust return the exit code, be non-verbose\n"
+"\t-v(erbose)\t\tBe verbose, starts every script in its own terminal (GUI "
+"only!)\n"
+"\t-w(wait)\tNUM\tChange the amount of seconds to wait between update-checks\n"
+"\n"
+"Files:\n"
+"--------------------------------------\n"
+"Log:\t\t$LOG\n"
+"Temp dir:\t$TEMP\n"
+"\n"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:104
+#, sh-format
+msgid "Created log file of $ME ($script_version)"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:111
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+"\n"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:137
+#, sh-format
+msgid "Changed the limit to: $LIMIT"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:140
+#, sh-format
+msgid "Count is now $COUNT"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:143
+msgid "Enabled quiet mode"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:146
+msgid "Enabled DEBUG mode"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:149
+#, sh-format
+msgid "Change the wait interval to: $WAIT"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:153
+msgid "Options:"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:179
+msgid "Status"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:206
+#, sh-format
+msgid "FAILED script: Empty pid while running : $script($pid) returned $RET"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:225
+#, sh-format
+msgid "$PID starting"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:237
+#, sh-format
+msgid "Finished $this_script"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:238
+#, sh-format
+msgid "Running $this_script\" \"$this_script"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:239
+#, sh-format
+msgid "Waiting $this_script"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:240
+#, sh-format
+msgid "Typo in script: \\\"$this_script\\\""
+msgstr ""
+
+#: bin/tui-bgjob-mgr:241
+#, sh-format
+msgid "Invalid STATUS ($STATUS) on $C $this_script"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:249
+msgid "Summary"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:250
+msgid "Scripts completed:"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:251
+msgid "Currently running:"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:252
+msgid "Successfully executed:"
+msgstr ""
+
+#: bin/tui-bgjob-mgr:255
+msgid "Wait for update.."
+msgstr ""
+
+#: bin/tui-bgjob-mgr:263
+#, possible-sh-format
+msgid "You started $MAX scripts, of which $GOOD exited with success"
+msgstr ""

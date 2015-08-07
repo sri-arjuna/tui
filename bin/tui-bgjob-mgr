@@ -23,14 +23,18 @@
 		break_on_injections "$@" && \
 		exit 1
 	source "${HOME:-/root}/.tuirc"  2>/dev/zero || source tuirc
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #	File:		tui-bgjob-mgr
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
-#	Changed:	2015.07.13
-	script_version=0.9.5
-	TITLE="Parallel Script Manager"
+#	Changed:	2015.08.06
+	script_version=0.9.6
+	TITLE="$(gettext 'Background Job Manager')"
 #	Description:	Executes all scripts in parallel, unless LIMIT says different, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
 #
@@ -58,12 +62,13 @@
 #
 #	Help text
 #
-	help_text="
-$ME ($script_version)
-${TITLE^}
+	show_help () {
+	## why? what? huuuuu???!?!
+	
+	eval_gettext '
 Usage: 		$ME [options] [arguments]
 Examples:	$ME ./script1 /some/path/script2
-		$ME -c script[1-9] ; echo \$?
+		$ME -c script[1-9]
 Where options are:
 	-h(elp) 		This screen
 	-L(og)			Show the log file ($LOG)
@@ -79,7 +84,8 @@ Files:
 Log:		$LOG
 Temp dir:	$TEMP
 
-"
+'
+	}
 #
 #	Functions
 #
@@ -95,26 +101,27 @@ Temp dir:	$TEMP
 	[ ! -e "$LOG" ] && \
 		touch $LOG && \
 		doLog "------------------------------------------" && \
-		doLog "Created log file of $ME ($script_version)" && \
+		doLog "$(eval_gettext 'Created log file of $ME ($script_version)')" && \
 		doLog "------------------------------------------"
 #
 #	Catching Arguments
 #
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
+	[ "--help" = "$1" ] && show_help && exit 99
 	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+'
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "cdhLl:qvw:" opt
 	do 	case $opt in
-		h)	printf "$help_text"
+		h)	show_help
 			rm -fr "$TEMP"
 			exit $RET_HELP
 			;;
@@ -127,25 +134,25 @@ Temp dir:	$TEMP
 			exit $?
 			;;
 		l)	LIMIT=$OPTARG
-			log_msg="Changed the limit to: $LIMIT"
+			log_msg="$(eval_gettext 'Changed the limit to: $LIMIT')"
 			;;
 		c)	COUNT=true
-			log_msg="Count is now $COUNT"
+			log_msg="$(eval_gettext 'Count is now $COUNT')"
 			;;
 		q)	QUIET=true
-			log_msg="Enabled quiet mode"
+			log_msg="$(gettext 'Enabled quiet mode')"
 			;;
 		v)	beVerbose=true
-			log_msg="Enabled DEBUG mode"
+			log_msg="$(gettext 'Enabled DEBUG mode')"
 			;;
 		w)	WAIT=$OPTARG
-			log_msg="Change the wait interval to: $WAIT"
+			log_msg="$(eval_gettext 'Change the wait interval to: $WAIT')"
 			;;
 		esac
 		# Print $log_msg to $LOG and print $log_msg to user if verbosity is enabled
-		doLog "Options: $log_msg"
+		doLog "$(gettext 'Options:') $log_msg"
 	done
-	shift $(($OPTIND - 1))
+	shift "$(($OPTIND - 1))"
 #
 #	Variable presets
 #
@@ -169,7 +176,7 @@ Temp dir:	$TEMP
 		if ! "$QUIET"
 		then	clear
 			tui-header "$TITLE ($script_version)" "$(date +'%F %T')"
-			tui-title "Status"
+			tui-title "$(gettext 'Status')"
 		fi
 		
 		while [ $C -lt $MAX ]
@@ -196,7 +203,7 @@ Temp dir:	$TEMP
 						[ $RET -eq 127 ] && msg="typo"
 						doLog "$script($pid) ,$msg $RET"
 					fi
-				else 	msg="FAILED script: Empty pid while running : $script($pid) returned $RET"
+				else 	msg="$(eval_gettext 'FAILED script: Empty pid while running : $script($pid) returned $RET')"
 					tui-status 1 "$msg"
 					doLog "$msg"
 				fi
@@ -213,8 +220,9 @@ Temp dir:	$TEMP
 						echo "$cmd" > "$TMP" && \
 						tui-terminal "$TMP" || \
 						( eval "$cmd" 1>/dev/zero ) &
-					script_pid[$C]="$!"
-					doLog "$script($!) ,starting"
+					script_pid["$C"]="$!"
+					PID="${script_pid[$C]}"
+					doLog "$(eval_gettext '$PID starting')"
 				fi
 				;;
 			*)	((DONE++))
@@ -223,40 +231,41 @@ Temp dir:	$TEMP
 			esac
 
 			# Display latest status
-			if ! $QUIET
-			then	case $STATUS in
-				0|1)	tui-status $STATUS "Finished ${script_name[$C]}"  ;;
-				2)	tui-status $STATUS "Running ${script_name[$C]}" "${script_pid[$C]}" ;;
-				3)	tui-status $STATUS "Waiting ${script_name[$C]}"	;;
-				127)	tui-status 1 "Typo in script: \"${script_name[$C]}\""	;;
-				*)	tui-status 1 "Invalid STATUS ($STATUS) on $C ${script_name[$C]}"	;;
+			if ! "$QUIET"
+			then	this_script="${script_name[$C]}"
+				case "$STATUS" in
+				0|1)	tui-status "$STATUS" "$(eval_gettext 'Finished $this_script')"  ;;
+				2)	tui-status "$STATUS" "$(eval_gettext 'Running $this_script" "$this_script')" ;;
+				3)	tui-status "$STATUS" "$(eval_gettext 'Waiting $this_script')"	;;
+				127)	tui-status 1 "$(eval_gettext 'Typo in script: \"$this_script\"')"	;;
+				*)	tui-status 1 "$(eval_gettext 'Invalid STATUS ($STATUS) on $C $this_script')"	;;
 				esac
 			fi
 			((C++))
 		done
 		
-		if ! $QUIET
+		if ! "$QUIET"
 		then	tui-echo
-			tui-title "Summary"
-			tui-echo "Scripts completed:" 	  "$DONE/$MAX"
-			tui-echo "Currently running:" 	  "$RUN/$LIMIT"
-			tui-echo "Successfully executed:" "$GOOD"
+			tui-title "$(gettext 'Summary')"
+			tui-echo "$(gettext 'Scripts completed:')" 	"$DONE/$MAX"
+			tui-echo "$(gettext 'Currently running:')" 	"$RUN/$LIMIT"
+			tui-echo "$(gettext 'Successfully executed:')" 	"$GOOD"
 			
 			tui-echo
-			tui-wait $WAIT "Wait for update..."
+			tui-wait "${WAIT:-5}" "$(gettext 'Wait for update..')."
 			echo
-		else	sleep $WAIT
+		else	sleep "${WAIT:-5}"
 		fi
 	done
 #
 #	Exit how the user want
 #
-	doLog "You started $MAX scripts, of which $GOOD exited with success"
+	doLog "$(gettext 'You started $MAX scripts, of which $GOOD exited with success')"
 	tui-log -e "$LOG" "----------------------------------------------"
 	tui-log -e "$LOG" ""
 	rm -fr "$TEMP"
 
-	if $COUNT
-	then	exit $GOOD
+	if "$COUNT"
+	then	exit "$GOOD"
 	else	exit 0
 	fi

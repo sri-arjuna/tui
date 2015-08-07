@@ -22,31 +22,38 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.06.19
+#	Changed:	2015.08.06
 #
 #	Variable defaults
 #
-	script_version=0.4
+	script_version=0.5
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
 		\rRequires the user to press enter to continue
 		\r"
-	default_text="Press [ENTER] to continue"
+	source /etc/tuirc
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+	default_text="$(gettext 'Press [ENTER] to continue')"
 	MESSAGE="${1:-${default_text}}"
+	
 #
 #	Variable handling
 #
 	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
 	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+'
 	}
 	case "$1" in
 	"--version")	showVersion

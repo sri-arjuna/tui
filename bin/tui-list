@@ -30,7 +30,6 @@
 	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
 	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
 	export TEXTDOMAIN TEXTDOMAINDIR
-
 #
 #	File:		tui-list
 #	Author: 	Simon Arjuna Erat (sea)

@@ -23,29 +23,32 @@
 #	Help text
 #
 	ME=tui-wait
-	script_version=0.8.9
+	script_version=0.8.9a
 	beVerbose=false
 	source gettext.sh
-	help_text="
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+	help_text="$(eval_gettext '
 $ME ($script_version)
 Usage: 		$ME TIME [MSG]
 Examples:	$ME 2m
 		$ME 1h \"Until somewhat happens\"
 		$ME -v 5 countdown
 
-"
+')"
 #
 #	Argument handling
 #
 	case "$1" in
-	"--version")	version_text="$(gettext "
+	"--version")	version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")"
+')"
 			printf "$version_text"
 			exit 0
 			;;
@@ -82,39 +85,39 @@ There is NO WARRANTY, to the extent permitted by law.
 	# Returns the time as string
 	# as much as applicable: hh:mm:ss
 		# Calculate values
-		secs=$seconds			# Use a temp var
-		minutes=$(( $seconds / 60 ))	# This many minutes are found
-		sub_s=$(( $minutes * 60 ))	# These minutes represent that many seconds
-		secs=$(( $secs - $sub_s ))	# Update the secs
-		hours=$(( $minutes / 60 ))	# This many hours from the minutes
-		sub_m=$(( $hours  * 60 ))	# These hours represent that many minutes
-		minutes=$(( $minutes - $sub_m ))	# Update the remaining minutes
+		secs="$seconds			# Use a temp var
+		minutes="$(( $seconds / 60 ))"	# This many minutes are found
+		sub_s="$(( $minutes * 60 ))"	# These minutes represent that many seconds
+		secs="$(( $secs - $sub_s ))"	# Update the secs
+		hours="$(( $minutes / 60 ))"	# This many hours from the minutes
+		sub_m="$(( $hours  * 60 ))"	# These hours represent that many minutes
+		minutes="$(( $minutes - $sub_m ))"	# Update the remaining minutes
 		# Generate strings
-		if [ $minutes -gt 0 ] 
-		then	[ ${#minutes} -eq 1 ] && \
-				[ $hours -gt 0 ] && \
+		if [ "$minutes" -gt 0 ] 
+		then	[ "${#minutes}" -eq 1 ] && \
+				[ "$hours" -gt 0 ] && \
 				minutes="0${minutes}:" || \
 				minutes+=":"
-		else	[ $hours -gt 0 ] && \
+		else	[ "$hours" -gt 0 ] && \
 				minutes="00:" || \
 				minutes=""
 		fi
 		#minutes=${minutes:-0}
-		if [ $secs -lt 59 ] && [ -z "$minutes" ] && [ -z "$hours" ]
-		then	[ 0 -eq ${secs:0:1} ] && \
-				secs=${secs/0}
+		if [ "$secs" -lt 59 ] && [ -z "$minutes" ] && [ -z "$hours" ]
+		then	[ 0 -eq "${secs:0:1}" ] && \
+				secs="${secs/0}"
 		elif [ ! -z "$minutes" ] 
-		then	[ ${#secs} -eq 1 ] && secs="0${secs}"
+		then	[ "${#secs}" -eq 1 ] && secs="0${secs}"
 		#else	secs="00"
 		fi
-		[ $hours -gt 0 ] && hours="$hours:" || hours=""
+		[ "$hours" -gt 0 ] && hours="$hours:" || hours=""
 		# Output
 		echo "${hours}${minutes}${secs}"		
 	}
 #
 #	Action - loop
 #
-	while [ $seconds -ge 0 ]
+	while [ "$seconds" -ge 0 ]
 	do 	# First display current / passed time
 		# Generate string & output to user
 		time_string="$(seconds2time $seconds)"
@@ -127,17 +130,17 @@ There is NO WARRANTY, to the extent permitted by law.
 		
 		# So subtract, its a countdown
 		((seconds--))
-		if [ $seconds -lt 0 ]
+		if [ "$seconds" -lt 0 ]
 		then 	# We have sub zero seconds, fix that
 			seconds=59
 			((minutes--)) 
 			# While minutes changes, check for hour changes
-			[ $minutes -lt 0 ] && minutes=59 && ((hours--))
-			[ $hours -lt 0 ] && hours=0
+			[ "$minutes" -lt 0 ] && minutes=59 && ((hours--))
+			[ "$hours" -lt 0 ] && hours=0
 		fi
 		
 		# Actually wait a second
-		$beVerbose && printf "\n"
+		"$beVerbose" && printf "\n"
 		sleep 1
 	done
 	exit 0
