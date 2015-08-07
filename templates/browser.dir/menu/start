@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+tui-echo "Hello world"

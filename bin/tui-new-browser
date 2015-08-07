@@ -19,15 +19,18 @@
 # ------------------------------------------------------------------------
 	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
 	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.08.03
-	script_version=0.6.1
+#	Changed:	2015.08.05
+	script_version=0.8.9
 #	Description:	Helps to create a tui-browser project
 #
 #	Variables
@@ -35,14 +38,16 @@
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
 	TITLE="$(gettext 'Create a new TUI project')"
-	help_text=$(gettext "
+	help_text="$(eval_gettext '
 Usage: 	$ME [options] [arguments]
 
-")
+
+')"
 #
 #	Project related variables
 #
 	optE_bool=false 	# For a working template
+	doTextMode=false
 	ARG_TOGGLE_ANOTHER=none # For a working template
 	APP_TITLE=""		# Project name
 	APP_BASE=""		# Where is the project root
@@ -52,30 +57,34 @@ Usage: 	$ME [options] [arguments]
 	APP_FILE=""		# save point, starter script
 	APP_DATA=""		# Where are the scripts to present
 	APP_INCLUDE=""		# Path to files to include
-	
+	TASK_BASIC="APP_TITLE APP_FILE APP_BASE" #APP_MENU
+	TASK_LABELS="APP_USER_LABEL APP_LOC_LABEL APP_POS_LABEL"
+	TASK_LABELS_TEXT="APP_DIR_LABEL APP_FILES_LABEL"
+	TASK_ADVANCED="APP_CONFIG_FILE APP_INCLUDE_DIR APP_SOURCE_THIS APP_SHELL APP_CLEAR"
 #
 #	Catching Arguments
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text=$(gettext "
+	version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")
+
+')"
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts "h" name
 	do 	case "$name" in
 		h|help)
 			printf "$help_text"
-			exit $RET_HELP
+			exit "$RET_HELP"
 			;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
 	done
-	shift $(($OPTIND - 1))
+	shift "$(($OPTIND - 1))"
 #
 #	Display & Action
 #
@@ -84,137 +93,152 @@ There is NO WARRANTY, to the extent permitted by law.
 	tui-printf -H "$ME ($script_version)" "$(date +'%F %T')"
 	tui-printf -T "$TITLE"
 	tui-printf -E "$(gettext 'Starting with basic required configuration')"
-# This is required for proper placement of files
-	for task in 	APP_TITLE APP_FILE APP_BASE APP_MENU
+#
+#	This is required for proper placement of files
+#
+	# Quoting breaks expanding
+	for task in $TASK_BASIC
 	do
 		case "$task" in
 		APP_TITLE)
-			Q="$(gettext "What is the $task, may contain spaces:")"
+			Q="$(eval_gettext "What is the $task, may contain spaces:")"
 			tui-echo "$Q"
-			TASK=$(tui-read)
-			APP_TITLE="${APP_TITLE:-${1:-Project Name}}"
+			TASK="$(tui-read)"
+			APP_TITLE="${APP_TITLE:-${TASK:-Project Name}}"
 			;;
 		APP_FILE)
-			Q="$(gettext "What is the name of the $task to execute:")"
+			Q="$(eval_gettext "What is the name of the $task to execute:")"
 			tui-echo "$Q"
-			TASK=$(tui-read)
-			APP_FILE="${APP_FILE:-${1:-project-binary}}"
+			TASK="$(tui-read)"
+			APP_FILE="${APP_FILE:-${TASK:-project-binary}}"
 			;;
 		APP_BASE)
-			Q="$(gettext "Where will \"$APP_FILE\" be stored ($default_new_browser_dir):")"
+			tmp_default_dir="$default_new_browser_dir/${APP_FILE/\.*}"
+			Q="$(eval_gettext "Where will \"$APP_FILE\" be stored ($tmp_default_dir):")"
 			tui-echo "$Q"
-			TASK=$(tui-read)
-			APP_BASE="${APP_BASE:-${1:-$TUI_DIR_}}"
-			;;
-		APP_MENU)
-			Q="$(gettext "How do you want to name your ${TUI_FONT_BOLD}$APP_BASE${RESET}/<$task> directory:")"
-			tui-echo "$Q"
-			TASK=$(tui-read)
-			APP_MENU="${APP_MENU:-${1:-}}"
+			TASK="$(tui-read)"
+			TASK="${TASK:-$tmp_default_dir}"
+			APP_BASE="${APP_BASE:-${TASK}}"
 			;;
 		esac
 	done
-# This is optional
-	if tui-yesno "$(gettext 'Would you like to apply some more template configuration/tweaking?')"
-	then	for task in 	APP_USER_LABEL APP_FOLDERS APP_FILES  APP_INCLUDE
-		do
-			case "$task" in
+	# Currently disabled
+	#tui-yesno "$(gettext 'Enable text-mode (unstable beta)?')" && doTextMode=true
+#
+#	Optional	:	Labels
+#
+	if tui-yesno "$(gettext 'Would you like to change some of the labels/captions?')"
+	then	for task in $TASK_LABELS
+		do 	case "$task" in
 			APP_USER_LABEL)
-				Q="$(gettext '')"
-				eval "$TASK=$(tui-read \"${Q:-}\")"
-				APP_USER_LABEL="${APP_USER_LABEL:-${1:-}}"
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext "What is the label for $task:")"
+				tui-echo "$Q"
+				TASK="$(tui-read)"
+				APP_USER_LABEL="${TASK:-\$USER}}"
 				;;
-			APP_FOLDERS)
-				Q="$(gettext '')"
-				eval "$TASK=$(tui-read \"${Q:-}\")"
-				APP_FOLDERS="${APP_FOLDERS:-${1:-}}"
+			APP_LOC_LABEL)
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext "What is the label for $task:")"
+				tui-echo "$Q"
+				TASK="$(tui-read)"
+				APP_LOC_LABEL="${TASK:-$(gettext 'Location:')}}"
 				;;
-			APP_FILES)
-				Q="$(gettext '')"
-				eval "$TASK=$(tui-read \"${Q:-}\")"
-				APP_FILES="${APP_FILES:-${1:-}}"
+			APP_POS_LABEL)
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext "What is the label for $task:")"
+				tui-echo "$Q"
+				TASK="$(tui-read)"
+				APP_LOC_LABEL="${TASK:-\$(MakeCurStr \$(pwd))}}"
 				;;
-			APP_INCLUDE)
-				Q="$(gettext '')"
-				eval "$TASK=$(tui-read \"${Q:-}\")"
-				APP_INCLUDE="${APP_INCLUDE:-${1:-}}"
+			esac
+		done
+		if "$doTextMode"
+		then	# Only show this if the the author has enabled the text mode
+			for task in $TASK_LABELS
+			do 	case "$task" in
+				APP_DIR_LABEL)
+					tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+					Q="$(eval_gettext "What is the label for $task:")"
+					tui-echo "$Q"
+					TASK="$(tui-read)"
+					APP_DIR_LABEL="${TASK:-$(gettext 'Sections')}}"
+					;;
+				APP_FILES_LABEL)
+					tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+					Q="$(eval_gettext "What is the label for $task:")"
+					tui-echo "$Q"
+					TASK="$(tui-read)"
+					APP_FILES_LABEL="${TASK:-$(gettext 'Tasks')}}"
+					;;
+				esac
+			done
+		fi
+	fi
+#
+# 	Optional 	:	Advanced
+#
+	if tui-yesno "$(gettext 'Change some advanced settings?')"
+	then	for task in 	$TASK_ADVANCED
+		do 	case "$task" in
+			APP_CONFIG_FILE)
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext 'What is the relative path ($APP_BASE/) of the installed configuration file:')"
+				tui-echo "$Q"
+				TASK="$(tui-read)"
+				APP_CONFIG_FILE="${TASK:-$APP_FILE.conf}"
+				;;
+			APP_SOURCE_THIS)
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext 'What is the relative path ($APP_BASE/) of the folder to source configuration and/or function files?:')"
+				tui-echo "$Q"
+				TASK="$(tui-read)"
+				APP_SOURCE_THIS="${TASK:-includes}"
+				;;
+			APP_SHELL)
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext 'What type are your scripts?')"
+				tui-echo "$Q"
+				TASK="$(tui-select ash bash csh dash ksh perl python tcsh zsh)"
+				APP_SHELL="${TASK:-bash}"
+				;;
+			APP_CLEAR)
+				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
+				Q="$(eval_gettext 'When changing a section or a task has been executed, do you want to clear the screen?')"
+				TASK=$(tui-yesno "$Q")
+				APP_CLEAR="$(tui-str-bol-conv -t ${TASK:-1})"
 				;;
 			esac
 		done
 	fi
-# Create the structure	
-	# Optional
-	if tui-yesno "$(gettext 'Make more changes?')"
-	then	tui-title "$INFO" "$(gettext 'Leave empty for default values, use 1 space for empty fields')" "$INFO"
-		APP_FOLDERS=$(tui-read "$(gettext 'What is the new caption for folders:')")
-		APP_FILES=$(tui-read "$(gettext 'What is the new caption for files:')")
-		APP_USER_LABEL=$(tui-read "$(gettext 'What is the new caption for upper right top line:')")
-	fi
-	
-	if ${default_new_browser_manpage_create:-true}
-	then	case "${default_new_browser_manpage_type:-application}" in
-		application)	var_opt="-a"	;;
-		*)		var_opt=""	;;
-		esac
-		tui-bol-dir -v "$APP_BASE/man"
-		${0/browser/manpage} $varOpt "$APP_BASE/man/$APP_FILE"
-	fi
-	
-	source "$TUI_DIR_TEMPLATES/browser" > "$APP_BASE/$APP_FILE"
-	chmod +x "$APP_BASE/$APP_FILE"
-	tui-filemgr "$APP_BASE"
-	
-
-	exit 0
-	# OLD STUFF
-	exit 0
-	# OLD STUFF
-	exit 0
-	
-	
-	
-	tui-echo "Welcome to the guide about how to create a new framework based on tui-browser."
-	tui-echo
-	# MUST BE
-	tui-title "Required Information:"
-	APP_NAME=$(tui-read "What is the folder its name?")
-	
-	tui-echo
-	tui-echo "The project its title, displayed in the upper left header area, may contain spaces."
-	APP_TITLE=$(tui-read "What is the project its name or title:")
-	
-	tui-echo
-	APP_FILE=$(tui-read "What is the filename to execute (name only):")
-	
-	tui-echo
-	APP_BASE=$(tui-read "Where is the '$APP_FILE' saved (just path, leave empty for $default_new_browser_dir/$APP_NAME):")
-	APP_BASE="${APP_BASE:-$default_new_browser_dir/$APP_NAME}"
-	
-	tui-echo
-	tui-echo "Where are the scripts to present $APP_TITLE?"
-	APP_DATA=$(tui-read "Leave  subdirname to $APP_BASE/")
-	
-	tui-echo
-	tui-bol-dir "$APP_BASE/$APP_DATA"
-	
-	# Optional
-	if tui-yesno "Make more changes?"
-	then	tui-title "$INFO" "Leave empty for default values, use 1 space for empty fields" "$INFO"
-		APP_FOLDERS=$(tui-read "What is the new caption for folders:")
-		APP_FILES=$(tui-read "What is the new caption for files:")
-		APP_USER_LABEL=$(tui-read "What is the new caption for upper right top line:")
-	fi
-	
-	if ${default_new_browser_manpage_create:-true}
-	then	case "${default_new_browser_manpage_type:-application}" in
-		application)	var_opt="-a"	;;
-		*)		var_opt=""	;;
-		esac
-		tui-bol-dir -v "$APP_BASE/man"
-		${0/browser/manpage} $varOpt "$APP_BASE/man/$APP_FILE"
-	fi
+#
+#	How or which template to save?
+#
+	tui-bol-dir -v "$APP_BASE" || exit 1
+	tui-title "$(gettext 'What kind of template do you want to use?')"
+	MSG_TR_WORD_SIMPLE="$(gettext 'Simple')"
+	MSG_TR_WORD_FULL="$(gettext 'Full')"
+	style=$(tui-select "$MSG_TR_WORD_FULL" "$MSG_TR_WORD_SIMPLE")
+	case "$style" in
+	"$MSG_TR_WORD_FULL")
+		cd "$APP_BASE"
+		tui-tar -xb "$TUI_DIR_TEMPLATES/browser.tar.gz"
+		# Since its full, provide full application manpage
+		default_new_browser_manpage_type=application
+		;;
+	esac
 	
 	source "$TUI_DIR_TEMPLATES/browser" > "$APP_BASE/$APP_FILE"
 	chmod +x "$APP_BASE/$APP_FILE"
+	
+	# Always creating a manpage, but which?
+	case "${default_new_browser_manpage_type:-application}" in
+	application)	var_opt="-a"	;;
+	*)		var_opt=""	;;
+	esac
+	tui-bol-dir -v "$APP_BASE/{man,menu}"
+	${0/browser/manpage} $varOpt "$APP_BASE/man/$APP_FILE"
+	
+	# Open project dir
 	tui-filemgr "$APP_BASE"
 	

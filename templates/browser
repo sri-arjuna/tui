@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
+# Reset container var
 MORE_OPTS=""
-[ -z $APP_USER_LABEL ]	|| MORE_OPTS+=" -u \"$APP_USER_LABEL\""
-[ -z $APP_FILES ]	|| MORE_OPTS+=" -F \"$APP_FILES\""
-[ -z $APP_FOLDERS ]	|| MORE_OPTS+=" -D \"$APP_FOLDERS\""
-[ -z $APP_SCRIPTS ] 	|| MORE_OPTS+=" -s \"$APP_SCRIPTS\""
+# Labels
+[ -z "$APP_USER_LABEL" ] || MORE_OPTS+=" -U \"$APP_USER_LABEL\""
+[ -z "$APP_LOC_LABEL" ]	|| MORE_OPTS+=" -L \"$APP_LOC_LABEL\""
+[ -z "$APP_POS_LABEL" ]	|| MORE_OPTS+=" -P \"$APP_POS_LABEL\""
+# Labels : text
+[ -z "$APP_FILES_LABEL" ]	|| MORE_OPTS+=" -F \"$APP_FILES_LABEL\""
+[ -z "$APP_DIR_LABEL" ]		|| MORE_OPTS+=" -D \"$APP_DIR_LABEL\""
+# Advanced
+[ -z "$APP_CONFIG_FILE" ] 	|| MORE_OPTS+=" -c \"$APP_CONFIG_FILE\""
+[ -z "$APP_SOURCE_THIS" ] 	|| MORE_OPTS+=" -s \"$APP_SOURCE_THIS\""
+[ -z "$APP_SHELL" ] 		|| MORE_OPTS+=" -X $APP_SHELL"
+[ -z "$APP_CLEAR" ] 		|| MORE_OPTS+=" -n"
+# Write the file
 cat << EOF
 #!/usr/bin/env bash
 # Project: $APP_TITLE ($APP_FILE)
@@ -32,8 +42,8 @@ cat << EOF
 #	$APP_TITLE requires TUI - Text User Interface by Simon Arjuna Erat (sea)
 #	Check if TUI is installed...
 #
-	if S=$(which tui) 2>/dev/zero
-	then 	[ ! 0 -eq \$UID ] && \\
+	if ! S="\$(which tui)" 2>/dev/zero
+	then 	[ ! 0 -eq \${UID:-0} ] && \\
 			printf "\\n#\\n#\\tPlease restart the script (\${0##*/}) as root to install TUI (Text User Interface).\\n#\\n#\\n" && \\
 			exit 1
 		if ! git clone https://github.com/sri-arjuna/tui.git /tmp/tui.inst
@@ -46,41 +56,59 @@ cat << EOF
 			make && make install || \\
     			(printf "\\n#\\n#\\tPlease report this issue of TUI installation fail.\\n#\\thttps://github.com/sri-arjuna/tui/issues\\n#\\t$(bash --version)\\n#\\n#\\n";exit 1)
     	fi
-    	source \$S ; unset S
+    	source "\$S" ; unset S
+#
+#	Gettext preps
+#
+	TEXTDOMAIN="\${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="\${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	Variables
 #
-	ME_VERSION=0.1
-	ME="\${0##*/}"
-	ME_DIR="$APP_BASE"
-	ME_BASE="\$ME_DIR/$APP_MENU"
-	TITLE="$APP_TITLE (\$ME_VERSION)"
+	source tuirc
+	script_name="\${0##*/}"
+	script_name="\${script_name/.sh/}"
+	script_version=0.1
+	script_title="$APP_TITLE (\$script_version)"
+	script_author="$USER_NAME"
+	script_contact="$USER_EMAIL"
+	script_license="$DEFAULT_LICENSE"
+	script_created="$(date +'%Y.%m.%d')"
+	script_changed="$(date +'%Y.%m.%d')"
+	# tui specific
+	script_base="$APP_BASE"
 	MORE_OPTS="$MORE_OPTS"
 #
-#	Help text
+#	MESSAGES
 #
-	help_text="
-Usage: 		\$ME [options] SECTION [SECTION ...] TASK [options] [arguments]
-Examples:	\$ME help
-		\$ME 
+	MSG_TR_HELP="$(gettext '
+Usage: 		\$script_name [options] SECTION [SECTION ...] TASK [options] [arguments]
+Examples:	\$script_name [help]|[TASK]
+		\$script_name SECTION TASK -h
+		\$script_name SECTION SECTION TASK -o 15 ARGUMENTS
+		\$script_name 
 
 Where options are:
 	-h|--help 		Prints this screen and exits
 	--version		Prints the version and exits
-"
-	case \$1 in
-	-h|--help)	printf '%s\n' "\$help_text"
-			exit 99
-			;;
-	--version)	version_text=$(gettext "
-GNU $ME, Version $script_version
+')"
+	MSG_TR_VERSION="$(eval_gettext '
+GNU $script_name, Version $script_version
 Copyright (C) $(date +'%Y') $USER_NAME
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-")
-			printf '%s\n' "\$version_text"
+')"
+#
+#	Catch 'caller' arguments
+#
+	case "\$1" in
+	-h|--help)	printf '%s\n' "\$MSG_TR_HELP"
+			exit 99
+			;;
+	--version)	printf '%s\n' "\$MSG_TR_VERSION"
 			exit 0
 			;;
 	esac
@@ -88,7 +116,7 @@ There is NO WARRANTY, to the extent permitted by law.
 #	Action and Display
 #
 	tui \\
-		-p "\$ME_BASE" \\
-		-T "\$TITLE" \\
+		-p "\$script_base/menu" \\
+		-T "\$script_title" \\
 		\$MORE_OPTS "\${@}"
 EOF

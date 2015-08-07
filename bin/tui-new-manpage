@@ -19,15 +19,18 @@
 # ------------------------------------------------------------------------
 #
 	if source /etc/tuirc && source gettext.sh && source "${HOME:-/root}/.tuirc"
-	then	for f in $TUI_FILE_USER $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-	else	. tuirc	# This first call would create the RC if its missing.
+	then	for f in "$TUI_FILE_USER" $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
+	else	source tuirc	# This first call would create the RC if its missing.
 	fi
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	Variable defaults
 #
-	script_version=0.8.9
+	script_version=0.8.9a
 	ME="${0##*/}"
-	help_text=$(gettext "
+	help_text="$(eval_gettext '
 $ME ($script_version)
 Creates a new man page in $HOME/bin, if $HOME/.local/bin does not exists.
 Also asks to create a basic man page template in the same location.
@@ -40,9 +43,9 @@ Where options are:
 	-a(pplication)	Create a full application manpage template
 	-m(inimal)	Creates a minimal manpage template
 	
-")
+')"
 	DEST=""
-	TITLE="$(gettext 'sea\'s New manpage script"')
+	TITLE="$(eval_gettext 'sea New manpage script')"
 	SHELL_EXT=""
 #
 #	Variable handling
@@ -59,23 +62,23 @@ There is NO WARRANTY, to the extent permitted by law.
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	tui-title "$TITLE ($script_version)"
 	while getopts "ham" name
-	do 	case $name in
+	do 	case "$name" in
 		a)	SHELL_EXT="application"	;;
 		m)	SHELL_EXT="minimal"	;;
 		h)	printf "$help_text"
-			exit $RET_HELP	;;
+			exit "$RET_HELP"	;;
 		*)	# If improper argument
 			printf "$help_text"
-			exit $RET_HELP	;;
+			exit "$RET_HELP"	;;
 		esac
 	done
 	SHELL_EXT="${SHELL_EXT:-$default_new_manpage_type}"
-	shift $(($OPTIND - 1))
+	shift "$(($OPTIND - 1))"
 #
 #	Display
 #
 	if [ -z "$1" ]
-	then	DEST=$(tui-read "Enter the file name:")
+	then	DEST=$(tui-read "$(gettext 'Enter the file name:')")
 		if [ "$DEST" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
 			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
@@ -92,11 +95,11 @@ There is NO WARRANTY, to the extent permitted by law.
 	
 	DEST="${DEST/.1/}.1"
 	if [ -f "$DEST" ]
-	then	tui-yesno "$(gettext 'File $DEST exists... Overwrite?')" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
-		tui-status $? "$(gettext 'Overwrite file: $DEST')"
+	then	tui-yesno "$(eval_gettext 'File $DEST exists... Overwrite it now?')" || mv "$DEST" "$DEST-$(date +'%F-%T').bak"
+		tui-status "$?" "$(eval_gettext 'Overwritten file: $DEST')"
 	fi
-	source $TUI_DIR_TEMPLATES/manpage/$SHELL_EXT > "$DEST"
-	tui-status $? "$(gettext 'Saved:') $(printf $DEST)"
+	source "$TUI_DIR_TEMPLATES/manpage/$SHELL_EXT" > "$DEST"
+	tui-status "$?" "$(gettext 'Saved:') $DEST"
 	# Open the script AFTER the manpage... to encourage the writing of the manpage
 	#set -x
 	tui-edit "$DEST"

@@ -145,10 +145,10 @@ There is NO WARRANTY, to the extent permitted by law.
 		printf "\r${BORDER_LEFT} >      \r${BORDER_LEFT} > " >&2
 		invalid=false
 		
-		# Get input
+		# Get input, quoting causes error
 		"$wasPipe" && \
-			"$cmd" NUM </dev/tty || \
-			"$cmd" NUM
+			$cmd NUM </dev/tty || \
+			$cmd NUM
 		# Catch invalid inputs
 		[ -z "$NUM" ] && invalid=true && continue
 		echo "$NUM" | $GREP '^\?' && invalid=true && continue
