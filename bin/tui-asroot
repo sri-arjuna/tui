@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-
-
-
 # ------------------------------------------------------------------------
 #
 # Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
@@ -38,8 +35,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.08.03
-	script_version=0.9.0c
+#	Changed:	2015.08.014
+	script_version=0.9.0d
 #	Description:	Executes passed command as root
 #
 #
@@ -93,7 +90,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	if tui-bol-root
 	then	# When passing eg: bash /path/to/script, quotes causes a failure!
 		#eval "${@}"
-		${@}
+		${@} >&2
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
 	then	tui-echo "${MSG:-$MSG_TR_SUDO}" >&2
