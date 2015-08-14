@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS = gnu
-SUBDIRS = bin docs conf.etc conf.home lists man templates themes
+SUBDIRS = bin docs conf.etc conf.home lists man templates themes locale
 EXTRA_DIST = 
 
 compldir = $(datadir)/bash-completion/completions

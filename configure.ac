@@ -16,5 +16,6 @@ AC_CONFIG_FILES([
  templates/manpage/Makefile
  templates/scripts/Makefile
  themes/Makefile
+ locale/Makefile
 ])
 AC_OUTPUT
