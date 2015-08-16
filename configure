@@ -8,6 +8,9 @@
 #			This is not about auto magic compiling,
 #			this is about simply placing files.
 #
+#	Path Reference:	http://www.pathname.com/fhs/
+#
+#
 #	To report bugs or suggestions, please raise an issue on:
 #			https://github.com/sri-arjuna/yassi/issues
 #
@@ -119,6 +122,11 @@
 	show_help() {
 	# Prints the helpscreen
 	# and exits
+		MSG_TR_CONTACT_INFO="
+	$( [ ! -z "$BUGS" ] && echo "Report bugs of \"$APP\"-installation to \"$BUGS\"")
+	$( [ ! -z "$ISSUE" ] && echo "Report bugs of \"$APP\"-installation on \"$ISSUE\"")
+"	
+		
 		MSG_TR_HELP="Usage:	./$script_name [options]
 Routine to configure the installation of $APP $APP_VER
 
@@ -128,7 +136,7 @@ Options:
 	--sample		Prints a sample configure.cfg required by projects
 	--sample-full		Prints a sample configure.cfg required by projects
 	
-	--tarball		Configures ${APP:-APPNAME} and saves the folder as tarball
+	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball
 	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR:-/usr/local})
 	
 	--bindir DIR		user executeables 		(\$PREFIX/bin)
@@ -153,9 +161,7 @@ Options:
 	
 	--sharedstatedir	modifiable architecture-independent	(\$PREFIX/com)
 			
-	$( [ ! -z "$BUGS" ] && echo "Report bugs of \"$APP\" to \"$BUGS\"")
-	$( [ ! -z "$ISSUE" ] && echo "Report bugs of \"$APP\" on \"$ISSUE\"")
-	"
+	$MSG_TR_CONTACT_INFO"
 		echo "$MSG_TR_HELP"
 		exit 99
 	}
@@ -312,12 +318,6 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "mkdir -p ${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
 			echo "rm -f ${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
 		fi
-		for m in install uninstall
-		do	echo >> "make-$m"
-			printf '%s\n' \
-				"RET=\$?" \
-				"set +x" >> "make-$m"
-		done
 		
 		# Check for post operations, letter better here, than with 'set -s'
 		if [ ! -z "$(echo ${POST[@]})" ]
@@ -332,7 +332,14 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			done
 		fi
 		
-		echo "echo;echo \"Finished installation of $APP with exit code: \$RET (0=success)\"" >> "make-install"
+		for m in install uninstall
+		do	echo >> "make-$m"
+			printf '%s\n' \
+				"RET=\$?" \
+				"set +x" >> "make-$m"
+		done
+		
+		echo "echo;echo \"Finished installation of $APP\";exit \$RET" >> "make-install"	# with exit code: \$RET (0=success)\""
 	}
 #
 #	Get options
@@ -404,10 +411,14 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="_${APP_VER}"
+		./configure --prefix=${FHS[prefix]}
+		source "$REFERENCE"
+		for t in "${PRIOR[@]}"
+		do 	(set -x ; $t )
+		done
 		tarball="../${APP}$VERSION.tar.gz"
-		tar -acf "$tarball" *
-		mv "$tarball" . && \
-			echo "Successfully created tarball ${tarball##*/}!"
+		tar -acf "$tarball" * && \
+			echo "Successfully created tarball ${tarball}!"
 	else	echo
 		echo "The installation script has been configured to ${FHS[prefix]}."
 		echo "To install \"$APP\" now, please execute: su -c \"./make-install\""
