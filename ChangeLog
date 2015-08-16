@@ -50,3 +50,7 @@
 * injection protection: updated some default values in 'conf.*/*' files
 * REMOVING QUOTES THAT CAUSE ERRORS!
 * Updated 'full' and 'regular' template scripts
+
+20.15.08.16 - 0.8.9-GNU-RC10
+* Updated: tui-wait, works again
+* Updated: tui-asroot, cant properly test since po-files cause local test-installation to fail

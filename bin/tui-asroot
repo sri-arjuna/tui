@@ -35,8 +35,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.08.014
-	script_version=0.9.0d
+#	Changed:	2015.08.16
+	script_version=0.9.1-alpha
 #	Description:	Executes passed command as root
 #
 #
@@ -72,12 +72,13 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 #	Catching Arguments
 #
+	#echo "1:$1 2:$2 3:$3 4:$4"
 	# Get access to the passed value of the argument by using $OPTARG
-	[ "--help" = "$1" ] && printf "$MSG_TR_HELP" && exit 99
-	[ "--version" = "${1,,}" ] && printf "$MSG_TR_VERSION" && exit 0
+	[ "--help" = "$1" ] && printf '%s\n' "$MSG_TR_HELP" && exit 99
+	[ "--version" = "${1,,}" ] && printf '%s\n' "$MSG_TR_VERSION" && exit 0
 	while getopts hm: opt
 	do 	case "$opt" in
-		h)	printf "$MSG_TR_HELP"
+		h)	printf '%s\n' "$MSG_TR_HELP"
 			exit "$RET_HELP"
 			;;
 		m)	MSG="$OPTARG"
@@ -97,7 +98,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		"${SUDO:-sudo}" ${@} 	>&2
 		exit "$?"
 	else	tui-echo "${MSG:-$MSG_TR_ROOT}"
-		su -c "${@}" 		>&2
+		su -c "$(echo $@)" 		>&2
 		exit "$?"
 	fi
 	exit 1
