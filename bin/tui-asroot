@@ -19,12 +19,9 @@
 #
 # ------------------------------------------------------------------------
 #
+	
+	source /etc/tui.conf
 	source /etc/tuirc
-	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
-	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
-	#TEXTDOMAINDIR="${TUI_DIR_SYSTEM}/po/"
-	export TEXTDOMAIN TEXTDOMAINDIR
-	source gettext.sh
 	for f in $TUI_FILE_CONF_{COMMANDS,SETTINGS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
 	done
@@ -46,40 +43,19 @@
 #
 #	Translate strings
 #
-	MSG_TR_ROOT="$(gettext 'Please provide root password.')" #,"'Please provide root password.'")"
-	MSG_TR_SUDO="$(eval_gettext 'Password for $USER')"
-#
-#	Help text
-#
-	MSG_TR_HELP="$(eval_gettext '
-Usage: 		$ME \"command\"
-Examples:	$ME \"cat /etc/cryptab\"
-		$ME -m \"Provide password to show crypttab\" \"cat /etc/cryptab\"
-Where options are:
-	-h(elp) 		This screen
-	-m(essage)	MSG	Prints \"MSG\" before asking for a password
-
-')"
-	MSG_TR_VERSION="$(gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-')"
+	TUI_LANG=en_GB
+	source "$TUI_DIR_LOCALE/$TUI_LANG/${ME/tui-}.sh"
 #
 #	Catching Arguments
 #
 	#echo "1:$1 2:$2 3:$3 4:$4"
 	# Get access to the passed value of the argument by using $OPTARG
-	[ "--help" = "$1" ] && printf '%s\n' "$MSG_TR_HELP" && exit 99
-	[ "--version" = "${1,,}" ] && printf '%s\n' "$MSG_TR_VERSION" && exit 0
+	[ "--help" = "$1" ] && printf '%s\n' "$TR_MSG_TEXT_HELP_SHORT" "$TR_MSG_TEXT_HELP_LONG" && exit 99
+	[ "--version" = "${1,,}" ] && printf '%s\n' "$TR_MSG_TEXT_VERSION" && exit 0
 	while getopts hm: opt
 	do 	case "$opt" in
-		h)	printf '%s\n' "$MSG_TR_HELP"
-			exit "$RET_HELP"
+		h)	printf '%s\n' "$TR_MSG_TEXT_HELP_SHORT" "$TR_MSG_TEXT_HELP_LONG"
+			exit 99
 			;;
 		m)	MSG="$OPTARG"
 			shift 2
@@ -94,10 +70,10 @@ There is NO WARRANTY, to the extent permitted by law.
 		${@} >&2
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
-	then	tui-echo "${MSG:-$MSG_TR_SUDO}" >&2
+	then	tui-echo "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2
 		"${SUDO:-sudo}" ${@} 	>&2
 		exit "$?"
-	else	tui-echo "${MSG:-$MSG_TR_ROOT}"
+	else	tui-echo "${MSG:-$TR_MSG_TEXT_PASSWORD}"
 		su -c "$(echo $@)" 		>&2
 		exit "$?"
 	fi

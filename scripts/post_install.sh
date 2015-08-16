@@ -12,7 +12,7 @@ DATA="#
 	[ -z \"\$TUI_DIR_CONF\" ] && readonly \\
 		TUI_DIR_CONF=${prefix}/etc/tui
 	[ -z \"\$TUI_DIR_SYSTEM\" ] && readonly \\
-		TUI_DIR_SYSTEM=\${prefix}/share/tui
+		TUI_DIR_SYSTEM=\"$DATADIR\"
 #
 #	Paths	:	Used to run TUI
 #
@@ -23,6 +23,8 @@ DATA="#
 		TUI_DIR_THEMES=\"\$TUI_DIR_SYSTEM/themes\"
 	[ -z \"\$TUI_DIR_LIST\" ] && readonly \\
 		TUI_DIR_LIST=\"\${TUI_DIR_SYSTEM}/lists\"
+	[ -z \"\$TUI_DIR_LOCALE\" ] && readonly \\
+		TUI_DIR_LOCALE=\"\${TUI_DIR_SYSTEM}/locale\"
 	TUI_DIR_TEMP=\"\${TUI_DIR_TEMP}\"
 #
 #	Files

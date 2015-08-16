@@ -6,7 +6,6 @@
 	# Returns true if it finds some
 		typeset arg ac=0
 		for arg do
-		#echo $arg
 		ac="$((ac+=1))"
 		case "$arg" in
 		#(*[';`|<&>:']*|*'$('*|)	# Orginal
