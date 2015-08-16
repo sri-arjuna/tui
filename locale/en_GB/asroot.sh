@@ -24,6 +24,6 @@ Where options are:
 	-h(elp) 		This screen
 	-m(essage)	MSG	Prints \"MSG\" before asking for a password
 "
-
+TR_MSG_TEXT_HELP="$TR_MSG_TEXT_HELP_SHORT$TR_MSG_TEXT_HELP_LONG"
 #------------------------------------------
 TR_MSG_TEXT_PASSWORD="Please provide the password for $USER"

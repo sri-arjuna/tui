@@ -20,7 +20,7 @@
 # ------------------------------------------------------------------------
 #
 	
-	source /etc/tui.conf
+	#source /etc/tui.conf
 	source /etc/tuirc
 	for f in $TUI_FILE_CONF_{COMMANDS,SETTINGS,SYSTEM}
 	do	[ -f "$f" ] && source "$f"
@@ -43,18 +43,23 @@
 #
 #	Translate strings
 #
-	TUI_LANG=en_GB
-	source "$TUI_DIR_LOCALE/$TUI_LANG/${ME/tui-}.sh"
+	if [ -z "$TUI_LANG" ] && [ -d "$TUI_DIR_LOCALE/${LANG##\.*}" ]
+	then	TUI_LANG="${LANG##\.*}"
+	else	TUI_LANG="${TUI_LANG:-en_GB}"
+	fi
+	LANG_FILE="$TUI_DIR_LOCALE/$TUI_LANG/${ME/tui-}.sh"
+	[ -f "$LANG_FILE" ] || LANG_FILE="${LANG_FILE/$TUI_LANG/en_GB}"
+	source "$LANG_FILE"
 #
 #	Catching Arguments
 #
 	#echo "1:$1 2:$2 3:$3 4:$4"
 	# Get access to the passed value of the argument by using $OPTARG
-	[ "--help" = "$1" ] && printf '%s\n' "$TR_MSG_TEXT_HELP_SHORT" "$TR_MSG_TEXT_HELP_LONG" && exit 99
+	[ "--help" = "$1" ] && printf '%s\n' "$TR_MSG_TEXT_HELP" && exit 99
 	[ "--version" = "${1,,}" ] && printf '%s\n' "$TR_MSG_TEXT_VERSION" && exit 0
 	while getopts hm: opt
 	do 	case "$opt" in
-		h)	printf '%s\n' "$TR_MSG_TEXT_HELP_SHORT" "$TR_MSG_TEXT_HELP_LONG"
+		h)	printf '%s\n' "$TR_MSG_TEXT_HELP"
 			exit 99
 			;;
 		m)	MSG="$OPTARG"
