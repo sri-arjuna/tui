@@ -61,3 +61,7 @@
 20.15.08.16 - 0.8.9-GNU-RC10
 * Updated: tui-wait, works again
 * Updated: tui-asroot, cant properly test since po-files cause local test-installation to fail
+* Removed GNU Autotools, was too difficult for me
+* Moved ./man to ./docs/man
+* Applied YASSI
+* Writing source based translating system for tui internally
