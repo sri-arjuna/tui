@@ -1,1 +1,0 @@
-locale/en_US/tui-asroot.po

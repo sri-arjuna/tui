@@ -1,3 +1,0 @@
-SUBDIRS = samples tex
-
-doc_DATA = AUTHORS.md INSTALL.md LICENSE NEWS README.md
