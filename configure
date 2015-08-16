@@ -17,7 +17,7 @@
 #	Created:	2015.07.27
 #	Changed:	2015.08.16
 	script_name=configure
-	script_version=0.9
+	script_version=0.9.1
 #
 # ------------------------------------------------------------------------
 #
@@ -41,10 +41,11 @@
 #
 #	Internal Variables
 #
-	unset FHS POST PRIOR
+	unset FHS POST PRIOR REMOVE
 	declare -A FHS
 	declare -a POST
 	declare -a PRIOR
+	declare -a REMOVE
 	
 	APP=""
 	doRef=false
@@ -63,6 +64,7 @@
 	# and exits
 		cat <<-EOF
 			APP="projectname"
+			APP_REQUIRES="awk bash grep sed"
 			BINDIR=bin
 			DOCDIR="docs/README.md docs/COPYING"
 			#MAN1DIR=docs/man1/\*.1
@@ -79,6 +81,7 @@
 			# Project name
 			# Used for /usr/share/\$APP & /usr/share/doc/\$APP
 			APP="projectname"
+			APP_REQUIRES="awk bash grep sed"
 			# Used for helpscreen & tarball
 			APP_VER=0.1
 			# If set overwrites /usr/local for plain './configure' invocation
@@ -250,6 +253,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		do	echo "#!/bin/sh" > "make-$m"
 			[ ! "$m" = "distclean" ] && \
 				printf '%s\n' \
+					"[ -z \$UID ] && UID=0" \
 					"[ \$UID -ne 0 ] && \\" \
 					"	echo \"This script requires root access.\" && \\" \
 					"	exit 99" \
@@ -295,7 +299,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				esac
 			fi
 		done
-		. "$REFERENCE"
+		source "$REFERENCE"
 		
 		# Check for removal operations
 		if [ ! -z "$(echo ${REMOVE[@]})" ]
@@ -402,6 +406,15 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 #	Prepare installation script
 #
 	write_files
+	APP_REQUIRES=""
+	source "$SOURCE";missing=""
+	for req in $APP_REQUIRES;do
+		which $req 2>/dev/zero 1>&2 || missing+=" $req"
+	done
+	[ ! -z "$missing" ] && \
+		printf '%s\n' "Please provide these commands before installing $APP!" "::-->> ${missing}" && \
+		exit 1
+	
 #
 #	Output
 #
@@ -411,7 +424,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="_${APP_VER}"
-		./configure --prefix=${FHS[prefix]}
+		./configure --prefix="${FHS[prefix]}"
 		source "$REFERENCE"
 		for t in "${PRIOR[@]}"
 		do 	(set -x ; $t )
@@ -421,7 +434,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "Successfully created tarball ${tarball}!"
 	else	echo
 		echo "The installation script has been configured to ${FHS[prefix]}."
-		echo "To install \"$APP\" now, please execute: su -c \"./make-install\""
+		echo "To install \"$APP\" now, please execute: 'su -c \"./make-install\"'"
 		echo
 	fi
 	exit
