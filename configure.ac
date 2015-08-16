@@ -1,7 +1,8 @@
 AC_PREREQ([2.69])
 AC_INIT([TUI], [0.9.0], [erat.simon@gmail.com])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
-AC_CONFIG_FILES([
+AM_GNU_GETTEXT([external])
+AC_CONFIG_FILES([ po/Makefile.in
  Makefile
  tuirc
  bin/Makefile
@@ -17,5 +18,6 @@ AC_CONFIG_FILES([
  templates/scripts/Makefile
  themes/Makefile
  locale/Makefile
+ po/Makefile
 ])
 AC_OUTPUT

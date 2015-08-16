@@ -2312,7 +2312,7 @@ END
   fi
 fi
 
-ac_config_files="$ac_config_files Makefile tuirc bin/Makefile docs/Makefile docs/samples/Makefile docs/tex/Makefile conf.etc/Makefile conf.home/Makefile lists/Makefile man/Makefile templates/Makefile templates/manpage/Makefile templates/scripts/Makefile themes/Makefile"
+ac_config_files="$ac_config_files Makefile tuirc bin/Makefile docs/Makefile docs/samples/Makefile docs/tex/Makefile conf.etc/Makefile conf.home/Makefile lists/Makefile man/Makefile templates/Makefile templates/manpage/Makefile templates/scripts/Makefile themes/Makefile locale/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3045,6 +3045,7 @@ do
     "templates/manpage/Makefile") CONFIG_FILES="$CONFIG_FILES templates/manpage/Makefile" ;;
     "templates/scripts/Makefile") CONFIG_FILES="$CONFIG_FILES templates/scripts/Makefile" ;;
     "themes/Makefile") CONFIG_FILES="$CONFIG_FILES themes/Makefile" ;;
+    "locale/Makefile") CONFIG_FILES="$CONFIG_FILES locale/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

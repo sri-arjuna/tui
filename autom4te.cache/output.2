@@ -2570,7 +2570,6 @@ END
   fi
 fi
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a sed that does not truncate output" >&5
 $as_echo_n "checking for a sed that does not truncate output... " >&6; }
 if ${ac_cv_path_SED+:} false; then :
@@ -6091,7 +6090,7 @@ $as_echo "@%:@define HAVE_DCGETTEXT 1" >>confdefs.h
   
   
 
-ac_config_files="$ac_config_files Makefile tuirc bin/Makefile docs/Makefile docs/samples/Makefile docs/tex/Makefile conf.etc/Makefile conf.home/Makefile lists/Makefile man/Makefile templates/Makefile templates/manpage/Makefile templates/scripts/Makefile themes/Makefile"
+ac_config_files="$ac_config_files po/Makefile.in Makefile tuirc bin/Makefile docs/Makefile docs/samples/Makefile docs/tex/Makefile conf.etc/Makefile conf.home/Makefile lists/Makefile man/Makefile templates/Makefile templates/manpage/Makefile templates/scripts/Makefile themes/Makefile locale/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6843,6 +6842,7 @@ do
   case $ac_config_target in
     "po-directories") CONFIG_COMMANDS="$CONFIG_COMMANDS po-directories" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "tuirc") CONFIG_FILES="$CONFIG_FILES tuirc" ;;
     "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
@@ -6857,6 +6857,7 @@ do
     "templates/manpage/Makefile") CONFIG_FILES="$CONFIG_FILES templates/manpage/Makefile" ;;
     "templates/scripts/Makefile") CONFIG_FILES="$CONFIG_FILES templates/scripts/Makefile" ;;
     "themes/Makefile") CONFIG_FILES="$CONFIG_FILES themes/Makefile" ;;
+    "locale/Makefile") CONFIG_FILES="$CONFIG_FILES locale/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
