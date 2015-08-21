@@ -34,24 +34,39 @@ shopt -s expand_aliases
 	if [ -z "$HOME" ]
 	then	# HOME is empty, if UID is empty too, asume machine is still booting
 		if [ 0 -eq "${UID:-0}" ]
-		then	# Its root
+		then	# Its root, check both eventhough /root is not standard
 			known="/root /"
 			for k in $(awk  -v FS=":" '/^root/ {print $6}' /etc/passwd 2>/dev/zero) $known
-			do 	[ -d "$k" ] && HOME="$k" && break
+			do 	[ -d "$k" ] && HOME="$k" && export HOME && break
 			done
 		else	# Its normal user
 			known="/Users /home"
 			for k in $known	# Dont quote, or it would not expand to words / paths
-			do 	[ -d "$k" ] && HOME="$k" && break
+			do 	[ -d "$k" ] && HOME="$k" && export HOME && break
 			done
 		fi
 	fi
+	# If its still empty, use 'cd' deault behaviour to return to the users homedir if invoked without args
 	[ -z "$HOME" ] && HOME="${k:-$(cd;pwd)}"
 	
 	# Regular definitions
 	TUI_VERSION=0.8.9
 	TRC="${HOME}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
-	TRC_SYS="/etc/tuirc"	# Only available if root installed tui
+	SYSCONFDIR=""
+	for install_kind in "/etc" "$HOME/.local" "$HOME"
+	do 	tmp_cfg="$install_kind/tui.conf"
+		[ -f "$tmp_cfg" ] && source "$tmp_cfg"
+	done
+	
+	if [ ! -f "$HOME/.config/tui/apps.conf" ]
+	then 	echo $DATADIR #; exit
+			HD="$HOME/.config/tui"
+			[ -d "$HD" ] || mkdir -p "$HD"
+			cp "$DATADIR/conf.home/"* "$HD"
+	fi
+	
+	
+	TRC_SYS="$SYSCONFDIR/tuirc"	# Only available if scratchit--root-- installed tui
 	source "$TRC_SYS" && \
 		break_on_injections "$@" && \
 		exit 1
