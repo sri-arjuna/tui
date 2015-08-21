@@ -1,23 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #	Yet Another Simple Script Installer
 # ------------------------------------------------------------------------
 #
-#	Description:	Generates a simple 'make-install' script 
-#			a basic FHS conform installation
-#
-#			This is not about auto magic compiling,
-#			this is about simply placing files.
-#
-#	Path Reference:	http://www.pathname.com/fhs/
-#
-#
-#	To report bugs or suggestions, please raise an issue on:
-#			https://github.com/sri-arjuna/yassi/issues
-#
 #	Created:	2015.07.27
-#	Changed:	2015.08.16
+#	Changed:	2015.08.22
 	script_name=configure
-	script_version=0.9.1
+	script_version=0.9.5
+#
+#	Description:
+#		This script automaticly, according to passed options, 
+#		generates the following files, named to go along with GNU Automake terminology.
+#		* make-install
+#		* make-uninstall
+#		* make-distclean
+#		
+#		The options were applied from the output of GNU Automake's './configure --help'
+#		and the calculation of the paths is done according to: http://www.pathname.com/fhs/
+#
+#		This is not about auto magic compiling,
+#		this is about simply placing files.
+#
+#
+#	To report bugs or suggestions about YASSI (configure), please raise an issue on:
+#		https://github.com/sri-arjuna/yassi/issues
+#	or send me an email.
 #
 # ------------------------------------------------------------------------
 #
@@ -50,11 +56,14 @@
 	APP=""
 	doRef=false
 	doTarball=false
-	SOURCE="$0.cfg"
+	is_at_home=false
+	SOURCE="./$script_name.cfg"
+	#LOG="${PWD:-$(pwd)}/make-install.log"		# Not yet used, see lines 214 + 215 for most important application
+	install_prefix="sudo "
 	
 	mandirs="$(echo man{1..9}dir)"
 	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs compldir sharedstatedir localstatedir"
-	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done #;variable_list+=" PRIOR POST REMOVE"
+	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
 	source "$SOURCE"
 #
 #	Functions
@@ -63,7 +72,7 @@
 	# Prints a sample configure.cfg
 	# and exits
 		cat <<-EOF
-			APP="projectname"
+			APP=projectname
 			APP_REQUIRES="awk bash grep sed"
 			BINDIR=bin
 			DOCDIR="docs/README.md docs/COPYING"
@@ -78,9 +87,9 @@
 	# Prints a sample configure.cfg
 	# and exits
 		cat <<-EOF
-			# Project name
+			# Project information
 			# Used for /usr/share/\$APP & /usr/share/doc/\$APP
-			APP="projectname"
+			APP=projectname
 			APP_REQUIRES="awk bash grep sed"
 			# Used for helpscreen & tarball
 			APP_VER=0.1
@@ -118,28 +127,26 @@
 			
 			# Append this in the uninstall script.
 			REMOVE[0]="rm docs/tex/\$APP.html docs/tex/\$APP.info"
-			REMOVE[1]="echo \"Dare you remove \$APP!\""
 		EOF
 		exit 0
 	}
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		MSG_TR_CONTACT_INFO="
-	$( [ ! -z "$BUGS" ] && echo "Report bugs of \"$APP\"-installation to \"$BUGS\"")
-	$( [ ! -z "$ISSUE" ] && echo "Report bugs of \"$APP\"-installation on \"$ISSUE\"")
+		MSG_TR_CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\n\tReport bugs of \"$APP\" to \"$BUGS\"")
+	$( [ ! -z "$ISSUE" ] && echo "Report bugs of \"$APP\" on \"$ISSUE\"")
 "	
 		
 		MSG_TR_HELP="Usage:	./$script_name [options]
-Routine to configure the installation of $APP $APP_VER
+Routine to configure the installation of ${APP:-APPNAME} ${APP_VER:-[APP_VER]}
 
 Options:
 	-h|--help		Shows this screen and exits
 	--version		Shows the version and exits
-	--sample		Prints a sample configure.cfg required by projects
-	--sample-full		Prints a sample configure.cfg required by projects
+	--sample		Prints a sample 'configure.cfg' required by projects and exits
+	--sample-full		Prints an advanced sample 'configure.cfg' required by projects and exits
+	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
 	
-	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball
 	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR:-/usr/local})
 	
 	--bindir DIR		user executeables 		(\$PREFIX/bin)
@@ -152,18 +159,17 @@ Options:
 	--htmldir DIR		project documentation root	(\$DOCDIR)
 	--infodir DIR		info documentation		(\$DATAROOTDIR/info)
 	
-	--man1dir DIR		man 1 Exe & Shell commands	(\$DATAROOTDIR/man/man1)
-		2) System calls		3) Library calls	4) Special files (eg /dev)
-		5) File formats & conventions (eg: /etc/passwd)	6) Games
-		7) Miscellaneous (eg: macros, groff(7));	8) Root commands (sbin)
-	--man9dir DIR		man 9 Kernel routines (non standard)	(\$DATAROOTDIR/man/man9)
-	
 	--compldir DIR		bash completion			(\$DATAROOTDIR/bash-completion/completions)
 	--localedir		locale-dependent data		(\$DATAROOTDIR/locale)
 	--localstatedir		modifiable single-machine data	(\$PREFIX/var)
 	
+	--man1dir DIR		man 1 Exe & Shell commands	(\$DATAROOTDIR/man/man1)
+		2) System calls		3) Library calls	4) Special files (eg /dev)
+		5) File formats & conventions (eg: /etc/passwd)	6) Games
+		7) Miscellaneous (eg: macros, groff)		8) Root commands (sbin)
+	--man9dir DIR		man 9 Kernel routines (non standard)	(\$DATAROOTDIR/man/man9)
+	
 	--sharedstatedir	modifiable architecture-independent	(\$PREFIX/com)
-			
 	$MSG_TR_CONTACT_INFO"
 		echo "$MSG_TR_HELP"
 		exit 99
@@ -172,7 +178,7 @@ Options:
 	# Prints the version of the script
 	# and exits
 		MSG_TR_VERSION="(sea) $script_name, Version $script_version
-Copyright (C) $(date +'%Y') Simon Arjuna Erat
+Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
@@ -191,7 +197,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		#
 			echo "mkdir -p \"${FHS[${1,,}]}\""
 			if [ -d "$2" ] && [ ! "./" = "${2:0:2}" ]
-			then	echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+			then	# Its a directory, go recursive
+				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
 			else	tmp_check="${2##*/}"
 				check_char="${tmp_check:0:1}"
 				isAsterix=$(printf '%s' "$check_char" | grep -v '*' && echo false || echo true )
@@ -203,7 +210,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				
 				if $isAsterix
 				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
-				else	echo "cp -ar \"${PWD:-$(pwd)}/$2\" \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
 				fi
 			fi
 		}
@@ -245,21 +252,24 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		write_distclean() { 
 		# Remove the files that where created
 		#
-			echo "(sleep 0.5 ; rm -f ./make-* ; rm -f $REFERENCE ) &"
+			echo "(sleep 0.5 ; rm -f ./make-* ; rm -f \"$REFERENCE\" ) &"
 		}
 		
 		# Prepare script headers
 		for m in install uninstall distclean
-		do	echo "#!/bin/sh" > "make-$m"
-			[ ! "$m" = "distclean" ] && \
-				printf '%s\n' \
+		do	echo "#!/usr/bin/env sh" > "make-$m"
+			if [ ! "$m" = "distclean" ] && $is_at_home 
+			then	printf '%s\n' \
 					"[ -z \$UID ] && UID=0" \
 					"[ \$UID -ne 0 ] && \\" \
 					"	echo \"This script requires root access.\" && \\" \
-					"	exit 99" \
-					"set -x" >> "make-$m"
+					"	exit 99"  >> "make-$m"
+			elif [ ! "$m" = "distclean" ]
+			then	echo "set -x" >> "make-$m"
+			fi
 			chmod +x "make-$m"
 		done
+		$is_at_home && FHS[prefix]="$prefix_home"
 		echo "prefix=${FHS[prefix]}">"$REFERENCE"
 		
 		# Write content of PRIOR tasks, if any
@@ -299,7 +309,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				esac
 			fi
 		done
-		source "$REFERENCE"
+		source "$PWD/$REFERENCE"
 		
 		# Check for removal operations
 		if [ ! -z "$(echo ${REMOVE[@]})" ]
@@ -335,7 +345,6 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				((C++))
 			done
 		fi
-		
 		for m in install uninstall
 		do	echo >> "make-$m"
 			printf '%s\n' \
@@ -344,6 +353,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		done
 		
 		echo "echo;echo \"Finished installation of $APP\";exit \$RET" >> "make-install"	# with exit code: \$RET (0=success)\""
+		#sed s,'set -x','',g -i make-{uni,i}nstall
+		
+		sed s,'set -x',"set -x\nSYSCONFDIR=$SYSCONFDIR",g -i make-{uni,i}nstall
+		sed s,'~',"$HOME",g -i make-{uni,i}nstall
 	}
 #
 #	Get options
@@ -378,16 +391,22 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	for index in $index_list
 	do
 		tmp="${FHS[$index]}"
+		etc_done=false
 		if [ -z "$tmp" ]
 		then	case "$index" in
 			prefix)		tmp="${APP_DIR:-/usr/local}"	;;
 			"bindir")	tmp="${FHS[prefix]}/bin"	;;
 			"sbindir")	tmp="${FHS[prefix]}/sbin"	;;
-			sysconfdir)	case "${FHS[prefix]}" in
+			sysconfdir)	tmp_prefix="${FHS[prefix]}"
+					case "$tmp_prefix" in
 					"/"|"/usr")
 						tmp="/etc"		;;
-					*)	tmp="${FHS[prefix]}/etc";;
-					esac				;;
+					*)	if $is_at_home
+						then	tmp="$HOME/.local/etc"
+						else	tmp="${FHS[prefix]}/etc"
+						fi
+						;;
+					esac ; etc_done=true				;;
 			datarootdir)	tmp="${FHS[prefix]}/share"	;;
 			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
 			infodir)	tmp="${FHS[datarootdir]}/info"	;;
@@ -399,6 +418,16 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
 			localstatedir)	tmp="${FHS[prefix]}/var"	;;
 			esac
+			if [ "$index" = "prefix" ] && ! $etc_done
+			then	# Do special handling
+					[ "~" = "${tmp:0:1}" ] && tmp="${tmp/~/$HOME}"
+					if [ "${tmp:0:${#HOME}}" = "$HOME" ] #|| [ "$tmp" ~= ^"~" ]
+					then	is_at_home=true
+						install_prefix=""
+						prefix_home="${{tmp/~/$HOME}/$HOME}"
+						tmp="$prefix_home"
+					fi
+			fi
 			FHS["$index"]="$tmp"
 		fi
 	done
@@ -434,7 +463,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "Successfully created tarball ${tarball}!"
 	else	echo
 		echo "The installation script has been configured to ${FHS[prefix]}."
-		echo "To install \"$APP\" now, please execute: 'su -c \"./make-install\"'"
+		echo "To install \"$APP\" now, please execute: '${install_prefix}./make-install'"
 		echo
 	fi
 	exit
