@@ -193,7 +193,7 @@
 						( eval "$cmd" 1>/dev/zero ) &
 					script_pid["$C"]="$!"
 					PID="${script_pid[$C]}"
-					doLog "$(eval_gettext '$PID starting')"
+					doLog "$TR_MSG_WORD_STARTING $PID"
 				fi
 				;;
 			*)	((DONE++))

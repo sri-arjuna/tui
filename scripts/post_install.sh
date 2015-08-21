@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
-SRC=/etc/tui.conf
-OUT=/etc/tuirc
+[ -f /etc/tui.conf ] && SRC=/etc/tui.conf
+[ -f $HOME/.local/tui.conf ] && SRC=$HOME/.local/tui.conf
+[ -z "$SRC" ] && which locate 2>/dev/zero >&2 && SRC=$(locate tui.conf)
+
+OUT="${SRC/\.conf/rc}"
 
 source "$SRC"
-
+export SYSCONFDIR
 DATA="#
 #	This file provides the default directories,
 #	required to created the user his own tuirc file.
 #
-	prefix=/usr
+	prefix=$prefix
 	[ -z \"\$TUI_DIR_CONF\" ] && readonly \\
 		TUI_DIR_CONF=${prefix}/etc/tui
 	[ -z \"\$TUI_DIR_SYSTEM\" ] && readonly \\
@@ -48,4 +51,5 @@ DATA="#
 		TUI_FILE_CONF_ALIAS=\"\$TUI_DIR_CONF/shorts-alias.conf\""
 
 echo "$DATA" > "$OUT"
+sed s,"$SYSCONFDIR/conf.tui","$SYSCONFDIR/tui",g -i "make-uninstall"
 cat "scripts/injection_protection.sh" >> "$OUT"
