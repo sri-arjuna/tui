@@ -20,7 +20,16 @@
 #
 #	Variable defaults
 #
-	source /etc/tuirc && \
+	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	# 
+	if ! source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	then 	source tuirc
+	fi
+	
+#	source /etc/tuirc && \
 		break_on_injections "$@" && \
 		exit 1
 	script_version=0.8.2a

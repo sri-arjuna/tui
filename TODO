@@ -7,10 +7,17 @@ you are encouraged to create your own theme - and send me for implementation.
 GNU
 ---
 gettext, where applicable - commands that require interaction....
+source files?
 
 
 Review for fix:
 ---------------
+tui-conf-get (spaces upon read output?)
+
+
+Security
+-----------
+tui-conf-[gs]et, tui-read(?) ; parsing for content variable strings
 
 
 
@@ -19,6 +26,8 @@ Review for fix:
 tui-conf-edit
 tui
 samples
+move manpages to helptext, to the update the manpages according of the helpscreen
+
 
 --help @ all
 Report bugs to: mailing-address

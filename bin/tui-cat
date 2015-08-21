@@ -24,17 +24,48 @@
 #	Variables
 #
 	BORDER_RIGHT=""
-	source /etc/tuirc && source "${HOME:-/root}/.tuirc" && \
-		. "$TUI_FILE_CONF_COMMANDS" && \
-		. "$TUI_DIR_THEMES/$TUI_THEME" && \
-		. "$TUI_FILE_CONF_SYSTEM" || . tuirc	# This first call would create the RC if its missing.
+	ME="${0##*/}"
+	script_version=0.8.1
+	
+	
+	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	# 
+	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	then 	# Load required variables
+		for f in $TUI_FILE_CONF_COMMANDS "$TUI_DIR_THEMES/$TUI_THEME"
+		do	[ -f "$f" ] && source "$f"
+		done
+		# Load language
+		if [ -z "$TUI_LANG" ]
+		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
+			lng="$(echo ${LANG/\.*})"
+			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
+				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
+				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
+			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
+			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
+		fi
+		LANG_FILE=${ME/tui\-}.sh
+		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
+		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+	
+	
+	
+	#source /etc/tuirc && source "${HOME:-/root}/.tuirc" && \
+	#	. "$TUI_FILE_CONF_COMMANDS" && \
+	#	. "$TUI_DIR_THEMES/$TUI_THEME" && \
+	#	. "$TUI_FILE_CONF_SYSTEM" || . tuirc	# This first call would create the RC if its missing.
 	# from: http://rosettacode.org/wiki/Reverse_a_string#UNIX_Shell
 	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
 	WIDTH=$[ $(tput cols) - ( 2 * ${#BORDER_LEFT} ) - 2 ]
 	EMPTY="$(printf '%*s' $WIDTH)"
 	
-	ME="${0##*/}"
-	script_version=0.8.1
 	DELAY=0.05
 	TITLE=false
 	wasPipe=false

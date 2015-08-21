@@ -17,26 +17,57 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # ------------------------------------------------------------------------
-	source /etc/tuirc && \
-		break_on_injections "$@" && \
-		exit 1
-	source "${HOME:-/root}/.tuirc" && \
-		. "$TUI_FILE_CONF_COMMANDS" || \
-		. tuirc	# This first call would create the RC if its missing.
+#
+#	Internals
+#
+	ME="${0##*/}"
+	script_version=1.3
+	
+	# Check the two default places for the core configuration
+	# First systemwide, second user only install
+	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	# 
+	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	then 	# Load required variables
+		source "$TUI_FILE_CONF_COMMANDS"
+		# Load language
+		if [ -z "$TUI_LANG" ]
+		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
+			lng="$(echo ${LANG/\.*})"
+			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
+				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
+				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
+			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
+			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
+		fi
+		LANG_FILE=${ME/tui\-}.sh
+		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
+		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+	
+#	source /etc/tuirc && \
+#		break_on_injections "$@" && \
+#		exit 1
+#	source "${HOME:-/root}/.tuirc" && \
+#		. "$TUI_FILE_CONF_COMMANDS" || \
+#		. tuirc	# This first call would create the RC if its missing.
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.06.27
-	script_version=1.3
+#	Changed:	2015.08.22
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
 #
 	RET_HELP=99
 	TITLE="Save values to conf files"
-	ME="${0##*/}"
 	help_text="
 $ME ($script_version)
 $TITLE

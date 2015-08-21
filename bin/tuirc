@@ -19,13 +19,19 @@ shopt -s expand_aliases
 #
 # ------------------------------------------------------------------------
 #
+#	Internals
+#
+	oME="$ME"	# Backup of variable 'ME' if sourced
+	oVER="$script_version"
+	ME=tuirc
+	script_version=2.6
+	TUI_VERSION=0.8.9-GNU-RC11
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.08.06
-	script_version=2.5
+#	Changed:	2015.08.21
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
@@ -50,26 +56,45 @@ shopt -s expand_aliases
 	[ -z "$HOME" ] && HOME="${k:-$(cd;pwd)}"
 	
 	# Regular definitions
-	TUI_VERSION=0.8.9
 	TRC="${HOME}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
+	
+	# Get paths of where it was installed
 	SYSCONFDIR=""
 	for install_kind in "/etc" "$HOME/.local" "$HOME"
 	do 	tmp_cfg="$install_kind/tui.conf"
 		[ -f "$tmp_cfg" ] && source "$tmp_cfg"
 	done
 	
+	# Check if user configuration files are present
 	if [ ! -f "$HOME/.config/tui/apps.conf" ]
-	then 	echo $DATADIR #; exit
-			HD="$HOME/.config/tui"
-			[ -d "$HD" ] || mkdir -p "$HD"
-			cp "$DATADIR/conf.home/"* "$HD"
+	then 	HD="$HOME/.config/tui"
+		[ -d "$HD" ] || mkdir -p "$HD"
+		cp "$DATADIR/conf.home/"* "$HD"
 	fi
 	
+	# Load its own language file
+	if [ -z "$TUI_LANG" ]
+	then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
+		lng="$(echo ${LANG/\.*})"
+		# Check all provided language directories
+		echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
+			tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
+			tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
+		# Sadly this echo is required to remove tailing spaces, 
+		# probablly an issue of tui-conf-get (2015.08.21)
+		TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
+	fi
+	LANG_FILE=${ME/tui\-}.sh
+	LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
+	[ -f "$LANG_FILE" ] && source "$LANG_FILE"
 	
-	TRC_SYS="$SYSCONFDIR/tuirc"	# Only available if scratchit--root-- installed tui
-	source "$TRC_SYS" && \
-		break_on_injections "$@" && \
-		exit 1
+	# Lets continue with a general security check
+	TRC_SYS="$SYSCONFDIR/tuirc"
+	if source "$TRC_SYS"
+	then 	break_on_injections "$@" && exit 1
+	else	tui-status 1 "${TR_MSG_TEXT_MISSING_FILE} $TRC_SYS"
+		exit 
+	fi
 #
 #	Functions
 #
@@ -81,6 +106,8 @@ shopt -s expand_aliases
 	function help_screen () { #
 	# Prints some basic usage
 	#
+		echo "$TR_MSG_TEXT_HELP"
+		return
 		eval_gettext '
 Usage: 	tuirc [config|reset[-yes]|theme] (source tui)
 Where options are:
@@ -272,7 +299,6 @@ Where options are:
 #
 #	Load Environment	:	System wide / defaults
 #
-	source "$TRC_SYS" 2>/dev/zero	# Load tui system path
 	source "$TRC" 	  2>/dev/zero	# Load tui user paths
 	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS}
 	do	source "$f" #&& printf "." > /dev/stderr
@@ -333,6 +359,8 @@ Where options are:
 		YES="false"
 		case "$MODE" in
 		--version|version)
+			echo "$TR_MSG_TEXT_VERSION"
+			exit
 			version_text="$(eval_gettext '
 GNU $ME, Version $script_version
 Copyright (C) 2011-2015 Simon Arjuna Erat
@@ -506,4 +534,16 @@ There is NO WARRANTY, to the extent permitted by law.
 		tui-printf -E 
 		tui-yesno "$(gettext 'Configure it now?')" || exit 0
 		ConfigTUI
+	else	# Set back possible original variables ME and script_version
+		ME="${oME:-${0##*/}}"
+		script_version="$oVER"
+		
+		# Set and load the LANG_FILE of the sourcing script (caller)
+		# Luckily, TUI_LANG is already set by now
+		LANG_FILE="$TUI_DIR_LOCALE/$TUI_LANG/${ME/tui\-}.sh"
+		[ -f "$LANG_FILE" ] && \
+			source "$LANG_FILE" || \
+			( [ tui = "${ME:0:3}" ] && printf '%s\n' \
+				"Language file for \"$ME ($LANG_FILE)\" does not exist yet." >&2
+			)
 	fi

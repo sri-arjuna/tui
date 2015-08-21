@@ -27,12 +27,13 @@
 	do 	[ -d "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && break
 	done
 	
-	if source ${tmp_task}/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zerothen
+	if source ${tmp_task}/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do source "$f";done
 	else	source tuirc
 	fi
 	
 	break_on_injections "$@" && exit 1
+	. gettext.sh
 	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
 	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
 	export TEXTDOMAIN TEXTDOMAINDIR
