@@ -38,8 +38,8 @@
 		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
 			lng="$(echo ${LANG/\.*})"
 			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
+				echo "	TUI_LANG=$lng" >> "${HOME:-/root}/.tuirc"  || \
+				echo "	TUI_LANG=en_GB" >> "${HOME:-/root}/.tuirc"
 			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
 			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
 		fi
