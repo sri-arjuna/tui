@@ -1,8 +1,6 @@
-# TASK (YEAR/S)		FAMNAME, YOURNAME [, EMAIL]
-# --------------------------------------------------------------
-Idea (1995-2015):	Erat, Simon Arjuna, erat.simon@gmail.com
-Readme (2015):   	Erat, Simon Arjuna
-Initial Release (2015):	Erat, Simon Arjuna
-# --------------------------------------------------------------
-# ------------         Bugfixes / Maintanance       ------------
-# --------------------------------------------------------------
+Authors
+=======
+
+   DATE   |     Surname, Fam Name     |         Email         | Desc
+----------|---------------------------|-----------------------|------
+(1995) 2011-2015 | Simon Arjuna, Erat | erat.simon@gmail.com | Initial idea and realisation

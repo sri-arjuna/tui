@@ -1,0 +1,184 @@
+#!/usr/bin/env bash
+source tuirc
+
+cat > "$DEST" << EOF
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) $(date +'%Y') by $USER_NAME, $USER_EMAIL
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the $DEFAULT_LICENSE as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# $DEFAULT_LICENSE for more details.
+#
+# You should have received a copy of the $DEFAULT_LICENSE
+# along with this program.  If not, see $DEFAULT_LICENSE_URL
+#
+# ------------------------------------------------------------------------
+#
+#	TUI Internals
+#
+	script_version=0.1
+	script_created="$(date +'%Y.%m.%d')"
+	script_changed="$(date +'%Y.%m.%d')"
+	
+	script_name="\${0##*/}"
+	script_name="\${script_name/.sh/}"
+	script_title="${DEST##*/}"
+	script_package=""
+	
+	script_author="$USER_NAME"
+	script_contact="$USER_EMAIL"
+	script_license="$DEFAULT_LICENSE"
+#
+#	Internal preps
+#
+	[ ! -z "\$script_package" ] && script_package+=" " && script_package_txt=" ($script_package)"
+#
+#	Shared variables & Language
+#
+	# Check the two default places for the core configuration
+	# First systemwide, second user only install
+	for tmp_task in "/etc" "\${HOME:-/root}/.local" "\$HOME"
+	do 	[ -f "\$tmp_task/tui.conf" ] && source "\$tmp_task/tui.conf" && [ ! -z "\${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	if source "\${SYSCONFDIR}/tuirc" && source "\${HOME:-/root}/.tuirc" 2>/dev/zero
+	then 	# Load required variables
+		source "\$TUI_FILE_CONF_COMMANDS"
+		# Load language
+		if [ -z "\$TUI_LANG" ]
+		then	[ -z "\$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print \$2}')
+			lng="\$(echo \${LANG/\.*})"
+			echo "\$TUI_DIR_LOCALE/"* | grep -q "\${lng}" && \\
+				echo "	TUI_LANG=\$lng" >> "\${HOME:-/root}/.tuirc"  || \\
+				echo "	TUI_LANG=en_GB" >> "\${HOME:-/root}/.tuirc"
+			# Sadly this echo is required to remove leading/tailing spaces, 
+			# probablly an issue of tui-conf-get (2015.08.21)
+			#TUI_LANG="\$(echo \$(tui-conf-get "\${HOME:-/root}/.tuirc" TUI_LANG))"
+			TUI_LANG="\$(tui-conf-get \${HOME:-/root}/.tuirc TUI_LANG)"
+		fi
+		LANG_FILE="\${ME/tui\-}.lng"
+		LANG_FILE="\$TUI_DIR_LOCALE/\${TUI_LANG}/\$LANG_FILE"
+		[ -f "\$LANG_FILE" ] && source "\$LANG_FILE"
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+#
+#	Variables
+#
+	CFG="\$script_config"
+	LOG="\$TUI_DIR_LOGS/\${script_name}.log"
+	TMP="\${TMPDIR}/\${script_name}-\$\$.tmp~"
+#
+#	Gettext
+#
+	#source gettext.sh
+	#TEXTDOMAIN="\$script_name"
+	#TEXTDOMAINDIR="\${TUI_DIR_SYSTEM/tui/locale}"	# Should not be changed, it applies to properly installed project
+	#export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Messages to translate:
+#
+	MSG_TR_VERSION="\${script_name}\${script_package_txt}, Version \$script_version
+Copyright (C) $(date +'%Y') $USER_NAME
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by $USER_NAME
+"
+	MSG_TR_HELP_SHORT="Usage:	\$script_name [options] args ..."
+	MSG_TR_HELP_LONG="$MSG_TR_HELP_SHORT
+
+Options:
+	-h|--help		Shows this screen and exits
+	--version		Shows the version and exits
+	
+	--YOUROPT ARG		Sets 'opt_str' to ARG
+
+Please report command bugs (in english, with LC_ALL=C) to: <$USER_EMAIL>
+${script_package}Homepage: <$USER_HOMEPAGE>
+For more help on how to use GNU-Software: <http://www.gnu.org/gethelp/>
+"
+	MSG_TR_XY=""
+	MSG_TR_XX=""
+	MSG_TR_YY=""
+#
+#	Functions
+#
+	cleanup() { 
+	# Removes all known tempfiles and exits
+	# Is called at the end of the script and by the trap
+		tmp_KNOWN=(
+			"\$TMP"
+			# Add your tempfiles
+			# here
+			)
+		for remove in "\${tmp_KNOWN[@]}"
+		do 	( [ -f "\$remove" ] || [ -p "\$remove" ] ) && rm -f "\$remove"
+		done
+	}
+	show_help() {
+	# Prints the helpscreen
+	# and exits
+		echo "\$MSG_TR_HELP_LONG"
+		exit 99
+	}
+	show_version() {
+	# Prints the version of the script
+	# and exits
+		echo "\$MSG_TR_VERSION"
+		exit 111
+	}
+#
+#	Traps are cool!
+#
+	# TRAP FUNCTION/"COMMAND" MODE's ...
+	#trap cleanup INT ERR
+#
+#	Get options
+#
+	# -a|--alternative ; to allow longoptions with a single leading '-'
+	GETOPT=\$(getopt \\
+		--options	"hCL" \\
+		--longoptions	"help,version,log,config,YOUROPT:" \\
+		--name 		"\${0##*/}" -- "\${@}" \\
+	)
+	eval set -- "\${GETOPT}";
+	while true
+	do 	case "\$1" in
+		-h|--help)	show_help	;;
+		--version)	show_version	;;
+		--)		shift ; break	;;
+		# -----------------------------------------------
+		--YOUROPT)	opt_str="\$2"
+				shift 2
+				;;
+		esac
+	done
+#
+#	Action
+#
+	
+#
+#	Display
+#
+	tui-header "\$script_name (\$script_version)" "\$(date +'%F %T')"
+	tui-title "\$script_title"
+	tui-echo "\$MSG_XY"
+	
+#
+# 	Clean up & exit
+#
+	cleanup
+	exit 0
+EOF

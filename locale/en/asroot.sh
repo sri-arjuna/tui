@@ -23,6 +23,10 @@ Examples:	$ME \"cat /etc/cryptab\"
 Where options are:
 	-h(elp) 		This screen
 	-m(essage)	MSG	Prints \"MSG\" before asking for a password
+	
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
 "
 TR_MSG_TEXT_HELP="$TR_MSG_TEXT_HELP_SHORT$TR_MSG_TEXT_HELP_LONG"
 #------------------------------------------

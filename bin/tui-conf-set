@@ -87,6 +87,7 @@ Where options are:
 	-v		Prints a status message whether or not the value could be saved
 
 "
+	TMP="$TUI_FILE_TEMP.$$"
 	OPT=""
 	VALUE=""
 	VARNAME=""
@@ -133,45 +134,68 @@ Where options are:
 		esac
 	done
 	shift $(($OPTIND - 1))
+#
+#	Prechecks
+#
 	[ $# -lt 3 ] && \
 		tui-printf -S 1 "$ME: Requires 3 arguments: CONFFILE VARNAME VALUE" && \
 		exit 1
-	CONFFILE="$1"
-	VARNAME="$2"
-	VALUE="$3"
-	 
-	# File does not exist yet
+	# Handle file
+	CONFFILE="$1"	;	shift
 	if [ ! -f "$CONFFILE" ]
 	then	tui-bol-dir "$(dirname $CONFFILE)" || exit 1
                 touch "$CONFFILE"
 	fi
+	# Handle VARNAME, secure if its pw|pass|password
+	VARNAME="$2"	;	shift
+	
+	# Handle VALUE, secure if VARNAME was pw|pass|password
+	cat > "$TMP" <<-EOF
+	$1
+	EOF
+	$GREP -q '[\ \$]' "$TMP" && \
+		need_quotes=true || \
+		need_quotes=false
+	$GREP -q "$VARNAME" "$CONFFILE" && \
+		need_sed=true ||\
+		need_sed=false
 #
 # 	Preformat strings
 #
-	# Full line
-	SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=" | head -n 1)"
-	# Remove leading spaces
-	#SEARCH="$(echo $SEARCH|$SED -e 's/^[[:space:]]*//')"
-	# But above sometimes fails with incomplete sed command...
-	SEARCH="$(echo $SEARCH|$SED -e 's/^[[:space:]]*//g')"
-	
-	# Apply options
-	$SMALL && VARNAME="${VARNAME,,}" && VALUE="${VALUE,,}"
-	$CAPS  && VARNAME="${VARNAME^^}" && VALUE="${VALUE^^}"
-	
-	# Check for quotes
-	printf  "$VALUE"|$GREP $Q '[\ $]' && \
-		REPLACE="$VARNAME=\"$VALUE\"" || \
-		REPLACE="$VARNAME=$VALUE"
-	
-	# Set proper SED 'divider'
-	if echo "$VALUE"|$GREP $Q "$SD"
-	then 	# Coma was found
-		SD="/"
-		printf "$REPLACE"|$GREP "$SD"|$GREP -q '\\' && SD="\\"	# backslash was found
-		[ ! "$SD" = "/" ] && \
-			printf "$REPLACE"|$GREP ","|$GREP "$SD"|$GREP -q "/" && SD="|"	# Forward slash was found
+	if $need_sed
+	then	# Full line
+		SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=" | tail -n 1)"
+		
+	#	$need_quotes && \
+	#		REPLACE="$VARNAME=\"$VALUE\"" || \
+	#		REPLACE="$VARNAME=$VALUE"
+		
+		# Set proper SED 'divider'
+		if $GREP $Q "$SD" "$TMP"
+		then 	# Coma was found
+			SD="/"
+			printf "$REPLACE"|$GREP "$SD"|$GREP -q '\\' && SD="\\"	# backslash was found
+			[ ! "$SD" = "/" ] && \
+				printf "$REPLACE"|$GREP ","|$GREP "$SD"|$GREP -q "/" && SD="|"	# Forward slash was found
+		fi
+	else	# Get leading spaces if applicable
+		lead_space=$(tail -n1 "$CONFFILE") # | $SED s,,,g)
+		lead_space="${lead_space/[a-zA-Z0-9]*}"
+		# Add the line
+		if $need_quotes
+		then	cat >> "$CONFFILE" <<-EOF
+			$lead_space$VARNAME="$1"
+			EOF
+		else	cat >> "$CONFFILE" <<-EOF
+			$lead_space$VARNAME=$1
+			EOF
+		fi
 	fi
+	exit
+	
+	
+	
+	
 	
 	# Troubles with VARIABLES due to chars that need to be escaped
         if echo "$REPLACE" | $GREP $Q '[%$+@\]'

@@ -4,6 +4,7 @@ Feedback / Suggestions wanted:
 If you do not like the 'default' theme, or any other of the provided themes,
 you are encouraged to create your own theme - and send me for implementation.
 
+
 GNU
 ---
 gettext, where applicable - commands that require interaction....
@@ -12,18 +13,17 @@ source files?
 
 Review for fix:
 ---------------
-tui-conf-get (spaces upon read output?)
+tui-bol-dir
+tui-download
 
 
 Security
------------
-tui-conf-[gs]et, tui-read(?) ; parsing for content variable strings
-
+----------
 
 
 # Finalize:
 -----------
-tui-conf-edit
+tui-conf-editor
 tui
 samples
 move manpages to helptext, to the update the manpages according of the helpscreen

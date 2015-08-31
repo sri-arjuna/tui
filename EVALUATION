@@ -1,0 +1,74 @@
+Open questions from the author of TUI regarding the evaluation process
+======================================================================
+
+General
+-------
+Do i have to register TUI already as a new project as savanah.org? 
+If so, gnu or nongnu?
+
+I do have some variables not following the coding standard, but you (the homepage) also says to not rewrite.
+So, may the current stay the same (as is), but just new variables have to follow the guideline?
+
+
+Installation
+------------
+The GNU Autotools are awesome, but IMO a massive overkill to just place files as required by this project.
+Furthermore its a bit of frustrating to see that the project code has changed from 98% BASH to 76.5% GROFF - just because of the installation tool.
+
+Due to this, i started an independant project, which is a 'configure' script using a single configuration file,
+from which it then generates: make-install, make-uninstall and make-distclean.
+
+
+
+Internationalization
+--------------------
+GNU Gettext is another great application, but since i provide quite an amount of scripted commands,
+of which some have to 'race' vs. shell built-in, and are not just a single application, performance/speed is of the essence!
+
+While a 'per-line-print-speed' of 0.100 already feels slow,
+i was very proud i could lower the inital 'per-line-print-speeds' from ~0.300 to ~0.010.
+
+I'm having a hard time to 'willingly increase the delay' and 'destory the enduser experience', 
+as i've experienced delays from ~0.300 up to 0.700 - for a command that does just prints strings without any serious processes.
+
+Mainwhile, sourcing files containg the required string variables provided in a directory named like $LANG - 
+or if nonexistent generated from the output of 'locale'.
+
+With this method i could (about) preserve the current 'per-line-print-speed', which i really would like to.
+It already provides default fallback to en\_GB, which will be the default language setting.
+So even just file by file could be translated,
+
+I'm not yet exporting all the strings, without the approvel that this concept may pass.
+However, i'll be preparing the files to 'unify and summarize' the strings that do require translation.
+
+Current examples are:
+* tui-asroot (for testing purposes, it also supports de_DE)
+* tui-bgjob-mgr (note the fallback to english if LANG is not de_DE[.UTF-8]
+
+The current 'core-language' directories are 'de' and 'en', with their de_DE/en_GB names symlinked to them.
+Any further language would require to be within a new directory.
+
+If 'my method' is accepted, the possible translator would copy the 'en' folder to the language he's translating, and start editing the files.
+As in: cp -R en es_US
+
+
+Security
+--------
+DONE: tui-read, tui-conf-get & tui-conf-set
+LOW:: Likewise for tui-conf-editor, but since i now gained the knowledge for some of the remaining improvements
+and because there is already a some basic protection, i'll have to partly rewrite it anyway.
+
+Code injection:
+Without ever (previous to this eval process) having read into anything about such a thing, i've tried to come up with something
+that protects from malicious code, but still allows most basic/common shell usages as that is part of its requirement.
+Due to the lack of professional background, specially on this topic, 
+i'll need help to improve this protection and keep up the required functionality.
+
+I did my best and will continue to do so, but i need to know what.
+
+
+Similarities
+------------
+While GNU paralell is doing paralell tasks on different computers, 
+tui-bgjob-mgr also handles a job queue but only on the machine it is executed.
+As soon the user is in a GUI environment, he can use tui-bgjob-mgr to monitor each of the running background tasks within their own terminal windows.

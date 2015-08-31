@@ -21,7 +21,7 @@
 #	Internals
 #
 	ME="${0##*/}"
-	script_version=0.5
+	script_version=0.6
 	
 	# Check the two default places for the core configuration
 	# First systemwide, second user only install
@@ -49,8 +49,6 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	
-	
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -62,6 +60,7 @@
 #	Variables
 #
 	RET_HELP=99
+	beSecure=false
 	TITLE="Get values from conf files"
 	help_text="
 $ME ($script_version - BETA)
@@ -75,6 +74,7 @@ Where options are:
 	-h		This screen
 	-i		Is no longer case sensitive
 	-l		Lists values available in the file
+	-s		Use more secure retrieval, but slightly slower
 
 "
 	OPT=""
@@ -97,7 +97,7 @@ Where options are:
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	while getopts "ilh" name
+	while getopts "ilhs" name
 	do 	case $name in
 		i)	OPT="-i"
 			;;
@@ -107,16 +107,31 @@ Where options are:
 		h)	printf "$help_text"
 			exit 99
 			;;
+		s)	beSecure=true
+			;;
 		esac
 	done
 	shift $(($OPTIND - 1))
+#
+#	Action
+#
 	CONFFILE="$1"
 	VARNAME="$2"
-	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$CONFFILE does not exist?" && exit 1
+	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$CONFFILE does not exist!" && exit 1
+	[ "$CONFFILE" = "${CONFFILE##*/}" ] && CONFFILE="./$CONFFILE"
+	
+	# If VARNAME starts with Pass|password|pw, do not source the conf file but use awk
+	case "${VARNAME,,}" in
+	pw|pass|passwor[dt])
+		beSecure=true
+		;;
+	esac
 #
-#	Display & Action
+#	Display 
 #
-	# http://www.unix.com/shell-programming-and-scripting/257841-awk-printing-value-variable-assignment-file.html
-	#$GREP -e "$VARNAME=" "$CONFFILE" | grep -ve ^"#" -ve ^[[:space:]]"#"|sed s,"$VARNAME=","",g
-	#$AWK -F= -v VAR="$VARNAME" '$1 ~ "^[^#]*" VAR "$"{print $2}' "$CONFFILE"
-	$AWK -F= -v VAR="$VARNAME" '$1 ~ "^[^#]*" VAR "$"{print $2,$3,$4,$5}' "$CONFFILE"|$SED s,'"','',g|head -n1
+	if $beSecure
+	then	# This is slower but doesnt show up the other values
+		$AWK -F= -v VAR="$VARNAME" '$1 ~ "^[^#]*" VAR "$"{gsub ("#.*$|\"|\047|"$1 FS, ""); print}' "$CONFFILE" | tail -n1
+	else	# This method is about twice the speed of the awk
+		source "$CONFFILE" && echo "${!VARNAME}"
+	fi

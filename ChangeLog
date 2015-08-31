@@ -1,9 +1,7 @@
-2015-08-16  gettextize  <bug-gnu-gettext@gnu.org>
+2015-08-31 - 0.8.9-GNU-RC12
+* Security update for: tui-read, tui-conf-get, tui-conf-set
+* Updated: tui-select
 
-	* Makefile.am (SUBDIRS): Add po.
-	(ACLOCAL_AMFLAGS): New variable.
-	(EXTRA_DIST): Add config.rpath, m4/ChangeLog.
-	* configure.ac (AC_CONFIG_FILES): Add po/Makefile.in.
 
 2015.07.05 - 0.8.5-GNU-RC1
 * Changed first time usage backend
@@ -68,4 +66,3 @@
 
 2015.08.16 - 0.8.9-GNU-RC11
 * Updated YASSI configure
-* 

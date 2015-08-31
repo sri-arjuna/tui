@@ -24,11 +24,11 @@
 	# Check the two default places for the core configuration
 	# First systemwide, second user only install
 	for tmp_task in "/etc" "$HOME/.local"
-	do 	[ -d "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && break
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && break
 	done
 	
 	if source ${tmp_task}/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zero
-	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do source "$f";done
+	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do [ -f "$f" ] && source "$f";done
 	else	source tuirc
 	fi
 	
@@ -60,7 +60,7 @@
 #	Variables
 #	
 	ME="${0##*/}"
-	script_version=0.9.0c
+	script_version=0.9.0d
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
