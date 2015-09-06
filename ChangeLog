@@ -1,7 +1,13 @@
 2015-08-31 - 0.8.9-GNU-RC12
 * Security update for: tui-read, tui-conf-get, tui-conf-set
 * Updated: tui-select
+* Added:   candidate template/script: modul
 
+#
+##
+### ------------------------------------------
+##
+#
 
 2015.07.05 - 0.8.5-GNU-RC1
 * Changed first time usage backend

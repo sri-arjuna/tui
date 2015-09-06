@@ -33,7 +33,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	
+	TERM="${TERM:-GNU Linux}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
@@ -52,7 +52,7 @@
 			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
 			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
 		fi
-		LANG_FILE=${ME/tui\-}.sh
+		LANG_FILE=${ME/tui\-}.lng
 		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
 		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc

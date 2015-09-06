@@ -24,8 +24,8 @@ shopt -s expand_aliases
 	oME="$ME"	# Backup of variable 'ME' if sourced
 	oVER="$script_version"
 	ME=tuirc
-	script_version=2.6
-	TUI_VERSION=0.8.9-GNU-RC11
+	script_version=2.7
+	TUI_VERSION=0.8.9-GNU-RC12
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -69,31 +69,7 @@ shopt -s expand_aliases
 	if [ ! -f "$HOME/.config/tui/apps.conf" ]
 	then 	HD="$HOME/.config/tui"
 		[ -d "$HD" ] || mkdir -p "$HD"
-		cp "$DATADIR/conf.home/"* "$HD"
-	fi
-	
-	# Load its own language file
-	if [ -z "$TUI_LANG" ]
-	then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-		lng="$(echo ${LANG/\.*})"
-		# Check all provided language directories
-		echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-			tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-			tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-		# Sadly this echo is required to remove tailing spaces, 
-		# probablly an issue of tui-conf-get (2015.08.21)
-		TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-	fi
-	LANG_FILE=${ME/tui\-}.sh
-	LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-	[ -f "$LANG_FILE" ] && source "$LANG_FILE"
-	
-	# Lets continue with a general security check
-	TRC_SYS="$SYSCONFDIR/tuirc"
-	if source "$TRC_SYS"
-	then 	break_on_injections "$@" && exit 1
-	else	tui-status 1 "${TR_MSG_TEXT_MISSING_FILE} $TRC_SYS"
-		exit 
+		cp "$DATADIR/conf.home/"* "$HD" 
 	fi
 #
 #	Functions
@@ -178,29 +154,23 @@ Where options are:
 			#
 			#	Paths	:	That are about the User
 			#
-			 	readonly \\
-			 		TUI_DIR_USER="${XDG_CONFIG_DIR:-\$HOME/.config}/tui"
-			 	readonly \\
-			 		TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
-			 	readonly \\
-			 		TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
-			 	readonly \\
-			 		TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
-			 	readonly \\
-			 		TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
-			 	readonly \\
-			 		TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
+			 	TUI_DIR_USER="${XDG_CONFIG_DIR:-\$HOME/.config}/tui"
+			 	TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
+			 	TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
+			 	TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
+			 	TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
+			 	TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
 			
 			#
 			#	Files	:	User specific configuration files
 			#
-			[ -z "\$TUI_FILE_USER" ] && readonly \\
+			[ -z "\$TUI_FILE_USER" ] && \\
 			 	TUI_FILE_USER="\$TUI_DIR_USER/user.conf"
-			[ -z "\$TUI_FILE_USER_APPS" ] && readonly \\
+			[ -z "\$TUI_FILE_USER_APPS" ] && \\
 			 	TUI_FILE_USER_APPS="\$TUI_DIR_USER/apps.conf"
-			[ -z "\$TUI_FILE_USER_SETTINGS" ] && readonly \\
+			[ -z "\$TUI_FILE_USER_SETTINGS" ] && \\
 			 	TUI_FILE_USER_SETTINGS="\$TUI_DIR_USER/settings.conf"
-			[ -z "\$TUI_FILE_USER_LOADLIST" ] && readonly \\
+			[ -z "\$TUI_FILE_USER_LOADLIST" ] &&  \\
 			 	TUI_FILE_USER_LOADLIST="\$TUI_DIR_USER/loadlist.conf"
 			TUI_FILE_TEMP="${TUI_DIR_TEMP:-\$HOME/.cache}/tui.tmp~"
 			
@@ -306,6 +276,38 @@ Where options are:
 #
 #	Load Environment	:	User settings
 #
+	# Check if user RC file is valid
+	if [ -z "$TUI_LANG" ]
+	then	# Copy template RC
+		#echo "BEEN HERE"
+		first_time
+		# Write language afterwards
+	fi
+	
+	# Load its own language file
+	if [ -z "$TUI_LANG" ]
+	then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
+		lng="$(echo ${LANG/\.*})"
+		# Check all provided language directories
+		echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
+			tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
+			echo "TUI_LANG=en_GB" >> "${HOME:-/root}/.tuirc" 
+		# Sadly this echo is required to remove tailing spaces, 
+		# probablly an issue of tui-conf-get (2015.08.21)
+		TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
+	fi
+	LANG_FILE=${ME/tui\-}.lng
+	LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
+	[ -f "$LANG_FILE" ] && source "$LANG_FILE"
+	
+	# Lets continue with a general security check
+	TRC_SYS="$SYSCONFDIR/tuirc"
+	if source "$TRC_SYS"
+	then 	break_on_injections "$@" && exit 1
+	else	tui-status 1 "${TR_MSG_TEXT_MISSING_FILE} $TRC_SYS"
+		exit 
+	fi
+	
 	# Write default loadlist if file is missing
 	[ -f "$TUI_FILE_USER_LOADLIST" ] || printf '%s\n' {user,apps,settings}.conf > "$TUI_FILE_USER_LOADLIST"
 	# Read loadlist and start parsing only if variable is not empty
