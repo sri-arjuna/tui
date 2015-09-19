@@ -31,31 +31,17 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
-	break_on_injections "$@" && exit 1	
+	break_on_injections "$@" && exit 1
 #
 #	File:		tui-ftp
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.01.28
-#	Changed:	2015.07.27
-	script_version=0.3.6-ALPHA
-	TITLE="TUI handler for FTP tasks"
+#	Changed:	2015.09.17
+	script_version=0.9-ALPHA
 #	Description:	A simple handler for FTP commands.
 #
 #	Script Environment
@@ -70,19 +56,26 @@
 	LOG="$CONFIG_DIR/$ME.log"			# Logfile
 	TEMPFILE="$TUI_DIR_TEMP/$ME.tmp"		# Tempfile
 #
-#	Variable defaults (options)
+#	Translate preps
 #
-	beVerbose=false
-	beLog=true
-	FTP_PORT=22	# Default value
-	force_active=false
-	force_passiv=false
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
-#	Help text
+#	Translate strings
 #
-	help_text="
-$ME ($script_version)
-${TITLE^}
+	TITLE="$(gettext 'TUI handler for FTP tasks')"
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+${TITLE}
 Usage: 		$ME [options]
 Examples:	$ME -U myuser -P myPassword -f /local/file -r /remote/path mydomain.com:23
 		$ME -d /remote/file -l /local/path mydomain.com
@@ -114,6 +107,22 @@ Where options are:
 For each call, you can either only Up- or Download files or execute commands.
 NOTE: I have no idea how those batch files should look like, please see the according ftp commands man page.
 
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+#
+#	Variable defaults (options)
+#
+	beVerbose=false
+	beLog=true
+	FTP_PORT=22	# Default value
+	force_active=false
+	force_passiv=false
+#
+#	Help text
+#
+	help_text="$TR_MSG_TEXT_HELP
 "
 #
 #	Functions
@@ -130,12 +139,12 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 		
 		# Before doing extended parsing, lets make sure the user could log in
 		while ! echo "$STRING" | $GREP -q  ^220
-		do	tui-progress "Connecting to $HOST"
+		do	tui-progress "$(eval_gettext 'Connecting to $HOST')"
 			STRING=$(tail -n 5 "$LOG")
 			CON_FAIL_CNT=$(( $CON_FAIL_CNT + 1 ))
 			[ $CON_FAIL_CNT -ge $CON_FAIL_AFTER ] && return 1
 		done
-		$beVerbose && tui-status 0 "Connected to $HOST"
+		$beVerbose && tui-status 0 "$(eval_gettext 'Connected to $HOST')"
 		
 		# Loop until logout num is found
 		while ! echo "$STRING" | $GREP -q ^221
@@ -169,14 +178,14 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 				last_found="$CCF"
 				;;
 			*)	if [ ! "$STRING" = "$(tail -n5 $LOG)" ]
-				then	tui-log -tv "$LOG" "Error parsing:"
+				then	tui-log -tv "$LOG" "$(gettext 'Error parsing:')"
 					tui-log -v "$LOG" "$STRING"
 				fi
 				;;
 			esac
 			
 			
-			[ -z "$action_work_out" ] && action_work_out="Parsing log..."
+			[ -z "$action_work_out" ] && action_work_out="$(gettext 'Parsing log...')"
 			tui-progress "$action_work_out" ; printf "\r"
 			sleep 0.5
 			# Is a failsafe exit required?
@@ -190,7 +199,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 	# Load default values before parsing options
 	if ! source "$CONFIG" 
 	then	# Could not source the configuration...
-		tui-status 1 "Failed to load: $CONFIG"
+		tui-status 1 "$(eval_gettext 'Failed to load: $CONFIG')"
 	fi
 	[ -f "$LOG" ] || touch "$LOG"
 #
@@ -203,12 +212,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 	
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	case "$1" in
@@ -220,8 +224,8 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 		exit $RET_HELP
 		;;
 	*)	tui-log -e "$LOG" 
-		tui-log -t "$LOG" "Process ID: $$"
-		tui-log -t "$LOG" "FTP Command: $FTP"
+		tui-log -t "$LOG" "$(eval_gettext 'Process ID: $$')"
+		tui-log -t "$LOG" "$(eval_gettext 'FTP Command: $FTP')"
 		;;
 	esac
 	while getopts "apLqvH:U:P:B:c:f:d:l:r:" opt
@@ -230,54 +234,54 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 			exit $?
 			;;
 		q)	beQuiet=true
-			log_msg="Forced silence"
+			log_msg="$(gettext 'Forced silence')"
 			;;
 		v)	beVerbose=true
-			log_msg="Enabled verbosity"
+			log_msg="$(gettext 'Enabled verbosity')"
 			;;
 		# -- Active / Passive modes
 		a)	force_aktive=true
 			force_passiv=false
-			log_msg="Force active mode"
+			log_msg="$(gettext 'Force active mode')"
 			[ lftp = "$FTP" ] && \
-				tui-status 111 "Please see the man page of $FTP, section 'Settings' to see how to ${log_msg,,}"
+				tui-status 111 "$(eval_gettext 'Please see the man page of $FTP, section 'Settings' to see how to ${log_msg}')"
 			[ sftp = "$FTP" ] && \
-				tui-status 111 "$FTP does not support the enforcing of passive mode."
+				tui-status 111 "$(eval_gettext '$FTP does not support the enforcing of passive mode.')"
 			[ ftp = "$FTP" ] && ACTPAS="-A"
 			;;
 		p)	force_passiv=true
 			force_aktive=false
-			log_msg="Force passiv mode"
+			log_msg="$(gettext 'Force passiv mode')"
 			[ lftp = "$FTP" ] && \
-				tui-status 111 "Please see the man page of $FTP, section 'Settings' to see how to ${log_msg,,}"
+				tui-status 111 "$(gettext 'Please see the man page of $FTP, section 'Settings' to see how to ${log_msg}')"
 			[ sftp = "$FTP" ] && \
-				tui-status 111 "$FTP does not support the enforcing of passive mode."
+				tui-status 111 "$(gettext '$FTP does not support the enforcing of passive mode.')"
 			[ ftp = "$FTP" ] && ACTPAS="-p"
 			;;
 		# -- General use
 		U)	USERNAME="$OPTARG"
-			log_msg="Set user to: $USERNAME" 		;;
+			log_msg="$(eval_gettext 'Set user to: $USERNAME')" 		;;
 		P)	PASSWORD="$OPTARG"
-			log_msg="Set password to: *******" 		;;
+			log_msg="$(gettext 'Set password to: *******')" 		;;
 		B)	BATCHES[${#BATCHES[@]}]="$OPTARG"
-			log_msg="Added batch file to execute: $OPTARG"
+			log_msg="$(eval_gettext 'Added batch file to execute: $OPTARG')"
 			MENU="cmd"					;;
 		c)	COMMANDS_RAW="$OPTARG"
-			log_msg="Set commands to parse: $OPTARG"
+			log_msg="$(eval_gettext 'Set commands to parse: $OPTARG')"
 			MENU="cmd"					;;
 		# -- Upload file
 		f)	LOC_FILES[${#LOC_FILES[@]}]="$OPTARG"
-			log_msg="Added file to upload: $OPTARG"
+			log_msg="$(eval_gettext 'Added file to upload: $OPTARG')"
 			MENU="up"					 		;;
 		l)	LOC_PATHS[${#LOC_PATHS[@]}]="$OPTARG"
-			log_msg="Added download target: $OPTARG"
+			log_msg="$(eval_gettext 'Added download target: $OPTARG')"
 			MENU="down"					 		;;
 		# -- Download file
 		d)	REM_FILES[${#REM_FILES[@]}]="$OPTARG"
-			log_msg="Added file to download: $OPTARG"
+			log_msg="$(eval_gettext 'Added file to download: $OPTARG')"
 			MENU="down"					 		;;
 		r)	REM_PATHS[${#REM_PATHS[@]}]="$OPTARG"
-			log_msg="Added upload target: $OPTARG"
+			log_msg="$(eval_gettext 'Added upload target: $OPTARG')"
 			MENU="up"							;;
 		*)	printf "$help_text" ; exit $?	;;
 		esac
@@ -290,7 +294,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 	PORT=${HOST/#*:} ; 
 	[ "$PORT" = "$HOST" ] && PORT=""
 	[ -z "$PORT" ] && PORT="$FTP_PORT"
-	log_msg="Set host to: $HOST"
+	log_msg="$(eval_gettext 'Set host to: $HOST')"
 	$beLog && tui-log $log_opt "$LOG" "$log_msg"
 	
 #
@@ -307,14 +311,14 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 				found+=" $f"
 		done
 		if [ $count -gt 1 ]
-		then	tui-echo "Please select which ftp command you want to use:"
+		then	tui-echo "$(gettext 'Please select which ftp command you want to use:')"
 			FTP=$(tui-select $found)
 			printf "\n"
 		else	FTP=$(echo $found|$AWK '{print $1}')
 		fi
-		tui-log -t "$LOG" "Set ftp command to: $FTP"
+		tui-log -t "$LOG" "$(eval_gettext 'Set ftp command to: $FTP')"
 		tui-conf-set "${CONFIG}" FTP $FTP
-		tui-status $? "Saved $FTP as FTP"
+		tui-status $? "$(eval_gettext 'Saved $FTP as FTP')"
 	# -- Not handling ports yet --
 	#	tui-yesno "Change the default ftp port of $FTP_PORT?" && \
 	#		FTP_PORT=$(tui-read "What is the new default port?") && \
@@ -374,10 +378,10 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 				C=$(( $C + 1 ))
 			done
 			$beVerbose && \
-				tui-status 0 "Generated command list..."
+				tui-status 0 "$(gettext 'Generated command list...')"
 		fi
 		
-		action_work="Executing custom command list"
+		action_work="$(gettext 'Executing custom command list')"
 		action_done="${action_work/ing/ed}"
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
 		;;
@@ -385,7 +389,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 		### tui-echo "TODO Download file" -- just copy pasted from the upload section
 		###
 		$beVerbose && \
-			tui-printf -rS 2 "Generate download commands..."
+			tui-printf -rS 2 "$(gettext 'Generate download commands...')"
 		count=0 ; total=${#REM_FILES[@]}
 		DEFAULT_DIR="${LOC_PATHS[0]}"
 		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
@@ -400,7 +404,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 				DEFAULT_DIR="$LOC"
 			
 			$beVerbose && \
-				tui-progress "Generate download list: $REM to $LOC"
+				tui-progress "$(eval_gettext 'Generate download list: $REM to $LOC')"
 			
 			echo "$LCD $LOC" >> "$TEMPFILE"
 			echo "$GET $REM" >> "$TEMPFILE"
@@ -408,14 +412,14 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 			count=$(( $count + 1 ))
 		done
 		$beVerbose && \
-			tui-status $? "Generated download list."
+			tui-status $? "$(gettext 'Generated download list.')"
 		
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
-		action_work="Downloading file"
-		action_done="${action_work/ing/ed}"
+		action_work="$(gettext 'Downloading file')"
+		action_done="$(gettext 'Downloaded file')"
 		;;
 	up)	$beVerbose && \
-			tui-printf -rS 2 "Generate upload commands..."
+			tui-printf -rS 2 "$(gettext 'Generate upload commands...')"
 		count=0 ; total=${#LOC_FILES[@]}
 		DEFAULT_DIR="${REM_PATHS[0]}"
 		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
@@ -430,7 +434,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 				DEFAULT_DIR="$REM"
 			
 			$beVerbose && \
-				tui-progress "Generate upload list: $LOC to $REM"
+				tui-progress "$(eval_gettext 'Generate upload list: $LOC to $REM')"
 			
 			echo "$CD $REM" >> "$TEMPFILE"
 			echo "$PUT $LOC $REM/$(basename $LOC)" >> "$TEMPFILE"
@@ -438,18 +442,16 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 			count=$(( $count + 1 ))
 		done
 		$beVerbose && \
-			tui-status $? "Generated upload list."
+			tui-status $? "$(gettext 'Generated upload list.')"
 		
-		action_work="Uploading file"
+		action_work="$(gettext 'Uploading file')"
 		action_done="${action_work/ing/ed}"
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
 		;;
-	"")	tui-status 1 "There was an error!"
+	"")	tui-status 1 "$(gettext 'There was an error!')"
 		exit $?
 		;;
 	esac
-	
-	#echo ; echo ; cat "$TEMPFILE" ; echo
 #
 #	Display & Action
 #
@@ -457,18 +459,18 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 		HOST_STRING="$HOST" || \
 		HOST_STRING="$USERNAME@$HOST"
 	[ -z "$HOST" ] && \
-		tui-printf -S 1 "No host supplied." && \
+		tui-printf -S 1 "$(gettext 'No host supplied.')" && \
 		exit 1
 	
 	if ! $GREP -q "$HOST" ~/.netrc
 	then
 		[ -f "$HOME/.netrc" ] || touch "$HOME/.netrc"
-		if tui-yesno "Add $HOST to $HOME/.netrc for automatic login?"
+		if tui-yesno "$(eval_gettext 'Add $HOST to $HOME/.netrc for automatic login?')"
 		then	echo "machine $HOST login $USERNAME password $PASSWORD" >> "$HOME/.netrc"
 			tui-title "$HOME/.netrc"
 			tui-cat "$HOME/.netrc"
 			tui-echo
-			tui-yesno "Change any loginame / password?" && \
+			tui-yesno "$(gettext 'Change any loginame / password?')" && \
 				tui-edit "$HOME/.netrc"
 		fi
 	fi
@@ -481,7 +483,7 @@ NOTE: I have no idea how those batch files should look like, please see the acco
 		# warn user if there are commands not available to this $FTP
 		for block in $BLOCKLIST;do
 			grep -q $block "$BATCH" && \
-				tui-status 111 "Warning: $BATCH contains invalid command for $FTP: $block"
+				tui-status 111 "$(eval_gettext 'Warning: $BATCH contains invalid command for $FTP: $block')"
 		done
 		
 		# Actualy work with each of the batch file/s
@@ -529,6 +531,6 @@ EOF
 	[ -f "$TEMPFILE.$$" ] && rm -fr "$TEMPFILE.$$"
 	RAN=$($GREP Process $LOG | wc -l )
 	[ $RAN -gt 1000 ] && \
-		tui-yesno "There were $RAN ftp calls, do you want to see the logfile and clear it after?" && \
+		tui-yesno "$(eval_gettext 'There were $RAN ftp calls, do you want to see the logfile and clear it after?')" && \
 		less "$LOG" && echo "" > "$LOG"
 	exit $RET

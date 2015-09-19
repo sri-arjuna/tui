@@ -20,7 +20,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.5
+	script_version=0.9
 	ME="${0##*/}"
 	
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -33,54 +33,110 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
 	
-	
-	help_text="$ME ($script_version)
-		\rUsage: $ME [-v] /path/to/check
-		\rReturns 0 if '/path/to/check' was found or could be created
-		\r"
+	help_text="$(eval_gettext '$ME ($script_version)
+Usage: $ME [-v] [-c] /path/to/check
+Returns 0 if '/path/to/check' was found or could be created
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	[ "-v" = "$1" ] && \
-		beVerbose=true && \
-		shift || \
-		beVerbose=false
+	beVerbose=false
+	countFails=false
+	while :
+	do
+		case "${1,,}" in
+		--version)
+			showVersion
+			exit 0
+			;;
+		-v)
+			beVerbose=true
+			shift
+			;;
+		-c)
+			countFails=true
+			shift
+			;;
+		""|"-h"|"--help")
+			echo -e "$help_text"
+			RET=99
+			exit $RET
+			;;
+		*|--)	break	;;
+		esac
+	done
 #
 #	Display
 #
-	if [ -z "$1" ] || [ "-h" = "$1" ]  || [ "--help" = "$1" ]
-	then	echo -e "$help_text"
-		RET=99
-	elif [ -d "$1" ]
-	then	$beVerbose && tui-status 0 "Found: $1"
-		RET=0
-	else	mkdir -p "$1"	2>/dev/zero
+	FAILED=0
+	RET=0
+	ARGS=( $(printf '%s\n' "${@}") )
+	for dir_name in "${ARGS[@]}"
+	do 	FAILED=$(( $FAILED + $RET ))
+		# Is it a linkfile?
+		if [ -L "$dir_name" ] && [ -f "$dir_name" ]
+		then	$beVerbose && tui-status 1 "$(eval_gettext 'Found link: $dir_name')" || \
+			RET=1
+			continue
+		fi
+		# Is it a file but not a link?
+		if [ -f "$dir_name" ] && [ ! -L "$dir_name" ] #2>/dev/zero
+		then	$beVerbose && tui-status 1 "$(eval_gettext 'Found file: $dir_name')"
+			RET=1
+			continue
+		fi
+		# A link that is a directory?
+		if [ -L "$dir_name" ] && [ -d "$dir_name" ] 2>/dev/zero
+		then	$beVerbose && tui-status 0 "$(eval_gettext 'Found link: $dir_name')"
+			RET=0
+			continue
+		fi
+		# Or just a plain original directory?
+		if [ -d "$dir_name" ]
+		then	$beVerbose && tui-status 0 "$(eval_gettext 'Found path: $dir_name')"
+			RET=0
+			continue
+		fi
+		# It does not exit yet, attempt to create it
+		mkdir -p "$dir_name" 2>/dev/zero
 		RET=$?
-		$beVerbose && tui-status $RET "Created: $1"
+		if $beVerbose
+		then	[ $RET -eq 0 ] && \
+				tui-status 0 "$(eval_gettext 'Successfully created: $dirname')" || \
+				tui-status 1 "$(eval_gettext 'Could not create: $dir_name')"
+		fi
+		# NEXT !
+	done
+	if $beVerbose
+	then	$countFails && tui-status $RET "$(eval_gettext '')" && RET=$FAILED
+	else	$countFails && RET=$FAILED
 	fi
 	exit $RET

@@ -25,53 +25,61 @@
 	# 
 	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then 	# Load required variables
-		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
+		for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS,STATUS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	. gettext.sh
-	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
-	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
-	export TEXTDOMAIN TEXTDOMAINDIR
+	
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.08.05
-	script_version=0.8.9
+#	Changed:	2015.09.17
+	script_version=0.9
 #	Description:	Helps to create a tui-browser project
 #
 #	Variables
 #
 	ME="${0##*/}"
-	ME_DIR="${0/${0##/*/}}"
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
 	TITLE="$(gettext 'Create a new TUI project')"
-	help_text="$(eval_gettext '
-Usage: 	$ME [options] [arguments]
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 ')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage:	$ME [[/path/to/]FOLDERNAME]
+
+Creates a new tui-browser project in either \044TUI_DIR_PROJECTS/FOLDERNAME
+or /path/to/FOLDERNAME.
+If \044TUI_DIR_PROJECTS is not set yet, you will be asked for its location.
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
 #
 #	Project related variables
 #
 	optE_bool=false 	# For a working template
-	doTextMode=false
+	doTextMode=false	# Which developement will continue after 
 	ARG_TOGGLE_ANOTHER=none # For a working template
 	APP_TITLE=""		# Project name
 	APP_BASE=""		# Where is the project root
@@ -81,66 +89,76 @@ Usage: 	$ME [options] [arguments]
 	APP_FILE=""		# save point, starter script
 	APP_DATA=""		# Where are the scripts to present
 	APP_INCLUDE=""		# Path to files to include
-	TASK_BASIC="APP_TITLE APP_FILE APP_BASE" #APP_MENU
+	TASK_BASIC="APP_FILE APP_BASE APP_TITLE " #APP_MENU
 	TASK_LABELS="APP_USER_LABEL APP_LOC_LABEL APP_POS_LABEL"
 	TASK_LABELS_TEXT="APP_DIR_LABEL APP_FILES_LABEL"
 	TASK_ADVANCED="APP_CONFIG_FILE APP_INCLUDE_DIR APP_SOURCE_THIS APP_SHELL APP_CLEAR"
 #
 #	Catching Arguments
 #
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-')"
+	version_text="$TR_MSG_TEXT_VERSION
+"
+	help_text="$TR_MSG_TEXT_HELP
+"
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
-	while getopts "h" name
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
+	while getopts "ha" name
 	do 	case "$name" in
 		h|help)
 			printf "$help_text"
 			exit "$RET_HELP"
 			;;
-		# *)	printf "$help_text" ; exit $RET_HELP	;;
+		a)	default_new_browser_manpage_type=application
+			;;
 		esac
 	done
 	shift "$(($OPTIND - 1))"
+	[ -n "$1" ] && APP_BASE="$1" && TASK_BASIC="${TASK_BASIC/APP_BASE}" && shift
+	[ -n "$APP_BASE" ] && [ "$APP_BASE" = "${APP_BASE##*/}" ] && APP_BASE="$TUI_DIR_PROJECTS/$APP_BASE"
 #
 #	Display & Action
 #
-	
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	tui-printf -H "$ME ($script_version)" "$(date +'%F %T')"
 	tui-printf -T "$TITLE"
 	tui-printf -E "$(gettext 'Starting with basic required configuration')"
+	if [ -z "$TUI_DIR_PROJECTS" ]
+	then	tui-echo
+		tui-echo "$(gettext 'You have not set \"$TUI_DIR_PROJECTS\" yet.')" \
+			"$(gettext 'All future projects will take that as their topdir.')"
+		MSG_MANUAL="$(gettext 'Enter Manual')"
+		oPWD="$PWD";cd "$HOME"
+		declare -a Dirs
+		declare C=0
+		for D in *;do [ -d "$D" ] && Dirs[$C]="$D" && ((C++));done;cd "$oPWD"
+		#set -x
+		WHERE=$(tui-select "$MSG_MANUAL" "$default_new_browser_dir" "${Dirs[@]}")
+		if [ "$MSG_MANUAL" = "$WHERE" ]
+		then	WHERE=$(tui-read "$(gettext 'Please provide full path to your projects dir:')")
+		else	WHERE="$HOME/$WHERE"
+		fi
+		tui-conf-set "$HOME/.tuirc" TUI_DIR_PROJECTS "$WHERE"
+	fi
 #
 #	This is required for proper placement of files
-#
+#	
 	# Quoting breaks expanding
 	for task in $TASK_BASIC
 	do
 		case "$task" in
 		APP_TITLE)
 			Q="$(eval_gettext "What is the $task, may contain spaces:")"
-			tui-echo "$Q"
-			TASK="$(tui-read)"
+			TASK=$(tui-read "$Q")
 			APP_TITLE="${APP_TITLE:-${TASK:-Project Name}}"
 			;;
 		APP_FILE)
 			Q="$(eval_gettext "What is the name of the $task to execute:")"
-			tui-echo "$Q"
-			TASK="$(tui-read)"
+			TASK=$(tui-read "$Q")
 			APP_FILE="${APP_FILE:-${TASK:-project-binary}}"
 			;;
 		APP_BASE)
 			tmp_default_dir="$default_new_browser_dir/${APP_FILE/\.*}"
 			Q="$(eval_gettext "Where will \"$APP_FILE\" be stored ($tmp_default_dir):")"
-			tui-echo "$Q"
-			TASK="$(tui-read)"
+			TASK=$(tui-read "$Q")
 			TASK="${TASK:-$tmp_default_dir}"
 			APP_BASE="${APP_BASE:-${TASK}}"
 			;;
@@ -235,34 +253,39 @@ There is NO WARRANTY, to the extent permitted by law.
 			esac
 		done
 	fi
-#
-#	How or which template to save?
-#
+
 	tui-bol-dir -v "$APP_BASE" || exit 1
-	tui-title "$(gettext 'What kind of template do you want to use?')"
-	MSG_TR_WORD_SIMPLE="$(gettext 'Simple')"
-	MSG_TR_WORD_FULL="$(gettext 'Full')"
-	style=$(tui-select "$MSG_TR_WORD_FULL" "$MSG_TR_WORD_SIMPLE")
-	case "$style" in
-	"$MSG_TR_WORD_FULL")
-		cd "$APP_BASE"
-		tui-tar -xb "$TUI_DIR_TEMPLATES/browser.tar.gz"
-		# Since its full, provide full application manpage
-		default_new_browser_manpage_type=application
-		;;
-	esac
-	
+
 	source "$TUI_DIR_TEMPLATES/browser" > "$APP_BASE/$APP_FILE"
 	chmod +x "$APP_BASE/$APP_FILE"
 	
-	# Always creating a manpage, but which?
+#
+#	How or which template to save?
+#
 	case "${default_new_browser_manpage_type:-application}" in
-	application)	var_opt="-a"	;;
+	application)	var_opt="-a"
+			cd "$APP_BASE"
+			tui-tar -xb "$TUI_DIR_TEMPLATES/browser.tar.gz"
+			cd "$OLDPWD"
+			;;
 	*)		var_opt=""	;;
+	
 	esac
-	tui-bol-dir -v "$APP_BASE/{man,menu}"
-	${0/browser/manpage} $varOpt "$APP_BASE/man/$APP_FILE"
-	
-	# Open project dir
+	tui-bol-dir -v "$APP_BASE"/{docs/man,menu}
+	${0/browser/manpage} $varOpt "$APP_BASE/docs/man/$APP_FILE"
+#	
+# 	Provide an installer?
+#
+	tui-echo
+	tui-yesno "$(gettext 'Would you like to ship/distribute $APP_TITLE using YASSI (Yet Another Simple Script Installer)')" && \
+		cd "$APP_BASE" && tui-download "https://raw.githubusercontent.com/sri-arjuna/yassi/master/configure" && \
+		cd "$OLDPWD" && \
+		thisToo="$APP_BASE/configure.cfg" && \
+		"$APP_BASE"/configure --sample-full > "$thisToo" || \
+		thisToo=""
+#
+# 	Open project dir
+#	and basic files
+#
 	tui-filemgr "$APP_BASE"
-	
+	tui-edit "$APP_BASE"/{docs/README.md,ChangeLog} "$thisToo"

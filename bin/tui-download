@@ -31,41 +31,51 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
-#	Changed: 2015.08.03
+#	Changed:2015.09.17
 #
 #
 #	Variable defaultsa
 #
 	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-${HOME:-/root}/.cache}}"
-	script_version=0.8.9
+	script_version=0.9
 	ME="${0##*/}"
-	help_text="$(gettext "
-Usage: $ME [options] URL [URL2] ..
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage:	$ME [options] URL [URL2] ..
 Where options are:
-	-h\tThis screen
-")"
+	-h	This screen
+	
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+	help_text="$TR_MSG_TEXT_HELP"
 	ARGS=( "${@}" )
 	FILE_TEMP="$TUI_DIR_TEMP/tui-download.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
 	DEST="" 
-	tui-bol-dir "$TUI_DIR_TEMP"  > /dev/zero
+	tui-bol-dir "$TUI_DIR_TEMP"  2>/dev/zero
 	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
 	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
@@ -74,24 +84,17 @@ Where options are:
 #
 #	Messages
 #
-	MSG_INIT_ACT="Starting new download..."
-	MSG_ACT_ING="Downloading..."
-	MSG_ACT_ED="Downloaded"
-	MSG_NOTFOUND="Could find neither curl nor wget!"
-	MSG_SELECT="Which one to install?"
-	MSG_INSTALL_ING="Installing"
-	MSG_INSTALL_ED="Installed"
+	MSG_INIT_ACT="$(gettext 'Starting new download...')"
+	MSG_ACT_ING="$(gettext 'Downloading...')"
+	MSG_ACT_ED="$(gettext 'Downloaded')"
+	MSG_NOTFOUND="$(gettext 'Could find neither curl nor wget!')"
+	MSG_SELECT="$(gettext 'Which one to install?')"
+	MSG_INSTALL_ING="$(gettext 'Installing')"
+	MSG_INSTALL_ED="$(gettext 'Installed')"
 #
 #	Variable handling
 #
-	version_text="$(gettext "
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-")"
+	version_text="$TR_MSG_TEXT_VERSION"
 	case "$1" in
 	"--version")	printf "$version_text"
 			exit 0
@@ -99,7 +102,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	"-h"|"--help")	printf "$help_text" ; exit $RET_HELP
 		;;
 	"")	unset ARGS[@]
-		ARGS[0]=$(tui-read "Enter URL to download:")
+		ARGS[0]=$(tui-read "$(gettext 'Enter URL to download:')")
 	esac
 #
 #	Display

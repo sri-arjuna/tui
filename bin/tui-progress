@@ -21,7 +21,7 @@
 #	Init TUI environment
 #
 	ME="${0##*/}"	# Name
-	script_version=1.0.2
+	script_version=1.2
 	# Check the two default places for the core configuration
 	# First systemwide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -34,39 +34,64 @@
 		for f in $TUI_FILE_CONF_{APPS,COMMANDS,SETTINGS} $TUI_FILE_USER_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
-#	if source /etc/tuirc  && source "${HOME:-/root}/.tuirc"
-#	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-#	else	source tuirc
-#	fi
 	break_on_injections "$@" && exit 1
-	TERM="${TERM:-GNU Linux}"
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: 	$ME [options] [\"Message\"]
+
+Where options are:
+	-h(elp) 		This screen
+	-b(ar)			Enables the \"bar\" mode (minimal)
+	-B(ar)	        VAL     Changes the bar-symbol to VAL
+	-c(urrent)	VAL	Required for bar-mode
+	-C(learline)		Clear the line before print a new value, recommended if you pass multiple files
+	-m(ax)		VAL	If provided, changes progress-string output to \"calculated-num / VAL \"
+	-l(ong)			Prints more info when in bar mode.
+	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
+				Should be provided if used with -m
+	-r(eset)		Resets the tempfile, should be used before one is passing 
+
+When called without options, it simply displays a rotating dash (-/|\) on the right side.
+When called with option \"-m NUM\" it increments the number found in the tempfile, and showing [ incr/NUM ], before using this mode, you should reset the tempfile (-r), or use a specific tempfile identifier (-i STRING_ID).
+You can overwrite the requirement for a tempfile, if you pass \"-c NUM\".
+When called with \"-b\", the options \"-m NUM\" and \"-c NUM\" are both required.
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
+
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.07.14
+#	Changed:	2015.09.17
 #	Description:	Simply displays a rotating line on the left side
 #			The line rotates upon each call
 #
 #	Variables
 #
-	TITLE="Progress indicator"
 	# internals
 	TYPE=""		# Start with no display mode
 	INDI=( '\' '|' '/' '-' )	# Dont use tui-indi, for asynchronus display
@@ -92,28 +117,7 @@
 	STATUS=""
 	MESSAGE=""
 	# Help
-	help_text="
-$ME ($script_version)
-$TITLE
-Usage: 	$ME [options] ['Message']
-
-Where options are:
-	-h(elp) 		This screen
-	-b(ar)			Enables the 'bar' mode (minimal)
-	-B(ar)	        VAL     Changes the bar-symbol to VAL
-	-c(urrent)	VAL	Required for bar-mode
-	-C(learline)		Clear the line before print a new value, recommended if you pass multiple files
-	-m(ax)		VAL	If provided, changes progress-string output to 'calculated-num / VAL '
-	-l(ong)			Prints more info when in bar mode.
-	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
-				Should be provided if used with -m
-	-r(eset)		Resets the tempfile, should be used before one is passing 
-
-When called without options, it simply displays a rotating dash (-/|\) on the right side.
-When called with option '-m NUM' it increments the number found in the tempfile, and showing [ incr/NUM ], before using this mode, you should reset the tempfile (-r), or use a specific tempfile identifier (-i STRING_ID).
-You can overwrite the requirement for a tempfile, if you pass '-c NUM'.
-When called with '-b', the options '-m NUM' and '-c NUM' are both required.
-
+	help_text="$TR_MSG_TEXT_HELP
 "
 #
 #	Functions
@@ -160,12 +164,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
@@ -203,10 +202,11 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 	then	TMPFILE="$TUI_DIR_TEMP/tui-progress_ids.tmp"
 	else	TMPFILE="$TUI_DIR_TEMP/tui-progress_default.tmp"
 	fi
+	trap "rm $TMPFILE" INT ABRT QUIT KILL TERM
 #
 #	Something quick?
 #
-	"$doReset" && \
+	$doReset && \
 		reset_tmp && \
 		exit 0
 #
@@ -227,14 +227,12 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 			doSave=false
 		;;
 	BAR)	if [ -z "$VAL" ]
-		then	# Kind of a workaround
-			VAL="$(read_tmp)"
-			#VAL=$(( $VAL + 1 ))
+		then	VAL="$(read_tmp)"
 			save_tmp "$(( $VAL + 1 ))"
 		fi
-		if [ -z "$MAX" ] || [ -z "$VAL" ]  #|| [ ! $MAX -gt 1 ]
+		if [ -z "$MAX" ] || [ -z "$VAL" ] 
 		then	# Improper handling
-			tui-status 1 "Usage: $ME [-r] [-m \$MAV_VALUE]  [-bc \$CUR_VALUE] [-l]]  'msg'"
+			tui-status 1 "$(eval_gettext 'Usage: $ME [-r] [-m \$MAV_VALUE]  [-bc \$CUR_VALUE] [-l]]  \"msg\"')"
 			exit 1
 		fi
 	esac
@@ -248,8 +246,7 @@ When called with '-b', the options '-m NUM' and '-c NUM' are both required.
 		;;
 	NUM)	# Show incrementing number
 		[ "$VAL" -gt "$MAX" ] && \
-			echo "$ME: Should have called \"${TUI_FONT_BOLD}$ME -r\" first!${TUI_FONT_RESET}" >&2
-			#echo "$ME:$LINENO: Error - \"v$VAL -gt m$MAX\"" >&2
+			echo "$(eval_gettext '$ME: Should have called \"${TUI_FONT_BOLD}$ME -r\" first!${TUI_FONT_RESET}')" >&2
 		STATUS="[ $VAL / $MAX ]"
 		;;
 	BAR)	# Show procent only if wanted

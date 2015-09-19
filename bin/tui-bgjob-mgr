@@ -30,19 +30,6 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
@@ -52,8 +39,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.10.15
-#	Changed:	2015.08.06
-	script_version=0.9.6
+#	Changed:	2015.09.17
+	script_version=0.9.7
 #	Description:	Executes all scripts in parallel, unless LIMIT says different, default 5, disabled 0
 #	Resources:	http://www.unix.com/shell-programming-and-scripting/252114-bash-script-manage-background-scripts-running-finished-exit-code.html
 #
@@ -78,20 +65,87 @@
 	DEBUG=false
 	beVerbose=false
 #
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
 #	Translate strings
 #
-	if [ -z "$TUI_LANG" ] && [ -d "$TUI_DIR_LOCALE/${LANG##\.*}" ]
-	then	TUI_LANG="${LANG##\.*}"
-	else	TUI_LANG="${TUI_LANG:-en_GB}"
-	fi
-	LANG_FILE="$TUI_DIR_LOCALE/$TUI_LANG/${ME/tui-}.sh"
-	[ -f "$LANG_FILE" ] || LANG_FILE="${LANG_FILE/$TUI_LANG/en_GB}"
-	source "$LANG_FILE"
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+		TR_MSG_TEXT_HELP_SHORT="$(eval_gettext 'Usage: 		$ME [options] scripts ...')"
+	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
+Examples:	$ME ./script1 /some/path/script2
+		$ME -c script[1-9]
+
+Where options are:
+	-h(elp) 		This screen
+	-L(og)			Show the log file ($LOG)
+	-c(count)		The exit code is now the number of successfully executed scripts.
+	-l(imit)	NUM	Limits the number of parallel executed scripts, 5 default, 0 to disable
+	-d(el-log)		Deletes (empty) the log file ($LOG)
+	-q(uiet)		Just return the exit code, be non-verbose
+	-v(erbose)		Be verbose, starts every script in its own terminal (GUI only!)
+	-w(wait)	NUM	Change the amount of seconds to wait between update-checks
+
+Files:
+Log:		$LOG
+Temp dir:	$TEMP
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+	TEXT_HELP="$TR_MSG_TEXT_HELP_SHORT
+	$TR_MSG_TEXT_HELP_LONG"
+	#------------------------------------------
+	TR_MSG_TITLE="$(gettext 'Background Job Manager')"
+	TR_MSG_LOG_LIMIT="$(eval_gettext 'Changed the limit to: $LIMIT')"
+	TR_MSG_LOG_COUNT="$(eval_gettext 'Count is now $COUNT')"
+	TR_MSG_LOG_QUIET="$(gettext 'Enabled quiet mode')"
+	TR_MSG_LOG_VERBOSE="$(eval_gettext 'Enabled DEBUG mode')"
+	TR_MSG_LOG_WAIT="$(eval_gettext 'Change the wait interval to: $WAIT')"
+	TR_MSG_LOG_FINAL="$(eval_gettext 'You started $MAX scripts, of which $GOOD exited with success')"
+
+	# Followed by: $TR_MSG_LOG_*
+	TR_MSG_WORD_OPTIONS="$(gettext 'Options:')"
+	TR_MSG_WORD_STATUS="$(gettext 'Status:')"
+	TR_MSG_WORD_SUMMARY="$(gettext 'Summary:')"
+
+	# Statusdisplay on errors 127/130
+	TR_MSG_WORD_CANCEL="$(gettext 'cancel')"
+	TR_MSG_WORD_TYPO="$(gettext 'typo')"
+
+	# Summary status results
+	TR_MSG_WORD_FINISHED="$(gettext 'Finished:')"
+	TR_MSG_WORD_RUNNING="$(gettext 'Running:')"
+	TR_MSG_WORD_WAITING="$(gettext 'Waiting')"
+	TR_MSG_WORD_STARTING="$(gettext 'Starting:')"
+
+	# Error Messages
+	TR_MSG_TEXT_EMPTY="$(eval_gettext 'FAILED script: Empty pid while running : $script($pid) returned $RET')"
+	TR_MSG_TEXT_TYPO="$(gettext 'Typo in script:')"
+	TR_MSG_TEXT_INVALID="$(eval_gettext 'Invalid STATUS ($STATUS) on $C $this_script')"
+
+	# Finaly summary
+	TR_MSG_TEXT_COMPLETED="$(gettext 'Scripts completed')"
+	TR_MSG_TEXT_CURRENTLY="$(gettext 'Currently running:')"
+	TR_MSG_TEXT_EXECUTED="$(gettext 'Successfully executed:')"
+	TR_MSG_TEXT_UPDATE="$(gettext 'Wait for update...')"
 #
 #	Functions
 #
 	show_version() { printf '%s\n' "$TR_MSG_TEXT_VERSION"; }
-	show_help() { printf '%s\n' "$TR_MSG_TEXT_HELP"; }
+	show_help() { printf '%s\n' "$TEXT_HELP"; }
 	doLog() { # "MESSAGE STRING"
 	# Prints: Time & "Message STRING"
 	# See 'tui-log -h' for more info

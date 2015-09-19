@@ -21,7 +21,7 @@
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	Created:	2014.05.19
-# 	Changed:	2015.08.03
+# 	Changed:	2015.09.17
 #
 #	Variable defaults
 #
@@ -35,27 +35,32 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
 	
-	script_version=0.8.9
+	script_version=0.9.0
 	TMP="$TUI_FILE_TEMP.$$"
 	ME="${0##*/}"
-	help_text="$(gettext "
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+"
+	help_text="$(eval_gettext '
 $ME ($script_version)
 Usage:	$ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 NOTE:	'Progress String' may contain shell escaped commands.
@@ -68,7 +73,10 @@ Executes SCRIPTFILE and prints 'Progress String' while running.
 Prints 'Exit String' when done, regardless of exit code (0,1,?) it uses.
 WAIT is optional wait time between updates, default is 0.7 (seconds).
 
-")"
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
 	CHECKFILE=false
 	SIZE_ORG=0
 	showBAR=false
@@ -80,15 +88,7 @@ WAIT is optional wait time between updates, default is 0.7 (seconds).
 	[ -z "$3" ] && printf "$help_text" && exit 99
 	BG_RET="-1"
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text=$(gettext "
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-")
-	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
+	[ "--version" = "${1,,}" ] && printf "$TR_MSG_TEXT_VERSION" && exit 0
 	while getopts "he:f:s:" opt
 	do 	case "$opt" in
 		h)	printf "$help_text"
@@ -102,7 +102,7 @@ There is NO WARRANTY, to the extent permitted by law.
 			;;
 		s)	if [ -f "$OPTARG" ]
 			then	SIZE_ORG=$("$LS" -l "$OPTARG"|"$AWK" '{print $5}')
-			else	tui-status 1 "$(gettext "$ME: File \"$OPTARG\" could not be found!")"
+			else	tui-status 1 "$(eval_gettext '$ME: File \"$OPTARG\" could not be found!')"
 				exit "$?"
 			fi
 			showBar=true
@@ -122,7 +122,7 @@ There is NO WARRANTY, to the extent permitted by law.
 #	Send job to bg and get pid
 #
 	[ ! -f "$JOB" ] && \
-		tui-printf -rS 1 "$(gettext "Failed, job: $JOB not found!")" && \
+		tui-printf -rS 1 "$(eval_gettext 'Failed, job: $JOB not found!')" && \
 		exit 1
 	tui-printf -rS 2 "$(gettext 'Starting job...')"
 	(

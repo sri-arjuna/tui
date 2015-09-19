@@ -31,37 +31,50 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+$ME ($script_version)
+Usage: $ME [options] file1 file2 ... ... target_directory
+Where options are:
+	-h	This screen
+	-d	Switch to (animated) dash-mode
+	-f	Force to overwrite if target exists
+	-l	Show long names (full passed target path)
+	-q	Be quiet, as in: print all on one line.
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+	TR_MSG_WORD_COPYING="$(gettext 'Copying')"
+	TR_MSG_WORD_COPYIED="$(gettext 'Copied')"
+	TR_MSG_TEXT_COPIED="$(eval_gettext 'Copied $final_TOTAL of $MAX files to $TARGET')"
 #
 #	Variable defaults
 #
 	script_version=0.5.5
 	ME="${0##*/}"
-	help_text="\r$ME ($script_version)
-		\rUsage: $ME [options] file1 file2 ... ... target_directory
-		\rWhere options are:
-		\r\t-h\tThis screen
-		\r\t-d\tSwitch to (animated) dash-mode
-		\r\t-f\tForce to overwrite if target exists
-		\r\t-l\tShow long names (full passed target path)
-		\r\t-q\tBe quiet, as in: print all on one line.
-		\r
-		\r"
+	help_text="$TR_MSG_TEXT_HELP"
 	
 	FILE_TEMP="$TUI_DIR_TEMP/$ME.$$.status"
 	DEST=""
@@ -82,12 +95,7 @@
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
@@ -105,7 +113,7 @@
 			showtotal=true
 			;;
 		"")	unset ARGS[@]
-			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
+			ARGS[0]=$(tui-read "$(gettext 'Enter (absolute) path to copy:')")
 			;;
 		h|*)	echo -e "$help_text" ; exit $RET_HELP
 			;;
@@ -173,7 +181,8 @@
 	# or user agrees to overwrite or force is enabled
 		[ -z "$1" ] && return 1
 		if [ -f "$1" ] && [ "$doForce" = "false" ]
-		then	tui-yesno "\"$1\" exists, overwrite?"
+		then	thisFile="$1"
+			tui-yesno "$(eval_gettext '\"$thisFile\" exists, overwrite?')"
 			return $?
 		else	return 0
 		fi
@@ -186,7 +195,7 @@
 	for thisFile in "${SOURCE[@]}"
 	do
 		thisFile="$(printf $thisFile)"
-		tui-status -r  2 "Reading ${thisFile##*/}..."
+		tui-status -r  2 "$(gettext 'Reading') ${thisFile##*/}..."
 		if [ -d "$thisFile" ]
 		then	c_opt="-r"
 			ORG=$(FolderSize "$thisFile")
@@ -196,7 +205,7 @@
 		else	# Skipping
 			ls -l $(dirname $thisFile)
 			if $showBar || $showRegular
-			then	tui-status 4 "Skipped \"${thisFile##*/}\"."
+			then	tui-status 4 "$(gettext 'Skipped') \"${thisFile##*/}\"."
 			fi
 			COUNTER=$(( $COUNTER + 1 ))
 			TOTAL=$(( $TOTAL + 1 ))
@@ -213,8 +222,8 @@
 		trgt="$TARGET/${thisFile##*/}"
 		if $showLong
 		then	[ -d "$TARGET" ] && \
-				display_trgt="to ${trgt}" || \
-				display_trgt="to ${TARGET}"
+				display_trgt="$(gettext to) ${trgt}" || \
+				display_trgt="$(gettext to) ${TARGET}"
 		else	[ -d "$TARGET" ] && \
 				display_trgt="${trgt##*/}" || \
 				display_trgt="${TARGET##*/}"
@@ -227,14 +236,14 @@
 
 		while tui_bol_runpid $pid
 		do	if $showRegular
-			then	tui-progress "Copying $display_trgt..."
+			then	tui-progress "$TR_MSG_WORD_COPYING $display_trgt..."
 			elif $showBar
 			then	[ -f "$trgt" ] && \
 					DEST=$(FileSize "$trgt") || \
 					DEST=$(FolderSize "$trgt")
-				tui-progress -b -m $ORG -c $DEST "Copying $display_trgt..."
+				tui-progress -b -m $ORG -c $DEST "$TR_MSG_WORD_COPYING $display_trgt..."
 				TOTAL=${TOTAL:-$ORG}
-			else	tui-progress "Copying $display_trgt ($COUNTER/$MAX)..."
+			else	tui-progress "$TR_MSG_WORD_COPYING $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actually represents the failures, TODO Error '127,130'
 				cat_num=$(cat $FILE_TEMP)
@@ -245,14 +254,17 @@
 		done
 
 		# Final Message
+		TR_MSG_TEXT_COPIED="$(eval_gettext 'Copied $final_TOTAL of $MAX files to $TARGET')"
 		if $showRegular
-		then	tui-status $(<"$FILE_TEMP") "Copied $display_trgt"
+		then	tui-status $(<"$FILE_TEMP") "$TR_MSG_WORD_COPIED $display_trgt"
 		elif $showBar
-		then	tui-status $(<"$FILE_TEMP") "Copied $display_trgt"
+		then	tui-status $(<"$FILE_TEMP") "$TR_MSG_WORD_COPIED $display_trgt"
 		#else
 		elif $showtotal
 		then	TOTAL=${TOTAL:-0}
-			tui-status -r $(cat "$FILE_TEMP") "Copied $(( $MAX - $TOTAL )) of $MAX files to $TARGET"
+			final_TOTAL=$(( $MAX - $TOTAL ))
+			
+			tui-status -r $(cat "$FILE_TEMP") "$TR_MSG_TEXT_COPIED"
 			#showtotal=true
 		fi
 	done

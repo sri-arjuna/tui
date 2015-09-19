@@ -22,11 +22,11 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.08.06
+#	Changed:	2015.09.17
 #
 #	Variable defaults
 #
-	script_version=0.5
+	script_version=0.9
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
@@ -43,28 +43,9 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	source gettext.sh
-	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
-	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
-	export TEXTDOMAIN TEXTDOMAINDIR
-	default_text="$(gettext 'Press [ENTER] to continue')"
-	MESSAGE="${1:-${default_text}}"
 	
 #
 #	Variable handling
@@ -82,15 +63,26 @@ There is NO WARRANTY, to the extent permitted by law.
 '
 	}
 	case "$1" in
-	"--version")	showVersion
-			exit 0
-			;;
+	"--version")
+		showVersion
+		exit 0
+		;;
 	"-h"|"--help")
 		echo -e "$help_text" ; exit $RET_HELP
+		;;
+	*)
+		MESSAGE="$1"
 		;;
 	esac
 #
 #	Display
 #
-	tui-printf "$MESSAGE" "$MESSAGE"
+	[ -z "$MESSAGE" ] && \
+		MESSAGE="$(gettext 'Press [ENTER] to continue')"
+	COLUMNS=${COLUMNS:-$(tput cols)}
+	LEN="${#MESSAGE}"
+	if [ $(( 2 * $LEN + 12 )) -lt $COLUMNS ]
+	then	tui-printf "$MESSAGE" "$MESSAGE"
+	else	tui-printf  "" "$MESSAGE" ""
+	fi
 	read buffer

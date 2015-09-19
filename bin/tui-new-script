@@ -29,31 +29,34 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	. gettext.sh
 #
 #	Variable defaults
 #
-	script_version=1.6.1
+	script_version=1.7
 	ME="${0##*/}"
-	help_text="$(eval_gettext '
-$ME ($script_version)
-Creates a new script in \$HOME/bin, if \$HOME/.local/bin does not exists.
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.
 Also asks to create a basic man page template in the same location.
 
 Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
@@ -66,38 +69,42 @@ Where options are:
 	-f(ull)		Creates a standalone application script template (bash only)
 	-r(egular)	Creates the same as basic, but with some code preset (bash only)
 	-s(elect)	Select among the script names found in $TUI_DIR_USER_TEMPLATES
-	
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
+
+	
+	help_text="$TR_MSG_TEXT_HELP
+"
+	version_text="$TR_MSG_TEXT_VERSION
+"
 	DEST=""
-	TITLE="$(gettext 'sea New script script')"
+	TITLE="$(gettext 'sea\047s New script script')"
 	SCRIPT="$default_new_script_type" # The default
 #
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-')"
+	
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	tui-title "$TITLE ($script_version)"
-	while getopts "hfrbes" name
+	while getopts "hfrmbes" name
 	do 	case $name in
 		h)	printf "$help_text"
 			exit $RET_HELP		;;
-		f)	SCRIPT="full"	;;
+		f)	SCRIPT="full"		;;
 		r)	SCRIPT="regular"	;;
+		m)	SCRIPT="modul"  	;;
 		b)	SCRIPT="basic"		;;
 		e)	SCRIPT="empty"		;;
-		s)	list_script=$(cd "$TUI_DIR_USER_TEMPLATES";ls)
-			[ -z "$list_script" ] && \
-				tui-printf -S 1 "$(gettext 'No scripts found in') $TUI_DIR_USER_TEMPLATES" && \
-				exit 1
-			SCRIPT=$(tui-select -a $list_script)
+		s)	oPWD="$PWD"
+			[ -d "$TUI_DIR_USER_TEMPLATES" ] && \
+					cd "$TUI_DIR_USER_TEMPLATES" || \
+					cd "${TUI_DIR_TEMPLATES}/scripts"
+			SCRIPT=$(tui-select -a *)
+			cd "$oPWD"
 			;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;
 		esac
@@ -108,7 +115,8 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 	if [ -z "$1" ]
 	then	# No filename passed
-		DEST=$(tui-read "$(gettext "Enter the filename for a \"$SCRIPT\" script:")")
+		MSG_TR_="$(gettext 'Enter the filename for the script:')"
+		DEST=$(tui-read "$MSG_TR_")
 		if [ "${DEST}" = "${DEST##*/}" ]
 		then	DEST="$TUI_DIR_USER_SCRIPTS/$DEST"
 			tui-bol-dir "$TUI_DIR_USER_SCRIPTS"
@@ -126,11 +134,13 @@ There is NO WARRANTY, to the extent permitted by law.
 		fi
 	fi
 	
+	
+	
 	if [ -f "$DEST" ]
-	then	tui-yesno "$(eval_gettext "File $DEST exists... Overwrite?")" ||  ( 
+	then	tui-yesno "$(eval_gettext 'File $DEST exists... Overwrite?')" ||  ( 
 			BACKUP="$DEST-$(date +'%F-%T').bak"
 			mv "$DEST" "$BACKUP"
-			tui-status "$?" "$(eval_gettext "Saved original $DEST to $BACKUP")"
+			tui-status "$?" "$(eval_gettext 'Saved original $DEST to $BACKUP')"
 		)
 	fi
 	
@@ -141,7 +151,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	elif [ -f "$TUI_DIR_USER_TEMPLATES/$SCRIPT" ]
 	then	# Just copy the user templates, as they are individual
 		tui-cp "$TUI_DIR_USER_TEMPLATES/$SCRIPT" "$DEST"
-	else	tui-status 1 "$(eval_gettext "Fatal error, template \"$SCRIPT\" not found!")"
+	else	tui-status 1 "$(eval_gettext 'Fatal error, template \"$SCRIPT\" not found!')"
 		exit 1
 	fi
 	
@@ -152,7 +162,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	else	exit $?
 	fi
 	
-	if "$default_new_script_manpage_ask"
+	if ${default_new_script_manpage_ask:-true}
 	then	tui-yesno "$(gettext 'Create a manpage as well?')" && \
 			tui-new-manpage "$DEST"
 	fi

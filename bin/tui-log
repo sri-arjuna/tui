@@ -37,33 +37,16 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
-	
-#	if source /etc/tuirc && source "${HOME:-/root}/.tuirc"
-#	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS};do source "$f";done
-#	else	source tuirc
-#	fi
+	TERM="${TERM:-GNU Linux}"
 	break_on_injections "$@" && exit 1
 #
 #	File:		tui-log
 #	Author: 	Simon Arjuna Erat (sea), erat.simon@gmail.com
 #	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
-#	Changed:	2015.02.18
+#	Changed:	2015.09.17
 #
 #	Description:	Simply writes a log file
 #
@@ -71,27 +54,40 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.6.4
+	script_version=0.9
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"
 	T="$(date +%T)"
 	daily_date_str="#### $(date +'%F') ####"	# Only used if log don't uses the date otherwise
-	
 	SEP="\t"
 	beVerbose=false
 #
-#	Help text
+#	Translate preps
 #
-	help_text="
-$ME ($script_version)
-The order of the options defines the string order.
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME [options] \"LOGFILE\" \"Message\"
 Examples:	$ME \"/var/log/appname.log\" \"Message\"
 		$ME -dtp \"LOGFILE\" \"Server started\"
 		$ME -pu \"LOGFILE\" \"Changed background\"
 		
 Where options are:
+The order of the options defines the string order.
 	-h(elp) 		This screen
 	-e(mpty)		Prints just the message or nothing
 	-d(ate)			Adds the DATE ($D) in front
@@ -101,6 +97,14 @@ Where options are:
 	-s(eparator)	ARG	Changes the the separator ($SEP) to ARG
 	-v(verbose)		Prints the MESSAGE also to screen using tui-echo
 
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+#
+#	Help text
+#
+	help_text="$TR_MSG_TEXT_HELP
 "
 #
 #	Catching arguments
@@ -109,12 +113,7 @@ Where options are:
 	[ -z "$2" ] && printf "$help_text" && exit 1
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
@@ -145,9 +144,9 @@ Where options are:
 	if [ ! -f "$LOG" ]
 	then 	# Create log file, exit with message on error
 		# Prints basic log header
-		tui-bol-dir "$(dirname $LOG)" 1>/dev/zero 2>/dev/zero || tui-status 1 "Failed to create $(dirname $LOG)"
+		tui-bol-dir "$(dirname $LOG)" 1>/dev/zero 2>/dev/zero || tui-status 1 "$(eval_gettext 'Failed to create $LOG')"
 		if ! touch "$LOG" 2>/dev/zero
-		then	tui-status 1 "Failed to create $LOG" 
+		then	tui-status 1 "$(eval_gettext 'Failed to create $LOG')" 
 			exit 1
 		fi
 		printf "$daily_date_str\n" > "$LOG"

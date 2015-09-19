@@ -49,6 +49,7 @@
 		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
+	TERM="${TERM:-GNU Linux}"
 	break_on_injections "$@" && exit 1
 	. gettext.sh
 	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste

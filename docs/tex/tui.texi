@@ -68,6 +68,15 @@ But be aware of their differences, such as string formatting and possible exit c
 @chapter Introduction to TUI
 @i {TUI is a bash framework to write scripts with a Text User Interface.}
 
+@section Idea
+In today's world, everything is about presenting. There are many tasks that can be faster accomplished using a script rather than writing an application for it as others require to use it.
+This said, it is known many end-users don't like the terminal screen. That is usually because the commands in terminals have their output not very well structured, usually just text-by-text-by-newline-by-text.
+This is if you need/want/have to provide scripts for users to use, and make it (a little) easier for them to 'read' the terminal, without to have to write 'presentation' handlers.
+Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui, same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
+Now in the combination with tui-edit, you don't even need to source tuirc to have tui-edit open the given filename with your favorite editor.
+
+
+@subsection What is TUI?
 It is a command based framework which wraps the task (executed command name represents task or 
 description) into an adaptive Text User Interface (TUI).
 It is a framework to be used in the shell or shell scripts, though the usage of scripts is recommended 
@@ -81,6 +90,7 @@ This said, when executed alone, a single tui-<command>, it doesn't look that muc
 However, as soon you append a few tui-echo after another or use tui-cat to print a small text file to
 the screen, you will feel the difference.
 
+@subsection Why TUI?
 Many script authors write their collection of code helpers, display features or task assistants.
 As such functions, they have to copy them to each of the scripts, 
 and manually maintain and adjust the function inside that script, 
@@ -89,6 +99,7 @@ or update all those scripts just to be sure that function is updated.
 TUI jumps in here, providing a 3-Way-Interface between the Author of a script, 
 the System (and its installed software) and the User who is executing it.
 
+@subsection What TUI is about
 In fact, TUI is tui!
 
 'tui' is meant to make a directory a simple but highly configurable script menu, and display its 
@@ -105,6 +116,7 @@ installations from Arch, over *BSD and Debian to Fedora/Red-Hat to Slackware or 
 
 It brings together the best of two worlds, the power of the console and the convenience of a graphical
 environment.
+
 
 
 @comment ## --------------------------------------------------------------- ##
@@ -175,8 +187,12 @@ You may add custom entries, but be aware these functions or values will not be a
 
 @section Settings / @sc {$TUI_FILE_USER_SETTINGS}
 Here, the behavior or default values for tui-commands is defined.
+Like your prefered shell, the byteisze used or how the tui-new-<COMMAND>s behave.
 
-
+@section User / @sc {$TUI_FILE_USER}
+Here you can set or change your USER_NAME, your USER_EMAIL you'd like to use for your scripts, 
+as well as the USER_HOMEPAGE.
+Moreover, you could change the default license DEFAULT_LICENSE and DEFAULT_LICENSE_URL.
 
 
 @comment ## --------------------------------------------------------------- ##
@@ -990,16 +1006,68 @@ Note, that in this case, SHELL could also be: Python or Perl, aside from ash, cs
 @node Appendix
 @chapter Appendix
 
-@section History
+@section History of TUI
+Around 1995 i've met the MSDOS command 'net', 
+which allowed me to send messages to a friends computer in the like of: 'net send <IP> "msg"'.
+
+That kind of usage feeling impressed me, to some extend, it was 'speech control', and i wanted to make something like that available.
+Not 'speech control' but allow 'words' to form a 'command' which then is executed.
+
+16 years later, i've joined the linux community and figured the power of BASH, which was the default shell on 
+all but one distributions i have tried within my first year.
+
+Due to that process of repeative installation and configuration of the system, i wanted to ease that task by writing scripts.
+Seeing other scripts, the linux loading text of the console, and the urge to simply some scripting tasks, i started to write some first functions.
+At some later time, that project was renamed several times, ending up with the name 'script-tools'.
+This said, you probably can imagine that 'TUI' was just a very part of 'script-tools', 
+which - due to several sub sections - had functions stored in external files, 
+so all the scripts spread across different folders could just source those function-scripts, 
+so i would not need to edit several files to apply a single char change.
+
+When i started to figure that i had several functions twice, with a slightly different name in another function-script, 
+but doing the very same task, i thought avoidance might be the key.
+
+This was in 2014, 3 years after my joining to the linux community, 'constantly' working on that project,
+so that project 'script-tools' contained everything, from tweaking grub1 & grub2, plymouth, signature generator, project manager (rpm, mock, kickstart/specs, git/sf, ftp, rpm repo, cron) to name a few...
+
+Now 'script-tools' was already part of that idea, you could call it like 'st tweak grub 2 timeout 4' or browse there by just calling 'st'.
+Those (not really) first functions where: sS, yesno, sE, sT and sH, representing the todays commands tui-status, tui-yesno, tui-echo, tui-title and tui-header.
+Figured, having the display functions and the working functions mixed up, causes unneeded trouble and could be avoided by extracting the display fuctions as their own project -- TUI.
+
+Those (not really) first functions where: sS, yesno, sE, sT and sH, representing the todays commands tui-status, tui-yesno, tui-echo, tui-title and tui-header.
+At first, i thought i might keep them as functions, due to the one time reading to the memory, it would be very fast afterwards.
+But then i thought of all the other shells i havent tried yet, but beeing aware that most of them work generally the same way,
+i wanted to make TUI also available to them - to some extend.
+Keeping TUI as plain BASH functions was no longer an option.
+Providing them as scripts/commands while sharing the same variables was the next obvious and usable option.
+
+Eventually, i thought i was done - besides of a few work-overs for one or two commands to improve usability, and therefor i thought i was ready to introduce TUI to GNU.
+
+After reading several hours of manuals and webpage and vides guides regarding the GNU Autotools (autoconf & automake), as well as TexInfo and GetText, my mind got blown, with all the additional (but very logical) requirements.
+After i had finaly managed my project to be installed properly by automake (make), it started to fail because of the 'po files', and i could not test my fixes on TUI.
+Since to simply toggle the including the 'po files' i had to edit multiple files and rerun the autotools, but even more because my project code stats went from 99% shell to 73.5% groff code, just because of the installation tools.
+This together caused me to write YASSI, which now is used to install TUI and provide as good GNU Automake syntax as possible.
+
+Luckily, during the time of evaluation of TUI to become GNU TUI, the gettext tools seemed to have massivly increased in speed, so that tool seem usable again...
 
 
-@section Idea
-In today's world, everything is about presenting. There are many tasks that can be faster accomplished using a script rather than writing an application for it as others require to use it.
-This said, it is known many end-users don't like the terminal screen. That is usually because the commands in terminals have their output not very well structured, usually just text-by-text-by-newline-by-text.
-This is if you need/want/have to provide scripts for users to use, and make it (a little) easier for them to 'read' the terminal, without to have to write 'presentation' handlers.
-Thus user.conf in ~/.config/tui provides variables that may be used for any script that sources tui, same goes for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL with your set favorite applications.
-Now in the combination with tui-edit, you don't even need to source tuirc to have tui-edit open the given filename with your favorite editor.
+@subsection About the Author
+Simon Arjuna Erat has first met a computer at the age of 8, at his dad's cellar office with a Commodore64.
+The first i remember about that computer is, that my dad was just changing the tape-drive with a 5.25" soft-floppy.
 
+Later on, i've had some plays with MSDOS 4,5 & 6, that GUI from 'Ensemble Studios' and Windows 3.1(1).
 
+Allthough i was very much into optimizing my system by tweaking the autoexec.bat and config.sys,
+i usualy just did it to gain more free memory over the 512k 'barrier', to play the games more fluently, 
+as they required an incredible high amount of RAM... up to 4MB!
+
+Later in 1995, i've had my hands on Slackware 3.0 and RedHat 2?, but returned quickly back to Windows 95, to play games.
+
+Between 1997 and 2001 i was self-employed PC-Supporter helping private people as well as small- & medium companies in and around my town.
+In  between there was some army services, and afterwards i've raised a security company with some friends, which went well until 2004,
+where i went back to my origins, and created homepages and flyers for several bars, clubs, discotheques and other etablissements.
+
+Then finaly in 2011, i've had enough of Windows and 'joined the GNU/Linux Community'.
+Providing my part to it, by realizing/writing an idea i've had almost 20 years ago... TUI for scripts.
 
 @bye

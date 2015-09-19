@@ -30,20 +30,8 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" #2>/dev/zero
 	then 	source "$TUI_FILE_CONF_COMMANDS"
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	TERM="${TERM:-GNU Linux}"
@@ -53,13 +41,51 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.08.02
-	script_version=0.6
+#	Changed:	2015.09.17
+	script_version=0.9
 #	Description:	Returns true if user is in GUI mode.
 #
 #	Variable defaults (options)
 #
 	beVerbose=false
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+$ME ($script_version)
+Usage: 		$ME [options]
+Returns true if user is in a graphical environment
+
+Examples:	$ME -v
+
+		if $ME
+		then	echo \"in gui\"
+		else	echo \"on tty\"
+		fi
+
+Where options are:
+	-h(elp) 		This screen
+	-v(erbose)		Prints the name of the Desktop Environment (DE) or Window Manager (WM)
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
 #
 #	Functions
 #
@@ -67,37 +93,20 @@
 	# Simply shows the help screen
 	# 
 		cat <<-HELP_SCREEN
-		$ME ($script_version)
-		Usage: 		$ME [options]
-		Returns true if user is in a graphical environment
-		
-		Examples:	$ME -v
-		
-		 		if $ME
-		 		then	echo 'in gui'
-		 		else	echo 'on tty'
-		 		fi
-		
-		Where options are:
-			-h(elp) 		This screen
-			-v(erbose)		Prints the name of the Desktop Environment (DE) or Window Manager (WM)
-		
+		$TR_MSG_TEXT_HELP
 		HELP_SCREEN
+	}
+	showVersion() { 
+	# Simply shows the version screen
+	# 
+		cat <<-EOF
+		$TR_MSG_TEXT_VERSION
+		EOF
 	}
 #
 #	Catching Arguments
 #
 	[ "--help" = "$1" ] && help_screen && exit 99
-	showVersion() { 
-	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
-	EOF
-	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	while getopts "hv" opt
 	do 	case $opt in
@@ -105,7 +114,6 @@
 			exit $RET_HELP
 			;;
 		v)	beVerbose=true
-			hadOpts=true
 			shift
 			;;
 		*)	printf "$help_text" ; exit $?	;;
@@ -115,7 +123,7 @@
 #	Display & Action
 #
 	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-	if [ ! -z "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other term/in/ator's
+	if [ ! -z "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other [ep]term/in/ator's
 	then	$beVerbose && echo "$DE"
 		exit 0
 	else	exit 1

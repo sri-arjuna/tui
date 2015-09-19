@@ -31,22 +31,9 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
-	break_on_injections "$@" && exit 1
+	break_on_injections "${@}" && exit 1
 #
 #	Author: 	Simon A. Erat (sea)
 #	Contact:	erat.simon@gmail.com
@@ -55,6 +42,7 @@
 #
 	script_version=1.4
 	BORDER_RIGHT=""
+	#echo $TERM ;exit #TERM="${TERM:-GNU Linux}"
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	# If there is a user theme directory, use that one instead
@@ -164,7 +152,7 @@ Examples:	$ME \"What is your favorite color?\"
 	if "$noEmpty"
 	then	while [ -z "$INPUT" ]
 		do	visual_arrangement "$1"
-			$READ ${doPassword} INPUT </dev/tty
+			$READ ${doPassword} INPUT #</dev/tty
 			echo "${INPUT:0:3}" | $GREP -q ^"\[\[" && INPUT=""
 		done
 	else	INPUT=""

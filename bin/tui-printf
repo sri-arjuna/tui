@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.3
+	script_version=2.4
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU Linux}"
 #
@@ -30,7 +30,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2013.05.03
-#	Changed:	2015.08.02
+#	Changed:	2015.09.17
 #	Description:	The absolute core display function for TUI
 #
 #	Variables
@@ -47,29 +47,9 @@
 		for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
-	
-	# Source only the most required files, 
-	# create the RC and load all variable if RC is not present yet.
-#	source /etc/tuirc && source "${HOME:-/root}/.tuirc" || source tuirc
-	# $TUI_FILE_CONF_STATUS is loaded only upon need, see line no: ~162
-#	for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
-#	do	source "$f"
-#	done
+	break_on_injections "$@" && exit 1
 	# If there is a user theme directory, use that one instead
 	if [ -f "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}" ]
 	then	# User has a custom theme
@@ -88,27 +68,48 @@
 #	Regular data
 #	
 	ME="${0##*/}"
-	ME_DIR="${0/${0##/*/}}"
-	TITLE="$ME"
-	help_text="
-$ME ($script_version)
-Usage: 	$ME [options] [arguments]
-	$ME		Prints up to 3 arguments. 
-			1: Left
-			2: Left, Right
-			3: Left, Center, Right
-Arguments will tell $ME if and where to colorize, or if to do a line break.
-Options are:
-	-h(elp) 	This screen
-	-E(cho)		Simulates 'echo', prints up to 3 strings and a newline.
-	-T(itle)	Prints 1st argument centered, if more - alignment like tui-echo
-			The inner background is colored white with blue font by default
-	-H(header)	Full line has a blue background and white font as default color
-	-S(tatus)	Does special handling with the first argument
-	-r(eturn)	Optional to '-S', returns to line start, rather than newline where used.
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
-If you want to pass a string with a leading dash (-) to $ME, please provide '--' as argument as well.
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: $ME [[-] | [str1] [str2] [str3]]
 
+	Prints one string on the left"
+	Prints two strings left and right
+	Prints three strings left, entered and right
+
+Pass \"-\" to read input from pipe
+One can pass empty strings to align the desired output.
+
+Where options are:
+	-h|--help	This screen
+	--version	Prints the version and exits
+	-E		Prints the echo
+	-H		Prints the header
+	-r		Returns cursors to line start
+	-S	NUM	Prints status, without exit status
+	-T		Prints the title
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+	help_text="$TR_MSG_TEXT_HELP
 "
 	FIRST=""
 	SECOND=""
@@ -128,35 +129,13 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 #
 	case "$1" in
 	"--version")	cat <<-EOF
-				GNU $ME, Version $script_version
-				Copyright (C) 2015 Simon Arjuna Erat
-				License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-				This is free software; you are free to change and redistribute it.
-				There is NO WARRANTY, to the extent permitted by law.
+				$TR_MSG_TEXT_VERSION
 			EOF
 			exit 0
 			;;
 	"-h"|"--help")
 		printf '%s\n' \
-			"" \
-			"$ME ($script_version)" \
-			"Usage: 	$ME [opts] [[-] | [str1] [str2] [str3]]" \
-			"" \
-			"Pass '-' to read input from pipe" \
-			"One can pass empty strings to align the desired output." \
-			"	Prints one string on the left" \
-			"	Prints two strings left and right" \
-			"	Prints three strings left, centered and right" \
-			"" \
-			"Where options are:" \
-			"	-h|--help	This screen" \
-			"	-E		Prints the echo" \
-			"	-H		Prints the header" \
-			"	-r		Returns cursors to line start" \
-			"	-S	NUM	Prints status, without exit status" \
-			"	-T		Prints the title" \
-			"" 
+			"$shelp_text"
 		exit 99
 		;;
 	"-")	# Read pipe, expect one line
@@ -175,7 +154,11 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 				optStyle="-T"	;;
 		S|status)	doStatus=true
 				optStyle="-S"
-				NUM_ID="$OPTARG" ;;
+				# Status requires first to be numeric
+				NUM_ID="$(echo $OPTARG|tr -d [:alpha:])"
+				[ -z "$NUM_ID" ] && \
+					tui-printf -S 1 "$(eval_gettext '$ME: For option \"-S\" the first argument must be numeric!')" && \
+					exit 1	;;
 		r|return)	doReturn=true
 				NL="\r" 	;;
 		esac
@@ -188,11 +171,6 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	#
 	#	Fill array according to return value
 	#
-		# Status requires first to be numeric
-		[ -z "$NUM_ID" ] && \
-			tui-printf -S 1 "$ME: For option '-S' the first argument needs to be numeric only!" && \
-			exit 1
-		
 		# get the vars, load this only on demand, its a tiny, but still a speed increase!
 		source "$TUI_FILE_CONF_STATUS"
 		unset retvalue[@]
@@ -205,7 +183,7 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		retvalue[127]="$TUI_NFOUND";	retvalue[130]="$TUI_CANC"
 		
 		# Make arguments in order
-		case $ARGS_COUNT in
+		case "$ARGS_COUNT" in
 		0)	FIRST=" "
 			SECOND=" "
 			;;
@@ -221,7 +199,9 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 		esac
 		# For tui-status always use '3' strings
 		ARGS_COUNT=3
-		THIRD="${retvalue[$NUM_ID]}"	#     = 6+2=8
+	#set -x
+		THIRD="${retvalue[${NUM_ID:-1}]}"	2>/dev/zero	#     = 6+2=8
+	#set +x
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
 	else
 		[ ! -z "$1" ] && FIRST="$1"
@@ -440,9 +420,9 @@ If you want to pass a string with a leading dash (-) to $ME, please provide '--'
 	if $doStatus
 	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
 		case $NUM_ID in
-		0|1|2|3|10|11|127|130)	# These are colored, was 21
+		0|1|2|3|7|10|11|127|130)	# These are colored, was 21
 			pos_three_adder=3	;;
-		4|5|6|7|99|111)		# These are not
+		4|5|6|99|111)		# These are not
 			pos_three_adder=0	;;
 		esac
 		long=${#THIRD}

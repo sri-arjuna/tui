@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 shopt -s expand_aliases
+#set -x
 #
 # Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
@@ -24,14 +25,49 @@ shopt -s expand_aliases
 	oME="$ME"	# Backup of variable 'ME' if sourced
 	oVER="$script_version"
 	ME=tuirc
-	script_version=2.7
-	TUI_VERSION=0.8.9-GNU-RC12
+	script_version=2.8
+	TUI_VERSION=0.8.9-GNU-RC13
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: 	tuirc [config|reset[-yes]|theme]  // source tui
+Where options are:
+	-h|--help	This screen
+	config		Enters directly into config mode
+	provides	List all variables provided by TUI
+	reset		Resets configuration to defaults, root will reset system wide defaults
+	reset-yes	Resets configuration without asking for verification
+	samples		View samples files, first codee then executed
+	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
+
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.08.21
+#	Changed:	2015.09.17
 #	Description:	The loader and configurator of TUI
 #
 #	Variables	:	Default
@@ -57,20 +93,21 @@ shopt -s expand_aliases
 	
 	# Regular definitions
 	TRC="${HOME}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
+	TRC_SYS="$SYSCONFDIR/tuirc"
 	
 	# Get paths of where it was installed
 	SYSCONFDIR=""
-	for install_kind in "/etc" "$HOME/.local" "$HOME"
-	do 	tmp_cfg="$install_kind/tui.conf"
-		[ -f "$tmp_cfg" ] && source "$tmp_cfg"
+	for install_kind in "/" "/usr" "$HOME/.local" "$HOME"
+	do 	tmp_cfg="$install_kind/etc/tui.conf"
+		[ -f "$tmp_cfg" ] && source "$tmp_cfg" && break
 	done
 	
-	# Check if user configuration files are present
-	if [ ! -f "$HOME/.config/tui/apps.conf" ]
-	then 	HD="$HOME/.config/tui"
-		[ -d "$HD" ] || mkdir -p "$HD"
-		cp "$DATADIR/conf.home/"* "$HD" 
-	fi
+	# Get systemwide default configuration paths
+	[ -z "$SYSCONFDIR" ] && \
+		printf '%s\n' "$(gettext 'Please attempt a fresh installation of TUI.')" && \
+		( return 1 || exit 1 )
+	source $SYSCONFDIR/tui.conf
+	source $SYSCONFDIR/tuirc
 #
 #	Functions
 #
@@ -82,19 +119,8 @@ shopt -s expand_aliases
 	function help_screen () { #
 	# Prints some basic usage
 	#
-		echo "$TR_MSG_TEXT_HELP"
-		return
-		eval_gettext '
-Usage: 	tuirc [config|reset[-yes]|theme] (source tui)
-Where options are:
-	-h		This screen
-	config		Enters directly into config mode
-	provides	List all variables provided by TUI
-	reset		Resets configuration to defaults, root will reset system wide defaults
-	reset-yes	Resets configuration without asking for verification
-	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
-
-'
+		echo "$TR_MSG_TEXT_HELP
+"
 	}
 	function first_time() { #
 	# Prepare all variables and write conf files
@@ -131,7 +157,6 @@ Where options are:
 			fi
 			TUI_DIR_TEMP="${TUI_DIR_TEMP:-$TCACHE}"
 			
-			
 			cat > "$TRC" <<-TUI_RC
 			#$TRC
 			# This file is not ment to be changed manualy!
@@ -150,7 +175,7 @@ Where options are:
 			#
 			#	Paths	:	System wide but user specific
 			#
-				TUI_DIR_TEMP="${TUI_DIR_TEMP}"
+			 	TUI_DIR_TEMP="${TUI_DIR_TEMP}"
 			#
 			#	Paths	:	That are about the User
 			#
@@ -160,19 +185,14 @@ Where options are:
 			 	TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
 			 	TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
 			 	TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
-			
 			#
 			#	Files	:	User specific configuration files
 			#
-			[ -z "\$TUI_FILE_USER" ] && \\
 			 	TUI_FILE_USER="\$TUI_DIR_USER/user.conf"
-			[ -z "\$TUI_FILE_USER_APPS" ] && \\
 			 	TUI_FILE_USER_APPS="\$TUI_DIR_USER/apps.conf"
-			[ -z "\$TUI_FILE_USER_SETTINGS" ] && \\
 			 	TUI_FILE_USER_SETTINGS="\$TUI_DIR_USER/settings.conf"
-			[ -z "\$TUI_FILE_USER_LOADLIST" ] &&  \\
 			 	TUI_FILE_USER_LOADLIST="\$TUI_DIR_USER/loadlist.conf"
-			TUI_FILE_TEMP="${TUI_DIR_TEMP:-\$HOME/.cache}/tui.tmp~"
+			 	TUI_FILE_TEMP="${TUI_DIR_TEMP:-\$HOME/.cache}/tui.tmp~"
 			
 			TUI_RC
 		}
@@ -193,7 +213,13 @@ Where options are:
 		
 		# Verify all dirs are created, could be so easy...
 		#tui-bol-dir $(tui-conf-get -l "$TRC"|grep "_DIR_")
-		for item in "$TUI_PREFIX" $TUI_DIR_{*} ##CONF $TUI_DIR_DOCS $TUI_DIR_SYSTEM $TUI_DIR_USER_LOGS \
+		DIRS_RAW="${!TUI_DIR_*}"
+		for r in $DIRS_RAW
+		do 	DIRS_N1+=" ${!r}"
+		done
+		#DIRS_N1="$(echo ${!DIRS_RAW} )" #| $SED s,\ T,\ \$T,g)"
+		echo $DIRS_N1
+		for item in "$TUI_PREFIX" $DIRS_N1 #$TUI_DIR_{*} ##CONF $TUI_DIR_DOCS $TUI_DIR_SYSTEM $TUI_DIR_USER_LOGS \
 				##$TUI_DIR_THEMES $TUI_DIR_TEMP $TUI_DIR_USER_SCRIPTS $TUI_DIR_USER_MANPAGES
 		do	[ -d "$item" ] ||  ( mkdir -p "$item" ; echo "$eval_gettext 'Created: $item')" >&2 )
 		done
@@ -250,6 +276,12 @@ Where options are:
 #
 #	Premiere?
 #
+	# Check if user configuration files are present
+	if [ ! -f "$HOME/.config/tui/apps.conf" ]
+	then 	HD="$HOME/.config/tui"
+		[ -d "$HD" ] || mkdir -p "$HD"
+		cp "$DATADIR/conf.home/"* "$HD" 
+	fi
 	if [ ! -f "$TRC" ]
 	then	# Some default values required for first time setup
 		[ -z "$DEFAULT" ] && \
@@ -269,40 +301,17 @@ Where options are:
 #
 #	Load Environment	:	System wide / defaults
 #
-	source "$TRC" 	  2>/dev/zero	# Load tui user paths
-	for f in $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS}
-	do	source "$f" #&& printf "." > /dev/stderr
+	source "$TRC_SYS" 	  2>/dev/zero	# Load tui user paths
+	list="" ; for F in ${!TUI_FILE_CONF_*} $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS} ${!TUI_FILE_USER_*};do list+=" ${!F}";done
+	for f in ${list}
+	do	[ loadlist.conf = "${f##*/}" ] && continue	# Skip this one - here
+		[ -f "$f" ] && source "$f"
 	done
 #
 #	Load Environment	:	User settings
 #
-	# Check if user RC file is valid
-	if [ -z "$TUI_LANG" ]
-	then	# Copy template RC
-		#echo "BEEN HERE"
-		first_time
-		# Write language afterwards
-	fi
-	
-	# Load its own language file
-	if [ -z "$TUI_LANG" ]
-	then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-		lng="$(echo ${LANG/\.*})"
-		# Check all provided language directories
-		echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-			tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-			echo "TUI_LANG=en_GB" >> "${HOME:-/root}/.tuirc" 
-		# Sadly this echo is required to remove tailing spaces, 
-		# probablly an issue of tui-conf-get (2015.08.21)
-		TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-	fi
-	LANG_FILE=${ME/tui\-}.lng
-	LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-	[ -f "$LANG_FILE" ] && source "$LANG_FILE"
-	
 	# Lets continue with a general security check
-	TRC_SYS="$SYSCONFDIR/tuirc"
-	if source "$TRC_SYS"
+	if source "$TRC"
 	then 	break_on_injections "$@" && exit 1
 	else	tui-status 1 "${TR_MSG_TEXT_MISSING_FILE} $TRC_SYS"
 		exit 
@@ -313,19 +322,15 @@ Where options are:
 	# Read loadlist and start parsing only if variable is not empty
 	while read f
 	do	# Filter out comments and verify file exists before sourcing it.
-		[ ! -z "$f" ] && \
+		#[ ! -z "$f" ] && \
 			[ ! "#" = "${f:0:1}" ] && \
 			[ -f "$TUI_DIR_USER/$f" ] && \
 			source "$TUI_DIR_USER/$f"
 	done<"$TUI_FILE_USER_LOADLIST"
-	# As these are essential for TUI to work properly, 
-	# do a fallback check, if any of these should be empty
-	AWK="${AWK:-\awk}"
-	GREP="${GREP:-\grep}"
-	READ="${READ:-read}"
-	SED="${SED:-\sed}"
+	
 	# Make apps not require *_CLI or *_GUI
-	if tui-bol-gui
+	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+	if [ ! -z "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other [ep]term/in/ator's
 	then	# Its GUI
 		BROWSER="$BROWSER_GUI"
 		EDITOR="$EDITOR_GUI"
@@ -363,15 +368,6 @@ Where options are:
 		--version|version)
 			echo "$TR_MSG_TEXT_VERSION"
 			exit
-			version_text="$(eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2011-2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-')"
-			printf "$version_text"
 			;;
 		config)
 			ConfigTUI
@@ -527,7 +523,7 @@ There is NO WARRANTY, to the extent permitted by law.
 				"${TUI_FONT_BOLD}tuirc provides${TUI_RESET}"
 		tui-printf -E
 		tui-printf -E 	"$(gettext 'There are some sample scripts to get you started:')" \
-				"$TUI_DIR_DOCS/samples"
+				"$DATADIR/samples"
 		tui-printf -E 	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
 				"tui-new-script [-emrst] [./]SCRIPTNAME"
 		tui-printf -E
@@ -539,13 +535,5 @@ There is NO WARRANTY, to the extent permitted by law.
 	else	# Set back possible original variables ME and script_version
 		ME="${oME:-${0##*/}}"
 		script_version="$oVER"
-		
-		# Set and load the LANG_FILE of the sourcing script (caller)
-		# Luckily, TUI_LANG is already set by now
-		LANG_FILE="$TUI_DIR_LOCALE/$TUI_LANG/${ME/tui\-}.sh"
-		[ -f "$LANG_FILE" ] && \
-			source "$LANG_FILE" || \
-			( [ tui = "${ME:0:3}" ] && printf '%s\n' \
-				"Language file for \"$ME ($LANG_FILE)\" does not exist yet." >&2
-			)
 	fi
+set +x

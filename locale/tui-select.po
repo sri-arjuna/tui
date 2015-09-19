@@ -1,0 +1,45 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-06 18:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-select:59
+msgid ""
+"\n"
+"$ME ($script_version)\n"
+"Usage: \t\t$ME \\[options\\] item1 item2 ..\n"
+"Examples:\tret=\\$($ME one two three)\n"
+"\t\t$ME *\n"
+"Where options are:\n"
+"\t\t-1|2\t\tPrint that many rows\n"
+"\t\t-a\t\tAuto select if only one entry was found\n"
+"\t\t-v(erbose)\tPrint cancel option 0.\n"
+"\n"
+msgstr ""
+
+#: bin/tui-select:94
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""

@@ -21,7 +21,7 @@
 #	Internals
 #
 	ME="${0##*/}"
-	script_version=0.6
+	script_version=0.9
 	
 	# Check the two default places for the core configuration
 	# First systemwide, second user only install
@@ -33,37 +33,30 @@
 	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then 	# Load required variables
 		source "$TUI_FILE_CONF_COMMANDS"
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
+	TERM="${TERM:-GNU Linux}"
 	break_on_injections "$@" && exit 1
 #
-#	Author: 	Simon Arjuna Erat (sea)
-#	Contact:	erat.simon@gmail.com
-#	License:	GNU General Public License (GPL)
-#	Created:	2014.04.24
-#	Changed:	2015.08.22
-#	Description:	Get a value from an 'conf/ini' file
+#	Translate preps
 #
-#	Variables
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
-	RET_HELP=99
-	beSecure=false
-	TITLE="Get values from conf files"
-	help_text="
-$ME ($script_version - BETA)
+#	Translate strings
+#
+	TITLE="$(gettext 'Get values from conf files')"
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version - BETA
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 $TITLE
 Usage: 		$ME [options] FILE [VALUENAME]
 Example:	$ME -l /etc/default/grub
@@ -75,8 +68,24 @@ Where options are:
 	-i		Is no longer case sensitive
 	-l		Lists values available in the file
 	-s		Use more secure retrieval, but slightly slower
-
-"
+	
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2014.04.24
+#	Changed:	2015.09.17
+#	Description:	Get a value from an 'conf/ini' file
+#
+#	Variables
+#
+	RET_HELP=99
+	beSecure=false
+	help_text="$TR_MSG_TEXT_HELP"
 	OPT=""
 	VALUE=""
 	CONFFILE=""
@@ -88,12 +97,7 @@ Where options are:
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
@@ -117,7 +121,7 @@ Where options are:
 #
 	CONFFILE="$1"
 	VARNAME="$2"
-	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$CONFFILE does not exist!" && exit 1
+	[ ! -f "$CONFFILE" ]  && tui-printf -S 1 "$(eval_gettext '$CONFFILE does not exist!')" && exit 1
 	[ "$CONFFILE" = "${CONFFILE##*/}" ] && CONFFILE="./$CONFFILE"
 	
 	# If VARNAME starts with Pass|password|pw, do not source the conf file but use awk
