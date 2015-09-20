@@ -1,0 +1,64 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-terminal:52
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-terminal:60
+#, sh-format
+msgid ""
+"\n"
+"Usage: $ME \\\"<cmd>\\\"\n"
+"\n"
+"Executes \\\"<cmd>\\\" in another terminal ($TERMINAL) window, closes on "
+"termination according to your setting with that terminal.\n"
+"\t\t\t\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-terminal:75
+#, sh-format
+msgid "$ME: Requires to be in GUI mode"
+msgstr ""
+
+#: bin/tui-terminal:87
+#, sh-format
+msgid ""
+"FATAL ERROR: No terminal could be identified, please set one manually in "
+"$APPS!"
+msgstr ""
+
+#: bin/tui-terminal:115
+#, sh-format
+msgid ""
+"$TERMINAL: Using default option \\\"$opt\\\", please report your terminal "
+"($TERMINAL) and its command execution option."
+msgstr ""

@@ -1,0 +1,70 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-str-usb:61
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-str-usb:69
+#, sh-format
+msgid ""
+"\n"
+"Usage: $ME [options]\n"
+"Select USB device if more than one is found\n"
+"Where options are:\n"
+"\t-h\tThis screen\n"
+"\t-a\tAutoselect entry if only one was found\n"
+"\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-str-usb:125
+msgid "Please connect an USB device..."
+msgstr ""
+
+#: bin/tui-str-usb:145
+msgid "The only device available is:"
+msgstr ""
+
+#: bin/tui-str-usb:146
+msgid "Is this a card reader that is always listed?"
+msgstr ""
+
+#: bin/tui-str-usb:147
+msgid "Ignore this device in future calls?"
+msgstr ""
+
+#: bin/tui-str-usb:151
+msgid "Do you want to be asked to select this device every time?"
+msgstr ""
+
+#: bin/tui-str-usb:152
+msgid "No, might result in that device being auto-selected!"
+msgstr ""

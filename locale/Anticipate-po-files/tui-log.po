@@ -1,0 +1,61 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-log:75
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-log:84
+#, sh-format
+msgid ""
+"\n"
+"Usage: \t\t$ME [options] \\\"LOGFILE\\\" \\\"Message\\\"\n"
+"Examples:\t$ME \\\"/var/log/appname.log\\\" \\\"Message\\\"\n"
+"\t\t$ME -dtp \\\"LOGFILE\\\" \\\"Server started\\\"\n"
+"\t\t$ME -pu \\\"LOGFILE\\\" \\\"Changed background\\\"\n"
+"\t\t\n"
+"Where options are:\n"
+"The order of the options defines the string order.\n"
+"\t-h(elp) \t\tThis screen\n"
+"\t-e(mpty)\t\tPrints just the message or nothing\n"
+"\t-d(ate)\t\t\tAdds the DATE ($D) in front\n"
+"\t-t(ime)\t\t\tAdds the TIME ($T) in front\n"
+"\t-p(id)\t\t\tAdds the PID  ($NUM) in front\n"
+"\t-u(ser)\t\t\tAdds the USER ($USER) in front\n"
+"\t-s(eparator)\tARG\tChanges the the separator ($SEP) to ARG\n"
+"\t-v(verbose)\t\tPrints the MESSAGE also to screen using tui-echo\n"
+"\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-log:148 bin/tui-log:150
+#, sh-format
+msgid "Failed to create $LOG"
+msgstr ""

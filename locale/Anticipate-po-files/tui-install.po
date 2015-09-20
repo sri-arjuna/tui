@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-install:59
+msgid "Install packages"
+msgstr ""
+
+#: bin/tui-install:60
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-install:68
+#, sh-format
+msgid ""
+"\n"
+"Usage: \t\t$ME [options] PACKAGES\n"
+"Examples:\t$ME PACKAGE\n"
+"\t\t$ME -\n"
+"\t\t$ME -q pkg1 pkg2\n"
+"\t\t$ME -l /path/to/logfile.log LIST OF PACKAGES\n"
+"Where options are:\n"
+"\t-h(elp) \t\tThis screen\n"
+"\t-------------------------------------------------------\n"
+"\t-b(ased)\t\tPrints on what the distro is based on and exit\n"
+"\t-d(istro)\t\tPrints the distro name and exit\n"
+"\t-l(og)\t\tARG\tWrites and entry to ARG whether installation was successful "
+"or not\n"
+"\t-q(uiet)\t\tInstall all at once, will fail if not all packages are "
+"available\n"
+"\t-y(es)\t\t\tAutomatically accept the package manager questions\n"
+"\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-install:185
+#, sh-format
+msgid "$ME requires root access!"
+msgstr ""
+
+#: bin/tui-install:187
+msgid "Installing as dependency:"
+msgstr ""
+
+#: bin/tui-install:235
+msgid "Intalled"
+msgstr ""
+
+#: bin/tui-install:236
+msgid "Intalling"
+msgstr ""
+
+#: bin/tui-install:237
+msgid "Successfully installed"
+msgstr ""
+
+#: bin/tui-install:238
+msgid "Failed to install"
+msgstr ""
+
+#: bin/tui-install:251
+msgid "Execute:"
+msgstr ""
+
+#: bin/tui-install:271
+#, sh-format
+msgid "There were $ERR_NO errors, namely these:"
+msgstr ""
+
+#: bin/tui-install:277
+msgid "Trying to execute"
+msgstr ""

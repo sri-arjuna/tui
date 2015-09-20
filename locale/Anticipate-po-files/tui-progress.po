@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-progress:50
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-progress:58
+#, sh-format
+msgid ""
+"\n"
+"Usage: \t$ME [options] [\\\"Message\\\"]\n"
+"\n"
+"Where options are:\n"
+"\t-h(elp) \t\tThis screen\n"
+"\t-b(ar)\t\t\tEnables the \\\"bar\\\" mode (minimal)\n"
+"\t-B(ar)\t        VAL     Changes the bar-symbol to VAL\n"
+"\t-c(urrent)\tVAL\tRequired for bar-mode\n"
+"\t-C(learline)\t\tClear the line before print a new value, recommended if "
+"you pass multiple files\n"
+"\t-m(ax)\t\tVAL\tIf provided, changes progress-string output to \\"
+"\"calculated-num / VAL \\\"\n"
+"\t-l(ong)\t\t\tPrints more info when in bar mode.\n"
+"\t-i(dent)\tVAL\tVAL is used as part of tempfile name tui-progress use, if "
+"used in multiple instances\n"
+"\t\t\t\tShould be provided if used with -m\n"
+"\t-r(eset)\t\tResets the tempfile, should be used before one is passing \n"
+"\n"
+"When called without options, it simply displays a rotating dash (-/|\\) on "
+"the right side.\n"
+"When called with option \\\"-m NUM\\\" it increments the number found in the "
+"tempfile, and showing [ incr/NUM ], before using this mode, you should reset "
+"the tempfile (-r), or use a specific tempfile identifier (-i STRING_ID).\n"
+"You can overwrite the requirement for a tempfile, if you pass \\\"-c NUM\\"
+"\".\n"
+"When called with \\\"-b\\\", the options \\\"-m NUM\\\" and \\\"-c NUM\\\" "
+"are both required.\n"
+"\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-progress:235
+#, sh-format
+msgid ""
+"Usage: $ME [-r] [-m \\$MAV_VALUE]  [-bc \\$CUR_VALUE] [-l]]  \\\"msg\\\""
+msgstr ""
+
+#: bin/tui-progress:256
+#, sh-format
+msgid ""
+"$ME: Should have called \\\"${TUI_FONT_BOLD}$ME -r\\\" first!"
+"${TUI_FONT_RESET}"
+msgstr ""

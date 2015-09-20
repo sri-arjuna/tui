@@ -1,0 +1,272 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-ftp:68
+msgid "TUI handler for FTP tasks"
+msgstr ""
+
+#: bin/tui-ftp:69
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-ftp:77
+#, sh-format
+msgid ""
+"\n"
+"${TITLE}\n"
+"Usage: \t\t$ME [options]\n"
+"Examples:\t$ME -U myuser -P myPassword -f /local/file -r /remote/path "
+"mydomain.com:23\n"
+"\t\t$ME -d /remote/file -l /local/path mydomain.com\n"
+"Where options are:\n"
+"\t-h(elp) \t\tThis screen\n"
+"\t-L(og)\t\t\tView the logfile\n"
+"\t-q(uiet)\t\tMutes all output\n"
+"\t-v(erbose)\t\tEnables the scripts verbosity\n"
+"\n"
+"    ----General use----\n"
+"\t-H(ost)\tHOST[:PORT]\tRemote host\n"
+"\t-U(user)\tNAME\tRemote user\n"
+"\t-P(assword)\tWORD\tRemote password\n"
+"\t-B(atch)\tFILE\tScript with ftp commands to execute\n"
+"\t-c(ommand) \\\"cmd1 ; cmd2 ... \\\"\tList of commands to execute upon "
+"successful login\n"
+"\n"
+"    ----Modes----\n"
+"    \t-a(active)\t\tForce active mode\n"
+"\t-p(assiv)\t\tForce passiv mode\n"
+"\t\n"
+"    ----Upload file----\n"
+"\t-f(ile) \tFILE\tLocal file to upload\n"
+"\t-r(emote)\tPATH\tRemote path to upload the file to\n"
+"\n"
+"    ---Download file----\n"
+"\t-d(ownload)\tFILE\tRemote file to download\n"
+"\t-l(ocal)\tPATH\tLocal path to download file to\n"
+"\n"
+"For each call, you can either only Up- or Download files or execute "
+"commands.\n"
+"NOTE: I have no idea how those batch files should look like, please see the "
+"according ftp commands man page.\n"
+"\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-ftp:142
+#, sh-format
+msgid "Connecting to $HOST"
+msgstr ""
+
+#: bin/tui-ftp:147
+#, sh-format
+msgid "Connected to $HOST"
+msgstr ""
+
+#: bin/tui-ftp:181
+msgid "Error parsing:"
+msgstr ""
+
+#: bin/tui-ftp:188
+msgid "Parsing log..."
+msgstr ""
+
+#: bin/tui-ftp:202
+#, sh-format
+msgid "Failed to load: $CONFIG"
+msgstr ""
+
+#: bin/tui-ftp:228
+#, sh-format
+msgid "Process ID: $NUM"
+msgstr ""
+
+#: bin/tui-ftp:229
+#, sh-format
+msgid "FTP Command: $FTP"
+msgstr ""
+
+#: bin/tui-ftp:238
+msgid "Forced silence"
+msgstr ""
+
+#: bin/tui-ftp:241
+msgid "Enabled verbosity"
+msgstr ""
+
+#: bin/tui-ftp:246
+msgid "Force active mode"
+msgstr ""
+
+#: bin/tui-ftp:248 bin/tui-ftp:257
+#, sh-format
+msgid ""
+"Please see the man page of $FTP, section Settings to see how to ${log_msg}"
+msgstr ""
+
+#: bin/tui-ftp:250 bin/tui-ftp:259
+#, sh-format
+msgid "$FTP does not support the enforcing of passive mode."
+msgstr ""
+
+#: bin/tui-ftp:255
+msgid "Force passiv mode"
+msgstr ""
+
+#: bin/tui-ftp:264
+#, sh-format
+msgid "Set user to: $USERNAME"
+msgstr ""
+
+#: bin/tui-ftp:266
+msgid "Set password to: *******"
+msgstr ""
+
+#: bin/tui-ftp:268
+#, sh-format
+msgid "Added batch file to execute: $OPTARG"
+msgstr ""
+
+#: bin/tui-ftp:271
+#, sh-format
+msgid "Set commands to parse: $OPTARG"
+msgstr ""
+
+#: bin/tui-ftp:275
+#, sh-format
+msgid "Added file to upload: $OPTARG"
+msgstr ""
+
+#: bin/tui-ftp:278
+#, sh-format
+msgid "Added download target: $OPTARG"
+msgstr ""
+
+#: bin/tui-ftp:282
+#, sh-format
+msgid "Added file to download: $OPTARG"
+msgstr ""
+
+#: bin/tui-ftp:285
+#, sh-format
+msgid "Added upload target: $OPTARG"
+msgstr ""
+
+#: bin/tui-ftp:298
+#, sh-format
+msgid "Set host to: $HOST"
+msgstr ""
+
+#: bin/tui-ftp:315
+msgid "Please select which ftp command you want to use:"
+msgstr ""
+
+#: bin/tui-ftp:320
+#, sh-format
+msgid "Set ftp command to: $FTP"
+msgstr ""
+
+#: bin/tui-ftp:322
+#, sh-format
+msgid "Saved $FTP as FTP"
+msgstr ""
+
+#: bin/tui-ftp:382
+msgid "Generated command list..."
+msgstr ""
+
+#: bin/tui-ftp:385
+msgid "Executing custom command list"
+msgstr ""
+
+#: bin/tui-ftp:393
+msgid "Generate download commands..."
+msgstr ""
+
+#: bin/tui-ftp:408
+#, sh-format
+msgid "Generate download list: $REM to $LOC"
+msgstr ""
+
+#: bin/tui-ftp:416
+msgid "Generated download list."
+msgstr ""
+
+#: bin/tui-ftp:419
+msgid "Downloading file"
+msgstr ""
+
+#: bin/tui-ftp:420
+msgid "Downloaded file"
+msgstr ""
+
+#: bin/tui-ftp:423
+msgid "Generate upload commands..."
+msgstr ""
+
+#: bin/tui-ftp:438
+#, sh-format
+msgid "Generate upload list: $LOC to $REM"
+msgstr ""
+
+#: bin/tui-ftp:446
+msgid "Generated upload list."
+msgstr ""
+
+#: bin/tui-ftp:448
+msgid "Uploading file"
+msgstr ""
+
+#: bin/tui-ftp:452
+msgid "There was an error!"
+msgstr ""
+
+#: bin/tui-ftp:463
+msgid "No host supplied."
+msgstr ""
+
+#: bin/tui-ftp:469
+#, sh-format
+msgid "Add $HOST to $HOME/.netrc for automatic login?"
+msgstr ""
+
+#: bin/tui-ftp:474
+msgid "Change any loginame / password?"
+msgstr ""
+
+#: bin/tui-ftp:487
+#, sh-format
+msgid "Warning: $BATCH contains invalid command for $FTP: $block"
+msgstr ""
+
+#: bin/tui-ftp:535
+#, sh-format
+msgid ""
+"There were $RAN ftp calls, do you want to see the logfile and clear it after?"
+msgstr ""

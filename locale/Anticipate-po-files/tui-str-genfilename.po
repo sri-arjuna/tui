@@ -1,0 +1,72 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-str-genfilename:49
+#, sh-format
+msgid ""
+"\n"
+"GNU $ME, Version $script_version\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-str-genfilename:57
+#, sh-format
+msgid ""
+"\n"
+"Usage: $ME [options] [/path/to/]BASENAME.EXT [NEW_EXTENSION]\n"
+"\n"
+"Examples:\t$ME input.txt\n"
+"\t\t2> input.txt exists, appending number.\n"
+"\t\t1> input.0.txt\n"
+"\n"
+"\t\t$ME input.txt html\n"
+"\t\t1> input.html\n"
+"\n"
+"If a NEW_EXTENSION is provided, it will be replacing EXT (if exists).\n"
+"If BASENAME with either the existing EXT or the NEW_EXTENSION already "
+"exists, a number will be inserted before the file its new/old EXT.\n"
+"If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will "
+"become its extension.\n"
+"The number will be increased until the generated file name does not exist "
+"yet.\n"
+"\n"
+"Report bugs to: erat.simon@gmail.com\n"
+"TUI home page: <http://www.gnu.org/software/tui/>\n"
+"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+msgstr ""
+
+#: bin/tui-str-genfilename:123
+#, sh-format
+msgid "$NAME_INIT exists, appending/increasing number."
+msgstr ""
+
+#: bin/tui-str-genfilename:129
+#, sh-format
+msgid "Checking for $NAME_CHECK"
+msgstr ""
+
+#: bin/tui-str-genfilename:132
+#, sh-format
+msgid "$NAME_CHECK is available"
+msgstr ""
