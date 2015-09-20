@@ -22,8 +22,8 @@
 #
 #	Variables
 #
-	ME=${0##*/}
-	script_version=0.6
+	ME="${0##*/}"
+	script_version=0.9
 	beVerbose=false
 	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -32,22 +32,49 @@
 	# Get the main config files
 	# 
 	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
-	then 	# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
+	then 	$TUI_FILE_CONF_COMMANDS
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: $ME [options] [/path/to/]BASENAME.EXT [NEW_EXTENSION]
+
+Examples:	$ME input.txt
+		2> input.txt exists, appending number.
+		1> input.0.txt
+
+		$ME input.txt html
+		1> input.html
+
+If a NEW_EXTENSION is provided, it will be replacing EXT (if exists).
+If BASENAME with either the existing EXT or the NEW_EXTENSION already exists, a number will be inserted before the file its new/old EXT.
+If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will become its extension.
+The number will be increased until the generated file name does not exist yet.
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
+
 #
 #	Functions
 #
@@ -55,31 +82,12 @@
 	# Shows the basic help screen
 	#
 		cat <<-EOF
-			$ME ($script_version)
-			Usage: $ME [options] [/path/to/]BASENAME.EXT [NEW_EXTENSION]
-			
-			Examples:	$ME input.txt
-			 		2> input.txt exists, appending number.
-			 		1> input.0.txt
-			 		
-			 		$ME input.txt html
-			 		1> input.html
-
-			If a NEW_EXTENSION is provided, it will be replacing EXT (if exists).
-			If BASENAME with either the existing EXT or the NEW_EXTENSION already exists, a number will be inserted before the file its new/old EXT.
-			If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will become its extension.
-			The number will be increased until the generated file name does not exist yet.
-			
+			$TR_MSG_TEXT_HELP
 		EOF
 	}
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ -z "$1" ] && showHelp && exit
@@ -102,7 +110,7 @@
 	this="$1"	# File without EXT?
 	EXT=$(tui-str-extension "$this")	# OLD
 	ext="${2:-$EXT}"	# Fill 'ext' with old EXT if its empty
-	this=${this%%$EXT}
+	this="${this%%$EXT}"
 #
 #	Action & Display
 #
@@ -112,16 +120,16 @@
 	
 	if [ -f "$NAME_INIT" ]
 	then	$beVerbose && \
-			echo "$NAME_INIT exists, appending/increasing number." > /dev/stderr
+			echo "$(eval_gettext '$NAME_INIT exists, appending/increasing number.')" >&2
 		C=0		# Counter
 		NAME_CHECK="$this$C.$ext"
 		while [ -f "$NAME_CHECK" ]
 		do	C=$(( $C + 1 ))
 			NAME_CHECK="$this$C.$ext"
-			$beVerbose && printf "\r%s" "Checking for $NAME_CHECK" > /dev/stderr
+			$beVerbose && printf "\r%s" "$(eval_gettext 'Checking for $NAME_CHECK')"  >&2
 		done
 		$beVerbose && [ $C -gt 0 ] && \
-			printf "\n%s\n" "$NAME_CHECK is available" > /dev/stderr
+			printf "\n%s\n" "$(eval_gettext '$NAME_CHECK is available')"  >&2
 		
 		# Finally a file that does not exist yet
 		echo "$NAME_CHECK" >&1

@@ -31,44 +31,60 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
 #
 #	Variable defaults
 #
-	script_version=0.8.1
+	script_version=0.9
 	ME="${0##*/}"
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: $ME \"<cmd>\"
+
+Executes \"<cmd>\" in another terminal ($TERMINAL) window, closes on termination according to your setting with that terminal.
+			
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
+
 #
 #	Check for the environment to load
 #
 	! tui-bol-gui && \
-		tui-printf -S 1 "$ME: Requires to be in GUI mode" && \
+		tui-printf -S 1 "$(eval_gettext '$ME: Requires to be in GUI mode')" && \
 		exit 1
 	
-	if ! which $TERMINAL 2>/dev/zero 1>/dev/zero
+	if ! which "$TERMINAL" 2>/dev/zero 1>/dev/zero
 	then	# List of known but possible unhandled terminals
 		list="$(<$TUI_DIR_LIST/terminals)"
 		found=false
 		for TERMINAL in $list;do
-			which $TERMINAL 1>/dev/zero 2>/dev/zero && found=true && break
+			which "$TERMINAL" 1>/dev/zero 2>/dev/zero && found=true && break
 		done
-		$found && tui-conf-set -v ${TUI_USER_CONF/user/apps/} TERMINAL $TERMINAL
+		$found && tui-conf-set -v "${TUI_USER_CONF/user/apps/}" TERMINAL "$TERMINAL"
 		! $found && \
-			tui-printf -S 1 "FATAL ERROR: No terminal could be identified, please set one manually in $APPS!" && \
+			tui-printf -S 1 "$(eval_gettext 'FATAL ERROR: No terminal could be identified, please set one manually in $APPS!')" && \
 			exit 1
 	fi
 #
@@ -76,22 +92,11 @@
 #
 	case "$1" in
 	"--version")
-		cat <<-EOF
-			GNU $ME, Version $script_version
-			Copyright (C) 2015 Simon Arjuna Erat
-			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-			This is free software; you are free to change and redistribute it.
-			There is NO WARRANTY, to the extent permitted by law.
-		EOF
+		echo "$TR_MSG_TEXT_VERSION"
 		exit 0
 		;;
 	"-h"|"--help")
-		printf '%s\n' \
-			"$ME ($script_version)" \
-			"Usage: $ME \"<cmd>\"" \
-			"Executes <cmd> in another terminal ($TERMINAL) window, closes on termination according to your setting with that terminal." \
-			""
+		echo "$TR_MSG_TEXT_HELP"
 		exit $RET_HELP
 		;;
 	esac
@@ -107,7 +112,7 @@
 		[ -z "$1" ] && opt="" || opt="-e "
 		# Fill the fallback, to avoid empty calls
 		TERMINAL="${TERMINAL:-xterm}"
-		tui-echo "$TERMINAL: Using 'default' option \"$opt\", please report your terminal ($TERMINAL) and its command execution option." > /dev/stderr
+		tui-echo "$(eval_gettext '$TERMINAL: Using default option \"$opt\", please report your terminal ($TERMINAL) and its command execution option.')" >&2
 		;;
 	esac
 #

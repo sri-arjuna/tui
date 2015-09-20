@@ -34,27 +34,10 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	TERM="${TERM:-GNU Linux}"
 	break_on_injections "$@" && exit 1
-	. gettext.sh
-	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
-	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
-	export TEXTDOMAIN TEXTDOMAINDIR
 	# If there is a user theme directory, use that one instead
 	[ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ] && \
 		use_DIR_THEME="$TUI_DIR_USER_THEMES" || \
@@ -66,19 +49,42 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.0c
+	script_version=0.9.0d
 	ME="${0##*/}"
-	MSG_TR_YESNO="$(gettext 'y/n')"
-	MSG_TR_help_text="$(eval_gettext '
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 	$ME \"Question\"
 
-Example: (Accepts: 'y,o,j,s', denies everything else)
-	if $ME 'Do you want to do this?'
-	then echo yes
-	else echo no
+Example: (Accepts: \"y,o,j,s\", denies everything else)
+	if $ME \"Do you want to do this?\"
+	then 	echo \"yes\"
+	else 	echo \"no\"
 	fi
 
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
+
+
+	MSG_TR_YESNO="$(gettext 'y/n')"
 	answer=""
 	GREP="${GREP:-\grep}"
 	READ="${READ:-\read}"
@@ -106,23 +112,15 @@ Example: (Accepts: 'y,o,j,s', denies everything else)
 #	Variable handling
 #
 	case "$1" in
-	"")	printf "$MSG_TR_help_text"
+	"")	echo "$TR_MSG_TEXT_HELP"
 		exit "$RET_HELP"
 		;;
 	"--version")
-		MSG_TR_version_text="$(eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-')"
-		printf "$MSG_TR_version_text"
+		echo "$TR_MSG_TEXT_VERSION"
 		exit 0
 		;;
 	"-h"|"--help")
-		printf "$MSG_TR_help_text"
+		echo "$TR_MSG_TEXT_HELP"
 		exit "$RET_HELP"
 		;;
 	esac
@@ -132,7 +130,7 @@ There is NO WARRANTY, to the extent permitted by law.
 #
 	while ! echo "${answer,,}" | "$GREP" -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
 	do	tui-printf "$1" >&2
-		printf "\r$BORDER_LEFT $1 (y/n) " >&2
+		printf "\r$BORDER_LEFT $1 ($MSG_TR_YESNO) " >&2
 		"$bash_read_numbers" && \
 			"$READ" -n1 answer || \
 			"$READ" answer

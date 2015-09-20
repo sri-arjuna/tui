@@ -24,7 +24,7 @@ cat > "$DEST" << EOF
 # ------------------------------------------------------------------------
 #
 #	Description:
-#	TODO text here ....
+#	TODO: Your text here ....
 #
 #
 #
@@ -36,6 +36,7 @@ cat > "$DEST" << EOF
 	script_title="${DEST##*/}"
 	script_author="$USER_NAME"
 	script_contact="$USER_EMAIL"
+	script_url="$USER_HOMEPAGE"
 	script_license="$DEFAULT_LICENSE"
 	script_created="$(date +'%Y.%m.%d')"
 	script_changed="$(date +'%Y.%m.%d')"
@@ -66,10 +67,35 @@ cat > "$DEST" << EOF
 	var=""
 #
 #	Messages to translate:
-#	(help & version texts are separate)
 #
 	MSG_XY="\$(gettext 'Hello world!')"
 	MSG_TR_CONFIG_BY="\$(gettext 'Configuration file written by')"
+	MSG_TR_VERSION="\$(eval_gettext '\${script_name}\${script_package_txt}, Version \$script_version
+Copyright (C) $(date +'%Y') $USER_NAME
+License $DEFAULT_LICENSE or later <$DEFAULT_LICENSE_URL>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	MSG_TR_HELP="\$(eval_gettext 'SYNTAX
+	\$script_name [options] arguments ...')"
+
+OPTIONS
+	-h|--help		Shows this screen and exits
+	--version		Shows the version and exits
+	
+	--YOUROPT ARG		Sets \"opt_str\" to ARG
+	-L|--log		Shows the logfile and exits
+	-C|--config		Opens the configuration editor
+	
+
+Please report command bugs (in english, with LC_ALL=C) to: <$USER_EMAIL>
+\${script_package}Homepage: <$USER_HOMEPAGE>
+For more help on how to use GNU-Software: <http://www.gnu.org/gethelp/>
+')"
+	MSG_TR_XY="\$(gettext '')"
+	MSG_TR_XX="\$(gettext '')"
+	MSG_TR_YY="\$(eval_gettext '')"
 #
 #	Functions
 #
@@ -95,47 +121,38 @@ cat > "$DEST" << EOF
 	cleanup() { 
 	# Removes all known tempfiles and exits
 	# Is called at the end of the script and by the trap
-		tmp_KNOWN=(
+		declare -a arr_CLEANUP=(
 			"\$TMP"
 			# Add your tempfiles
 			# here
 			)
-		for remove in "\${tmp_KNOWN[@]}"
-		do 	[ -f "\$remove" ] && rm -f "\$remove"
+		for remove in "\${arr_CLEANUP[@]}"
+		do 	( [ -f "\$remove" ] || [ -p "\$remove" ] ) && rm -f "\$remove"
 		done
 	}
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		MSG_TR_HELP="\$(eval_gettext 'Usage:	\$script_name [options] arguments ...
-Options:
-	-h|--help		Shows this screen and exits
-	--version		Shows the version and exits
-	-L|--log		Shows the logfile and exits
-	-C|--config		Opens the configuration editor
-	--YOUROPT ARG		Sets 'opt_str' to ARG
-')"
-		echo "\$MSG_TR_HELP"
+		echo "\$MSG_TR_HELP_LONG"
 		exit 99
 	}
 	show_version() {
 	# Prints the version of the script
 	# and exits
-		MSG_TR_VERSION="$(eval_gettext '\$script_name, Version \$script_version
-Copyright (C) $(date +'%Y') $USER_NAME
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-')"
 		echo "\$MSG_TR_VERSION"
 		exit 111
+	}
+	show_help() {
+	# Prints the helpscreen	
+	# and exits
+		echo "\$MSG_TR_HELP"
+		exit 99
 	}
 #
 #	Traps are cool!
 #
 	# TRAP FUNCTION/"COMMAND" MODE's ...
-	#trap cleanup INT ERR
+	trap cleanup INT ERR QUIT KILL ABRT
 #
 #	Get options
 #
@@ -152,7 +169,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		--version)	show_version	;;
 		--)		shift ; break	;;
 		-C|--config)	tui-conf-editor	"\$script_config"
-				exit \"\$?\"
+				exit \$?
 				;;
 		-L|--log)	tui-cat "\$LOG"
 				tui-press

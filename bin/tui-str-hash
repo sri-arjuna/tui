@@ -28,19 +28,6 @@
 	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then 	# Load required variables
 		source "$TUI_FILE_CONF_COMMANDS"
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
@@ -50,9 +37,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.03.26
-#	Changed:	2015.08.02
-	script_version=0.4
-	TITLE="tui-str-hash"
+#	Changed:	2015.09.17
+	script_version=0.9
 #	Description:	hashing text on the fly
 #
 #
@@ -65,11 +51,24 @@
 #
 	beVerbose=false
 #
-#	Help text
+#	Translate preps
 #
-	help_text="
-$ME ($script_version)
-${TITLE^}
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME [options] arguments
 Examples:	$ME 'teststring'
 		$ME -t 384 'teststring'
@@ -78,19 +77,22 @@ Where options are:
 	-h(elp) 		This screen
 	-t(ype)		TYPE	Pass which type of hashing you want, default/fallback: md5sum
 
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
+
+	help_text="$TR_MSG_TEXT_HELP
 "
+	TR_MSG_WORD_HASHING="$(gettext 'Hashing:')"
 #
 #	Catching Arguments
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
-		GNU $ME, Version $script_version
-		Copyright (C) 2015 Simon Arjuna Erat
-		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-		This is free software; you are free to change and redistribute it.
-		There is NO WARRANTY, to the extent permitted by law.
+		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
@@ -124,7 +126,7 @@ Where options are:
 	if [ "-" = "$1" ] || [ "--" = "$1" ]
 	then	# Do pipe handling
 		while read stream
-		do 	$beVerbose && tui-title "hashing: \"$A\""
+		do 	$beVerbose && tui-title "$TR_MSG_WORD_HASHING \"$A\""
 			for T in $TOOLS
 			do	str=$(echo -e "$stream" | $T | $AWK '{print $1}')
 				$beVerbose && \
@@ -133,7 +135,7 @@ Where options are:
 			done
 		done
 	else	for A in "${@}"
-		do	$beVerbose && tui-title "hashing: \"$A\""
+		do	$beVerbose && tui-title "$TR_MSG_WORD_HASHING \"$A\""
 			for T in $TOOLS
 			do	str=$(echo -e "$A" | $T | $AWK '{print $1}')
 				$beVerbose && \

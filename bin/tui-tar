@@ -31,32 +31,33 @@
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		# Load language
-		if [ -z "$TUI_LANG" ]
-		then	[ -z "$LANG" ] && LANG=$(locale|sed s,[=\"],\ ,g|awk '/MESS/ {print $2}')
-			lng="$(echo ${LANG/\.*})"
-			echo "$TUI_DIR_LOCALE/"* | grep -q "${lng}" && \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG "$lng" || \
-				tui-conf-set "${HOME:-/root}/.tuirc" TUI_LANG en_GB
-			# Sadly this echo is required to remove tailing spaces, probablly an issue of tui-conf-get (2015.08.21)
-			TUI_LANG="$(echo $(tui-conf-get "${HOME:-/root}/.tuirc" TUI_LANG))"
-		fi
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	. gettext.sh
+#
+#	Variable defaults
+#
+	script_version=0.9
+	ME="${0##*/}"
+#
+#	Translate preps
+#
+	source gettext.sh
 	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
 	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
 	export TEXTDOMAIN TEXTDOMAINDIR
 #
-#	Variable defaults
+#	Translate strings
 #
-	script_version=0.8.9a
-	ME="${0##*/}"
-	help_text="$(eval_gettext '
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: $ME [options] [/path/to/]directory
 Where options are:
 	-h	This screen
@@ -65,7 +66,14 @@ Where options are:
 
 It is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
 
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
+	version_text="$TR_MSG_TEXT_VERSION
+"
+	help_text="$TR_MSG_TEXT_HELP
+"
 	
 	FILE_TEMP="$TUI_DIR_TEMP/tui-tar.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
@@ -78,18 +86,12 @@ It is designed to pass directory names to compress, it will store the tarball in
 	READING="$(gettext 'Reading')"
 	COMPRESSING="$(gettext 'Compressing')"
 	COMPRESSED="$(gettext 'Compressed')"
+	EXTRACTING="$(gettext 'Extracting')"
 #
 #	Variable handling
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-')"
+	
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts hbvx opt
 	do	case "$opt" in
@@ -102,7 +104,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		v)	beVerbose=true
 			;;
 		"")	unset ARGS[@]
-			ARGS[0]=$(tui-read "Enter (absolute) path to tar:")
+			ARGS[0]=$(tui-read "$(gettext 'Enter (absolute) path to tar:')")
 			;;
 		esac
 	done
@@ -162,8 +164,8 @@ There is NO WARRANTY, to the extent permitted by law.
 							size_output=$($LS -l "$CURRENT"|$AWK '{print $5}') || \
 							size_output=0
 						if $showBar
-						then	tui-progress -bi $$ -m $size_tarball -c $size_output "Extracting \"$CURRENT\"..."
-						else	tui-progress -i $$ -m ${#list_tarball[@]} -c $COUNT "Extracting \"$FOLDER\"..."
+						then	tui-progress -bi $$ -m $size_tarball -c $size_output "$EXTRACTING \"$CURRENT\"..."
+						else	tui-progress -i $$ -m ${#list_tarball[@]} -c $COUNT "$EXTRACTING \"$FOLDER\"..."
 						fi
 						sleep 0.7
 					done
@@ -176,7 +178,7 @@ There is NO WARRANTY, to the extent permitted by law.
 			RET=$?
 		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
 			tui-printf -rS 2 "$READING..."
-			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > $FILE_CMD
+			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > "$FILE_CMD"
 			cd "$(dirname $FOLDER)"
 			chmod +x "$FILE_CMD"
 
@@ -188,7 +190,7 @@ There is NO WARRANTY, to the extent permitted by law.
 
 			$showBar && tui-progress -rbm $org_size -i $$
 
-			$FILE_CMD &
+			"$FILE_CMD" &
 			pid=$!
 			sleep 0.5
 			#while [ ! "" = "$(ps|$GREP -v tui|$GREP tar)" ]

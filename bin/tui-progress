@@ -94,7 +94,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 	# internals
 	TYPE=""		# Start with no display mode
-	INDI=( '\' '|' '/' '-' )	# Dont use tui-indi, for asynchronus display
+	INDI=( '\' '\\174' '/' '-' )	# Dont use tui-indi, for asynchronus display
 	TOTAL=$[ ${#INDI[@]} -1 ]
 	WIDTH=${COLUMNS:-$(tput cols)}
 	# id file?
@@ -239,10 +239,17 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 #	Generate output string, and save values
 #
+	INDI=( '/' '-' '\')	# Dont use tui-indi, for asynchronus display
 	case "${TYPE}" in
 	DASH)	# Regular animated dash
 		[ "$VAL" -gt 3 ] && VAL=0
-		STATUS="[  ${INDI[$VAL]}   ]"
+		case $VAL in
+		0|1|2)	STATUS="[  ${INDI[$VAL]}   ]"	;;
+		3)	. $TUI_DIR_THEMES/$TUI_THEME
+			n=$(( $WIDTH - ${#BORDER_LEFT} - 9 ))
+			POS="\033[${n}G"
+			STATUS="$POS[  \174   ]"	;;
+		esac
 		;;
 	NUM)	# Show incrementing number
 		[ "$VAL" -gt "$MAX" ] && \

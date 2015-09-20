@@ -32,11 +32,6 @@
 	else	source tuirc
 	fi
 	TERM="${TERM:-GNU Linux}"
-	#break_on_injections "$@" && exit 1
-	. gettext.sh
-	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
-	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
-	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	A simple tool which returns the string of the selected num-id
 #
@@ -60,12 +55,29 @@
 #	Variables
 #	
 	ME="${0##*/}"
-	script_version=0.9.0d
+	script_version=0.9.1
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
-	help_text="$(gettext '
-$ME ($script_version)
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME \[options\] item1 item2 ..
 Examples:	ret=\$($ME one two three)
 		$ME *
@@ -74,7 +86,15 @@ Where options are:
 		-a		Auto select if only one entry was found
 		-v(erbose)	Print cancel option 0.
 
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
+
+	help_text="$TR_MSG_TEXT_HELP
+"
+	version_text="$TR_MSG_TEXT_VERSION
+"
 #
 #	Check for read capabilities if not set yet
 #
@@ -100,14 +120,7 @@ Where options are:
 #
 	ROWS=""
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text="$(eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-')"
+	
 	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
 	while getopts "12hav" opt
 	do	case "$opt" in

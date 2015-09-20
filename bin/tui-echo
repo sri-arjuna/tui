@@ -53,10 +53,9 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-$ME ($script_version)
 Usage: $ME [[-] | [str1] [str2] [str3]]
 
-	Prints one string on the left"
+	Prints one string on the left
 	Prints two strings left and right
 	Prints three strings left, entered and right
 

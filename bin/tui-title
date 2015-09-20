@@ -32,34 +32,54 @@
 #	source /etc/tuirc && \
 	break_on_injections "$@" && \
 		exit 1
-	script_version=0.9.0a
+	script_version=0.9.0c
 	ME="${0##*/}"
-	TERM="${TERM:-GNU Linux}"
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU $ME, Version $script_version
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: $ME [[-] | [str1] [str2] [str3]]
+
+	Prints one string in the center
+	Prints two strings left and right
+	Prints three strings left, entered and right
+
+Pass \"-\" to read input from pipe
+One can pass empty strings to align the desired output.
+
+Report bugs to: erat.simon@gmail.com
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+
+
 #
 #	Variable handling
 #
 	case "$1" in
 	"--version")
 		cat <<-EOF
-			GNU $ME, Version $script_version
-			Copyright (C) 2015 Simon Arjuna Erat
-			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-			This is free software; you are free to change and redistribute it.
-			There is NO WARRANTY, to the extent permitted by law.
+			$TR_MSG_TEXT_VERSION
 		EOF
 		exit 0
 		;;
 	"-h"|"--help")
-		printf '%s\n' \
-			"$ME ($script_version)" \
-			"Usage: $ME [[-] | [str1] [str2] [str3]]" \
-			"Pass '-' to read input from pipe" \
-			"One can pass empty strings to align the desired output." \
-			"	Prints one string in the center" \
-			"	Prints two strings left and right" \
-			"	Prints three strings left, centered and right" \
-			""
+		echo "$TR_MSG_TEXT_HELP"
 		exit 99
 		;;
 	*)	[ "-" = "${1:0:1}" ] && \
