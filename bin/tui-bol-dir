@@ -136,7 +136,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		# NEXT !
 	done
 	if $beVerbose
-	then	$countFails && tui-status $RET "$(eval_gettext '')" && RET=$FAILED
+	then	$countFails && tui-status $RET "$(eval_gettext 'There has been $FAILED errors.')" && RET=$FAILED
 	else	$countFails && RET=$FAILED
 	fi
 	exit $RET

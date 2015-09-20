@@ -79,7 +79,7 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME \[options\] item1 item2 ..
-Examples:	ret=\$($ME one two three)
+Examples:	ret=\044($ME one two three)
 		$ME *
 Where options are:
 		-1|2		Print that many rows

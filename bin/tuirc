@@ -106,8 +106,8 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	[ -z "$SYSCONFDIR" ] && \
 		printf '%s\n' "$(gettext 'Please attempt a fresh installation of TUI.')" && \
 		( return 1 || exit 1 )
-	source $SYSCONFDIR/tui.conf
-	source $SYSCONFDIR/tuirc
+	source "$SYSCONFDIR/tui.conf"
+	source "$SYSCONFDIR/tuirc"
 #
 #	Functions
 #
@@ -510,13 +510,20 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 #	Display & Action
 #
+		# Freaky this workaround is required because of injection_protection...
+		HIT_TAB="$(gettext 'hit-tab')"
+		COLUMNS="${COLUMNS:-$(tput cols)}"
+		. $TUI_DIR_THEMES/$TUI_THEME
+		n=$(( $COLUMNS - ${#BORDER_LEFT} - 14 ))
+		POS="\033[${n}G"
+		# Actual display
 		tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION) by sea')" \
 				"$MSG_TR_HELLO_USER"
 		tui-printf -T "$(gettext 'Text User Interface - Framework for Scripts')"
 		tui-printf -E "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"
 		tui-printf -E
 		tui-printf -E 	"$(gettext 'If you are looking for the commands of TUI, try this:')" \
-				"$(gettext 'tui-<hit-tab>')"
+				"${POS}tui-\074${HIT_TAB}\076"
 		tui-printf -E 	"$(gettext 'If you are a developer, i highly recommend to read:')" \
 				"$(eval_gettext 'man tui[rc] // ${TUI_FONT_BOLD}info tui${TUI_RESET}')"
 		tui-printf -E 	"$(gettext 'And to check the provided variables, see:')" \
@@ -528,7 +535,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				"tui-new-script [-emrst] [./]SCRIPTNAME"
 		tui-printf -E
 		tui-printf -E 	"$(gettext 'Arguments to this command are:')" \
-				"config html info provides reset reset-yes samples  theme"
+				"config html info provides reset reset-yes samples theme"
 		tui-printf -E 
 		tui-yesno "$(gettext 'Configure it now?')" || exit 0
 		ConfigTUI

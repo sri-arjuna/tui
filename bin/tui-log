@@ -80,6 +80,7 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
+	NUM=$$
 	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME [options] \"LOGFILE\" \"Message\"
 Examples:	$ME \"/var/log/appname.log\" \"Message\"
@@ -92,7 +93,7 @@ The order of the options defines the string order.
 	-e(mpty)		Prints just the message or nothing
 	-d(ate)			Adds the DATE ($D) in front
 	-t(ime)			Adds the TIME ($T) in front
-	-p(id)			Adds the PID  ($$) in front
+	-p(id)			Adds the PID  ($NUM) in front
 	-u(ser)			Adds the USER ($USER) in front
 	-s(eparator)	ARG	Changes the the separator ($SEP) to ARG
 	-v(verbose)		Prints the MESSAGE also to screen using tui-echo

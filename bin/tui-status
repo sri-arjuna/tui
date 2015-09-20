@@ -120,9 +120,10 @@ General help using GNU software: <http://www.gnu.org/gethelp/>')"
 			shift	;;
 		esac
 	done
-	check=$(echo "$1" | tr -d '[:digit:]')
+	arg="$1"
+	check=$(echo "$arg" | tr -d '[:digit:]')
 	if [ ! -z "$check" ]
-	then	echo "$(eval_gettext 'First argument $1 ($check) is not numeric!')" >&2
+	then	echo "$(eval_gettext 'First argument $arg ($check) is not numeric!')" >&2
 		exit 1
 	fi
 

@@ -62,11 +62,11 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage:	$ME [options] [MAX=100] [MIN=0]
-	$ME
-	$ME \$(ls|wc -l)
-	$ME 25000 1000
+	TR_MSG_TEXT_HELP="$(gettext '
+Usage:	tui-log [options] [MAX=100] [MIN=0]
+	tui-log
+	tui-log $(ls|wc -l)
+	tui-log 25000 1000
 
 Note:	MAX is limited to integer size (32767)
 

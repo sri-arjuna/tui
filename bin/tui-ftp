@@ -223,8 +223,9 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		printf "$help_text"
 		exit $RET_HELP
 		;;
-	*)	tui-log -e "$LOG" 
-		tui-log -t "$LOG" "$(eval_gettext 'Process ID: $$')"
+	*)	tui-log -e "$LOG"
+		NUM=$$
+		tui-log -t "$LOG" "$(eval_gettext 'Process ID: $NUM')"
 		tui-log -t "$LOG" "$(eval_gettext 'FTP Command: $FTP')"
 		;;
 	esac

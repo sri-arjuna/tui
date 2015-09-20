@@ -63,11 +63,11 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-	TR_MSG_TEXT_HELP="$(eval_gettext '
+	TR_MSG_TEXT_HELP="$(gettext '
 Usage: 		$ME
 
 Examples:	$ME 
-		tui-status \$? \"User is root\"
+		tui-status $? "User is root"
 
 Where options are:
 	-h(elp) 		This screen

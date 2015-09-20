@@ -74,7 +74,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME [options] MSG
 Examples:	$ME \"What is your favorite color?\"
-		password=\$($ME -np \"Enter your password:\")
+		password=\044(tui-read -np \"Enter your password:\")
 	-n	does not accept empty strings
 	-p	does not show chars on input
 
