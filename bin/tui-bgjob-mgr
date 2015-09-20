@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (GPL) for more details.
 #
 # You should have received a copy of the GNU General Public License (GPL)
@@ -47,7 +47,7 @@
 #
 #	Script Environment
 #
-	ME="${0##*/}"				# Basename of tui-bg-scripts
+	ME="${0##*/}"				# Base name of tui-bg-scripts
 	ME="${ME/.sh/}"				# Cut off .sh extension
 	[ ! "." = "$(dirname $0)" ] && \
 		ME_DIR="$(dirname $0)" || \
@@ -121,7 +121,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	TR_MSG_WORD_STATUS="$(gettext 'Status:')"
 	TR_MSG_WORD_SUMMARY="$(gettext 'Summary:')"
 
-	# Statusdisplay on errors 127/130
+	# Status display on errors 127/130
 	TR_MSG_WORD_CANCEL="$(gettext 'cancel')"
 	TR_MSG_WORD_TYPO="$(gettext 'typo')"
 
@@ -136,7 +136,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	TR_MSG_TEXT_TYPO="$(gettext 'Typo in script:')"
 	TR_MSG_TEXT_INVALID="$(eval_gettext 'Invalid STATUS ($STATUS) on $C $this_script')"
 
-	# Finaly summary
+	# Final summary
 	TR_MSG_TEXT_COMPLETED="$(gettext 'Scripts completed')"
 	TR_MSG_TEXT_CURRENTLY="$(gettext 'Currently running:')"
 	TR_MSG_TEXT_EXECUTED="$(gettext 'Successfully executed:')"
@@ -284,7 +284,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				source "$LANG_FILE"
 				case "$STATUS" in
 				0|1)	tui-status "$STATUS" "$TR_MSG_WORD_FINISHED $this_script"  ;;
-				2)	tui-status "$STATUS" "$TR_MSG_WORD_RUNNIN $this_script" ;;
+				2)	tui-status "$STATUS" "$TR_MSG_WORD_RUNNING $this_script" ;;
 				3)	tui-status "$STATUS" "$TR_MSG_WORD_WAITING $this_script"	;;
 				127)	tui-status 1 "$TR_MSG_TEXT_TYPO \"$this_script\""	;;
 				*)	tui-status 1 "$TR_MSG_TEXT_INVALID"	;;

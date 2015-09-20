@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -24,7 +24,7 @@
 	script_version=0.9
 	
 	# Check the two default places for the core configuration
-	# First systemwide, second user only install
+	# First system wide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
@@ -60,8 +60,8 @@ There is NO WARRANTY, to the extent permitted by law.
 $TITLE
 Usage: 		$ME [options] FILE [VALUENAME]
 Example:	$ME -l /etc/default/grub
-		$ME /etc/default/grub GRUB_CMDLINE_LINUX
-		$ME -i /etc/default/grub grub_cmdline_linux
+		$ME /etc/default/grub GRUB_CMD LINE_LINUX
+		$ME -i /etc/default/grub grub_cmd line_Linux
 		
 Where options are:
 	-h		This screen

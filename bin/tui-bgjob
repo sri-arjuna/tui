@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -65,9 +65,9 @@ $ME ($script_version)
 Usage:	$ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 NOTE:	'Progress String' may contain shell escaped commands.
 
-	-f [/path/to/]file\tPrint the filesize of passed file
-	-s [/path/to/]orgfile\tSwitches to progressbar if -f file is passed too
-	-e BYTESEXPECTED\tRequired to adjust the progressbar, leave out to just print the actual file size
+	-f [/path/to/]file\tPrint the file size of passed file
+	-s [/path/to/]orgfile\tSwitches to progress-bar if -f file is passed too
+	-e NUM_as_BYTES\tRequired to adjust the progressbar, leave out to just print the actual file size
 
 Executes SCRIPTFILE and prints 'Progress String' while running.
 Prints 'Exit String' when done, regardless of exit code (0,1,?) it uses.

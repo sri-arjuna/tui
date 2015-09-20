@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
@@ -22,7 +22,7 @@
 #	Init TUI environment
 #
 	# Check the two default places for the core configuration
-	# First systemwide, second user only install
+	# First system wide, second user only install
 	for tmp_task in "/etc" "$HOME/.local"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && break
 	done

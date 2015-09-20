@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -23,7 +23,7 @@
 	ME="${0##*/}"	# Name
 	script_version=1.2
 	# Check the two default places for the core configuration
-	# First systemwide, second user only install
+	# First system wide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
@@ -68,11 +68,11 @@ Where options are:
 	-l(ong)			Prints more info when in bar mode.
 	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
 				Should be provided if used with -m
-	-r(eset)		Resets the tempfile, should be used before one is passing 
+	-r(eset)		Resets the temp file, should be used before one is passing 
 
 When called without options, it simply displays a rotating dash (-/|\) on the right side.
-When called with option \"-m NUM\" it increments the number found in the tempfile, and showing [ incr/NUM ], before using this mode, you should reset the tempfile (-r), or use a specific tempfile identifier (-i STRING_ID).
-You can overwrite the requirement for a tempfile, if you pass \"-c NUM\".
+When called with option \"-m NUM\" it increments the number found in the temp file, and showing [ incr/NUM ], before using this mode, you should reset the temp file (-r), or use a specific temp file identifier (-i STRING_ID).
+You can overwrite the requirement for a temp file, if you pass \"-c NUM\".
 When called with \"-b\", the options \"-m NUM\" and \"-c NUM\" are both required.
 
 Report bugs to: erat.simon@gmail.com
@@ -140,7 +140,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		#echo was here
 	}
 	save_tmp() { # VAL
-	# Saves VAL in the tempfile according to passed id
+	# Saves VAL in the temp file according to passed id
 	#
 		[ -z "$1" ] && return 1
 		if "$hasID"
@@ -149,7 +149,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		fi
 	}
 	read_tmp() { 
-	# Reads VAL in the tempfile according to passed id
+	# Reads VAL in the temp file according to passed id
 	# Returns VAL
 		if "$hasID"
 		then	tui-conf-get "$TMPFILE" "$ID"
@@ -214,7 +214,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 	case "${TYPE}" in
 	DASH|NUM)
-		# Create initial tempfile if none exists
+		# Create initial temp file if none exists
 		if [ ! -f "$TMPFILE" ]
 		then	if tui-bol-dir "$TUI_DIR_TEMP" 
 			then	touch "$TMPFILE"
@@ -239,7 +239,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 #	Generate output string, and save values
 #
-	INDI=( '/' '-' '\')	# Dont use tui-indi, for asynchronus display
+	INDI=( '/' '-' '\')	# Dont use tui-indi, for asynchronous display
 	case "${TYPE}" in
 	DASH)	# Regular animated dash
 		[ "$VAL" -gt 3 ] && VAL=0
@@ -251,12 +251,12 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			STATUS="$POS[  \174   ]"	;;
 		esac
 		;;
-	NUM)	# Show incrementing number
+	NUM)	# Show increments number
 		[ "$VAL" -gt "$MAX" ] && \
 			echo "$(eval_gettext '$ME: Should have called \"${TUI_FONT_BOLD}$ME -r\" first!${TUI_FONT_RESET}')" >&2
 		STATUS="[ $VAL / $MAX ]"
 		;;
-	BAR)	# Show procent only if wanted
+	BAR)	# Show pro-cent only if wanted
 		fixer_fix=0
 		if "$longBar"
 		then	# Show also procent ($STATUS)

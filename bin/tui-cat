@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -125,7 +125,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	case $MODE in
 	cat)	for arg in "${ARGS[@]}"
 		do 	if [ -f "$arg" ]
-			then 	$TITLE && tui-title "File: $arg"
+			then 	$TITLE && tui-title "$(eval_gettext 'File: $arg')"
 				while IFS="" read -er content #|sed s,"	","    ",g
 				do	# Leading dash
 					[ "-" = "${content:0:1}" ] && \

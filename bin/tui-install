@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -232,8 +232,8 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #	echo "$verbose -- $APP -- $cmd" ; exit
 	# Install depending upon verbosity	
 	#set -x
-	MSG_TR_WORD_INSTALLED="$(gettext 'Intalled')"
-	MSG_TR_WORD_INSTALLING="$(gettext 'Intalling')"
+	MSG_TR_WORD_INSTALLED="$(gettext 'Installed')"
+	MSG_TR_WORD_INSTALLING="$(gettext 'Installing')"
 	MSG_TR_WORD_INSTALLED_SUCCESS="$(gettext 'Successfully installed')"
 	MSG_TR_WORD_INSTALLED_FAILED="$(gettext 'Failed to install')"
 	

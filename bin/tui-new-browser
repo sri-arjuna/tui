@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -79,7 +79,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #	Project related variables
 #
 	optE_bool=false 	# For a working template
-	doTextMode=false	# Which developement will continue after 
+	doTextMode=false	# Which development will continue after 
 	ARG_TOGGLE_ANOTHER=none # For a working template
 	APP_TITLE=""		# Project name
 	APP_BASE=""		# Where is the project root
@@ -124,7 +124,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	if [ -z "$TUI_DIR_PROJECTS" ]
 	then	tui-echo
 		tui-echo "$(gettext 'You have not set \"$TUI_DIR_PROJECTS\" yet.')" \
-			"$(gettext 'All future projects will take that as their topdir.')"
+			"$(gettext 'All future projects will take that as their top dir.')"
 		MSG_MANUAL="$(gettext 'Enter Manual')"
 		oPWD="$PWD";cd "$HOME"
 		declare -a Dirs

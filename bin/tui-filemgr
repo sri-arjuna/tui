@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -60,7 +60,7 @@ There is NO WARRANTY, to the extent permitted by law.
 	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: $ME LOCATION1 [/path/to/]LOCATION2 [../]LOCATION3 ...
 Opens provided LOCATION/s in the file manager.
-Does only work in GUI, unless the enduser (you) has a cli-filebrowser installed.
+Does only work in GUI, unless the end user (you) has a cli-filebrowser installed.
 
 Report bugs to: erat.simon@gmail.com
 TUI home page: <http://www.gnu.org/software/tui/>
@@ -111,7 +111,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		var=FILEMGR_CLI
 	fi
 	
-	# Failsafe check, use first available editor found if set EDITOR was not found
+	# Fail safe check, use first available editor found if set EDITOR was not found
 	if ! which $FILEMGR 2>/dev/zero 1>/dev/zero
 	then 	# The EDITOR is not available, search for default
 		FILEMGR=$(GetAvailableApp $MODE)

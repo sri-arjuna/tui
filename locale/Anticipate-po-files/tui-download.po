@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:04+0200\n"
+"POT-Creation-Date: 2015-09-20 05:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,34 +43,34 @@ msgid ""
 "General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 msgstr ""
 
-#: bin/tui-download:87
+#: bin/tui-download:86
 msgid "Starting new download..."
 msgstr ""
 
-#: bin/tui-download:88
+#: bin/tui-download:87
 msgid "Downloading..."
 msgstr ""
 
-#: bin/tui-download:89
+#: bin/tui-download:88
 msgid "Downloaded"
 msgstr ""
 
-#: bin/tui-download:90
+#: bin/tui-download:89
 msgid "Could find neither curl nor wget!"
 msgstr ""
 
-#: bin/tui-download:91
+#: bin/tui-download:90
 msgid "Which one to install?"
 msgstr ""
 
-#: bin/tui-download:92
+#: bin/tui-download:91
 msgid "Installing"
 msgstr ""
 
-#: bin/tui-download:93
+#: bin/tui-download:92
 msgid "Installed"
 msgstr ""
 
-#: bin/tui-download:105
+#: bin/tui-download:104
 msgid "Enter URL to download:"
 msgstr ""

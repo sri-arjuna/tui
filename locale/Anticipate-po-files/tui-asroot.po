@@ -3,21 +3,23 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: GNU TUI 0.9.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:04+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2015-09-20 05:58+0200\n"
+"PO-Revision-Date: 2015-09-20 06:10+0200\n"
+"Language: en_GB\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Simon A. Erat (sea) <erat.simon@gmail.com>\n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.8.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
-#: bin/tui-asroot:64
+#: bin/tui-asroot:60
 #, sh-format
 msgid ""
 "\n"
@@ -30,17 +32,17 @@ msgid ""
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
 
-#: bin/tui-asroot:72
+#: bin/tui-asroot:68
 #, sh-format
 msgid "Usage: \t\t$ME \\\"command\\\""
 msgstr ""
 
-#: bin/tui-asroot:73
+#: bin/tui-asroot:69
 #, sh-format
 msgid ""
 "\n"
-"Examples:\t$ME \\\"cat /etc/cryptab\\\"\n"
-"\t\t$ME -m \\\"Provide password to show crypttab\\\" \\\"cat /etc/cryptab\\"
+"Examples:\t$ME \\\"cat /etc/crypttab\\\"\n"
+"\t\t$ME -m \\\"Provide password to show crypttab\\\" \\\"cat /etc/crypttab\\"
 "\"\n"
 "Where options are:\n"
 "\t-h(elp) \t\tThis screen\n"
@@ -51,11 +53,11 @@ msgid ""
 "General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 msgstr ""
 
-#: bin/tui-asroot:86
+#: bin/tui-asroot:82
 #, sh-format
 msgid "Please provide the password for $USER"
 msgstr ""
 
-#: bin/tui-asroot:87
+#: bin/tui-asroot:83
 msgid "Please provide the password for root"
 msgstr ""

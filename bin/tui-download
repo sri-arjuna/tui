@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -38,7 +38,7 @@
 #	Changed:2015.09.17
 #
 #
-#	Variable defaultsa
+#	Variable defaults
 #
 	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-${HOME:-/root}/.cache}}"
 	script_version=0.9
@@ -76,7 +76,6 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
 	DEST="" 
 	tui-bol-dir "$TUI_DIR_TEMP"  2>/dev/zero
-	#tui-echo "Downloading to:"  "$(pwd)"
 	LIST_APPS="wget curl"
 	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
 		CURLWGET="$(echo ${LIST_APP/$CURLWGET})"
@@ -149,11 +148,11 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
 		
 		# While its found, assume its till downloading...
-		while [ ! "" = "$(ps|$GREP $CURLWGET)" ] #|| [ ! "" = "$(ps $!)" ]
+		while [ ! "" = "$(ps|$GREP $CURLWGET)" ]
 		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
 			COLUMNS="$(tput cols)"
 			str_middle="$THIS ($tmp_size)"
-			tui-progress "$str_left" "${str_middle_corrected}" #"[  $(tui-indi)   ]"
+			tui-progress "$str_left" "${str_middle_corrected}"
 			sleep 1
 		done
 		tui-status $? "${MSG_ACT_ING}: ${THIS}"

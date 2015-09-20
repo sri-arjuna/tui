@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (GPL) for more details.
 #
 # You should have received a copy of the GNU General Public License (GPL)
@@ -29,10 +29,6 @@
 		for f in $TUI_FILE_CONF_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
-		
-		LANG_FILE=${ME/tui\-}.lng
-		LANG_FILE="$TUI_DIR_LOCALE/${TUI_LANG}/$LANG_FILE"
-		[ -f "$LANG_FILE" ] && source "$LANG_FILE" #|| tui-status 3 "$ME -- language file"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
@@ -50,7 +46,7 @@
 #
 #	Script Environment
 #
-	ME="${0##*/}"				# Basename of tui-asroot
+	ME="${0##*/}"				# Base name of tui-asroot
 #
 #	Translate preps
 #
@@ -71,8 +67,8 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP_SHORT="$(eval_gettext 'Usage: 		$ME \"command\"')"
 	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
-Examples:	$ME \"cat /etc/cryptab\"
-		$ME -m \"Provide password to show crypttab\" \"cat /etc/cryptab\"
+Examples:	$ME \"cat /etc/crypttab\"
+		$ME -m \"Provide password to show crypttab\" \"cat /etc/crypttab\"
 Where options are:
 	-h(elp) 		This screen
 	-m(essage)	MSG	Prints \"MSG\" before asking for a password

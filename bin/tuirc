@@ -12,7 +12,7 @@ shopt -s expand_aliases
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -53,7 +53,7 @@ Where options are:
 	provides	List all variables provided by TUI
 	reset		Resets configuration to defaults, root will reset system wide defaults
 	reset-yes	Resets configuration without asking for verification
-	samples		View samples files, first codee then executed
+	samples		View samples files, first code then executed
 	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
 
 Report bugs to: erat.simon@gmail.com
@@ -68,15 +68,15 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #	License:	GNU General Public License (GPL)
 #	Created:        2013.05.03 (rev:3)
 #	Changed:	2015.09.17
-#	Description:	The loader and configurator of TUI
+#	Description:	The loader and configuration of TUI
 #
 #	Variables	:	Default
 #
 	# Check for '$HOME'
 	if [ -z "$HOME" ]
-	then	# HOME is empty, if UID is empty too, asume machine is still booting
+	then	# HOME is empty, if UID is empty too, assume machine is still booting
 		if [ 0 -eq "${UID:-0}" ]
-		then	# Its root, check both eventhough /root is not standard
+		then	# Its root, check both even though /root is not standard
 			known="/root /"
 			for k in $(awk  -v FS=":" '/^root/ {print $6}' /etc/passwd 2>/dev/zero) $known
 			do 	[ -d "$k" ] && HOME="$k" && export HOME && break
@@ -88,7 +88,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			done
 		fi
 	fi
-	# If its still empty, use 'cd' deault behaviour to return to the users homedir if invoked without args
+	# If its still empty, use 'cd' default behaviour to return to the users homedir if invoked without args
 	[ -z "$HOME" ] && HOME="${k:-$(cd;pwd)}"
 	
 	# Regular definitions
@@ -102,7 +102,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		[ -f "$tmp_cfg" ] && source "$tmp_cfg" && break
 	done
 	
-	# Get systemwide default configuration paths
+	# Get system wide default configuration paths
 	[ -z "$SYSCONFDIR" ] && \
 		printf '%s\n' "$(gettext 'Please attempt a fresh installation of TUI.')" && \
 		( return 1 || exit 1 )
@@ -159,7 +159,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			
 			cat > "$TRC" <<-TUI_RC
 			#$TRC
-			# This file is not ment to be changed manualy!
+			# This file is not meant to be changed manually!
 			# Any change of this file may result in an unusable TUI.
 			# Do changes at your own risk!
 			#

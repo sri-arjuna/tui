@@ -12,7 +12,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (GPL) for more details.
 #
 # You should have received a copy of the GNU General Public License (GPL)
@@ -94,7 +94,7 @@ Where options are:
 
     ----Modes----
     	-a(active)		Force active mode
-	-p(assiv)		Force passiv mode
+	-p(assiv)		Force passive mode
 	
     ----Upload file----
 	-f(ile) 	FILE	Local file to upload
@@ -471,7 +471,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			tui-title "$HOME/.netrc"
 			tui-cat "$HOME/.netrc"
 			tui-echo
-			tui-yesno "$(gettext 'Change any loginame / password?')" && \
+			tui-yesno "$(gettext 'Change any login name / password?')" && \
 				tui-edit "$HOME/.netrc"
 		fi
 	fi
@@ -487,8 +487,8 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				tui-status 111 "$(eval_gettext 'Warning: $BATCH contains invalid command for $FTP: $block')"
 		done
 		
-		# Actualy work with each of the batch file/s
-		# Generate commands according to which FTP-command is beeing used.
+		# Actually work with each of the batch file/s
+		# Generate commands according to which FTP-command is being used.
 		case $FTP in
 		ftp)	# Do ftp settings
 			# There is NO batch file handling for regular 'ftp' command :(
@@ -532,6 +532,6 @@ EOF
 	[ -f "$TEMPFILE.$$" ] && rm -fr "$TEMPFILE.$$"
 	RAN=$($GREP Process $LOG | wc -l )
 	[ $RAN -gt 1000 ] && \
-		tui-yesno "$(eval_gettext 'There were $RAN ftp calls, do you want to see the logfile and clear it after?')" && \
+		tui-yesno "$(eval_gettext 'There were $RAN ftp calls, do you want to see the log file and clear it after?')" && \
 		less "$LOG" && echo "" > "$LOG"
 	exit $RET

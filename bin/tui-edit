@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -125,7 +125,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		esac
 		export EDITOR
 	fi
-	# Failsafe check, use first available editor found if set EDITOR was not found
+	# Fail safe check, use first available editor found if set EDITOR was not found
 	if [ -z "$EDITOR" ]
 	then 	# The EDITOR is not available, search for default
 		EDITOR=$(GetAvailableApp "$MODE")

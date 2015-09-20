@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -73,7 +73,7 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
 Usage: 		$ME [options] MSG
-Examples:	$ME \"What is your favorite color?\"
+Examples:	$ME \"What is your favourite colour?\"
 		password=\044(tui-read -np \"Enter your password:\")
 	-n	does not accept empty strings
 	-p	does not show chars on input

@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -71,7 +71,7 @@ Usage: $ME [options]
 Select USB device if more than one is found
 Where options are:
 	-h	This screen
-	-a	Autoselect entry if only one was found
+	-a	Auto select entry if only one was found
 
 Report bugs to: erat.simon@gmail.com
 TUI home page: <http://www.gnu.org/software/tui/>

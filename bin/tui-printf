@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -36,7 +36,7 @@
 #	Variables
 #
 	# Check the two default places for the core configuration
-	# First systemwide, second user only install
+	# First system wide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
@@ -135,7 +135,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			;;
 	"-h"|"--help")
 		printf '%s\n' \
-			"$shelp_text"
+			"$help_text"
 		exit 99
 		;;
 	"-")	# Read pipe, expect one line
@@ -348,7 +348,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	POS_CENTER=""
 	POS_THIRD=""
 #
-#	Passing color escape sequences increases the chars required, but lowers the chars shown
+#	Passing colour escape sequences increases the chars required, but lowers the chars shown
 #	This part is to fix this part for the alignment
 #
 	
@@ -418,7 +418,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		;;
 	esac
 	if $doStatus
-	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for color and reset
+	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for colour and reset
 		case $NUM_ID in
 		0|1|2|3|7|10|11|127|130)	# These are colored, was 21
 			pos_three_adder=3	;;
