@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.9
-Release:     8%{?dist}
+Release:     14%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -43,7 +43,7 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_datarootdir}/info \
 		     %{buildroot}%{_datadir}/bash-completion/completions
 # Actual install
-make install DESTDIR=$RPM_BUILD_ROOT 
+./make-install DESTDIR=$RPM_BUILD_ROOT 
 # Dont know why this gets created...
 rm -f $RPM_BUILD_ROOT/%{_datarootdir}/info/dir
 
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
 %changelog
+* Mon Sep 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.9
+* Version update - GNU RC 14
+
 * Sun Aug 02 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.9
 - Name changes: tui -> tuirc ; tui-browser -> tui
 - Name changes: tui-psm -> tui-bgjob-mgr

@@ -331,7 +331,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 					"[ -z \$UID ] && UID=0" \
 					"[ \$UID -ne 0 ] && \\" \
 					"	echo \"To $m '$APP', root access is required.\" && \\" \
-					"	exit 99"  >> "make-$m"
+					"	exit 99" \
+					"set -x" >> "make-$m"
 			else	echo "set -x" >> "make-$m"
 			fi
 			chmod +x "make-$m"

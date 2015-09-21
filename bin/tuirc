@@ -532,7 +532,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		tui-printf -E 	"$(gettext 'There are some sample scripts to get you started:')" \
 				"$DATADIR/samples"
 		tui-printf -E 	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
-				"tui-new-script [-befrs] [./]$(getext 'SCRIPTNAME')"
+				"tui-new-script [-befrs] [./]$(gettext 'SCRIPTNAME')"
 		tui-printf -E
 		tui-printf -E 	"$(gettext 'Arguments to this command are:')" \
 				"config html info provides reset reset-yes samples theme"
