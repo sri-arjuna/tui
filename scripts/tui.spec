@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.9
-Release:     15%{?dist}
+Release:     16%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
