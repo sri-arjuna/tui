@@ -1,6 +1,6 @@
 Name:        tui
 Version:     0.8.9
-Release:     14%{?dist}
+Release:     15%{?dist}
 Summary:     Shell wrapper and I/O toolset
 
 License:     GPLv3
@@ -18,6 +18,7 @@ Requires:    coreutils
 Advanced command based framework for scripts
 Each command represents a known counterpart from a regular command,
 or describes its task with its name.
+From 'tui-asroot' over 'tui-progress' to 'tui-yesno' and lots more.
 
 
 %prep
@@ -25,8 +26,7 @@ or describes its task with its name.
 
 %build
 cd %name
-%configure --prefix=/usr
-make
+./configure --prefix=/usr --chroot=$RPM_BUILD_ROOT
 
 
 %install
@@ -43,9 +43,7 @@ mkdir -p     %{buildroot}%{_bindir}/ \
                      %{buildroot}%{_datarootdir}/info \
 		     %{buildroot}%{_datadir}/bash-completion/completions
 # Actual install
-./make-install DESTDIR=$RPM_BUILD_ROOT 
-# Dont know why this gets created...
-rm -f $RPM_BUILD_ROOT/%{_datarootdir}/info/dir
+./make-install
 
 %clean
 rm -rf %{buildroot}
@@ -53,7 +51,6 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)   
 %doc %{_docdir}/%{name}/
-%{_sysconfdir}/%{name}rc
 %{_mandir}/man1/%{name}*.1.gz
 %{_datarootdir}/%{name}/
 %{_datarootdir}/info/%{name}.info.gz
@@ -61,6 +58,7 @@ rm -rf %{buildroot}
 
 %config
 %{_sysconfdir}/%{name}rc
+%{_sysconfdir}/%{name}.conf
 %{_sysconfdir}/%{name}/
 %{_datadir}/bash-completion/completions/%{name}_compl.bash
 
