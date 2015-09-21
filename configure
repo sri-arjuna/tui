@@ -5,7 +5,7 @@
 #	Created:	2015.07.27
 #	Changed:	2015.09.21
 	script_name=configure
-	script_version=1.0.1
+	script_version=1.0.2
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -327,14 +327,15 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		for m in install uninstall distclean
 		do	echo "#!/usr/bin/env sh" > "make-$m"
 			if [ ! "$m" = "distclean" ] && ! $is_at_home 
-			then	printf '%s\n' \
-					"[ -z \$UID ] && UID=0" \
-					"[ \$UID -ne 0 ] && \\" \
-					"	echo \"To $m '$APP', root access is required.\" && \\" \
-					"	exit 99" \
-					"set -x" >> "make-$m"
-			else	echo "set -x" >> "make-$m"
+			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
+						printf '%s\n' \
+						"[ -z \$UID ] && UID=0" \
+						"[ \$UID -ne 0 ] && \\" \
+						"	echo \"To $m '$APP', root access is required.\" && \\" \
+						"	exit 99" >> "make-$m"
+			#else	echo "set -x" >> "make-$m"
 			fi
+			echo "set -x" >> "make-$m"
 			chmod +x "make-$m"
 		done
 		$is_at_home && FHS[prefix]="$prefix_home"
