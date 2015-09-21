@@ -3,9 +3,9 @@
 # ------------------------------------------------------------------------
 #
 #	Created:	2015.07.27
-#	Changed:	2015.09.09
+#	Changed:	2015.09.21
 	script_name=configure
-	script_version=0.9.9
+	script_version=1.0
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -77,6 +77,7 @@
 	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs compldir sharedstatedir localstatedir"
 	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
 	TMP="$PWD/tmp.$$"
+	CHROOT=""
 	source "$CONFIG"
 #
 #	Functions
@@ -116,7 +117,7 @@
 		 	# Used for /usr/share/\$APP & /usr/share/doc/\$APP
 		 	APP=projectname
 		 	APP_REQUIRES="awk bash grep sed"
-		 	CFG_REQUIRES="texi2any txt2man"
+		 	CFG_REQUIRES="git texi2any txt2man"
 		 	
 		 	# Used for helpscreen & tarball
 		 	APP_VER=0.1
@@ -191,6 +192,7 @@ OPTIONS:
 	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
 	
 	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR:-/usr/local})
+	--chroot DIR		Sets the CHROOT to DIR, to write files, it prefixes the prefix with CHROOT.
 	
 	--bindir DIR		user executeables 		(\$PREFIX/bin)
 	--sbindir DIR		admin executeables		(\$PREFIX/sbin)
@@ -248,9 +250,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		write_install() { # INDEX CONTENT
 		# Prints the copy commands
 		#
-			if [ -d "$2" ] && [ ! "./" = "${2:0:2}" ]
+			fullPath="${2/$CHROOT}"
+			if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
 			then	# Its a directory, go recursive
-				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
 			else	tmp_check="${2##*/}"
 				check_char="${tmp_check:0:1}"
 				isAsterix=$(printf '%s' "$check_char" | grep -v '*' && echo false || echo true )
@@ -261,8 +264,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				esac
 				
 				if $isAsterix
-				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
-				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
 				fi
 			fi
 		}
@@ -276,7 +279,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Prints the remove commands
 		#
 			INDEX="$1" ; shift
-			DEST="${FHS[${INDEX,,}]}"
+			DEST="${CHROOT}${FHS[${INDEX,,}]}"
 			
 			for tr in ${@}
 			do	case "$INDEX" in
@@ -327,6 +330,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		done
 		$is_at_home && FHS[prefix]="$prefix_home"
 		echo "prefix=${FHS[prefix]}">"$REFERENCE"
+		if [ -n "$CHROOT" ] 
+		then	echo "CHROOT=$CHROOT" >> "make-install"
+			echo "CHROOT=$CHROOT" >> "make-uninstall"
+		fi
 		
 		# Write content of PRIOR tasks, if any
 		if [ ! -z "${PRIOR[@]}" ]
@@ -336,7 +343,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			while 	item="${PRIOR[$C]}"
 			[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
-					echo "sh ./$item" >> "make-install" || \
+					echo "bash ./$item" >> "make-install" || \
 					echo "$item" >> "make-install" #  || exit 1
 				((C++))
 			done
@@ -347,7 +354,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		do	# Expand index
 			tmp="${!index}"
 			# Count words
-			num=$(echo $tmp | wc -w)
+			num=$(echo "$tmp" | wc -w)
 			
 			# Only do something if index has content count higher than 0
 			if [ "$num" -gt 0 ]
@@ -357,15 +364,16 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				
 				# It has content
 				write_reference "$index" >> "$REFERENCE"
-				# This is a tryout, 
 				set $index
 				# This usualy is the most important fix, sadly
 				cat >> "make-install" <<-EOF
 				tmp_str="${FHS[${1,,}]}"
-				if [ ! -d "\${tmp_str%/*}" ]
-				then 	[ -d "/usr\${tmp_str%/*}" ] && \\
-				 		ln -s "/usr\${tmp_str%/*}" "\${tmp_str%/*}" || \\
-				 		mkdir -p "\$tmp_str"
+				if [ ! -d "\${CHROOT}\${tmp_str%/*}" ]
+				then 	cd "\${CHROOT}/usr/.."
+				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && \\
+				 		ln -s "./usr\${tmp_str%/*}" "./\${tmp_str%/*}" || \\
+				 		mkdir -p "\${CHROOT}\$tmp_str"
+				 	cd "\$OLDPWD"
 				fi
 				EOF
 				case "$num" in
@@ -397,6 +405,12 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				((C++))
 			done
 		fi
+		# Now remove hardcoded folders that were used
+		for D in data doc
+		do 	d="${FHS[${D}dir]}"
+			[ -n "$d" ] && \
+				echo "[ -d \"\${CHROOT}$d\" ] && rm -fr \${CHROOT}$d" >> "make-uninstall"
+		done
 		
 		# Check for DISTCLEAN operations
 		if [ ! -z "$(echo ${CLEAN[@]})" ]
@@ -404,10 +418,10 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo >> "make-distclean"
 			
 			while 	item="${CLEAN[$C]}"
-				[ ! -z "$item" ]
-			do 	[ -f "$item" ] && \
-					echo "rm $item" >> "make-distclean" || \
-					echo "$item" >> "make-distclean" #  || exit 1
+				[ -n "$item" ]
+			do 	( [ -f "./$item" ] || [ -f "$item" ] ) && \
+					echo "rm -f $item" >> "make-distclean" || \
+					echo "$item" >> "make-distclean"
 				((C++))
 			done
 		fi
@@ -415,8 +429,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		
 		if [ "true" = "${doRef:-false}" ]
 		then	echo >> "make-install"
-			echo "mkdir -p ${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
-			echo "rm -f ${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
+			echo "mkdir -p ${CHROOT}${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${CHROOT}${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
+			echo "rm -f ${CHROOT}${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
 		fi
 		
 		# Check for post operations, letter better here, than with 'set -s'
@@ -427,7 +441,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
 					echo "sh ./$item" >> "make-install" || \
-					echo "$item" >> "make-install" # || exit 1
+					echo "$item" >> "make-install"
 				((C++))
 			done
 		fi
@@ -444,15 +458,16 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			while 	item="${PREPARE[$C]}"
 				[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
-					sh ./"$item" || \
-					( echo "$item" > "$TMP" ; sh -x "$TMP" )
+					bash ./"$item" || \
+					( echo "$item" > "$TMP" ; bash -x "$TMP" && rm -f "$TMP")
 				((C++))
 			done
-			rm -f "$TMP"
 		fi
-		echo "echo;echo \"Finished installation of $APP\";exit \$RET" >> "make-install"	# with exit code: \$RET (0=success)\""
+		# Let the script exit with their proper exit code.
+		echo "echo;echo \"Finished installation of $APP\";exit \$RET" >> "make-install"
+		echo "exit \$RET" >> "make-uninstall"
+		echo "exit \$RET" >> "make-distclean"
 		
-		#sed s,'set -x','',g -i make-{uni,i}nstall
 		sed s,'set -x',"set -x\nSYSCONFDIR=$SYSCONFDIR",g -i make-{uni,i}nstall
 		sed s,'~',"$HOME",g -i make-{uni,i}nstall
 	}
@@ -461,7 +476,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 #
 	GETOPT=$(getopt \
 		--options	"h" \
-		--longoptions	"help,version,sample,sample-full,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:" \
+		--longoptions	"help,version,sample,sample-full,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:" \
 		--name 		"${0##*/}" -- "${@}"
 	)
 	eval set -- "$GETOPT"
@@ -478,6 +493,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				shift 2		;;
 		--tarball)	doTarball=true
 				shift 		;;
+		--chroot)	CHROOT="$2"
+				shift 2		;;
 		--)		shift ; break	;;
 		esac
 	done
