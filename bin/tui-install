@@ -39,8 +39,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.07.28
-#	Changed:	2015.09.17
-	script_version=0.9
+#	Changed:	2015.09.21
+	script_version=0.9a
 	ME="${0##*/}"				# Basename of tui-install
 #	Description:	Install provided packages, using the 'default' package manager
 #			that is to be expected on this based distro.
@@ -266,7 +266,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				bad_ones+=" $app_name"
 			((count_total++))
 		done
-		ERR_NO=$[ "$count_total" - "$count_good" ]
+		ERR_NO="$[ $count_total - $count_good ]"
 		[ -z "$bad_ones" ] && \
 			tui-echo "$(eval_gettext 'There were $ERR_NO errors, namely these:')" "$bad_ones"
 	else	# Do all in one bunch, but shorten the names to display

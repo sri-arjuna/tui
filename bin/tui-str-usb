@@ -38,7 +38,7 @@
 	fi
 	break_on_injections "$@" && exit 1
 	# If there is a user theme directory, use that one instead
-	[ -d "$TUI_DIR_USER_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	[ -d "$TUI_DIR_USER_THEMES" ] && [ -z "$TUI_DIR_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
 	source "$TUI_DIR_THEMES/$TUI_THEME" 
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
@@ -46,7 +46,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=0.9a
 	ME="${0##*/}"
 #
 #	Translate preps

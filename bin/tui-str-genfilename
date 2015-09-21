@@ -23,7 +23,7 @@
 #	Variables
 #
 	ME="${0##*/}"
-	script_version=0.9
+	script_version=0.9b
 	beVerbose=false
 	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -32,7 +32,7 @@
 	# Get the main config files
 	# 
 	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
-	then 	$TUI_FILE_CONF_COMMANDS
+	then 	source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
@@ -116,16 +116,18 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 	# Set the initial name check according to presets:
 	# Currently only known special case: tar
-	NAME_INIT="${this/\.tar/}$ext"
-	
-	if [ -f "$NAME_INIT" ]
+	NAME_INIT="${this/\.tar/}.$ext"
+	NAME_INIT="${NAME_INIT/\.\./\.}"
+	if [ -f "${NAME_INIT}" ]
 	then	$beVerbose && \
 			echo "$(eval_gettext '$NAME_INIT exists, appending/increasing number.')" >&2
 		C=0		# Counter
-		NAME_CHECK="$this$C.$ext"
-		while [ -f "$NAME_CHECK" ]
+		NAME_CHECK="${this/\.tar}.$C.$ext"
+		NAME_CHECK="${NAME_CHECK/\.\./\.}"
+		while [ -f "${NAME_CHECK}" ]
 		do	C=$(( $C + 1 ))
-			NAME_CHECK="$this$C.$ext"
+			NAME_CHECK="${this/\.tar}.$C.$ext"
+			NAME_CHECK="${NAME_CHECK/\.\./\.}"
 			$beVerbose && printf "\r%s" "$(eval_gettext 'Checking for $NAME_CHECK')"  >&2
 		done
 		$beVerbose && [ $C -gt 0 ] && \
