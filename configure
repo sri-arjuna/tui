@@ -371,7 +371,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				if [ ! -d "\${CHROOT}\${tmp_str%/*}" ]
 				then 	cd "\${CHROOT}/usr/.."
 				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && \\
-				 		ln -s "./usr\${tmp_str%/*}" "./\${tmp_str%/*}" || \\
+				 		ln -sf "./usr\${tmp_str%/*}" "./\${tmp_str%/*}" || \\
 				 		mkdir -p "\${CHROOT}\$tmp_str"
 				 	cd "\$OLDPWD"
 				fi
