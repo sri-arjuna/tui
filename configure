@@ -5,7 +5,7 @@
 #	Created:	2015.07.27
 #	Changed:	2015.09.21
 	script_name=configure
-	script_version=1.0
+	script_version=1.0.1
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -71,7 +71,9 @@
 	GREP=\grep
 	SED=\sed
 	CONFIG="./$script_name.cfg"
-	install_prefix="sudo "
+	which sudo 1>/dev/zero 2>/dev/zero && \
+		install_prefix="sudo " || \
+		install_prefix="su -c "
 	#LOG="${PWD:-$(pwd)}/make-install.log"		# Not yet used, see lines 214 + 215 for most important application
 	mandirs="$(echo man{1..9}dir)"
 	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs compldir sharedstatedir localstatedir"
@@ -103,7 +105,6 @@
 		#	Contact
 		#
 		 	BUGS="$USER AT $HOSTNAME"
-		 	ISSUE="https://github.com/sri-arjuna/yassi/issues"
 		EOF
 		exit 0
 	}
@@ -151,6 +152,11 @@
 		 	HTMLDIR=docs/info/\$APP.html
 		 	DATADIR="./menu ./includes"
 		#
+		#	Task prior to the installation
+		#
+		 	PRIOR[0]="echo 'Some variable examples:'"
+		 	PRIOR[1]="printf '* %s\n' \"CHROOT=\\\$CHROOT\" \"prefix=\\\$prefix\" \"SYSCONFDIR=\\\$SYSCONFDIR\" \"DATADIR=\\\$DATADIR\";read -p 'press enter to continue' buffer"
+		#
 		#	Tasks post of installation
 		#
 		 	POST[0]=scripts/post_script1.sh
@@ -163,7 +169,7 @@
 		#
 		#	Additional tasks for the uninstallation process
 		#
-		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && \
+		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && \\
 		 			./make-uninstall && \
 		 			./make-distclean && cd .."
 		#
@@ -177,27 +183,27 @@
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		MSG_TR_CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\n\tReport bugs of \"$APP\" to \"$BUGS\"")
-	$( [ ! -z "$ISSUE" ] && echo "Report bugs of \"$APP\" on \"$ISSUE\"")
-"	
+		MSG_TR_CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\nReport bugs of \"$APP\" to \"$BUGS\"")$( [ ! -z "$ISSUE" ] && printf "\nReport bugs of \"$APP\" on \"$ISSUE\"\n \n")"
 		
-		MSG_TR_HELP="Usage:	./$script_name [options]
+		MSG_TR_HELP="
+Usage:	./$script_name [options]
 Routine to configure the installation of ${APP:-APPNAME} ${APP_VER}
 
 OPTIONS:
 	-h|--help		Shows this screen and exits
 	--version		Shows the version and exits
+	
 	--sample		Prints a sample 'configure.cfg' required by projects and exits
 	--sample-full		Prints an advanced sample 'configure.cfg' required by projects and exits
 	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
 	
 	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR:-/usr/local})
-	--chroot DIR		Sets the CHROOT to DIR, to write files, it prefixes the prefix with CHROOT.
+	--chroot DIR		Sets the CHROOT to DIR		(for 'builddirs' or before chrooting into a partition)
 	
-	--bindir DIR		user executeables 		(\$PREFIX/bin)
-	--sbindir DIR		admin executeables		(\$PREFIX/sbin)
-	--sysconfdir DIR	read-only single-machine data 	(\$PREFIX/etc)
-	--datarootdir DIR	read-only arch.-independent data root 	(\$PREFIX/share)
+	--bindir DIR		user executeables 		(\$prefix/bin)
+	--sbindir DIR		admin executeables		(\$prefix/sbin)
+	--sysconfdir DIR	read-only single-machine data 	(\$prefix/etc)
+	--datarootdir DIR	read-only arch.-independent data root 	(\$prefix/share)
 	
 	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/${APP:-APPNAME})
 	--docdir DIR		project documentation root	(\$DATAROOTDIR/doc/${APP:-APPNAME})
@@ -206,7 +212,7 @@ OPTIONS:
 	
 	--compldir DIR		bash completion			(\$DATAROOTDIR/bash-completion/completions)
 	--localedir		locale-dependent data		(\$DATAROOTDIR/locale)
-	--localstatedir		modifiable single-machine data	(\$PREFIX/var)
+	--localstatedir		modifiable single-machine data	(\$prefix/var)
 	
 	--man1dir DIR		man 1 Exe & Shell commands	(\$DATAROOTDIR/man/man1)
 	-	2) System calls		3) Library calls	4) Special files (eg /dev)
@@ -214,8 +220,10 @@ OPTIONS:
 	-	7) Miscellaneous (eg: macros, groff)		8) Root commands (sbin)
 	--man9dir DIR		man 9 Kernel routines (non standard)	(\$DATAROOTDIR/man/man9)
 	
-	--sharedstatedir	modifiable architecture-independent	(\$PREFIX/com)
-	$MSG_TR_CONTACT_INFO"
+	--sharedstatedir	modifiable architecture-independent	(\$prefix/com)
+$MSG_TR_CONTACT_INFO
+YASSI (Yet Another Simple Script Installer, ./$script_name), was written in 2015 by Simon Arjuna Erat (sea), Switzerland
+"
 		echo "$MSG_TR_HELP"
 		exit 99
 	}
@@ -318,11 +326,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Prepare script headers
 		for m in install uninstall distclean
 		do	echo "#!/usr/bin/env sh" > "make-$m"
-			if [ ! "$m" = "distclean" ] && $is_at_home 
+			if [ ! "$m" = "distclean" ] && ! $is_at_home 
 			then	printf '%s\n' \
 					"[ -z \$UID ] && UID=0" \
 					"[ \$UID -ne 0 ] && \\" \
-					"	echo \"This script requires root access.\" && \\" \
+					"	echo \"To $m '$APP', root access is required.\" && \\" \
 					"	exit 99"  >> "make-$m"
 			else	echo "set -x" >> "make-$m"
 			fi
@@ -336,7 +344,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		fi
 		
 		# Write content of PRIOR tasks, if any
-		if [ ! -z "${PRIOR[@]}" ]
+		if [ -n "$(echo ${PRIOR[@]})" ]
 		then	source "$PWD/$REFERENCE"	# Just prefix yet
 			C=0
 			echo >> "make-install"
@@ -393,7 +401,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	# 	Finalize
 	#
 		# Uninstall
-		if [ ! -z "$(echo ${REMOVE[@]})" ]
+		if [ -n "$(echo ${REMOVE[@]})" ]
 		then 	C=0
 			echo >> "make-uninstall"
 			
@@ -413,7 +421,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		done
 		
 		# Check for DISTCLEAN operations
-		if [ ! -z "$(echo ${CLEAN[@]})" ]
+		if [ -n "$(echo ${CLEAN[@]})" ]
 		then 	C=0
 			echo >> "make-distclean"
 			
@@ -434,7 +442,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		fi
 		
 		# Check for post operations, letter better here, than with 'set -s'
-		if [ ! -z "$(echo ${POST[@]})" ]
+		if [ -n "$(echo ${POST[@]})" ]
 		then 	C=0
 			echo >> "make-install"
 			while 	item="${POST[$C]}"
@@ -453,7 +461,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		done
 		
 		# Do the PREPARE stuff, before telling to call ./make-install
-		if [ ! -z "$(echo ${PREPARE[@]})" ]
+		if [ -n "$(echo ${PREPARE[@]})" ]
 		then 	C=0
 			while 	item="${PREPARE[$C]}"
 				[ ! -z "$item" ]
@@ -568,7 +576,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	if $doTarball
 	then	exclude_list="make-distclean"
 		for ex in "${IGNORE[@]}";do exclude_list+=" $ex";done
-		opt_exclude=""
+		# Since we prepare the make-<files>, configure is no longer required
+		opt_exclude="--exclude-ignore=configure"
 		for item in $exclude_list;do opt_exclude+=" --exclude-ignore=$item";done
 		
 		tmp_p="${PWD:-$(pwd)}"
@@ -588,7 +597,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "Successfully created tarball ${tarball}!"
 		set +x
 	else	echo
-		echo "The installation script has been configured to ${FHS[prefix]}."
+		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
 		echo "To install \"$APP\" now, please execute: '${install_prefix}./make-install'"
 		echo
 	fi
