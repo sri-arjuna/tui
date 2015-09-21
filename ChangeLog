@@ -1,3 +1,9 @@
+2015-09-21 - 0.8.9-GNU-RC14
+* YASSI was updated
+* Cleaned configure.cfg & fixed an error
+* Fixed wrong options for tui-new-script example in tuirc
+* Updated po file of tuirc
+
 2015-09-17 - 0.8.9-GNU-RC13
 * tui, renamed again to tui-browser, otherwise... --- SKIPED, due to upcoming rework ---
 * tui-asroot, gettext

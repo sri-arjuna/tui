@@ -26,7 +26,7 @@ shopt -s expand_aliases
 	oVER="$script_version"
 	ME=tuirc
 	script_version=2.8.1
-	TUI_VERSION=0.8.9-GNU-RC13
+	TUI_VERSION=0.8.9-GNU-RC14
 #
 #	Translate preps
 #
