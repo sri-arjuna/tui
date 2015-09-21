@@ -25,7 +25,7 @@ shopt -s expand_aliases
 	oME="$ME"	# Backup of variable 'ME' if sourced
 	oVER="$script_version"
 	ME=tuirc
-	script_version=2.8
+	script_version=2.8.1
 	TUI_VERSION=0.8.9-GNU-RC13
 #
 #	Translate preps
@@ -532,7 +532,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		tui-printf -E 	"$(gettext 'There are some sample scripts to get you started:')" \
 				"$DATADIR/samples"
 		tui-printf -E 	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
-				"tui-new-script [-emrst] [./]SCRIPTNAME"
+				"tui-new-script [-befrs] [./]$(getext 'SCRIPTNAME')"
 		tui-printf -E
 		tui-printf -E 	"$(gettext 'Arguments to this command are:')" \
 				"config html info provides reset reset-yes samples theme"
