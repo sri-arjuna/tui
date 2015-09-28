@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,105 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bin/tui-conf-editor:65
+#: bin/tui-conf-editor:45
+#, sh-format
+msgid ""
+"\n"
+"NAME\n"
+"  $ME - The configuration editor\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-L] [-l LOGFILE] [-t TITLE] FILE1 [FILE2 ..]\n"
+"  \n"
+"DESCRIPTION\n"
+"  Advanced configuration editor, handles multiple files, reads them out and "
+"let the user change them.\n"
+"  Version 0.9.0 or later may even provide options to create a proper config "
+"file from a blank file.\n"
+"  \n"
+"  You can either change setting by setting, or edit the file in an editor, "
+"straight from the menu.\n"
+"  \n"
+"  By default, all changes done using the editor are loged in $LOG.\n"
+"  However, values of variables named \\\"pass, password, passwd, pw, pword\\"
+"\" will not be saved for security reasons.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -L\t\tShows the LOG ($LOG) on PAGER ($PAGER) and exit with 0\n"
+"  -l LOG\tChanges \\\"$LOG\\\" to LOG\n"
+"  -t TITLE\tSet title to TITLE (default: \n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\t$ME /path/to/multiple/files*.conf\n"
+"\t\n"
+"\t$ME -t \\\"My Config Editor\\\" ./script.conf\n"
+"\n"
+"HINTS\n"
+"  Upcoming version will provide functionality to provide selectable options "
+"for variables, so you and your enduser can create a proper configuration "
+"file from empty.\n"
+"  It might even provide options for default values, and to automaticly write "
+"an initial config file from that.\n"
+"  \n"
+"SEE ALSO\n"
+"  bash(1), gawk(1), grep(1), sed(1), tui-conf-get(1), tui-conf-set(1), tui-"
+"select(1), tui-status(1), tui-yesno(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
+msgstr ""
+
+#: bin/tui-conf-editor:96
 msgid "Please select the configuration to edit:"
 msgstr ""
 
-#: bin/tui-conf-editor:66
-#, possible-sh-format
-msgid "$CONFIG: Does not exist."
-msgstr ""
-
-#: bin/tui-conf-editor:67
+#: bin/tui-conf-editor:97
 msgid "Please select which variable to change:"
 msgstr ""
 
-#: bin/tui-conf-editor:68
+#: bin/tui-conf-editor:98
 msgid "Do you want to change this?"
 msgstr ""
 
-#: bin/tui-conf-editor:69
+#: bin/tui-conf-editor:99
 msgid "Please select the new value:"
 msgstr ""
 
-#: bin/tui-conf-editor:71
+#: bin/tui-conf-editor:100
 msgid "Please type the new value:"
 msgstr ""
 
-#: bin/tui-conf-editor:204
+#: bin/tui-conf-editor:101
+#, sh-format
+msgid "$CONFIG: Does not exist."
+msgstr ""
+
+#: bin/tui-conf-editor:152
+#, sh-format
+msgid "Currently \\\"$VAR\\\" is set to \\\"$VAL\\\"."
+msgstr ""
+
+#: bin/tui-conf-editor:165
+#, sh-format
+msgid "Changed \\\"$VAR\\\" from \\\"*******\\\" to \\\"*******\\\""
+msgstr ""
+
+#: bin/tui-conf-editor:166
+#, sh-format
+msgid "Changed \\\"$VAR\\\" from \\\"$VAL\\\" to \\\"$newval\\\""
+msgstr ""
+
+#: bin/tui-conf-editor:238
 msgid "Configuration:"
 msgstr ""

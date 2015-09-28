@@ -19,14 +19,14 @@
 #
 # ------------------------------------------------------------------------
 #
-#	File:		tui-config-editor
+#	File:		tui-conf-editor
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.11.03
 #	Changed:	2015.08.03
 	source tuirc && source gettext.sh
-	script_version=0.8
+	script_version=0.8.1
 #	Description:	Basic configuration file editor
 #
 #
@@ -34,6 +34,7 @@
 #
 	ME="${0##*/}"				# Basename of tui-config-editor
 	LOG="$TUI_DIR_LOG/tui.log"		# Set default log file
+	TITLE="GNU TUI - Configuration Editor"
 #
 #	Variable defaults (options)
 #
@@ -41,34 +42,65 @@
 #
 #	Help text
 #
-	help_text="$(gettext "
-Usage: 		$ME [options] [arguments]
-Examples:	$ME 
-		$ME /etc/tui/tui.conf
-		
-Where options are:
-	-h(elp) 		This screen
-	-L(og)			Show the log file ($LOG)
-	-l [/path/to/]file.log	Change the log file to this
-	-t \"Your prj title\"	Change the title to this
+	help_text="$(eval_gettext '
+NAME
+  $ME - The configuration editor
 
-Files:
---------------------------------------
-Script:		$ME
-Log:		$LOG
+SYNOPSYS
+  $ME [-h|--help] [--version] [-L] [-l LOGFILE] [-t TITLE] FILE1 [FILE2 ..]
+  
+DESCRIPTION
+  Advanced configuration editor, handles multiple files, reads them out and let the user change them.
+  Version 0.9.0 or later may even provide options to create a proper config file from a blank file.
+  
+  You can either change setting by setting, or edit the file in an editor, straight from the menu.
+  
+  By default, all changes done using the editor are loged in $LOG.
+  However, values of variables named \"pass, password, passwd, pw, pword\" will not be saved for security reasons.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -L		Shows the LOG ($LOG) on PAGER ($PAGER) and exit with 0
+  -l LOG	Changes \"$LOG\" to LOG
+  -t TITLE	Set title to TITLE (default: 
+ 
+EXAMPLE
 
-")"
+	$ME /path/to/multiple/files*.conf
+	
+	$ME -t \"My Config Editor\" ./script.conf
+
+HINTS
+  Upcoming version will provide functionality to provide selectable options for variables, so you and your enduser can create a proper configuration file from empty.
+  It might even provide options for default values, and to automaticly write an initial config file from that.
+  
+SEE ALSO
+  bash(1), gawk(1), grep(1), sed(1), tui-conf-get(1), tui-conf-set(1), tui-select(1), tui-status(1), tui-yesno(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
 # TODO :: -o OPTNAME opt1 opt2 ... Disables the scan of a file, but provides OPTNAME\'s
 #
 #	Messages
 #
 	MSG_FILE_SELECT="$(gettext 'Please select the configuration to edit:')"
-	MSG_FILE_DONT_EXIST="$(gettext '$CONFIG: Does not exist.')"
 	MSG_CONF_VAR_SELECT="$(gettext 'Please select which variable to change:')"
 	MSG_CONF_VAR_CHANGE="$(gettext 'Do you want to change this?')"
 	MSG_CONF_VAL_SELECT="$(gettext 'Please select the new value:')"
-	MSG_CONF_VAL_CURRENT="$(gettext 'Currently '$VAR' is set to '$VAL'.')"
 	MSG_CONF_VAL_TYPE="$(gettext 'Please type the new value:')"
+	MSG_FILE_DONT_EXIST="$(eval_gettext '$CONFIG: Does not exist.')"
+	
+	
 #
 #	Functions
 #
@@ -117,6 +149,7 @@ Log:		$LOG
 						selection="on off"
 						;;
 				esac
+				MSG_CONF_VAL_CURRENT="$(eval_gettext 'Currently \"$VAR\" is set to \"$VAL\".')"
 				tui-echo "$MSG_CONF_VAL_CURRENT"
 				if tui-yesno "$MSG_CONF_VAR_CHANGE"
 				then 	if $doSelect
@@ -127,9 +160,10 @@ Log:		$LOG
 					
 					if [ ! -z "$newval" ]
 					then	if [ 0 -eq "$UID" ]
-						then	if [ password = "${VAR,,}" ] || [ pw = "${VAR,,}" ]
-							then	msg="Changed \"$VAR\" from \"*******\" to \"*******\"" 
-							else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
+						then	# pass, password, passwd, pw, pword
+							if ([ password = "${VAR,,}" ] || [ pw = "${VAR,,}" ] || [ "pass" = "${VAR,,}" ] || [ "passwd" = "${VAR,,}" ] || [ "pword" = "${VAR,,}" ])
+							then	msg="$(eval_gettext 'Changed \"$VAR\" from \"*******\" to \"*******\"')"
+							else	msg="$(eval_gettext 'Changed \"$VAR\" from \"$VAL\" to \"$newval\"')"
 							fi
 						else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
 						fi
@@ -153,7 +187,7 @@ Log:		$LOG
 #
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	version_text=$(gettext "
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -166,7 +200,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		h)	printf "$help_text"
 			exit $RET_HELP
 			;;
-		L)	less "$LOG"	
+		L)	$PAGER "$LOG"	
 			exit $RET_DONE
 			;;
 		t)	TITLE="$OPTARG"
@@ -191,7 +225,7 @@ There is NO WARRANTY, to the extent permitted by law.
 			;;
 		1)	tui-title "Configuration: $1"
 			ConfigMenu "$1"
-			break
+			exit $?
 			;;
 		*)	tui-title "$TITLE"
 			tui-echo "$MSG_FILE_SELECT"

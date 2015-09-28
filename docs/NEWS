@@ -1,3 +1,23 @@
+2015.09.27
+----------
+Releasing TUI 0.8.9-GNU-RC16, which now has been stripped off no longer used files.
+Basicly, this release contains only the changes/tasks from https://savannah.gnu.org/task/?13746#comment2
+
+As stated in some previous release notes 'tui' was renamed back to 'tui-browser'.
+The symlink provided for an easier moving is now removed.
+
+With the final big change on the help-screen of all the tui-<command>'s the old manpages are now merged into the current help screens,
+this only means that the new manpages will be generated from the current help screen of the current command.
+
+With the faith that these updates will help to pass the GNU evaluation, 
+the mandatory upcoming GNU TUI 0.9.0 will then contain the updated URL
+when it is hosted on http://www.gnu.org/software/tui
+
+Then, i will take a little break.
+Afterwich the hughe updates of tui-browser and tui-conf-editor will follow.
+Meanwhile, i'll be working on tui-str-key, and extract some functions of tui-list.
+
+
 2015.07.15
 ----------
 Configure and learn about TUI using 'tuirc'.

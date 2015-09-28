@@ -61,7 +61,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -69,17 +69,38 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: 		$ME [options] arguments
-Examples:	$ME 'test string'
-		$ME -t 384 'test string'
-		cat /tmp/password.txt | $ME -
-Where options are:
-	-h(elp) 		This screen
-	-t(ype)		TYPE	Pass which type of hashing you want, default/fallback: md5sum
+NAME
+  $ME - SHORTDESC
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [-options] [-option arg]
+  
+DESCRIPTION
+  desc
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -t TYPE	Pass which type of hashing you want, default/fallback: md5sum
+  
+  Hash types supported: sha1sum, sha224sum, sha256sum, sha384sum, sha512sum
+ 
+EXAMPLE
+
+	$ME -t 384 "some string"
+	
+	cat file.txt | $ME -
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 

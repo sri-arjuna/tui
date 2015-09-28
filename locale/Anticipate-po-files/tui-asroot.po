@@ -3,27 +3,25 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: GNU TUI 0.9.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:58+0200\n"
-"PO-Revision-Date: 2015-09-20 06:10+0200\n"
-"Language: en_GB\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: Simon A. Erat (sea) <erat.simon@gmail.com>\n"
-"Language-Team: \n"
-"X-Generator: Poedit 1.8.4\n"
-"X-Poedit-SourceCharset: UTF-8\n"
 
-#: bin/tui-asroot:60
+#: bin/tui-asroot:62
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -32,32 +30,58 @@ msgid ""
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
 
-#: bin/tui-asroot:68
-#, sh-format
-msgid "Usage: \t\t$ME \\\"command\\\""
-msgstr ""
-
-#: bin/tui-asroot:69
+#: bin/tui-asroot:70
 #, sh-format
 msgid ""
 "\n"
-"Examples:\t$ME \\\"cat /etc/crypttab\\\"\n"
-"\t\t$ME -m \\\"Provide password to show crypttab\\\" \\\"cat /etc/crypttab\\"
-"\"\n"
-"Where options are:\n"
-"\t-h(elp) \t\tThis screen\n"
-"\t-m(essage)\tMSG\tPrints \\\"MSG\\\" before asking for a password\n"
+"NAME\n"
+"  $ME - Execute a command with root privileges\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-m \"MES SA GE\" ]\n"
+"  \n"
+"DESCRIPTION\n"
+"  Enables the author of a script to make sure certain commands are executed "
+"with root account privileges.\n"
+"  This helps the author of scripts to simplify the task to get done.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -m MSG\tPrints \"MSG\" before asking for a password\n"
+" \n"
+"ENVIRONMENT\n"
+"  TERM\tIf TERM is not set, GNU TUI will set it to GNU Linux, this is "
+"required to determine wether GNU TUI runs in GUI or VT (cli only) mode.\n"
+"  UID\tReads UID to determine wether the user is root or not.\n"
+"  USER\tIf user is empty, it takes LOGINNAME to display the user name for "
+"sudo.\n"
+"  \n"
+"EXAMPLE\n"
+"\n"
+"\ttui-asroot whoami\n"
 "\t\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\ttui-asroot \"cat /etc/passwd\"\n"
+"\n"
+"SEE ALSO\n"
+"  su(1), sudo(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  This script ($ME, $script_version) was written by Simon Arjuna Erat from "
+"Switzerland.\n"
 msgstr ""
 
-#: bin/tui-asroot:82
+#: bin/tui-asroot:112
 #, sh-format
 msgid "Please provide the password for $USER"
 msgstr ""
 
-#: bin/tui-asroot:83
+#: bin/tui-asroot:113
 msgid "Please provide the password for root"
 msgstr ""

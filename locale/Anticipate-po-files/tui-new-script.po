@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,57 +34,72 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.\n"
-"Also asks to create a basic man page template in the same location.\n"
+"NAME\n"
+"  $ME - Creates a new executable script\n"
 "\n"
-"Usage:  \t$ME [options] [path/to/]FILENAME # Creates the file in that "
-"location\n"
-"Examples:\t$ME fileA.sh\t\t\t# Creates a script in ~/bin or ~/.local/bin if "
-"existing\n"
-"\t\t$ME -s /opt/bin/fileB.sh\t# Creates a standalone application script in /"
-"opt/bin\n"
-"Where options are:\n"
-"\t-h\t\tThis screen\n"
-"\t-b(asic)\tCreates an empty script, with preset comment-indention (shell = "
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-befgrs] [/path/to/][./]SCRIPT\n"
+"  \n"
+"DESCRIPTION\n"
+"  Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.\n"
+"  Also asks to create a basic man page template in the same location.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -b(asic)\tCreates an empty script, with preset comment-indention (shell = "
 "$USER_SHELL)\n"
-"\t-e(mpty)\tCreates an empty script (default) (shell = $USER_SHELL)\n"
-"\t-f(ull)\t\tCreates a standalone application script template (bash only)\n"
-"\t-r(egular)\tCreates the same as basic, but with some code preset (bash "
+"  -e(mpty)\tCreates an empty script (default) (shell = $USER_SHELL)\n"
+"  -f(ull)\t\tCreates a standalone application script template (bash only)\n"
+"  -r(egular)\tCreates the same as basic, but with some code preset (bash "
 "only)\n"
-"\t-s(elect)\tSelect among the script names found in $TUI_DIR_USER_TEMPLATES\n"
+"  -s(elect)\tSelect among the script names found in $TUI_DIR_USER_TEMPLATES\n"
+" \n"
+"EXAMPLE\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\t$ME fileA.sh\t\t\t# Creates a script in ~/bin or ~/.local/bin if existing\n"
+"\t$ME -s /opt/bin/fileB.sh\t# Creates a standalone application script in /"
+"opt/bin\n"
+"\n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-new-script:84
+#: bin/tui-new-script:101
 msgid "sea\\047s New script script"
 msgstr ""
 
-#: bin/tui-new-script:118
+#: bin/tui-new-script:136
 msgid "Enter the filename for the script:"
 msgstr ""
 
-#: bin/tui-new-script:140
+#: bin/tui-new-script:158
 #, sh-format
 msgid "File $DEST exists... Overwrite?"
 msgstr ""
 
-#: bin/tui-new-script:143
+#: bin/tui-new-script:161
 #, sh-format
 msgid "Saved original $DEST to $BACKUP"
 msgstr ""
 
-#: bin/tui-new-script:154
+#: bin/tui-new-script:172
 #, sh-format
 msgid "Fatal error, template \\\"$SCRIPT\\\" not found!"
 msgstr ""
 
-#: bin/tui-new-script:160
+#: bin/tui-new-script:178
 msgid "Saved script:"
 msgstr ""
 
-#: bin/tui-new-script:166
+#: bin/tui-new-script:184
 msgid "Create a manpage as well?"
 msgstr ""

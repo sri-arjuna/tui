@@ -52,27 +52,50 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
+	USER_STRING=$(printf "\044USER")
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-$ME ($script_version)
-Usage:	$ME [options] \"STRING\" ...
+NAME
+  $ME - Print a file to screen and wrap TUI borders around it
 
-Example:	$ME \"/path/to/file1\" \"/path/to/file2\" ...
-		$ME -td 0.005 \"\[/path/to/]file1\" \"string 1\" \"string 2\" \"\[/path/to/]file2\"
-Options:
-		-d(elay) NUM	Sets delay to NUM seconds, enables typewriter automatically
-		-t(ypewriter)	Prints char by char with a default delay of $DELAY
-		-T(itle)	Enables title printing per file output
+SYNOPSYS
+  $ME [-h|--help] [--version] [-d DELAY] [-tT] FILE "Some String" ...
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -d DELAY	Waits DELAY seconds before it prints the next char.
+  		DELAY may be an integer or flaoting point like "0.007"
+		This also triggers the typewriter "-t"
+  -t		Enables typewriter mode, using default delay of 0.05
+  -T		Prints the file name with tui-title before it prints its content
+EXAMPLE
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	tui-cat file.txt
+	
+	tui-cat -T /path/to/multiple/files*
+	
+	tui-cat -t "Hello $USER_STRING, how are you today?"
+
+HINTS
+  In typewriter mode you can pass a mixed list of files and strings.
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 #
 #	Default variables

@@ -1,3 +1,5 @@
+This document is about how to install GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+
 INSTALL
 -------
 
@@ -11,9 +13,9 @@ INSTALL
         git clone https://github.com/sri-arjuna/tui.git
         cd tui
 
-3. Use the auto-tools behaviour, provided by [YASSI](https://github.com/sri-arjuna/yassi)
+3. Use the auto-tools behaviour, provided by [YASSI (Yet Another Simple Script Installer)](https://github.com/sri-arjuna/yassi)
 
-        ./configure [--prefix=/usr] && su -c ./make-install
+        ./configure [--prefix=/usr] [--chroot=$HOME/buildroot] && ( sudo ./make-install || su -c ./make-install )
 
 
 
@@ -27,7 +29,7 @@ UNINSTALL
 
 2. Use the auto-tools behaviour
 
-        make-uninstall
+        ./make-uninstall
 
 
 

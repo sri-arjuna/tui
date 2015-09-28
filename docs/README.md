@@ -1,16 +1,17 @@
-README - TUI - 0.8.9-GNU-RC14
-============================
+README - GNU TUI - 0.8.9-GNU-RC16
+=================================
 
 A 'Text User Interface' framework for scripts
 -------------------------------------------
-See the [News](docs/NEWS) for news
-
-See the [Chagelog](ChangeLog) for the latest changes
-
-See the [Install page](docs/INSTALL.md) for help with (de-)installation.
-
-See the [License](docs/LICENSE) for copyright/copyleft related information.
-
+* See the [News](docs/NEWS) for news
+* See the [Chagelog](ChangeLog) for the latest changes
+* See the [Install page](docs/INSTALL.md) for help with (de-)installation.
+* See the [COPYING](./COPYING) (GNU GPLv3+) for copyright/copyleft related information.
+* See the [COPYING.LESSER](./COPYING.LESSER) (GNU LPLv3+) for copyright/copyleft related information.
+* Additional Licenses:
+    * GNU Free Documentation License [GFDL.txt](GFDL.txt) for the documention
+    * GNU General Public License v3 or later is also applied to all images within: ./screenshots
+    * All scripts in ./docs/samples are licensed as GPLv3+ too, 
 
 
 Description / What is it?:

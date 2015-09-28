@@ -1,7 +1,23 @@
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# --------------------------------------------------------------------
 Name:        tui
 Version:     0.8.9
 Release:     16%{?dist}
-Summary:     Shell wrapper and I/O toolset
+Summary:     GNU Text User Interface, framework for scripts
 
 License:     GPLv3
 URL:         https://github.com/sri-arjuna/tui
@@ -177,7 +193,7 @@ rm -rf %{buildroot}
 
 * Thu May 21 2015 - Simon A. Erat - erat.simon@gmail.com - 0.8.0-0
 - Changed:   tui, now using an RC file to provide internal paths
--                required for manual install and some exotic bsd, linux, unix distros
+-                required for manual install and some exotic bsd, gnu/linux, unix distros
 - Changed:   Preparing themes to 'not' calculate BORDER_RIGHT, if its set in the theme
 - Changed:   Conffiles for both, system and user
 - Split:     Settings.conf, previously part of apps.conf

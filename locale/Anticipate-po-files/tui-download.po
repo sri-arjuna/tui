@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,43 +34,63 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage:\t$ME [options] URL [URL2] ..\n"
-"Where options are:\n"
-"\t-h\tThis screen\n"
-"\t\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"NAME\n"
+"  $ME - Download files from web\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] URL [URL2 ..]\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\ttui-download https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.1.tar."
+"xz\n"
+"\n"
+"SEE ALSO\n"
+"  bash(1), curl(1), wget(1), tui-download(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-download:86
+#: bin/tui-download:108
 msgid "Starting new download..."
 msgstr ""
 
-#: bin/tui-download:87
+#: bin/tui-download:109
 msgid "Downloading..."
 msgstr ""
 
-#: bin/tui-download:88
+#: bin/tui-download:110
 msgid "Downloaded"
 msgstr ""
 
-#: bin/tui-download:89
+#: bin/tui-download:111
 msgid "Could find neither curl nor wget!"
 msgstr ""
 
-#: bin/tui-download:90
+#: bin/tui-download:112
 msgid "Which one to install?"
 msgstr ""
 
-#: bin/tui-download:91
+#: bin/tui-download:113
 msgid "Installing"
 msgstr ""
 
-#: bin/tui-download:92
+#: bin/tui-download:114
 msgid "Installed"
 msgstr ""
 
-#: bin/tui-download:104
+#: bin/tui-download:127
 msgid "Enter URL to download:"
 msgstr ""

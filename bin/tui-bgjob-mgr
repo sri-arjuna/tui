@@ -75,38 +75,65 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-		TR_MSG_TEXT_HELP_SHORT="$(eval_gettext 'Usage: 		$ME [options] scripts ...')"
-	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
-Examples:	$ME ./script1 /some/path/script2
-		$ME -c script[1-9]
+		TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - Run multiple scripts in background
 
-Where options are:
-	-h(elp) 		This screen
-	-L(og)			Show the log file ($LOG)
-	-c(count)		The exit code is now the number of successfully executed scripts.
-	-l(imit)	NUM	Limits the number of parallel executed scripts, 5 default, 0 to disable
-	-d(el-log)		Deletes (empty) the log file ($LOG)
-	-q(uiet)		Just return the exit code, be non-verbose
-	-v(erbose)		Be verbose, starts every script in its own terminal (GUI only!)
-	-w(wait)	NUM	Change the amount of seconds to wait between update-checks
+SYNOPSYS
+  $ME [-h|--help] [--version] [-cdqv] [-l NUM] [-w NUM] SCRIPT1 SCRIPT2 ...
+  
+DESCRIPTION
+  Runs several scripts in background,
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -L(og)			Show the log file ($LOG)
+  -c(count)		The exit code is now the number of successfully executed scripts.
+  -l(imit) NUM	Limits the number of parallel executed scripts, 5 default, 0 to disable
+  -d(el-log)		Deletes (empty) the log file ($LOG)
+  -q(uiet)		Just return the exit code, be non-verbose
+  -v(erbose)		Be verbose, starts every script in its own terminal (GUI only!)
+  -w(wait) NUM	Change the amount of seconds to wait between update-checks
 
-Files:
-Log:		$LOG
-Temp dir:	$TEMP
+ 
+EXAMPLE
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	cd ./job/scripts
+	
+	$ME -l 10 *
+FILES
+  $LOG	When is which script executed and how did it exit?
+  $TEMP	Where the temp files of the scripts are
+
+HINTS
+  If you need to have scripts executed upon previous success scripts, try:
+
+  	$ME -qc *
+
+SEE ALSO
+  bash(1), ps(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
-	TEXT_HELP="$TR_MSG_TEXT_HELP_SHORT
-	$TR_MSG_TEXT_HELP_LONG"
+	TEXT_HELP="$TR_MSG_TEXT_HELP
+"
 	#------------------------------------------
 	TR_MSG_TITLE="$(gettext 'Background Job Manager')"
 	TR_MSG_LOG_LIMIT="$(eval_gettext 'Changed the limit to: $LIMIT')"

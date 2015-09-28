@@ -55,27 +55,42 @@
 #
 #	Translate strings
 #
+	USER_STRING=$(printf "\044USER")
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-	TR_MSG_TEXT_HELP="$(gettext '
-Usage: 		$ME
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - Returns true if you are root
 
-Examples:	$ME 
-		tui-status $? "User is root"
+SYNOPSYS
+  $ME [-h|--help] [--version] [-v]
+  
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -v		Be Verbose
+ 
+EXAMPLE
 
-Where options are:
-	-h(elp) 		This screen
-	-v(erbose)		Enables the scripts verbosity
+	tui-bol-root && grep $USER_STRING /etc/passwd || tui-status 1 "No Access"
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 #
 #	Functions

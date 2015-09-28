@@ -59,7 +59,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -67,15 +67,33 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: $ME [options]
-Select USB device if more than one is found
-Where options are:
-	-h	This screen
-	-a	Auto select entry if only one was found
+NAME
+  $ME - Select an USB storage
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [-options] [-option arg]
+
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -a	Auto select entry if only one was found
+ 
+EXAMPLE
+
+	usb=\044($ME)
+	
+	usb=\044($ME -a)
+	
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 	version_text="$TR_MSG_TEXT_VERSION
 "
@@ -99,7 +117,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			;;
 	esac
 	done
-	shift "$(($OPTIND -1))"
+	shift $(($OPTIND -1))
 #
 #	Functions
 #
@@ -161,7 +179,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 #	Ask now or not?
 #
-	if "$usbAsk"
+	if ${usbAsk:-true}
 	then	"$AUTO" && \
 			targetUsb="$(tui-select -a $list)" || \
 			targetUsb="$(tui-select $list)"
@@ -169,3 +187,4 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	fi
 	tDev="$(readlink -f $devDisk/$targetUsb)"
 	echo "$tDev" >&1
+

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,43 +34,64 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Creates a new man page in $HOME/bin, if $HOME/.local/bin does not exists.\n"
-"Also asks to create a basic man page template in the same location.\n"
+"NAME\n"
+"  $ME - Creates a new and empty manpage template\n"
 "\n"
-"Usage:  \t$ME [options] [path/to/]FILENAME # Creates the file in that "
-"location\n"
-"Examples:\t$ME fileA.sh\t\t\t# Creates a script in $HOME/bin\n"
-"\t\t$ME -a $PREFIX/share/man/man1/$ME[.1]\t# Creates a full application "
-"script in /opt/bin\n"
-"Where options are:\n"
-"\t-h\t\tThis screen\n"
-"\t-a(pplication)\tCreate a full application manpage template\n"
-"\t-m(inimal)\tCreates a minimal manpage template\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-am] [path/to/]FILENAME\n"
+"\n"
+"DESCRIPTION\n"
+"  Creates a new man page in $HOME/bin, if $HOME/.local/bin does not exists.\n"
+"  Also asks to create a basic man page template in the same location.\n"
+"\n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -a\t\tCreate a full application manpage template\n"
+"  -m\t\tCreates a minimal manpage template\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\t$ME\n"
 "\t\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\t$ME ./my-manpage[.1]\n"
+"\t\n"
+"\t$ME -a my-full-manpage\n"
+"\n"
+"SEE ALSO\n"
+"  bash(1), groff(1), troff(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-new-manpage:78
+#: bin/tui-new-manpage:101
 #, sh-format
 msgid "sea New manpage script"
 msgstr ""
 
-#: bin/tui-new-manpage:104
+#: bin/tui-new-manpage:127
 msgid "Enter the file name:"
 msgstr ""
 
-#: bin/tui-new-manpage:121
+#: bin/tui-new-manpage:144
 #, sh-format
 msgid "File $DEST exists... Overwrite it now?"
 msgstr ""
 
-#: bin/tui-new-manpage:122
+#: bin/tui-new-manpage:145
 #, sh-format
 msgid "Overwritten file: $DEST"
 msgstr ""
 
-#: bin/tui-new-manpage:125
+#: bin/tui-new-manpage:148
 msgid "Saved:"
 msgstr ""

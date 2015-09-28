@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+tui-header "TUIRC - Samples"	"tui-edit"
+
+tui-title "Basic invocation"
+tui-edit filename.txt
+
+tui-title "Example 2"
+source tuirc
+tui-edit "$TUI_CONF_USER"
+
+tui-title "Example 3"
+tui-edit /etc/fstab

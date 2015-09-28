@@ -59,7 +59,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -67,18 +67,39 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: $ME [option] ERRORLEVEL \"Message to user\" [\"centred Message\"]
-Where options are:
-	-h	This screen
-	-r	Return on line, do not do a newline.
+NAME
+  $ME - Status Messages
 
-Interpreted error levels are:')"
+SYNOPSYS
+  $ME [-h|--help] [--version] [-r] RET ["Message to user" ["Center string"]]
+  
+DESCRIPTION
+  desc
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -r	Return on line, do not do a newline.
+ 
+  Interpreted exit codes are:
+')"
 	TR_MSG_TEXT_HELP_ENDING="$(gettext '
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>')"
+EXAMPLE
 
+	$ME 0 "Your account exists:" "\044USER"
 	
+	$ME -r 2 "Loading data..." ; sleep 1 ; $ME \044? "Loaded data."
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>')"
 #
 #	Display
 #	

@@ -50,7 +50,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -58,15 +58,32 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(gettext '
-Usage: tui-web [options] URL
-Opens provided URL in $BROWSER_[CLI,GUI]
+NAME
+  $ME - Opens passed URLs in the favorite web browser (gui/cli)
 
-Options:
-	-c	Force CLI mode
+SYNOPSYS
+  $ME [-h|--help] [--version] URL URL2 ..
+  
+DESCRIPTION
+  Does only work in GUI, unless the end user (you) has a cli-filebrowser installed.
+  Opens provided directories in the preferred file manager according to environment.
+  In multi-user or emergency stage it will open \"$FILEMGR_CLI\" and in graphical stage it will open \"$FILEMGR_GUI\"
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -c		Force CLI mode
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 

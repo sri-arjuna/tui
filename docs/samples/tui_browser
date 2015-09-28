@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# -- Sample script to use with likewise named command --
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 #
 #	Variables
 #
@@ -43,7 +43,7 @@
 #	Sourced the config file and sources either the file passed to -s,
 # 	or source all files found in the path passed to -s.
 #	It will then provide all variables they contain to all scripts executed by tui-browser
-#	Functions are in progress, but their recognition doesnt always work
+#	Functions are in progress, but their recognition doesn't always work
 #
 	tui-echo
 	tui-title "Sample: #4"
@@ -51,6 +51,6 @@
 	tui-browser 	-T "Sample Title" \
 			-U "${DE:-console}" \
 			-p "$MENU" \
-			-c "$HOME/.tui_rc
-			-s $(tui-conf-get $HOME/.tui_rc TUI_DIR_CONF) \
+			-c "$HOME/.tuirc
+			-s $(tui-conf-get $HOME/.tuirc TUI_DIR_CONF) \
 			-x ksh

@@ -50,7 +50,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -58,13 +58,30 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: $ME LOCATION1 [/path/to/]LOCATION2 [../]LOCATION3 ...
-Opens provided LOCATION/s in the file manager.
-Does only work in GUI, unless the end user (you) has a cli-filebrowser installed.
+NAME
+  $ME - Opens passed directories in the favorite filemanager (gui/cli)
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [/path/to/]DIR [../]DIR2 ...
+  
+DESCRIPTION
+  Does only work in GUI, unless the end user (you) has a cli-filebrowser installed.
+  Opens provided directories in the preferred file manager according to environment.
+  In multi-user or emergency stage it will open \"$FILEMGR_CLI\" and in graphical stage it will open \"$FILEMGR_GUI\"
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 	help_text="$TR_MSG_TEXT_HELP"
 #

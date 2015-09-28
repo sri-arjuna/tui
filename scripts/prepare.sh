@@ -1,4 +1,21 @@
 #!/usr/bin/env bash
+# ------------------------------------------------------------------------
+# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# ------------------------------------------------------------------------
 #
 #	Prepare the RC file
 #
@@ -8,10 +25,30 @@
 #	Write it
 #
 	cat > "./tuirc" <<EOF
+# ------------------------------------------------------------------------
+# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# ------------------------------------------------------------------------
+#
 #	This file provides the default directories,
 #	required to created the user his own tuirc file.
 #
-	prefix=$prefix
+#	This file is NOT meant to be changed.
+#
+	prefix="$prefix"
 	[ -z "\$TUI_DIR_CONF" ] && readonly \\
 		TUI_DIR_CONF=$SYSCONFDIR/tui
 	[ -z "\$TUI_DIR_SYSTEM" ] && readonly \\

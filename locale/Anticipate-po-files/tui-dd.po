@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,29 +34,43 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"$ME ($script_version)\n"
-"Requires root rights.\n"
+"NAME\n"
+"  $ME - Write an ISO/IMG/BLOCKDEVICE to TARGET\n"
 "\n"
-"Usage: $ME SOURCE TARGET\n"
-"Writes SOURCE to TARGET\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] SOURCE [TARGET]\n"
+"  \n"
+"DESCRIPTION\n"
+"  Writes SOURCE to TARGET\n"
+"  SOURCE and TARGET can be, a partition, disk, directory, file\n"
 "\n"
-"SOURCE and TARGET can be, a partition, disk, directory, file\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+" \n"
+"EXAMPLE\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\ttui-dd ./somefile.iso /dev/sda\n"
+"\n"
+"HINTS\n"
+"  If you know youre"
 msgstr ""
 
-#: bin/tui-dd:101
+#: bin/tui-dd:128
 msgid "Requires root"
 msgstr ""
 
-#: bin/tui-dd:103
+#: bin/tui-dd:131
 #, sh-format
 msgid "Writing $SRC to $TARGET..."
 msgstr ""
 
-#: bin/tui-dd:104
+#: bin/tui-dd:132
 #, sh-format
 msgid "Written $SRC to $TARGET"
+msgstr ""
+
+#: bin/tui-dd:138
+msgid "Starting job, please wait..."
 msgstr ""

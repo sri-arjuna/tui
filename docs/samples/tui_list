@@ -1,31 +1,24 @@
 #!/usr/bin/env bash
-# -- Sample script to use with likewise named command --
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 #
-#	Variables
+#	Vars
 #
-	IAM_SAMPLE="${0##*/}"
-	LIST="one two three four five six seven eight nine ten eleven twelve"
-	tui-title "$IAM_SAMPLE samples"
+	LETTERS="$(echo {a..g})"
+	NUMBERS="$(echo {25..42})"
 #
-#	List entries of a list
+#	Action
 #
-	tui-title "Sample: #1"
-	tui-list $LIST
-#
-#	Print the list with 2 columns with roman counting
-#
-	tui-echo
-	tui-title "Sample: #2"
-	tui-list -2r $LIST
-#
-#	Print the list with 1 columns with alphabetic counting
-#
-	tui-echo
-	tui-title "Sample: #3"
-	tui-list -1a $LIST
-#
-#	Print without indexing at all
-#
-	tui-echo
-	tui-title "Sample: #4"
-	tui-list -n $LIST
+	tui-title "Single column"
+	tui-list -1 $LETTERS
+	
+	tui-title "Two columns numbered
+	tui-list -2n $LETTERS
+	
+	tui-title "Automatic columns numbered with roman letters"
+	tui-list -r $LETTERS
+
+	tui-title "Two columns with alpha numeric numbering"
+	tui-list -2a $NUMBERS
+
+	tui-title "List content of current directory"
+	ls | tui-list -n1

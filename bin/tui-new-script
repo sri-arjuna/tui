@@ -48,7 +48,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -56,23 +56,40 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.
-Also asks to create a basic man page template in the same location.
+NAME
+  $ME - Creates a new executable script
 
-Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
-Examples:	$ME fileA.sh			# Creates a script in ~/bin or ~/.local/bin if existing
-		$ME -s /opt/bin/fileB.sh	# Creates a standalone application script in /opt/bin
-Where options are:
-	-h		This screen
-	-b(asic)	Creates an empty script, with preset comment-indention (shell = $USER_SHELL)
-	-e(mpty)	Creates an empty script (default) (shell = $USER_SHELL)
-	-f(ull)		Creates a standalone application script template (bash only)
-	-r(egular)	Creates the same as basic, but with some code preset (bash only)
-	-s(elect)	Select among the script names found in $TUI_DIR_USER_TEMPLATES
+SYNOPSYS
+  $ME [-h|--help] [--version] [-befgrs] [/path/to/][./]SCRIPT
+  
+DESCRIPTION
+  Creates a new script in $HOME/bin, if $HOME/.local/bin does not exists.
+  Also asks to create a basic man page template in the same location.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -b(asic)	Creates an empty script, with preset comment-indention (shell = $USER_SHELL)
+  -e(mpty)	Creates an empty script (default) (shell = $USER_SHELL)
+  -f(ull)		Creates a standalone application script template (bash only)
+  -r(egular)	Creates the same as basic, but with some code preset (bash only)
+  -s(elect)	Select among the script names found in $TUI_DIR_USER_TEMPLATES
+ 
+EXAMPLE
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	$ME fileA.sh			# Creates a script in ~/bin or ~/.local/bin if existing
+	$ME -s /opt/bin/fileB.sh	# Creates a standalone application script in /opt/bin
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 	
@@ -100,10 +117,11 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		b)	SCRIPT="basic"		;;
 		e)	SCRIPT="empty"		;;
 		s)	oPWD="$PWD"
+			rmdir "$TUI_DIR_USER_TEMPLATES" 2>/dev/zero
 			[ -d "$TUI_DIR_USER_TEMPLATES" ] && \
 					cd "$TUI_DIR_USER_TEMPLATES" || \
 					cd "${TUI_DIR_TEMPLATES}/scripts"
-			SCRIPT=$(tui-select -a *)
+			SCRIPT=$(tui-select -a $($LS -1))
 			cd "$oPWD"
 			;;
 		# *)	printf "$help_text" ; exit $RET_HELP	;;

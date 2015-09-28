@@ -60,7 +60,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -68,22 +68,37 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: 		$ME [-hcCdty] arguments
-Examples:	$ME 
-		$ME -a
-		$ME -e optVAL
+NAME
+  $ME - Converts a bool return value in text
 
-Where options are:
-	-h|--help	This screen
-	-c		Makes first letter Capital
-	-C		Makes all letters CAPITAL
-	-d		Returns: done/fail
-	-t		Returns: true/false
-	-y		Returns: yes/no
-		
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [-hcCdty] \044?
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -c		Makes first letter Capital
+  -C		Makes all letters CAPITAL
+  -d		Returns: done/fail
+  -t		Returns: true/false
+  -y		Returns: yes/no
+ 
+EXAMPLE
+
+	tui-yesno "Do you like this?"
+	
+	answer_word=\044($ME -y \044?)
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 

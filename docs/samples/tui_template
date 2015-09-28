@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 tui-header "TUIRC - Samples"	"tui-$1"
-tui-title "Basic incovation"
+
+tui-title "Basic invocation"
 tui-$1
 
 tui-title "Example 2"

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+tui-header "TUIRC - Samples"	"tui-cat"
+
+tui-title "Basic invocation"
+tui-cat /etc/fstab
+
+tui-title "Example 2"
+grep -i boot /etc/fstab | tui-cat 
+
+tui-title "Example 3"
+tui-cat -t "Hello $USER, how are you today?"
+
+tui-title "Example 4"
+source tuirc
+head $DOCDIR/README.md | tui-cat -d 0.02

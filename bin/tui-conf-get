@@ -49,7 +49,7 @@
 #
 	TITLE="$(gettext 'Get values from conf files')"
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version - BETA
+GNU TUI ($ME, Version $script_version) - BETA
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -57,21 +57,39 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-$TITLE
-Usage: 		$ME [options] FILE [VALUENAME]
-Example:	$ME -l /etc/default/grub
-		$ME /etc/default/grub GRUB_CMD LINE_LINUX
-		$ME -i /etc/default/grub grub_cmd line_Linux
-		
-Where options are:
-	-h		This screen
-	-i		Is no longer case sensitive
-	-l		Lists values available in the file
-	-s		Use more secure retrieval, but slightly slower
+NAME
+  $ME - Gets a value from a configuration file
+
+SYNOPSYS
+  $ME [-h|--help] [--version] [-options] [-option arg]
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -i		Is no longer case sensitive
+  -l		Lists values available in the file
+  -s		Use more secure retrieval, but slightly slower
+ 
+EXAMPLE
+
+	$ME -l $TUI_FILE_CONF_COMMANDS
 	
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	value=\044($ME $TUI_FILE_CONF_COMMANDS PAGER)
+	
+  
+SEE ALSO
+  bash(1), cat(1), gawk(1), grep(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 #
 #	Author: 	Simon Arjuna Erat (sea)

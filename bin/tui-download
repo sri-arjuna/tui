@@ -35,7 +35,7 @@
 	fi
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
-#	Changed:2015.09.17
+#	Changed:2015.09.28
 #
 #
 #	Variable defaults
@@ -54,7 +54,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -62,24 +62,46 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage:	$ME [options] URL [URL2] ..
-Where options are:
-	-h	This screen
-	
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+NAME
+  $ME - Download files from web
+
+SYNOPSYS
+  $ME [-h|--help] [--version] URL [URL2 ..]
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+ 
+EXAMPLE
+
+	tui-download https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.1.tar.xz
+
+SEE ALSO
+  bash(1), curl(1), wget(1), tui-download(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
-	help_text="$TR_MSG_TEXT_HELP"
+	help_text="$TR_MSG_TEXT_HELP
+"
 	ARGS=( "${@}" )
 	FILE_TEMP="$TUI_DIR_TEMP/tui-download.status"
-	FILE_CMD="$TUI_DIR_TEMP/bgjob"
+	FILE_CMD="$TUI_FILE_TEMP.cmd"
 	DEST="" 
-	tui-bol-dir "$TUI_DIR_TEMP"  2>/dev/zero
+	tui-bol-dir "$TUI_DIR_TEMP"  2>/dev/zero 
 	LIST_APPS="wget curl"
 	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
 		CURLWGET="$(echo ${LIST_APP/$CURLWGET})"
 	TERM="${TERM:-GNU Linux}"
+	tui-bol-dir "$TUI_DIR_TEMP"
+	touch "$TUI_FILE_TEMP"
 #
 #	Messages
 #
@@ -93,6 +115,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 #	Variable handling
 #
+	trap "RET=$?;rm -f $TUI_FILE_TEMP $TUI_FILE_TEMP.cmd" INT ABRT QUIT KILL
 	version_text="$TR_MSG_TEXT_VERSION"
 	case "$1" in
 	"--version")	printf "$version_text"
@@ -113,8 +136,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				CURLWGET="$app" && \
 				break
 		done
-		#set -x
-		tui-conf-set "$APPS" CURLWGET "$CURLWGET"
+		tui-conf-set "$TUI_FILE_USER_APPS" CURLWGET "$CURLWGET"
 	fi
 	case "$CURLWGET" in
 	curl)	OPT_O="-o"
@@ -127,18 +149,34 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		tui-echo "$MSG_SELECT"
 		CURLWGET="$(tui-select curl wget)"
 		which "$CURLWGET" 1>/dev/zero && \
-			tui-conf-set "$APPS" CURLWGET $CURLWGET || \
+			tui-conf-set "$TUI_FILE_USER_APPS" CURLWGET $CURLWGET || \
 			exit 1
 		tui-asroot "tui-install $CURLWGET"
 		;;
 	esac
+	
+	curl_get_filesize() {
+		#
+		#
+			max_ret=$($AWK -vRS=$'\r' 'END{NR=3}END{print $2}' "$TUI_FILE_TEMP")
+			case ${max_ret:(-1)} in
+			G)	multi=$(( 1024 * 1024 * 1024 ))	;;
+			M)	multi=$(( 1024 * 1024 ))	;;
+			K)	multi=1024	;;
+			B)	multi=1	;;
+			esac
+			
+			max_val=$( echo "${max_ret:0:(-1)}" "$multi" | awk '{ print ($1*$2)}' )
+			echo ${max_val:-0}
+		}
 	
 	for URL in "${ARGS[@]}"
 	do 	THIS="${URL##*/}"
 		out_string="./$THIS"
 		
 		tui-printf -rS 2 "$MSG_INIT_ACT" #"$WORK"
-		echo "$CURLWGET $OPT_Q $OPT_C $OPT_O \"$THIS\" \"$URL\"" > "$FILE_CMD"
+		>$TUI_FILE_TEMP
+		echo "LC_ALL=C $CURLWGET $OPT_C $OPT_O \"$out_string\" \"$URL\" 1>/dev/zero 2>$TUI_FILE_TEMP" > "$FILE_CMD"
 		
 		chmod +x "$FILE_CMD"
 		"$FILE_CMD" &
@@ -147,13 +185,23 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		str_left="$MSG_ACT_ING"
 		str_middle="$THIS ($tmp_size)"	; len=${#str_middle}
 		
+		MAXVAL=$(curl_get_filesize)
 		# While its found, assume its till downloading...
 		while [ ! "" = "$(ps|$GREP $CURLWGET)" ]
-		do	tmp_size="$(ls -hl |$GREP $THIS |$AWK '{print $5}')"
+		do	tmp_size="$($LS -hl |$GREP $THIS |$AWK '{print $5}')"
 			COLUMNS="$(tput cols)"
 			str_middle="$THIS ($tmp_size)"
-			tui-progress "$str_left" "${str_middle_corrected}"
+			[ 0 -ne "${MAXVAL:-0}" ] && \
+				size_bar="$($LS -l |$GREP $THIS |$AWK '{print $5}')" \
+				opt_bar="-lbm $MAXVAL -c $size_bar" || \
+				opt_bar=""
+			
+			tui-progress $opt_bar "$str_left" "${str_middle_corrected}"
 			sleep 1
+			case ${CURLWGET,,} in
+			curl*)	MAXVAL=$(curl_get_filesize)
+				;;
+			esac
 		done
 		tui-status $? "${MSG_ACT_ING}: ${THIS}"
 	done 

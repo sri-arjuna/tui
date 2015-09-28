@@ -31,7 +31,9 @@
 		done
 	else	source tuirc
 	fi
-	break_on_injections "$@" && exit 1
+	# Disabled code injection protection,
+	# as one can run a script (which contains whatever), which bypasses those checks anyway...
+	# break_on_injections "$@" && exit 1
 	TERM="${TERM:-GNU Linux}"
 #
 #	File:		tui-asroot
@@ -39,7 +41,7 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.09.17
+#	Changed:	2015.09.27
 	script_version=0.9.1-alpha
 #	Description:	Executes passed command as root
 #
@@ -58,26 +60,54 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-	TR_MSG_TEXT_HELP_SHORT="$(eval_gettext 'Usage: 		$ME \"command\"')"
-	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
-Examples:	$ME \"cat /etc/crypttab\"
-		$ME -m \"Provide password to show crypttab\" \"cat /etc/crypttab\"
-Where options are:
-	-h(elp) 		This screen
-	-m(essage)	MSG	Prints \"MSG\" before asking for a password
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - Execute a command with root privileges
+
+SYNOPSYS
+  $ME [-h|--help] [--version] [-m "MES SA GE" ]
+  
+DESCRIPTION
+  Enables the author of a script to make sure certain commands are executed with root account privileges.
+  This helps the author of scripts to simplify the task to get done.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -m MSG	Prints "MSG" before asking for a password
+ 
+ENVIRONMENT
+  TERM	If TERM is not set, GNU TUI will set it to GNU Linux, this is required to determine wether GNU TUI runs in GUI or VT (cli only) mode.
+  UID	Reads UID to determine wether the user is root or not.
+  USER	If user is empty, it takes LOGINNAME to display the user name for sudo.
+  
+EXAMPLE
+
+	tui-asroot whoami
 	
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	tui-asroot "cat /etc/passwd"
+
+SEE ALSO
+  su(1), sudo(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  This script ($ME, $script_version) was written by Simon Arjuna Erat from Switzerland.
 ')"
-	TEXT_HELP="$TR_MSG_TEXT_HELP_SHORT$TR_MSG_TEXT_HELP_LONG"
+	TEXT_HELP="$TR_MSG_TEXT_HELP
+"
 	#------------------------------------------
 	TR_MSG_TEXT_PASSWORD="$(eval_gettext 'Please provide the password for $USER')"
 	TR_MSG_TEXT_ROOT="$(gettext 'Please provide the password for root')"

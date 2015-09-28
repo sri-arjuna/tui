@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.4
+	script_version=2.4a
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU Linux}"
 #
@@ -79,7 +79,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -87,27 +87,56 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: $ME [[-] | [str1] [str2] [str3]]
+NAME
+  $ME - The core display command of GNU TUI
 
-	Prints one string on the left"
-	Prints two strings left and right
-	Prints three strings left, entered and right
+SYNOPSYS
+  $ME [-h|--help] [--version] [[-] | [str1] [str2] [str3]]
+  
+DESCRIPTION
+  Prints one string on the left
+  Prints two strings left and right
+  Prints three strings left, entered and right
 
-Pass \"-\" to read input from pipe
-One can pass empty strings to align the desired output.
+  Pass \"-\" to read input from pipe
+  One can pass empty strings to align the desired output.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -		Read input from pipe
+  -E		Prints the echo
+  -H		Prints the header
+  -r		Returns cursors to line start
+  -S NUM	Prints status, without exit status
+  -T		Prints the title
+EXAMPLE
 
-Where options are:
-	-h|--help	This screen
-	--version	Prints the version and exits
-	-E		Prints the echo
-	-H		Prints the header
-	-r		Returns cursors to line start
-	-S	NUM	Prints status, without exit status
-	-T		Prints the title
+	$ME "Replace me" 
+	$ME "Replaced above line"
+	$ME -E "Replace again"
+	$ME -H "No more replacing"
+	$ME -T "Can you feel it?"
+	$ME -S \044? "Last command worked!"
+	$ME -rS 2 "Loading, and replace me..."
+  
+HINTS
+  If your script should feel too slow, 
+  you might get a slightly better performance using "tui-printf -E"
+  
+SEE ALSO
+  bash(1), console_codes(4), gawk(1), grep(1), printf(1),
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 	help_text="$TR_MSG_TEXT_HELP
 "
@@ -193,15 +222,13 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		2)	FIRST="$1"
 			SECOND="$2"
 			;;
-		*)	tui-printf -S 1 "Too many arguments ($#)!"
+		*)	tui-printf -S 1 "$(gettext 'Too many arguments (check quoting)')!"
 			exit 1
 			;;
 		esac
 		# For tui-status always use '3' strings
 		ARGS_COUNT=3
-	#set -x
-		THIRD="${retvalue[${NUM_ID:-1}]}"	2>/dev/zero	#     = 6+2=8
-	#set +x
+		THIRD="${retvalue[${NUM_ID:-1}]}"	2>/dev/zero
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
 	else
 		[ ! -z "$1" ] && FIRST="$1"

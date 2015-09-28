@@ -62,7 +62,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -70,17 +70,32 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: 	$ME \"Question\"
+NAME
+  $ME - Put a simple yes or no question
 
-Example: (Accepts: \"y,o,j,s\", denies everything else)
-	if $ME \"Do you want to do this?\"
-	then 	echo \"yes\"
-	else 	echo \"no\"
+SYNOPSYS
+  $ME [-h|--help] [--version] "Question to user?"
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+ 
+EXAMPLE
+
+	if $ME "Do you want to do this?"
+	then 	echo "yes"
+	else 	echo "no"
 	fi
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 
@@ -113,7 +128,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 	case "$1" in
 	"")	echo "$TR_MSG_TEXT_HELP"
-		exit "$RET_HELP"
+		exit $RET_HELP
 		;;
 	"--version")
 		echo "$TR_MSG_TEXT_VERSION"
@@ -121,7 +136,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		;;
 	"-h"|"--help")
 		echo "$TR_MSG_TEXT_HELP"
-		exit "$RET_HELP"
+		exit $RET_HELP
 		;;
 	esac
 	

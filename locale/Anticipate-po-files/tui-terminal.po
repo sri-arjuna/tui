@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -30,9 +30,33 @@ msgid ""
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
 
-#: bin/tui-terminal:60
+#: bin/tui-terminal:62
 #, sh-format
 msgid ""
+"\n"
+"NAME\n"
+"  $ME - Executed commands in a new terminal\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] \"echo $ESCAPED$USER_STRING\" | "
+"\"[ condition ] && action\" \n"
+"  \n"
+"DESCRIPTION\n"
+"  Opens provided command in the preferred terminal window.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 "\n"
 "Usage: $ME \\\"<cmd>\\\"\n"
 "\n"
@@ -44,19 +68,19 @@ msgid ""
 "General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 msgstr ""
 
-#: bin/tui-terminal:75
+#: bin/tui-terminal:100
 #, sh-format
 msgid "$ME: Requires to be in GUI mode"
 msgstr ""
 
-#: bin/tui-terminal:87
+#: bin/tui-terminal:112
 #, sh-format
 msgid ""
 "FATAL ERROR: No terminal could be identified, please set one manually in "
 "$APPS!"
 msgstr ""
 
-#: bin/tui-terminal:115
+#: bin/tui-terminal:140
 #, sh-format
 msgid ""
 "$TERMINAL: Using default option \\\"$opt\\\", please report your terminal "

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,50 +34,69 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"$ME ($script_version)\n"
-"Usage: $ME [options] file1 file2 ... ... target_directory\n"
-"Where options are:\n"
-"\t-h\tThis screen\n"
-"\t-d\tSwitch to (animated) dash-mode\n"
-"\t-f\tForce to overwrite if target exists\n"
-"\t-l\tShow long names (full passed target path)\n"
-"\t-q\tBe quiet, as in: print all on one line.\n"
+"NAME\n"
+"  $ME - Copy, TUI-Style\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-dflq] SOURCE [SOURCE2 ..] TARGET\n"
+"\n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -d\tSwitch to (animated) dash-mode\n"
+"  -f\tForce to overwrite if target exists\n"
+"  -l\tShow long names (full passed target path)\n"
+"  -q\tBe quiet, as in: print all on one line.\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\ttui-cp * $TARGET\n"
+" \n"
+"SEE ALSO\n"
+"  bash(1), cp(1), tui-progress(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-cp:69
+#: bin/tui-cp:88
 msgid "Copying"
 msgstr ""
 
-#: bin/tui-cp:70
+#: bin/tui-cp:89
 msgid "Copied"
 msgstr ""
 
-#: bin/tui-cp:71 bin/tui-cp:257
+#: bin/tui-cp:90 bin/tui-cp:276
 #, sh-format
 msgid "Copied $final_TOTAL of $MAX files to $TARGET"
 msgstr ""
 
-#: bin/tui-cp:116
+#: bin/tui-cp:135
 msgid "Enter (absolute) path to copy:"
 msgstr ""
 
-#: bin/tui-cp:185
+#: bin/tui-cp:204
 #, sh-format
 msgid "\\\"$thisFile\\\" exists, overwrite?"
 msgstr ""
 
-#: bin/tui-cp:198
+#: bin/tui-cp:217
 msgid "Reading"
 msgstr ""
 
-#: bin/tui-cp:208
+#: bin/tui-cp:227
 msgid "Skipped"
 msgstr ""
 
-#: bin/tui-cp:225 bin/tui-cp:226
+#: bin/tui-cp:244 bin/tui-cp:245
 msgid "to"
 msgstr ""

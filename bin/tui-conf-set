@@ -49,7 +49,7 @@
 #
 	TITLE="$(gettext 'Save values to conf files')"
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -57,26 +57,49 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-$ME ($script_version)
-$TITLE
-Usage: 		$ME [options] FILE VALUENAME [VALUE]
-Examples:	$ME -l  /etc/default/grub 			| Prints a list of found variable-names
-		$ME     /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as passed (VALUENAME)
-		$ME -ic /etc/default/grub grub_timeout 15	| Saves valuename as VALUENAME
-		$ME -i  /etc/default/grub grub_timeout 15	| Saves valuename as passed (valuename)
-		$ME -is /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as valuename
-		
-Where options are:
-	-h		This screen
-	-i		Internal search pattern is no longer case sensitive
-	-l		Lists values available in the file
-	-c		Writes the VALUE, and stores VALUENAME in capital chars
-	-s		Writes the VALUE, and stores VALUENAME in lower chars
-	-v		Prints a status message whether or not the value could be saved
+NAME
+  $ME - SHORTDESC
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [-options] [-option arg]
+  
+DESCRIPTION
+  desc
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -i		Internal search pattern is no longer case sensitive
+  -l		Lists values available in the file
+  -c		Writes the VALUE, and stores VALUENAME in capital chars
+  -s		Writes the VALUE, and stores VALUENAME in lower chars
+  -v		Prints a status message whether or not the value could be saved
+ 
+EXAMPLE
+
+	$ME -l  /etc/default/grub 			| Prints a list of found variable-names
+	
+	$ME     /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as passed (VALUENAME)
+	
+	$ME -ic /etc/default/grub grub_timeout 15	| Saves valuename as VALUENAME
+	
+	$ME -i  /etc/default/grub grub_timeout 15	| Saves valuename as passed (valuename)
+	
+	$ME -is /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as valuename
+
+SEE ALSO
+  bash(1), cat(1), gawk(1), grep(1), read(1), sed(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 #
 #	Author: 	Simon Arjuna Erat (sea)

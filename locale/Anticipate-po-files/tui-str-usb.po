@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,37 +34,55 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage: $ME [options]\n"
-"Select USB device if more than one is found\n"
-"Where options are:\n"
-"\t-h\tThis screen\n"
-"\t-a\tAuto select entry if only one was found\n"
+"NAME\n"
+"  $ME - Select an USB storage\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-options] [-option arg]\n"
+"\n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -a\tAuto select entry if only one was found\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\tusb=\\044($ME)\n"
+"\t\n"
+"\tusb=\\044($ME -a)\n"
+"\t\n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-str-usb:125
+#: bin/tui-str-usb:143
 msgid "Please connect an USB device..."
 msgstr ""
 
-#: bin/tui-str-usb:145
+#: bin/tui-str-usb:163
 msgid "The only device available is:"
 msgstr ""
 
-#: bin/tui-str-usb:146
+#: bin/tui-str-usb:164
 msgid "Is this a card reader that is always listed?"
 msgstr ""
 
-#: bin/tui-str-usb:147
+#: bin/tui-str-usb:165
 msgid "Ignore this device in future calls?"
 msgstr ""
 
-#: bin/tui-str-usb:151
+#: bin/tui-str-usb:169
 msgid "Do you want to be asked to select this device every time?"
 msgstr ""
 
-#: bin/tui-str-usb:152
+#: bin/tui-str-usb:170
 msgid "No, might result in that device being auto-selected!"
 msgstr ""

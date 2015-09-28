@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:58+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -33,41 +33,68 @@ msgstr ""
 #: bin/tui-bol-dir:58
 #, sh-format
 msgid ""
-"$ME ($script_version)\n"
-"Usage: $ME [-v] [-c] /path/to/check\n"
-"Returns 0 if /path/to/check was found or could be created\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"NAME\n"
+"  $ME - Make sure DIR exist\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-cv] DIR\n"
+"  \n"
+"\n"
+"DESCRIPTION\n"
+"  Returns true (0) if DIR exists or could be created.\n"
+"  Returns false (1) if DIR could not be created, or is a file\n"
+"\n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -c\t\tCount how many passed DIR do not exist, and use that as exit code\n"
+"  -v\t\tBe verbose\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\ttui-bol-dir -v *\n"
+"\t\n"
+"\ttui-bol-dir -cv /etc $HOME/.cache $HOME /fail1 /fail2\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-bol-dir:106 bin/tui-bol-dir:118
+#: bin/tui-bol-dir:134 bin/tui-bol-dir:146
 #, sh-format
 msgid "Found link: $dir_name"
 msgstr ""
 
-#: bin/tui-bol-dir:112
+#: bin/tui-bol-dir:140
 #, sh-format
 msgid "Found file: $dir_name"
 msgstr ""
 
-#: bin/tui-bol-dir:124
+#: bin/tui-bol-dir:152
 #, sh-format
 msgid "Found path: $dir_name"
 msgstr ""
 
-#: bin/tui-bol-dir:133
+#: bin/tui-bol-dir:161
 #, sh-format
 msgid "Successfully created: $dirname"
 msgstr ""
 
-#: bin/tui-bol-dir:134
+#: bin/tui-bol-dir:162
 #, sh-format
 msgid "Could not create: $dir_name"
 msgstr ""
 
-#: bin/tui-bol-dir:139
+#: bin/tui-bol-dir:168
 #, sh-format
 msgid "There has been $FAILED errors."
 msgstr ""

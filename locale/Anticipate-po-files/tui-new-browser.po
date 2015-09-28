@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -38,93 +38,115 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage:\t$ME [[/path/to/]FOLDERNAME]\n"
+"NAME\n"
+"  $ME - Create a new project based on tui-browser\n"
 "\n"
-"Creates a new tui-browser project in either \\044TUI_DIR_PROJECTS/"
-"FOLDERNAME\n"
-"or /path/to/FOLDERNAME.\n"
-"If \\044TUI_DIR_PROJECTS is not set yet, you will be asked for its "
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [[/path/to/]FOLDERNAME]\n"
+"  \n"
+"DESCRIPTION\n"
+"  Creates a new tui-browser project in either \\044TUI_DIR_PROJECTS/"
+"FOLDERNAME or /path/to/FOLDERNAME.\n"
+"  If \\044TUI_DIR_PROJECTS is not set yet, you will be asked for its "
 "location.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -a\t\tUse the \"application\" template which provides some sample files\n"
+" \n"
+"EXAMPLE\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\t$ME\n"
+"\t\n"
+"\t$ME -a $HOME/Projects/my_new_project\n"
+"\n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-new-browser:123
+#: bin/tui-new-browser:145
 msgid "Starting with basic required configuration"
 msgstr ""
 
-#: bin/tui-new-browser:126
+#: bin/tui-new-browser:148
 #, possible-sh-format
 msgid "You have not set \\\"$TUI_DIR_PROJECTS\\\" yet."
 msgstr ""
 
-#: bin/tui-new-browser:127
+#: bin/tui-new-browser:149
 msgid "All future projects will take that as their top dir."
 msgstr ""
 
-#: bin/tui-new-browser:128
+#: bin/tui-new-browser:150
 msgid "Enter Manual"
 msgstr ""
 
-#: bin/tui-new-browser:136
+#: bin/tui-new-browser:158
 msgid "Please provide full path to your projects dir:"
 msgstr ""
 
-#: bin/tui-new-browser:172
+#: bin/tui-new-browser:194
 msgid "Would you like to change some of the labels/captions?"
 msgstr ""
 
-#: bin/tui-new-browser:176 bin/tui-new-browser:183 bin/tui-new-browser:190
-#: bin/tui-new-browser:203 bin/tui-new-browser:210 bin/tui-new-browser:227
-#: bin/tui-new-browser:234 bin/tui-new-browser:241 bin/tui-new-browser:248
+#: bin/tui-new-browser:198 bin/tui-new-browser:205 bin/tui-new-browser:212
+#: bin/tui-new-browser:225 bin/tui-new-browser:232 bin/tui-new-browser:249
+#: bin/tui-new-browser:256 bin/tui-new-browser:263 bin/tui-new-browser:270
 #, sh-format
 msgid "Set the value for $task?"
 msgstr ""
 
-#: bin/tui-new-browser:187
+#: bin/tui-new-browser:209
 msgid "Location:"
 msgstr ""
 
-#: bin/tui-new-browser:207
+#: bin/tui-new-browser:229
 msgid "Sections"
 msgstr ""
 
-#: bin/tui-new-browser:214
+#: bin/tui-new-browser:236
 msgid "Tasks"
 msgstr ""
 
-#: bin/tui-new-browser:223
+#: bin/tui-new-browser:245
 msgid "Change some advanced settings?"
 msgstr ""
 
-#: bin/tui-new-browser:228
+#: bin/tui-new-browser:250
 #, sh-format
 msgid ""
 "What is the relative path ($APP_BASE/) of the installed configuration file:"
 msgstr ""
 
-#: bin/tui-new-browser:235
+#: bin/tui-new-browser:257
 #, sh-format
 msgid ""
 "What is the relative path ($APP_BASE/) of the folder to source configuration "
 "and/or function files?:"
 msgstr ""
 
-#: bin/tui-new-browser:242
+#: bin/tui-new-browser:264
 #, sh-format
 msgid "What type are your scripts?"
 msgstr ""
 
-#: bin/tui-new-browser:249
+#: bin/tui-new-browser:271
 #, sh-format
 msgid ""
 "When changing a section or a task has been executed, do you want to clear "
 "the screen?"
 msgstr ""
 
-#: bin/tui-new-browser:280
+#: bin/tui-new-browser:302
 #, possible-sh-format
 msgid ""
 "Would you like to ship/distribute $APP_TITLE using YASSI (Yet Another Simple "

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,48 +34,68 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage: $ME [options] [/path/to/]directory\n"
-"Where options are:\n"
-"\t-h\tThis screen\n"
-"\t-b\tShow progress bar\n"
-"\t-x\tExtract tarball\n"
+"NAME\n"
+"  $ME - tar, TUI-Style\n"
 "\n"
-"It is designed to pass directory names to compress, it will store the "
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-bx] [/path/to/]directory\n"
+"  \n"
+"DESCRIPTION\n"
+"  It is designed to pass directory names to compress, it will store the "
 "tarball in current path, named like the last folder.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -b\tShow progress bar\n"
+"  -x\tExtract tarball\n"
+" \n"
+"EXAMPLE\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\t$ME -b ../thisdir.tar.gz .\n"
+"\t\n"
+"\t$ME -x tarball.tar.gz\n"
+"\n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-tar:86
+#: bin/tui-tar:106
 msgid "Reading"
 msgstr ""
 
-#: bin/tui-tar:87
+#: bin/tui-tar:107
 msgid "Compressing"
 msgstr ""
 
-#: bin/tui-tar:88
+#: bin/tui-tar:108
 msgid "Compressed"
 msgstr ""
 
-#: bin/tui-tar:89
+#: bin/tui-tar:109
 msgid "Extracting"
 msgstr ""
 
-#: bin/tui-tar:107
+#: bin/tui-tar:127
 msgid "Enter (absolute) path to tar:"
 msgstr ""
 
-#: bin/tui-tar:126
+#: bin/tui-tar:146
 msgid "Failure reading"
 msgstr ""
 
-#: bin/tui-tar:174
+#: bin/tui-tar:194
 msgid "is not a file or could not be found!"
 msgstr ""
 
-#: bin/tui-tar:177
+#: bin/tui-tar:197
 msgid "Extracted:"
 msgstr ""

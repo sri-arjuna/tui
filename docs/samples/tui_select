@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# -- Sample script to use with likewise named command --
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 #
 #	Variables
 #
@@ -17,7 +17,7 @@
 	tui-echo
 	tui-title "Sample: #2"
 	value=$(tui-select -2 $LIST)
-	tui-status $? "Selected:" "$value"
+	tui-status $? "Selected value:" "$value"
 #
 #	Print the list with 1 column
 #

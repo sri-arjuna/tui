@@ -46,22 +46,54 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR	
 #
 #	Variable handling
 #
-	#[ -z $1 ] && echo -e "$help_text" && exit $RET_HELP
-	showVersion() { 
-	eval_gettext '
-GNU $ME, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+GNU TUI ($ME, Version $script_version)
+Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - Press enter, with an optional custom message
 
-'
-	}
+SYNOPSYS
+  $ME [-h|--help] [--version] [-options] [-option arg]
+ 
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+
+EXAMPLE
+
+	$ME
+	
+	$ME "Hello there"
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
+#
+#	Get Arguments xD
+#
 	case "$1" in
 	"--version")
 		showVersion

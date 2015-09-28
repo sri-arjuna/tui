@@ -47,41 +47,122 @@
 	TITLE="$(gettext 'Text User Interface')"
 	ME="${0##*/}"
 	ME_DIR="${0/${0##/*/}}"
-	help_text="
-$ME ($script_version)
-$TITLE
-Usage: 	$ME [options] [arguments]
-Where options are:
-	-h(elp)		This screen
+	help_text="$(eval_gettext '
+NAME
+  $ME ($script_version)
 
-	-T(itle)	STR	Title-label (upper-left) will be label'd as STR
-	-U(ser) 	STR	User-label (upper-right) will be labled as STR
-	-L(ocation)  	STR	Location will be labled as STR
-	-P(osition)	STR	Position (/ some / dir) will be overwritten by STR
-	
-	-p(ath)		PATH	Will use ARG as basedir
-	-n(oclear)		Don't clear screen after menu actions
-	-s(ource)	PATH	Sources the file or all files, if its a path, exports its values and prints a dot
-	-m(ode) 		Enables 'text' mode (nice looking)
-				instead of 'numeric' (easy handling, default)
-	
-	-- Text Mode --
-	-D(ir)  	STR	Folders will be labled as ARG
-	-F(ile) 	STR	Files will be labled as ARG
-	
-	-- Advanced --
-	-b(lacklist)	WORD	Add a WORD to the BLACKLIST of (GNU Linux-)commands not to be executed (Text mode only)
-	-c(onfig)	FILE	Full path to the configuration file of the project
-	-d(efault)	STR	Changes the file name string from 'default' to 'NAME'
-				These files will be hidden from the menu, and according to their
-				extension be called on different purposes...
-				default.info	- Will be shown upon folder entry
-				default.cmd	- Will be executed upon folder entry
-	-q(uiet)		Does not show header, title, footer
-	-S(show pos-line)	Forces the 'Location/Position' line to be shown when calling scripts
-	-X(eXecute)	SHELL	Which shell to use to execute scripts, default bash
+SYNOPSIS
+  $ME [-h|--help] [--version] [-mnqS] [-p DIR_OF_MENU_ROOT]
+  	[-c /path/to/file.conf] [-s /path/to/files/to/include]
+	[-D LABEL_DIR] [-F LABEL_FILES] 
+	[-L LABEL_LOCATION] [-P LABEL_POSITION] 
+	[-T LABEL_TITLE] [-U LABEL_USER]
+	[-b WORD_TO_BLACKLIST] [-d PREFIX_FOR*.{info,help,cmd}]
+	[-X SHELL_OF_CONTAINED_SCRIPTS]
+	[ARG UM ENTS]
+  
+  Where ARG could be a subfolder, UM a script and ENTS an argument to the 
+  script, of the passed "-p /path/to/menu".
 
-"
+DESCRIPTION
+  This is "The one script to rule them all!" :)
+  
+  It is ment to give a highly customizeable tool to be used for your own "file and directory based" projects.
+  It uses its arguments to match among its root directory folders and files, and changes to a path or executes files, even with argumemts.
+
+  It lets you browse through the folders, using either a "select" based menu ( -m num ) or a text based menu ( -m text - default ).
+
+  Also, one can simply provide help test within each folder, by simply providing a file named default.info which each should contain only text, and will be read line-wise before showing either the text or numeric menu.
+
+  Furthermore it helps to ease the task of catching arguments per file, since no matter how deep the file is, it handles arguments as if it was called directly.
+
+OPTIONS
+  -b WORD	Blacklists a certain string from beeing executed ( text mode only )
+  
+  -c /path/to/file.conf 	Full path to the configuration file of your project. All  variables  provided with that file, will be exported and are available by all called within the sub dirs of your root.
+
+  -D STRING	The "Directory" section will be labled as STRING ( text mode only )
+
+  -d STRING	For the path based info files, STRING will be used, rather than default (default).
+
+  -F STRING	The "File" section will be labled as STRING ( text mode only )
+
+  -L STRING	Renames Location: to STRING (2nd line upper left)
+
+  -m	When provided, enables textmode , default is numeric.
+
+  -P STRING	The "Position" section will be labled as STRING (2nd line upper right)
+
+  -p /path/to/menu/root 	Pass this if you want a specific path to be the menu-root.
+
+  -n	 Do no clear screen before the menu is shown again.
+
+  -S	Forces to show the location/position (2nd) line to be shown when executing a script directly.
+  Most likely you want to use this only when you use -P STRING or -L STRING as well.
+
+  -s /path/to/files/to/include  	Sources all files found in /path/to/files/to/include and exports  all  VARIABLES  and  FUNCTIONS
+  found within the files.
+
+  -T TITLE	This  TITLE  will  be  used in the top left as project title, and also when scripts are executed
+  before the passed arguments.
+
+  -U STRING	Changes the default userstring from $USER_NAME to STRING (top right)
+  
+  -d NAME	Changes the file name string from "default" to "NAME"
+		These files will be hidden from the menu, and according to their extension be called on different purposes...
+		* default.help - Will be shown if no script named "help" is found
+		* default.info - Will be shown upon folder entry
+		* default.cmd - Will be executed upon folder entry
+  
+  -q		Does not show header, title, footer
+	
+  -X	SHELL	Which shell to use to execute scripts, default bash
+
+EXAMPLES
+  Open the browser with the current directory as "root".
+
+	$ME
+ 
+  Opens the browser using provided -p /path/to/menu path.
+
+	$ME -p "$HOME/path with spaces"
+         
+  Starts the browser, using "My script manager" as title, and prints "Contains \044(ls|wc -l) entries" in the username area (top right), and shares the values of /path/to/config/file.conf among all scripts the browser will call, by exporting those variables, using /path/to/menu as base/root directory shown in the "Location bar"
+
+	$ME	-T "My script manager" \134\134
+			-p "/path/to/menu" \134\134
+			-U "Contains \044(ls\174wc -l) entries" \134\134
+			-c /path/to/config/file.conf \134\134
+			"\044{@}"
+
+NUMERIC MODE
+  The numeric mode is for easy and quick access and browse through the "BASE" (-p PATH) and all its subdirectories.
+  If one would "leave" the BASE directory to a toplevel one, $ME will exit. While browsing, only numeric inputs within range shown will be accepted, at any (sub-)level, all content of the current location will be displayed. With the exception of the "default.{cmd,info,help}" files, unless changed by -d STRING is provided, in which case it still hides all "STRING.{cmd,info,help}" files.
+  In both modes, default.{str,info} will be looked for, and if found, default.cmd will be sourced, with all variables and functions provided in the files passed with -c FILE and -s DIR/FILE, while default.info will be shown before the directory content.
+
+TEXTMODE
+  While the default numeric mode is for quick and easy access, the textmode, enabled with -m gives you a quite diffrent design or layout.
+  The main diffrence is, one doesnt select among numbers, but must enter the name of the item.
+  This said, and since one has the ability to write anyway, i also wanted to give you the possibility to block certain words. Similar to the numeric mode, at all times you have the option to go back or quit, by entering: b, B, BACK, back, Back or q, Q, quit, QUIT, Quit
+
+SEE ALSO
+  tuirc(1), tui-bol-dir(1), tui-bol-gui(1), tui-bol-root(1), tui-cat(1), 
+  tui-cp(1), tui-download(1), tui-echo(1), tui-edit(1), tui-header(1),
+  tui-install(1), tui-list(1), tui-log(1), tui-mv(1), tui-new-browser(1), 
+  tui-new-manpage(1), tui-new-script(1), tui-press(1), tui-printf(1), 
+  tui-progress(1), tui-read(1), tui-select(1), tui-status(1), tui-tar(1), 
+  tui-terminal(1), tui-title(1), tui-wait(1), tui-web(1), tui-yesno(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
 #
 # 	Default Interface:
 #
@@ -108,7 +189,7 @@ Where options are:
 #
 	menu=show
 	PWD_OLD="$PWD"	# This is where the user actually entered the command
-	export PWD_OLD	# Make sure one can access this from within the scripts called by tui-browser
+	export PWD_OLD	# Make sure one can access this from within the scripts called by $ME
 	CURRENT="$PWD"
 	
 	# Text mode only

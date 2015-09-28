@@ -1,4 +1,21 @@
 #!/usr/bin/env bash
+# ----------------------------------------------------------------------
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+# ----------------------------------------------------------------------
 source tuirc
 
 cat > "$DEST" << EOF
@@ -77,18 +94,44 @@ License $DEFAULT_LICENSE or later <$DEFAULT_LICENSE_URL>
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-	MSG_TR_HELP="\$(eval_gettext 'SYNTAX
-	\$script_name [options] args ...')"
+	MSG_TR_HELP="\$(eval_gettext '
+NAME
+  $script_name - SHORTDESC
 
+SYNOPSYS
+  $script_name [-h|--help] [--version] [-abcx] [--option] [--more opt]
+  
+DESCRIPTION
+  desc
+  
 OPTIONS
-	-h|--help		Shows this screen and exits
-	--version		Shows the version and exits
-	
-	--YOUROPT ARG		Sets \"opt_str\" to ARG
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -a		Some
+  -b		more
+  -c		text
+  --more opt	desc
+ 
+EXAMPLE
 
-Please report command bugs (in english, with LC_ALL=C) to: <$USER_EMAIL>
-\${script_package}Homepage: <$USER_HOMEPAGE>
-For more help on how to use GNU-Software: <http://www.gnu.org/gethelp/>
+	code
+
+HINTS
+  Some_text
+  
+SEE ALSO
+  tuirc(1), txt2man(1), gettext(1)
+  
+BUGS
+  Report bugs to: mailinglist ; <$USER_EMAIL>
+  
+  $script_name - Homepage: <$USER_HOMEPAGE>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  $USER_NAME, <$USER_HOMEPAGE>
 ')"
 	MSG_TR_XY="\$(gettext '')"
 	MSG_TR_XX="\$(gettext '')"

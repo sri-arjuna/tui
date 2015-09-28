@@ -50,7 +50,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -58,17 +58,37 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: $ME [options] [/path/to/]directory
-Where options are:
-	-h	This screen
-	-b	Show progress bar
-	-x	Extract tarball
+NAME
+  $ME - tar, TUI-Style
 
-It is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
+SYNOPSYS
+  $ME [-h|--help] [--version] [-bx] [/path/to/]directory
+  
+DESCRIPTION
+  It is designed to pass directory names to compress, it will store the tarball in current path, named like the last folder.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -b	Show progress bar
+  -x	Extract tarball
+ 
+EXAMPLE
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	$ME -b ../thisdir.tar.gz .
+	
+	$ME -x tarball.tar.gz
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 	version_text="$TR_MSG_TEXT_VERSION
 "

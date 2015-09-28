@@ -1,10 +1,12 @@
+This document is about how to install GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+
 Configuration:
 --------------
 
 Since TUI is meant have a minimalists approach, there is not much to configure.
 However, you do so by calling:
 	
-	tui config
+	tuirc config
 
 There will be these to change:
 1.	$TUI\_THEME, to define the colors for tui-{header,title} and the borders printed in $HOME/.tuirc

@@ -56,7 +56,7 @@
 #
 	TITLE="$(gettext 'Create a new TUI project')"
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -64,15 +64,37 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage:	$ME [[/path/to/]FOLDERNAME]
+NAME
+  $ME - Create a new project based on tui-browser
 
-Creates a new tui-browser project in either \044TUI_DIR_PROJECTS/FOLDERNAME
-or /path/to/FOLDERNAME.
-If \044TUI_DIR_PROJECTS is not set yet, you will be asked for its location.
+SYNOPSYS
+  $ME [-h|--help] [--version] [[/path/to/]FOLDERNAME]
+  
+DESCRIPTION
+  Creates a new tui-browser project in either \044TUI_DIR_PROJECTS/FOLDERNAME or /path/to/FOLDERNAME.
+  If \044TUI_DIR_PROJECTS is not set yet, you will be asked for its location.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -a		Use the "application" template which provides some sample files
+ 
+EXAMPLE
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	$ME
+	
+	$ME -a $HOME/Projects/my_new_project
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 #

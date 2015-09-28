@@ -48,7 +48,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -56,20 +56,43 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Creates a new man page in $HOME/bin, if $HOME/.local/bin does not exists.
-Also asks to create a basic man page template in the same location.
+NAME
+  $ME - Creates a new and empty manpage template
 
-Usage:  	$ME [options] [path/to/]FILENAME # Creates the file in that location
-Examples:	$ME fileA.sh			# Creates a script in $HOME/bin
-		$ME -a $PREFIX/share/man/man1/$ME[.1]	# Creates a full application script in /opt/bin
-Where options are:
-	-h		This screen
-	-a(pplication)	Create a full application manpage template
-	-m(inimal)	Creates a minimal manpage template
+SYNOPSYS
+  $ME [-h|--help] [--version] [-am] [path/to/]FILENAME
+
+DESCRIPTION
+  Creates a new man page in $HOME/bin, if $HOME/.local/bin does not exists.
+  Also asks to create a basic man page template in the same location.
+
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -a		Create a full application manpage template
+  -m		Creates a minimal manpage template
+ 
+EXAMPLE
+
+	$ME
 	
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	$ME ./my-manpage[.1]
+	
+	$ME -a my-full-manpage
+
+SEE ALSO
+  bash(1), groff(1), troff(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 	help_text="$TR_MSG_TEXT_HELP

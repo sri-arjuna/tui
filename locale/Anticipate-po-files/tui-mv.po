@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,40 +34,63 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage: $ME [options] file1 file2 ... ... target_directory\n"
-"Where options are:\n"
-"\t-h\tThis screen\n"
-"\t-d\tSwitch to (animated) dash-mode\n"
-"\t-f\tForce to overwrite if target exists\n"
-"\t-l\tShow long names (full passed target path)\n"
-"\t-q\tBe quiet, as in: print all on one line.\n"
+"NAME\n"
+"  $ME - mv, TUI-Style\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-options] [-option arg]\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -d\tSwitch to (animated) dash-mode\n"
+"  -f\tForce to overwrite if target exists\n"
+"  -l\tShow long names (full passed target path)\n"
+"  -q\tBe quiet, as in: print all on one line.\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\t$ME SOURCE SOURCE2 TARGET\n"
+"\t\n"
+"\t$ME -qfl SOURCE SOURCE2 SOURCE3 TARGET\n"
+"\n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 "\n"
 "Report bugs to: erat.simon@gmail.com\n"
 "TUI home page: <http://www.gnu.org/software/tui/>\n"
 "General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 msgstr ""
 
-#: bin/tui-mv:197
+#: bin/tui-mv:220
 #, sh-format
 msgid "Reading $thisFile..."
 msgstr ""
 
-#: bin/tui-mv:204
+#: bin/tui-mv:227
 #, sh-format
 msgid "Skipped $thisFile."
 msgstr ""
 
-#: bin/tui-mv:232
+#: bin/tui-mv:255
 #, sh-format
 msgid "Moving to $display_trgt..."
 msgstr ""
 
-#: bin/tui-mv:233
+#: bin/tui-mv:256
 #, sh-format
 msgid "Moved to $display_trgt"
 msgstr ""
 
-#: bin/tui-mv:262
+#: bin/tui-mv:285
 #, sh-format
 msgid "Moved $TOTAL_COUNT of $MAX items to $TARGET"
 msgstr ""

@@ -3,24 +3,25 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:58+0200\n"
-"PO-Revision-Date: 2015-09-20 06:09+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: Simon A. Erat (sea) <erat.simon@gmail.com>\n"
-"Language-Team: \n"
-"X-Generator: Poedit 1.8.4\n"
 
 #: bin/tui-bgjob-mgr:77
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -31,139 +32,161 @@ msgstr ""
 
 #: bin/tui-bgjob-mgr:85
 #, sh-format
-msgid "Usage: \t\t$ME [options] scripts ..."
-msgstr ""
-
-#: bin/tui-bgjob-mgr:86
-#, sh-format
 msgid ""
 "\n"
-"Examples:\t$ME ./script1 /some/path/script2\n"
-"\t\t$ME -c script[1-9]\n"
+"NAME\n"
+"  $ME - Run multiple scripts in background\n"
 "\n"
-"Where options are:\n"
-"\t-h(elp) \t\tThis screen\n"
-"\t-L(og)\t\t\tShow the log file ($LOG)\n"
-"\t-c(count)\t\tThe exit code is now the number of successfully executed "
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-cdqv] [-l NUM] [-w NUM] SCRIPT1 SCRIPT2 ...\n"
+"  \n"
+"DESCRIPTION\n"
+"  Runs several scripts in background,\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -L(og)\t\t\tShow the log file ($LOG)\n"
+"  -c(count)\t\tThe exit code is now the number of successfully executed "
 "scripts.\n"
-"\t-l(imit)\tNUM\tLimits the number of parallel executed scripts, 5 default, "
-"0 to disable\n"
-"\t-d(el-log)\t\tDeletes (empty) the log file ($LOG)\n"
-"\t-q(uiet)\t\tJust return the exit code, be non-verbose\n"
-"\t-v(erbose)\t\tBe verbose, starts every script in its own terminal (GUI "
+"  -l(imit) NUM\tLimits the number of parallel executed scripts, 5 default, 0 "
+"to disable\n"
+"  -d(el-log)\t\tDeletes (empty) the log file ($LOG)\n"
+"  -q(uiet)\t\tJust return the exit code, be non-verbose\n"
+"  -v(erbose)\t\tBe verbose, starts every script in its own terminal (GUI "
 "only!)\n"
-"\t-w(wait)\tNUM\tChange the amount of seconds to wait between update-"
-"checks\n"
+"  -w(wait) NUM\tChange the amount of seconds to wait between update-checks\n"
 "\n"
-"Files:\n"
-"Log:\t\t$LOG\n"
-"Temp dir:\t$TEMP\n"
+" \n"
+"EXAMPLE\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\tcd ./job/scripts\n"
+"\t\n"
+"\t$ME -l 10 *\n"
+"FILES\n"
+"  $LOG\tWhen is which script executed and how did it exit?\n"
+"  $TEMP\tWhere the temp files of the scripts are\n"
+"\n"
+"HINTS\n"
+"  If you need to have scripts executed upon previous success scripts, try:\n"
+"\n"
+"  \t$ME -qc *\n"
+"\n"
+"SEE ALSO\n"
+"  bash(1), ps(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:111
+#: bin/tui-bgjob-mgr:138
 msgid "Background Job Manager"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:112
+#: bin/tui-bgjob-mgr:139
 #, sh-format
 msgid "Changed the limit to: $LIMIT"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:113
+#: bin/tui-bgjob-mgr:140
 #, sh-format
 msgid "Count is now $COUNT"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:114
+#: bin/tui-bgjob-mgr:141
 msgid "Enabled quiet mode"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:115 bin/tui-bgjob-mgr:193
+#: bin/tui-bgjob-mgr:142 bin/tui-bgjob-mgr:220
 #, sh-format
 msgid "Enabled DEBUG mode"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:116
+#: bin/tui-bgjob-mgr:143
 #, sh-format
 msgid "Change the wait interval to: $WAIT"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:117
+#: bin/tui-bgjob-mgr:144
 #, sh-format
 msgid "You started $MAX scripts, of which $GOOD exited with success"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:120
+#: bin/tui-bgjob-mgr:147
 msgid "Options:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:121
+#: bin/tui-bgjob-mgr:148
 msgid "Status:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:122
+#: bin/tui-bgjob-mgr:149
 msgid "Summary:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:125
+#: bin/tui-bgjob-mgr:152
 msgid "cancel"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:126
+#: bin/tui-bgjob-mgr:153
 msgid "typo"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:129
+#: bin/tui-bgjob-mgr:156
 msgid "Finished:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:130
+#: bin/tui-bgjob-mgr:157
 msgid "Running:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:131
+#: bin/tui-bgjob-mgr:158
 msgid "Waiting"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:132
+#: bin/tui-bgjob-mgr:159
 msgid "Starting:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:135
+#: bin/tui-bgjob-mgr:162
 #, sh-format
 msgid "FAILED script: Empty pid while running : $script($pid) returned $RET"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:136
+#: bin/tui-bgjob-mgr:163
 msgid "Typo in script:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:137
+#: bin/tui-bgjob-mgr:164
 #, sh-format
 msgid "Invalid STATUS ($STATUS) on $C $this_script"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:140
+#: bin/tui-bgjob-mgr:167
 msgid "Scripts completed"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:141
+#: bin/tui-bgjob-mgr:168
 msgid "Currently running:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:142
+#: bin/tui-bgjob-mgr:169
 msgid "Successfully executed:"
 msgstr ""
 
-#: bin/tui-bgjob-mgr:143
+#: bin/tui-bgjob-mgr:170
 msgid "Wait for update..."
 msgstr ""
 
-#: bin/tui-bgjob-mgr:161
+#: bin/tui-bgjob-mgr:188
 #, sh-format
 msgid "Created log file of $ME ($script_version)"
 msgstr ""

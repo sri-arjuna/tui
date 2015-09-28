@@ -50,7 +50,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -58,14 +58,28 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: 		$script_name [-v "final msg"] TIME[interval_type] [MSG]
-Examples:	$script_name 2s
-		$script_name 1m \"Until somewhat happens\"
-		$script_name -v \"Starting XY...\" 5m \"Starting XY in\"
+NAME
+  $ME - Wait some time
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] TIME ["Message to user"]
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+
+EXAMPLE
+
+	$ME 1m "Wait a minute"
+	
+	$ME 1h "Wait an hour"
+
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
 	version_text="$TR_MSG_TEXT_VERSION
 "

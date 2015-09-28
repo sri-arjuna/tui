@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# -- Sample script to use with likewise named command --
-#
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 IAM_SAMPLE="${0##*/}"
-
 tui-title "$IAM_SAMPLE samples"
 
 #

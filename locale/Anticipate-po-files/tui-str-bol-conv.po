@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -34,52 +34,67 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage: \t\t$ME [-hcCdty] arguments\n"
-"Examples:\t$ME \n"
-"\t\t$ME -a\n"
-"\t\t$ME -e optVAL\n"
+"NAME\n"
+"  $ME - Converts a bool return value in text\n"
 "\n"
-"Where options are:\n"
-"\t-h|--help\tThis screen\n"
-"\t-c\t\tMakes first letter Capital\n"
-"\t-C\t\tMakes all letters CAPITAL\n"
-"\t-d\t\tReturns: done/fail\n"
-"\t-t\t\tReturns: true/false\n"
-"\t-y\t\tReturns: yes/no\n"
-"\t\t\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
-msgstr ""
-
-#: bin/tui-str-bol-conv:144
-msgid "done"
-msgstr ""
-
-#: bin/tui-str-bol-conv:145
-msgid "fail"
-msgstr ""
-
-#: bin/tui-str-bol-conv:149
-msgid "true"
-msgstr ""
-
-#: bin/tui-str-bol-conv:150
-msgid "false"
-msgstr ""
-
-#: bin/tui-str-bol-conv:154
-msgid "yes"
-msgstr ""
-
-#: bin/tui-str-bol-conv:155
-msgid "no"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-hcCdty] \\044?\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -c\t\tMakes first letter Capital\n"
+"  -C\t\tMakes all letters CAPITAL\n"
+"  -d\t\tReturns: done/fail\n"
+"  -t\t\tReturns: true/false\n"
+"  -y\t\tReturns: yes/no\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\ttui-yesno \"Do you like this?\"\n"
+"\t\n"
+"\tanswer_word=\\044($ME -y \\044?)\n"
+"\n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
 #: bin/tui-str-bol-conv:159
-msgid "on"
+msgid "done"
 msgstr ""
 
 #: bin/tui-str-bol-conv:160
+msgid "fail"
+msgstr ""
+
+#: bin/tui-str-bol-conv:164
+msgid "true"
+msgstr ""
+
+#: bin/tui-str-bol-conv:165
+msgid "false"
+msgstr ""
+
+#: bin/tui-str-bol-conv:169
+msgid "yes"
+msgstr ""
+
+#: bin/tui-str-bol-conv:170
+msgid "no"
+msgstr ""
+
+#: bin/tui-str-bol-conv:174
+msgid "on"
+msgstr ""
+
+#: bin/tui-str-bol-conv:175
 msgid "off"
 msgstr ""

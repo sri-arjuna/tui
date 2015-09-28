@@ -2,11 +2,11 @@
 @comment %**start of header
 @setfilename tui.info
 @include _version.texi
-@settitle Manual 1.0 for Text User Interface (TUI)
+@settitle Manual 1.0 for GNU Text User Interface (TUI)
 @syncodeindex pg cp
 @comment %**end of header
 @copying
-This manual is for TUI (version @value{VERSION}, @value{UPDATED})
+This manual is for GNU TUI (version @value{VERSION}, @value{UPDATED})
 Copyright @copyright{} 2011-2015 Simon Arjuna Erat
 TUI is licensed as GPLv3.
 The manual is licensed as GFDL.
@@ -42,10 +42,10 @@ gnu,linux,script,bash,ash,csh,zsh,tui,cli
 @ifnottex
 @node Top
 @top GNU TUI
-This manual is for TUI (version @value{VERSION}, @value{UPDATED}).
+This manual is for GNU TUI (version @value{VERSION}, @value{UPDATED}).
 @end ifnottex
 
-TUI is a command based Text User Interface framework for scripts.
+GNU TUI is a command based Text User Interface framework for scripts.
 
 Although it requires BASH to be installed, the commands can be called from other SHELLS as well.
 But be aware of their differences, such as string formatting and possible exit codes as examples.
@@ -1007,17 +1007,40 @@ Note, that in this case, SHELL could also be: Python or Perl, aside from ash, cs
 @chapter Appendix
 
 @section History of TUI
+@subsection Original Origin
 Around 1995 i've met the MSDOS command 'net', 
 which allowed me to send messages to a friends computer in the like of: 'net send <IP> "msg"'.
 
 That kind of usage feeling impressed me, to some extend, it was 'speech control', and i wanted to make something like that available.
-Not 'speech control' but allow 'words' to form a 'command' which then is executed.
+Not literal 'speech control' but allow 'words' to form a 'command' which then is executed.
 
-16 years later, i've joined the linux community and figured the power of BASH, which was the default shell on 
-all but one distributions i have tried within my first year.
+A bit later, a friend asked me if we wanted to try to write an interface for the console, but we failed badly because he was pushing for GUI actions too much, which text just doesnt allow that easily.
+Sadly, my BATCH and QBASIC skills werent that trained, and beeing a teenager, i had other interests too, so that idea never got realized.
 
-Due to that process of repeative installation and configuration of the system, i wanted to ease that task by writing scripts.
-Seeing other scripts, the linux loading text of the console, and the urge to simply some scripting tasks, i started to write some first functions.
+Early 2000 those ideas, thoughts and goals lost their focus pretty quickly when i joined the army for some service.
+
+
+
+@subsection First year of GNU/Linux
+Back in May 2011, i've got annoyed by Windows 7 - actually by the laptop it was installed on, as it didnt have a GPU (graphic processor unit) to play games - eventually i figured to try GNU/Linux again, after like 16 ears.
+As you are probaly aware, there is more than just one flavor of GNU/Linux. 
+
+There are more than just the mainstream 'brands' (like: Ubuntu, Mint, Fedora/RedHat, Debian, etc) but there is also a wide range of DE and WM's.
+So, still being a technical enthusiast, who likes to tinker around, break things and learn new things, i've enjoyed the diversity of so many distributions (also known as: distro / distros).
+
+Anyway, so end of May 2011, when Fedora 15 (LoveLock) was just released, i 'joined' GNU/Linux, as in, the distro hopping began.
+
+As i been 'at home' among diffrent distros/de/wm combinations, i quickly figured, the most powerfull tool to get things done on any possibe combination, while giving me the power to maintain/change the tool even at init 1, was scripts.
+
+In the end, I ended up having tons of scripts doing almost the same, just for every different distro i had tried.
+But all those scripts had something in common, they did the very same things (tweakings/installations) on different ways (apt-get, brewer, pacman, yum...) or with different paths set.
+Oh boy did i start writing scripts, at first each script/task for its own distro, then i started to sort them in folders, but could no longer access them easily from anywhere of the terminal.
+
+
+@subsection Getting used to GNU/Linux and the birth of 'script-tools'
+Due to that process of repeative installation and configuration of the system, i wanted to ease that task of writing scripts.
+Seeing other scripts, the GNU/Linux loading text of the console, and the urge to simply some scripting tasks, i started to write some first functions.
+
 At some later time, that project was renamed several times, ending up with the name 'script-tools'.
 This said, you probably can imagine that 'TUI' was just a very part of 'script-tools', 
 which - due to several sub sections - had functions stored in external files, 
@@ -1027,28 +1050,27 @@ so i would not need to edit several files to apply a single char change.
 When i started to figure that i had several functions twice, with a slightly different name in another function-script, 
 but doing the very same task, i thought avoidance might be the key.
 
-This was in 2014, 3 years after my joining to the linux community, 'constantly' working on that project,
+This was in 2014, 3 years after my joining to the GNU/Linux community, 'constantly' working on that project,
 so that project 'script-tools' contained everything, from tweaking grub1 & grub2, plymouth, signature generator, project manager (rpm, mock, kickstart/specs, git/sf, ftp, rpm repo, cron) to name a few...
 
 Now 'script-tools' was already part of that idea, you could call it like 'st tweak grub 2 timeout 4' or browse there by just calling 'st'.
-Those (not really) first functions where: sS, yesno, sE, sT and sH, representing the todays commands tui-status, tui-yesno, tui-echo, tui-title and tui-header.
-Figured, having the display functions and the working functions mixed up, causes unneeded trouble and could be avoided by extracting the display fuctions as their own project -- TUI.
 
+@subsection The extraction of TUI
 Those (not really) first functions where: sS, yesno, sE, sT and sH, representing the todays commands tui-status, tui-yesno, tui-echo, tui-title and tui-header.
 At first, i thought i might keep them as functions, due to the one time reading to the memory, it would be very fast afterwards.
+Figured, having the display functions and the working functions mixed up, causes unneeded trouble and could be avoided by extracting the display fuctions as their own project -- TUI.
+
 But then i thought of all the other shells i havent tried yet, but beeing aware that most of them work generally the same way,
 i wanted to make TUI also available to them - to some extend.
 Keeping TUI as plain BASH functions was no longer an option.
-Providing them as scripts/commands while sharing the same variables was the next obvious and usable option.
+Providing these functions as scripts/commands while sharing the same variables was the next obvious and usable option.
 
-Eventually, i thought i was done - besides of a few work-overs for one or two commands to improve usability, and therefor i thought i was ready to introduce TUI to GNU.
 
-After reading several hours of manuals and webpage and vides guides regarding the GNU Autotools (autoconf & automake), as well as TexInfo and GetText, my mind got blown, with all the additional (but very logical) requirements.
-After i had finaly managed my project to be installed properly by automake (make), it started to fail because of the 'po files', and i could not test my fixes on TUI.
-Since to simply toggle the including the 'po files' i had to edit multiple files and rerun the autotools, but even more because my project code stats went from 99% shell to 73.5% groff code, just because of the installation tools.
-This together caused me to write YASSI, which now is used to install TUI and provide as good GNU Automake syntax as possible.
+@subsection Finalizing TUI
 
-Luckily, during the time of evaluation of TUI to become GNU TUI, the gettext tools seemed to have massivly increased in speed, so that tool seem usable again...
+Eventually, i thought it was done - besides of a few work-overs for one or two commands to improve usability, and therefor i thought i was ready to introduce TUI to GNU.
+After deleting some commands, there were still over 46 commands to be worked on, their manpage, their wiki.md, their infotext and their helpscreens.
+Preparing all the commands to be translateable was more of a mental challenge in regards of the count of the command, rather than the actual effort required.
 
 
 @subsection About the Author

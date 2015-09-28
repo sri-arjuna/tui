@@ -51,7 +51,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -59,19 +59,45 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-$ME ($script_version)
-Requires root rights.
+NAME
+  $ME - Write an ISO/IMG/BLOCKDEVICE to TARGET
 
-Usage: $ME SOURCE TARGET
-Writes SOURCE to TARGET
+SYNOPSYS
+  $ME [-h|--help] [--version] SOURCE [TARGET]
+  
+DESCRIPTION
+  Writes SOURCE to TARGET
+  SOURCE and TARGET can be, a partition, disk, directory, file
 
-SOURCE and TARGET can be, a partition, disk, directory, file
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+ 
+EXAMPLE
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+	tui-dd ./somefile.iso /dev/sda
+
+HINTS
+  If you know you're going to write an ISO to an USB device, you can leave out the target as:
+  
+	tui-dd ./somefile.iso 
+  
+SEE ALSO
+  bash(1), dd(1), ps(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
-	help_text="$TR_MSG_TEXT_HELP"
+	help_text="$TR_MSG_TEXT_HELP
+"
 #
 #	Variable handling
 #
@@ -92,25 +118,29 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
 	case "$TARGET" in
 	"")	if tui-yesno "Use USB as target?"
-		then	TARGET=$(tui-str-usb)
+		then	TARGET="$(tui-str-usb)"
 		else	printf "$help_text"
 			exit 1
 		fi
 		;;
 	esac
-	[ 0 -eq $UID ] || tui-status 1 "$(gettext 'Requires root')" || exit 1
-	SRC="$(basename $SOURCE)"
+	[ "/dev" = "${TARGET:0:4}" ] && [ 0 -ne $UID ] && \
+		tui-printf -S 1 "$(gettext 'Requires root')" && \
+		exit 1
+	SRC="${SOURCE##*/}"
 	TR_MSG_STRING_WORK="$(eval_gettext 'Writing $SRC to $TARGET...')"
 	TR_MSG_STRING_DONE="$(eval_gettext 'Written $SRC to $TARGET')"
 #
 #	Display
 #
-	tui-printf "$(gettext 'Starting job, please wait...'" "$WORK"
-	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP")   &
+	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP" ; sync)   &
+	PID=$!
+	tui-printf -rS 2 "$(gettext 'Starting job, please wait...')"
 	sleep 0.7
-	PID=$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')
-	MAX=$($LS -l "$SOURCE"|$AWK '{print $5}')
-	
+#	PID=$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')
+	[ -b "$SOURCE" ] && \
+		MAX=$(gdisk -l $SOURCE|$AWK -v DEV_NUM="$(echo $TARGET|tr -d [:alpha:])" '/ DEV_NUM / {print $4,$5}') || \
+		MAX=$($LS -l "$SOURCE"|$AWK '{print $5}')
 	while [ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
 	do 	kill -USR1 $PID 2>&1
 	 	SIZE=($(tail -n 3 "$TUI_FILE_TEMP" | $GREP "Bytes"|$AWK '{print $1}'))
@@ -118,4 +148,5 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		tui-progress -lbm $MAX -c ${SIZE:-$MAX} "$TR_MSG_STRING_WORK" "$MB"
 		sleep 0.7
 	done
-	tui-status $? "$TR_MSG_STRING_DONE"
+	tui-status $(<$TUI_FILE_TEMP) "$TR_MSG_STRING_DONE"
+

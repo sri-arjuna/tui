@@ -58,7 +58,7 @@
 	
 	TITLE="$(gettext 'Install packages')"
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -66,23 +66,56 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: 		$ME [options] PACKAGES
-Examples:	$ME PACKAGE
-		$ME -
-		$ME -q pkg1 pkg2
-		$ME -l /path/to/logfile.log LIST OF PACKAGES
-Where options are:
-	-h(elp) 		This screen
-	-------------------------------------------------------
-	-b(ased)		Prints on what the distro is based on and exit
-	-d(istro)		Prints the distro name and exit
-	-l(og)		ARG	Writes and entry to ARG whether installation was successful or not
-	-q(uiet)		Install all at once, will fail if not all packages are available
-	-y(es)			Automatically accept the package manager questions
+NAME
+  $ME - Package installer
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [-bdqy] [-l LOG] PACK AG ES ..
+
+DESCRIPTION
+  It is not a synonym for "install", but aims to become a handler for package managers, but only to install dependencies.
+  
+  To do so, it is looking for the most known/spearch distros, and tries to figure out if it is based on another.
+  It reckognizes: arch, debian (*buntu, mint), redhat (centos, fedora, sl)
+  Needs verification for: exherbo, gentoo, mac, opensusue, openbsd, freebsd
+  
+  Currently it installs using: yum/dnf, pcmanm, apt-get
+  Need verification for: brew, cave, emerge, port, pkg, pkgng, zypper
+  
+  The return values of "-b" and "-d" are ment to assist you to provide the proper package names.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -b		Prints on what the distro is based on and exit
+  -d		Prints the distro name and exit
+  -l LOG	Writes and entry to LOG whether installation was successful or not
+  -q		Install all at once, will fail if not all packages are available
+  -y		Automatically accept the package manager questions
+ 
+EXAMPLE
+
+	$ME -b
+	
+	$ME -d
+	
+	no | $ME gimp
+	
+	$ME -y gimp
+
+SEE ALSO
+  bash(1), yum(1), dnf(1), pcman(1), apt-get(1), cave(1), brewer
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 #
 #	Help text

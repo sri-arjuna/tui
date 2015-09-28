@@ -47,7 +47,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -55,13 +55,40 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	
-	help_text="$(eval_gettext '$ME ($script_version)
-Usage: $ME [-v] [-c] /path/to/check
-Returns 0 if '/path/to/check' was found or could be created
+	help_text="$(eval_gettext '
+NAME
+  $ME - Make sure DIR exist
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+SYNOPSYS
+  $ME [-h|--help] [--version] [-cv] DIR
+  
+
+DESCRIPTION
+  Returns true (0) if DIR exists or could be created.
+  Returns false (1) if DIR could not be created, or is a file
+
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -c		Count how many passed DIR do not exist, and use that as exit code
+  -v		Be verbose
+ 
+EXAMPLE
+
+	tui-bol-dir -v *
+	
+	tui-bol-dir -cv /etc $HOME/.cache $HOME /fail1 /fail2
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 	showVersion() { 
 	cat <<-EOF
@@ -70,29 +97,31 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	}
 	beVerbose=false
 	countFails=false
-	while :
-	do
-		case "${1,,}" in
-		--version)
-			showVersion
-			exit 0
-			;;
-		-v)
+	case "${1,,}" in
+	--version)
+		showVersion
+		exit 0
+		;;
+	""|"-h"|"--help")
+		echo -e "$help_text"
+		RET=99
+		exit $RET
+		;;
+	esac
+	while getopts "vc" opt
+	do 	
+		case "${opt,,}" in
+		v)
 			beVerbose=true
-			shift
+			#shift
 			;;
-		-c)
+		c)
 			countFails=true
-			shift
+			#shift
 			;;
-		""|"-h"|"--help")
-			echo -e "$help_text"
-			RET=99
-			exit $RET
-			;;
-		*|--)	break	;;
 		esac
 	done
+	shift $(($OPTIND - 1))
 #
 #	Display
 #
@@ -100,8 +129,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	RET=0
 	ARGS=( $(printf '%s\n' "${@}") )
 	for dir_name in "${ARGS[@]}"
-	do 	FAILED=$(( $FAILED + $RET ))
-		# Is it a linkfile?
+	do 	# Is it a linkfile?
 		if [ -L "$dir_name" ] && [ -f "$dir_name" ]
 		then	$beVerbose && tui-status 1 "$(eval_gettext 'Found link: $dir_name')" || \
 			RET=1
@@ -134,9 +162,10 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				tui-status 1 "$(eval_gettext 'Could not create: $dir_name')"
 		fi
 		# NEXT !
+		FAILED=$(( $FAILED + $RET ))
 	done
 	if $beVerbose
-	then	$countFails && tui-status $RET "$(eval_gettext 'There has been $FAILED errors.')" && RET=$FAILED
+	then	$countFails && tui-printf -S 111 "$(eval_gettext 'There has been $FAILED errors.')" && RET=$FAILED
 	else	$countFails && RET=$FAILED
 	fi
 	exit $RET

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-20 05:59+0200\n"
+"POT-Creation-Date: 2015-09-28 22:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU $ME, Version $script_version\n"
+"GNU TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -38,61 +38,96 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"Usage: \t\t$ME [options] PACKAGES\n"
-"Examples:\t$ME PACKAGE\n"
-"\t\t$ME -\n"
-"\t\t$ME -q pkg1 pkg2\n"
-"\t\t$ME -l /path/to/logfile.log LIST OF PACKAGES\n"
-"Where options are:\n"
-"\t-h(elp) \t\tThis screen\n"
-"\t-------------------------------------------------------\n"
-"\t-b(ased)\t\tPrints on what the distro is based on and exit\n"
-"\t-d(istro)\t\tPrints the distro name and exit\n"
-"\t-l(og)\t\tARG\tWrites and entry to ARG whether installation was successful "
-"or not\n"
-"\t-q(uiet)\t\tInstall all at once, will fail if not all packages are "
-"available\n"
-"\t-y(es)\t\t\tAutomatically accept the package manager questions\n"
+"NAME\n"
+"  $ME - Package installer\n"
 "\n"
-"Report bugs to: erat.simon@gmail.com\n"
-"TUI home page: <http://www.gnu.org/software/tui/>\n"
-"General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-bdqy] [-l LOG] PACK AG ES ..\n"
+"\n"
+"DESCRIPTION\n"
+"  It is not a synonym for \"install\", but aims to become a handler for "
+"package managers, but only to install dependencies.\n"
+"  \n"
+"  To do so, it is looking for the most known/spearch distros, and tries to "
+"figure out if it is based on another.\n"
+"  It reckognizes: arch, debian (*buntu, mint), redhat (centos, fedora, sl)\n"
+"  Needs verification for: exherbo, gentoo, mac, opensusue, openbsd, freebsd\n"
+"  \n"
+"  Currently it installs using: yum/dnf, pcmanm, apt-get\n"
+"  Need verification for: brew, cave, emerge, port, pkg, pkgng, zypper\n"
+"  \n"
+"  The return values of \"-b\" and \"-d\" are ment to assist you to provide "
+"the proper package names.\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -b\t\tPrints on what the distro is based on and exit\n"
+"  -d\t\tPrints the distro name and exit\n"
+"  -l LOG\tWrites and entry to LOG whether installation was successful or "
+"not\n"
+"  -q\t\tInstall all at once, will fail if not all packages are available\n"
+"  -y\t\tAutomatically accept the package manager questions\n"
+" \n"
+"EXAMPLE\n"
+"\n"
+"\t$ME -b\n"
+"\t\n"
+"\t$ME -d\n"
+"\t\n"
+"\tno | $ME gimp\n"
+"\t\n"
+"\t$ME -y gimp\n"
+"\n"
+"SEE ALSO\n"
+"  bash(1), yum(1), dnf(1), pcman(1), apt-get(1), cave(1), brewer\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-install:185
+#: bin/tui-install:218
 #, sh-format
 msgid "$ME requires root access!"
 msgstr ""
 
-#: bin/tui-install:187
+#: bin/tui-install:220
 msgid "Installing as dependency:"
 msgstr ""
 
-#: bin/tui-install:235
+#: bin/tui-install:268
 msgid "Installed"
 msgstr ""
 
-#: bin/tui-install:236
+#: bin/tui-install:269
 msgid "Installing"
 msgstr ""
 
-#: bin/tui-install:237
+#: bin/tui-install:270
 msgid "Successfully installed"
 msgstr ""
 
-#: bin/tui-install:238
+#: bin/tui-install:271
 msgid "Failed to install"
 msgstr ""
 
-#: bin/tui-install:251
+#: bin/tui-install:284
 msgid "Execute:"
 msgstr ""
 
-#: bin/tui-install:271
+#: bin/tui-install:304
 #, sh-format
 msgid "There were $ERR_NO errors, namely these:"
 msgstr ""
 
-#: bin/tui-install:277
+#: bin/tui-install:310
 msgid "Trying to execute"
 msgstr ""

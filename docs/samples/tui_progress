@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+tui-header "TUIRC - Samples"	"tui-progress"
+tui-title "Basic invocation"
+MAX=21
+COUNT=1
+while [ $COUNT -le $MAX ];do
+	tui-progress -lbm $MAX -c $COUNT "Message to user"
+	sleep 0.1
+	((COUNT++))
+done
+
+tui-title "Example 2"
+tui-progress -r
+for i in $(seq 1 1 5);do 
+	tui-progress -m 5 "Number: $i"
+	sleep 1
+done
+
+tui-title "Example 3"
+MAX=5
+COUNT=0
+while [ $COUNT -le $MAX ];do
+	tui-progress -lbm $MAX -c $COUNT "Message to user"
+	sleep 1
+	((COUNT++))
+done

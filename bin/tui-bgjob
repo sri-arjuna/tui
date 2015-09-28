@@ -52,16 +52,57 @@
 #
 #	Translate strings
 #
-	TR_MSG_TEXT_VERSION="
-GNU $ME, Version $script_version
+	TR_MSG_TEXT_VERSION="$(gettext '
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-"
+')"
 	help_text="$(eval_gettext '
-$ME ($script_version)
+NAME
+  $ME - Runs a script in the background and shows some progress indication.
+
+SYNOPSYS
+  $ME [-h|--help] [--version] [-f OUTFILE [-e EXPECTED_BYTES] [-s ORGFILE]] SCRIPT "Progress String" "Exit String" [WAIT]
+
+DESCRIPTION
+  Runs SCRIPT in background while showing a progress.
+
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -f OUTFILE	If OUTFILE is passed, it will search for it and display its current size.
+  
+  -e EXPECTED_BYTES	If OUTFILE is passed as well, it will show a progress bar and the filesize. 
+  -s ORGFILE	If OUTFILE is passed as well, it will show a progress bar and the filesize.
+
+  
+EXAMPLE
+
+	echo \"tar -acf /mnt/backups/\044(hostname).tar.xz -P \044HOME\" > \044TMP
+	
+	tui-bgjob -f /mnt/backups/\044(hostname).tar.xz -e 45123123123 \044TMP
+
+HINTS
+  If you have multiple scripts to be executed, and too many to be all at once, use tui-bgjob-mgr.
+
+SEE ALSO
+  bash(1), ps(1), tui-bgjob-mgr(1), tui-progress(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+  
+  
 Usage:	$ME [-f OUTFILE] [-s ORGFILE] SCRIPTFILE  \"Progress String\"  \"Exit String\"  [ WAIT ]
 NOTE:	'Progress String' may contain shell escaped commands.
 

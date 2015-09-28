@@ -48,7 +48,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -56,28 +56,45 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: 	$ME [options] [\"Message\"]
+NAME
+  $ME - Progress indication, which flavor?
 
-Where options are:
-	-h(elp) 		This screen
-	-b(ar)			Enables the \"bar\" mode (minimal)
-	-B(ar)	        VAL     Changes the bar-symbol to VAL
-	-c(urrent)	VAL	Required for bar-mode
-	-C(learline)		Clear the line before print a new value, recommended if you pass multiple files
-	-m(ax)		VAL	If provided, changes progress-string output to \"calculated-num / VAL \"
-	-l(ong)			Prints more info when in bar mode.
-	-i(dent)	VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
-				Should be provided if used with -m
-	-r(eset)		Resets the temp file, should be used before one is passing 
+SYNOPSYS
+  $ME [-h|--help] [--version] [-bClr] [-B VAL] [-c VAL] [-i VAL] ["Message to the user"]
+  
+DESCRIPTION
+  When called without options, it simply displays a rotating dash (-/|\) on the right side.
+  When called with option \"-m NUM\" it increments the number found in the temp file, and showing [ incr/NUM ], before using this mode, you should reset the temp file (-r), or use a specific temp file identifier (-i STRING_ID).
+  You can overwrite the requirement for a temp file, if you pass \"-c NUM\".
+  When called with \"-b\", the options \"-m NUM\" and \"-c NUM\" are both required.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -b		Enables the \"bar\" mode (minimal)
+  -B VAL	Changes the bar-symbol to VAL
+  -c VAL	Current value, required for bar-mode
+  -C		Clear the line before print a new value, recommended if you pass multiple files
+  -m VAL	If provided, changes progress-string output to \"calculated-num / VAL \"
+  -l		Prints more info when in bar mode.
+  -i VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
+  		Should be provided if used with -m
+  -r		Resets the temp file, required for automatic increasing counts
+  		If the counting exceeds the set max value, it prints a warning but continues.
 
-When called without options, it simply displays a rotating dash (-/|\) on the right side.
-When called with option \"-m NUM\" it increments the number found in the temp file, and showing [ incr/NUM ], before using this mode, you should reset the temp file (-r), or use a specific temp file identifier (-i STRING_ID).
-You can overwrite the requirement for a temp file, if you pass \"-c NUM\".
-When called with \"-b\", the options \"-m NUM\" and \"-c NUM\" are both required.
+EXAMPLE
+  Please see "tuirc samples"
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 

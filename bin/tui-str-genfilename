@@ -47,7 +47,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -55,23 +55,37 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-Usage: $ME [options] [/path/to/]BASENAME.EXT [NEW_EXTENSION]
+NAME
+  $ME - Generate a filename, explace extension if provided
 
-Examples:	$ME input.txt
-		2> input.txt exists, appending number.
-		1> input.0.txt
+SYNOPSYS
+  $ME [-h|--help] [--version] [/path/to/]BASENAME.EXT [NEW_EXTENSION]
+  
+DESCRIPTION
+  If a NEW_EXTENSION is provided, it will be replacing EXT (if exists).
+  If BASENAME with either the existing EXT or the NEW_EXTENSION already exists, a number will be inserted before the file its new/old EXT.
+  If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will become its extension.
+  The number will be increased until the generated file name does not exist yet.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
 
-		$ME input.txt html
-		1> input.html
+EXAMPLE
 
-If a NEW_EXTENSION is provided, it will be replacing EXT (if exists).
-If BASENAME with either the existing EXT or the NEW_EXTENSION already exists, a number will be inserted before the file its new/old EXT.
-If BASENAME has neither an old EXT nor a NEW_EXTENSION, the number will become its extension.
-The number will be increased until the generated file name does not exist yet.
+	$ME tempfile.tmp
+	
+	$ME ../tempfile.tmp cache
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 
 

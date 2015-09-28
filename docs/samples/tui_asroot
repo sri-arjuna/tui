@@ -1,19 +1,14 @@
 #!/usr/bin/env bash
-tui-header "TUIRC - Samples"	"tui-$1"
-tui-title "Basic incovation"
-tui-$1
+# This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+tui-header "TUIRC - Samples"	"tui-asroot"
+tui-title "Basic invocation"
+tui-asroot "sh ./script.sh"
 
 tui-title "Example 2"
-tui-$1
+tui-asroot "echo \$(whoami)"
 
 tui-title "Example 3"
-tui-$1
+tui-asroot "echo \$USER"
 
 tui-title "Example 4"
-tui-$1
-
-tui-title "Example 5"
-tui-$1
-
-tui-title "Example 6"
-tui-$1
+tui-asroot "[ -r /etc/fstab ] ; tui-status \$? 'Can read from /etc/fstab'"

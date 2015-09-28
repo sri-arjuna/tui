@@ -59,7 +59,7 @@
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU $ME, Version $script_version
+GNU TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -67,24 +67,42 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
-$ME ($script_version)
-Usage: 		$ME [options]
-Returns true if user is in a graphical environment
+NAME
+  $ME - Returns true (0) if user is in GUI
 
-Examples:	$ME -v
+SYNOPSYS
+  $ME [-h|--help] [--version] [-v]
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -v		Display the DE or WM name
+ 
+EXAMPLE
 
-		if $ME
-		then	echo \"in gui\"
-		else	echo \"on tty\"
-		fi
+	if tui-bol-gui
+	then 	zenity --info --text="You are in GUI!"
+	else	tui-echo "Your terminal say it is: \044(tui-bol-gui -v)"
+	
+	fi
 
-Where options are:
-	-h(elp) 		This screen
-	-v(erbose)		Prints the name of the Desktop Environment (DE) or Window Manager (WM)
+ENVIRONMENT
+XDG_CURRENT_DESKTOP	Will return the Desktop Environment name on an X11 session
+DESKTOP_SESSION		Will return the Desktop Environment name on any other session
+  
+SEE ALSO
+  bash(1)
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
 
-Report bugs to: erat.simon@gmail.com
-TUI home page: <http://www.gnu.org/software/tui/>
-General help using GNU software: <http://www.gnu.org/gethelp/>
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
 #
 #	Functions
