@@ -29,7 +29,7 @@
 	getpo() { # ITEM
 	#
 	#
-		xgettext --debug -kMSG_TR -kgettext -L Shell -o "$DEST/$1.po" "bin/$1"
+		xgettext --debug -kMSG_TR -kgettext -L Shell -o "$DEST/$1.po"  "bin/$1"
 	}
 #
 #	Action
