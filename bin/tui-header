@@ -76,9 +76,9 @@ EXAMPLE
 
 	$ME "Hello World"
 	
-	$ME ""  "i'm left"
+	$ME ""  "i am left"
 	
-	$ME "" "i'm centered" ""
+	$ME "" "i am centered" ""
 HINTS
   If your script should feel too slow, 
   you might get a slightly better performance using "tui-printf -H"

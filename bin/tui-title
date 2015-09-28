@@ -76,8 +76,8 @@ OPTIONS
 EXAMPLE
 
 	$ME "Hello World, in the center" 
-	$ME "i'm left"  "i'm right"
-	$ME "" "i'm in the center too" ""
+	$ME "iam left"  "i am right"
+	$ME "" "i am in the center too" ""
   
 HINTS
   If your script should feel too slow, 

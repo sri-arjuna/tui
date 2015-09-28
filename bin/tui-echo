@@ -76,8 +76,8 @@ OPTIONS
 EXAMPLE
 
 	$ME "Hello World" 
-	$ME "i'm left"  "i'm right"
-	$ME "" "i'm centered" ""
+	$ME "i am left"  "i am right"
+	$ME "" "i am centered" ""
   
 HINTS
   If your script should feel too slow, 
