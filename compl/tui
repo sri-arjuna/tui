@@ -31,8 +31,8 @@ _tui()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h --help"
-		ARGS="provides reset reset-yes theme"
+		OPTS="--version -h --help"
+		ARGS="config html info provides reset reset-yes samples theme"
 		#echo "prev:$prev :: cur:$cur"
 	#
 	#	Action
@@ -80,7 +80,7 @@ _tui_browser()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -T -U -L -P -p -n -s -D -F -b -c -d -q -S -X"
+		OPTS="--version -h -T -U -L -P -p -n -s -D -F -b -c -d -q -S -X"
 
 	#
 	#	Action
@@ -146,7 +146,7 @@ _tui_conf_editor()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -l -L -t"
+		OPTS="--version -h -l -L -t"
 
 	#
 	#	Action
@@ -179,7 +179,7 @@ _tui_conf_get()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -i -l"
+		OPTS="--version -h -i -l"
 
 	#
 	#	Action
@@ -207,7 +207,7 @@ _tui_conf_set()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -i -c -s -l"
+		OPTS="--version -h -i -c -s -l"
 
 	#
 	#	Action
@@ -235,7 +235,7 @@ _tui_install()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -b -d -l -v"
+		OPTS="--version -h -b -d -l -v"
 
 	#
 	#	Action
@@ -266,8 +266,8 @@ _tui_new_script()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -a -r -m"
-
+		#OPTS="--version -h -a -r -m"
+		OPTS=""
 	#
 	#	Action
 	#
@@ -294,7 +294,7 @@ _tui_printf()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -E -H -S -T"
+		OPTS="--version -h -E -H -r -S -T"
 		ARGS=""
 	#
 	#	Action
@@ -302,7 +302,12 @@ _tui_printf()
 		# This completes the word you are currently writing
 		# These need manual maintainance
 		case "$cur" in
-		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+		-)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+			return 0
+			;;
+		esac
+		case "$prev" in
+		-S)	COMPREPLY=( $(compgen -W "0 1 2 3 4 5 6 7 10 11 99 127 130" -- $cur) )
 			return 0
 			;;
 		esac
@@ -320,7 +325,7 @@ _tui_progress()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -m -i -r"
+		OPTS="--version -h -b -B -c -C -m -l -i -r"
 		ARGS=""
 	#
 	#	Action
@@ -348,7 +353,7 @@ _tui_psm()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h -L -c -l -d -q -w"
+		OPTS="--version -h -L -c -l -d -q -v -w"
 		ARGS=""
 	#
 	#	Action
@@ -379,8 +384,8 @@ _tui_status()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h --help"
-		ARGS="0 1 2 3 4 5 6 7  10 11 99 111"
+		OPTS="--version -h --help"
+		ARGS="0 1 2 3 4 5 6 7 10 11 99 111 127 130"
 	#
 	#	Action
 	#
@@ -393,14 +398,16 @@ _tui_status()
 		-l)	COMPREPLY=( $(compgen -W "my_LIMIT_VALUE" -- $cur) )
 			return 0
 			;;
+		esac
+		case "$prev" in
 		tui-status)
 		COMPREPLY=( $(compgen -W "$(echo ${ARGS[@]})" -- $cur) )
 			return 0
 			;;
 		esac
-		[ $2 = tui-status ]  && \
-			COMPREPLY=( $(compgen -W "\"MSG1\" \"MSG2\"" -- $cur) ) && \
-			return 0
+		#[ $2 = tui-status ]  && \
+		#	COMPREPLY=( $(compgen -W "\"MSG1\" \"MSG2\"" -- $cur) ) && \
+		#	return 0
 	}
 _tui_tar()
 	{
@@ -441,7 +448,7 @@ _tui_asroot()
 		COMPREPLY=()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
-		OPTS="-h --help -m"
+		OPTS="--version -h --help -m"
 		ARGS=""
 		# Is user currently typing?
 		case "$cur" in
@@ -466,7 +473,7 @@ _tui_bgjob()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -f -s -e"
+		OPTS="--version -h --help -f -s -e"
 		ARGS=""
 	#
 	#	Action
@@ -498,7 +505,7 @@ _tui_bol_dir()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -v"
+		OPTS="--version -h --help -v"
 		ARGS=""
 	#
 	#	Action
@@ -531,7 +538,7 @@ _tui_cat()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -d -t -T"
+		OPTS="--version -h --help -d -t -T"
 		ARGS=""
 	#
 	#	Action
@@ -564,7 +571,7 @@ _tui_cp()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -d -f -l -q"
+		OPTS="--version -h --help -d -f -l -q"
 		ARGS=""
 	#
 	#	Action
@@ -593,7 +600,7 @@ _tui_ftp()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -L -q -v -H -U -P -B -c -a -p -f -r -d -l"
+		OPTS="--version -h --help -L -q -v -H -U -P -B -c -a -p -f -r -d -l"
 		ARGS=""
 	#
 	#	Action
@@ -649,7 +656,7 @@ _tui_list()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -a -r -n -v"
+		OPTS="--version -h --help -a -r -n -v"
 		ARGS=""
 	#
 	#	Action
@@ -671,7 +678,7 @@ _tui_log()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -e -d -t -p -u -s -v"
+		OPTS="--version -h --help -e -d -t -p -u -s -v"
 		ARGS=""
 	#
 	#	Action
@@ -703,7 +710,7 @@ _tui_verbose()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -v"
+		OPTS="--version -h --help -v"
 		ARGS=""
 	#
 	#	Action
@@ -731,7 +738,7 @@ _tui_new_manpage()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -a -m"
+		OPTS="--version -h --help -a -m"
 		ARGS=""
 	#
 	#	Action
@@ -753,7 +760,7 @@ _tui_new_script()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -e -s -r -t -m -M"
+		OPTS="--version -h --help -e -s -r -t -m -M"
 		ARGS=""
 	#
 	#	Action
@@ -775,7 +782,7 @@ _tui_read()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help"
+		OPTS="--version -h --help"
 		ARGS=""
 	#
 	#	Action
@@ -804,7 +811,7 @@ _tui_select()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -1 -2 -a -v"
+		OPTS="--version -h --help -1 -2 -a -v"
 		ARGS=""
 	#
 	#	Action
@@ -826,7 +833,7 @@ _tui_str_usb()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -a"
+		OPTS="--version -h --help -a"
 		ARGS=""
 	#
 	#	Action
@@ -848,7 +855,7 @@ _tui_str_bol_conv()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -C -d -t -y"
+		OPTS="--version -h --help -C -d -t -y"
 		ARGS=""
 	#
 	#	Action
@@ -870,7 +877,7 @@ _tui_str_hash()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help -t"
+		OPTS="--version -h --help -t"
 		ARGS="md5 224 256 384 512 sha224 sha256 sha384 sha512 sha1sum shasum "
 	#
 	#	Action
@@ -899,7 +906,7 @@ _tui_terminal()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help"
+		OPTS="--version -h --help"
 		ARGS=""
 	#
 	#	Action
@@ -928,7 +935,7 @@ _tui_wait()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help"
+		OPTS="--version -h --help"
 		ARGS=""
 	#
 	#	Action
@@ -957,7 +964,7 @@ _tui_web()
 		cur="${COMP_WORDS[COMP_CWORD]}"
 		prev="${COMP_WORDS[COMP_CWORD-1]}"
 		DIR=""
-		OPTS="-h --help"
+		OPTS="--version -h --help"
 		ARGS=""
 	#
 	#	Action
@@ -989,8 +996,6 @@ complete -F _tui_justhelp tui-header
 complete -F _tui_status tui-status
 complete -F _tui_progress tui-progress
 
-complete -F _tui_browser tui
-
 # Core Interaction
 complete -F _tui_select tui-select
 complete -F _tui_justhelp tui-yesno
@@ -1015,7 +1020,7 @@ complete -F _tui_justhelp tui-str-genfilename
 complete -F _tui_str_usb tui-str-usb
 
 # Code Wrappers
-complete -F _tui_tar tui-tar
+complete -F _tui_justhelp tui-tar
 complete -F _tui_cat tui-cat
 complete -F _tui_cp tui-cp
 complete -F _tui_cp tui-dd
@@ -1029,6 +1034,7 @@ complete -F _tui_justhelp tui-filemgr
 complete -F _tui_verbose tui-wait
 
 # Advanced
+complete -F _tui_browser tui-browser
 complete -F _tui_install tui-install
 complete -F _tui_psm tui-bgjob-mgr
 complete -F _tui_bgjob tui-bgjob

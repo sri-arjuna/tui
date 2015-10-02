@@ -91,6 +91,25 @@
 #	As in: When called by a script during boot process
 #
 	TERM="\${TERM:-GNU Linux}"
+#
+#	Injection protection
+#
+	break_on_injections() { # ARGS
+	# Searches for injection subjects
+	# Returns true if it finds some
+		typeset arg ac=0
+		for arg do
+		ac="$((ac+=1))"
+		case "$arg" in
+		(*[';´|<&>']*|*':('*|*':-'*)
+			printf "%s\n" "Aborting, injection detected! arg${ac}='$arg'"
+			return 0
+		;;
+		esac
+		done
+		return 1
+	}
+
 EOF
-cat "scripts/injection_protection.sh" >> ./tuirc
+#cat "scripts/injection_protection.sh" >> ./tuirc
 sed s,"$SYSCONFDIR/conf.tui","$SYSCONFDIR/tui",g -i "make-uninstall"

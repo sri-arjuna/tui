@@ -14,12 +14,15 @@ Missing feedback for these types:
 
 Known Bugs:
 -----------
-None.
-You tell me one?
+* Bash-completion not working
 
 Security:
 ---------
 No issues know. :)
+
+Fix:
+----
+tui-conf-editor (tuirc?), logfile
 
 
 Finalize:

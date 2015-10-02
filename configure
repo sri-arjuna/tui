@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 #	Yet Another Simple Script Installer
 # ------------------------------------------------------------------------
+# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
 #
 #	Created:	2015.07.27
-#	Changed:	2015.09.21
+#	Changed:	2015.09.30
 	script_name=configure
-	script_version=1.0.2
+	script_version=1.1
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -13,6 +29,9 @@
 #		* make-install
 #		* make-uninstall
 #		* make-distclean
+#
+#		It can also create a REFERENCE file ($APP_dirs.conf) and if 'doRef=true',
+#		it will copy that file to $SYSCONFDIR automaticly, as well as remove it when uninstalling
 #		
 #		The options were applied from the output of GNU Automake's './configure --help'
 #		and the calculation of the paths is done according to: http://www.pathname.com/fhs/
@@ -74,9 +93,8 @@
 	which sudo 1>/dev/zero 2>/dev/zero && \
 		install_prefix="sudo " || \
 		install_prefix="su -c "
-	#LOG="${PWD:-$(pwd)}/make-install.log"		# Not yet used, see lines 214 + 215 for most important application
 	mandirs="$(echo man{1..9}dir)"
-	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs compldir sharedstatedir localstatedir"
+	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir mandir $mandirs compldir sharedstatedir localstatedir"
 	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
 	TMP="$PWD/tmp.$$"
 	CHROOT=""
@@ -92,7 +110,7 @@
 		#	Project Info
 		#
 		 	APP=projectname
-		 	APP_REQUIRES="awk bash grep sed"
+		 	APP_REQUIRES="gawk bash grep sed"
 		#
 		#	Targets
 		#
@@ -112,20 +130,28 @@
 	# Prints an advanced sample configure.cfg
 	# and exits
 		cat <<-EOF
+		#!/usr/bin/env bash
 		#
 		#	Project Info
 		#
 		 	# Used for /usr/share/\$APP & /usr/share/doc/\$APP
 		 	APP=projectname
-		 	APP_REQUIRES="awk bash grep sed"
+		 	# This is required to run the script properly
+		 	APP_REQUIRES="gawk bash grep sed"
+		 	# This is required only until it is installed
 		 	CFG_REQUIRES="git texi2any txt2man"
-		 	
+			
 		 	# Used for helpscreen & tarball
 		 	APP_VER=0.1
-		 	
+			
+		 	# Contact
+		 	APP_AUTHOR="${USER_NAME:-USER}"
+		 	APP_EMAIL="${USER_EMAIL:-your@email.com}"
+		 	APP_SITE="https://github.com"
+			
 		 	# If set, overwrites the default PREFIX (/usr/local) to assigned value.
 		 	#APP_DIR=~/.local
-		 	
+			
 		 	# Set true to install the reference file to $PREFIX/$SYSCONFDIR/\$APP.conf
 		 	# This will automaticly be uninstalled if set to true, no extra work.
 		 	#doRef=false
@@ -140,27 +166,25 @@
 		#
 		#	Tasks prior to installation, but after tarball
 		#
-		 	# Only install if the current system does not provide TUI
-		 	PRIOR[0]="! which tuirc 1>/dev/zero 2>/dev/zero && cd tui && ./configure --prefix=${prefix} && (./make-install || make install) && cd .. "
+		 	# Only install if the current system does not provide TUI, simply remove this if you dont need it
+		 	PRIOR[0]="! which tuirc 1>/dev/zero 2>/dev/zero && cd tui && ./configure --prefix=\${prefix} && ./make-install && cd .. "
+		 	PRIOR[1]="echo 'Some variable examples:'"
+		 	PRIOR[2]="printf '* %s\n' \"CHROOT=\\\$CHROOT\" \"prefix=\\\$prefix\" \"SYSCONFDIR=\\\$SYSCONFDIR\" \"DATADIR=\\\$DATADIR\";read -p 'press enter to continue' buffer"
 		#
 		#	Targets, where is what installed
 		#
 		 	BINDIR=bin
-		 	DOCDIR=docs/[A-Z]*
+		 	# Do not use [A-Z], that might include a-z as well
+		 	DOCDIR=docs/[CLR]*
 		 	MAN1DIR=docs/man/*.1
 		 	INFODIR=docs/info/\$APP.info
 		 	HTMLDIR=docs/info/\$APP.html
 		 	DATADIR="./menu ./includes"
 		#
-		#	Task prior to the installation
-		#
-		 	PRIOR[0]="echo 'Some variable examples:'"
-		 	PRIOR[1]="printf '* %s\n' \"CHROOT=\\\$CHROOT\" \"prefix=\\\$prefix\" \"SYSCONFDIR=\\\$SYSCONFDIR\" \"DATADIR=\\\$DATADIR\";read -p 'press enter to continue' buffer"
-		#
 		#	Tasks post of installation
 		#
 		 	POST[0]=scripts/post_script1.sh
-		 	POST[1]="echo \"Thank you for choosing '\$APP'!\""
+		 	POST[1]="echo \"Thank you for installing '\$APP' to \\\${prefix}! :)\""
 		#
 		#	Clean up what has been prepared 
 		#
@@ -169,27 +193,29 @@
 		#
 		#	Additional tasks for the uninstallation process
 		#
-		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && \\
-		 			./make-uninstall && \
-		 			./make-distclean && cd .."
+		 	# In this example, TUI was installed, therefor the command 'tui-yesno' is available
+			REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-distclean && cd .."
 		#
 		#	Contact
 		#
-		 	BUGS="your@email.com"
-		 	ISSUE="https://github.com/sri-arjuna/yassi/issues"
+		 	BUGS="\$APP_EMAIL"
+		 	ISSUE="\$APP_SITE/\$APP_AUTHOR/\$APP/issues"
 		EOF
 		exit 0
 	}
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		MSG_TR_CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\nReport bugs of \"$APP\" to \"$BUGS\"")$( [ ! -z "$ISSUE" ] && printf "\nReport bugs of \"$APP\" on \"$ISSUE\"\n \n")"
+		FINAL_NOTE=$(printf '\n%s\n' "YASSI (Yet Another Simple Script Installer, ./$script_name), was written in 2015 by Simon Arjuna Erat (sea) from Switzerland")
+		MSG_TR_CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\nReport bugs of \"$APP\" to <$BUGS>")$( [ ! -z "$ISSUE" ] && printf "\nReport bugs of \"$APP\" on <$ISSUE>\n\n")$(printf '\n')"
 		
-		MSG_TR_HELP="
-Usage:	./$script_name [options]
-Routine to configure the installation of ${APP:-APPNAME} ${APP_VER}
+		MSG_TR_HELP="SYNOPSIS
+  	./$script_name [options]
 
-OPTIONS:
+DESCRIPTION
+	Routine to configure the installation of ${APP:-APPNAME} ${APP_VER}
+
+OPTIONS
 	-h|--help		Shows this screen and exits
 	--version		Shows the version and exits
 	
@@ -214,17 +240,21 @@ OPTIONS:
 	--localedir		locale-dependent data		(\$DATAROOTDIR/locale)
 	--localstatedir		modifiable single-machine data	(\$prefix/var)
 	
-	--man1dir DIR		man 1 Exe & Shell commands	(\$DATAROOTDIR/man/man1)
-	-	2) System calls		3) Library calls	4) Special files (eg /dev)
-	-	5) File formats & conventions (eg: /etc/passwd)	6) Games
-	-	7) Miscellaneous (eg: macros, groff)		8) Root commands (sbin)
-	--man9dir DIR		man 9 Kernel routines (non standard)	(\$DATAROOTDIR/man/man9)
+	--mandir DIR		Basedir for manpages		(\$DATAROOTDIR/man)
+	--man[1-9]dir DIR	Specific manpage dirs		(\$MANDIR/man/man[1-9])
 	
 	--sharedstatedir	modifiable architecture-independent	(\$prefix/com)
-$MSG_TR_CONTACT_INFO
-YASSI (Yet Another Simple Script Installer, ./$script_name), was written in 2015 by Simon Arjuna Erat (sea), Switzerland
-"
-		echo "$MSG_TR_HELP"
+
+NOTES
+  Common Prefix Locations
+  	Common places that are used as --prefix=DIR:
+  	* / or /usr
+	* /usr/local or /opt
+	* \$HOME
+	* \$HOME/local or \$HOME/.local
+  ${MSG_TR_CONTACT_INFO}
+  ${FINAL_NOTE}"
+		printf "%s\n" "$MSG_TR_HELP"
 		exit 99
 	}
 	show_version() {
@@ -259,12 +289,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Prints the copy commands
 		#
 			fullPath="${2/$CHROOT}"
+			target="${CHROOT}${FHS[${1,,}]}"
 			if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
 			then	# Its a directory, go recursive
-				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
 			else	tmp_check="${2##*/}"
 				check_char="${tmp_check:0:1}"
-				isAsterix=$(printf '%s' "$check_char" | grep -v '*' && echo false || echo true )
+				isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
 				
 				case "$isAsterix" in
 				true|false)	isAsterix=$isAsterix	;;
@@ -272,9 +303,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				esac
 				
 				if $isAsterix
-				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
-				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"${CHROOT}${FHS[${1,,}]}\" || exit 1" | sed s,"//","/",g
+				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
+				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
 				fi
+				
+				case "${1,,}" in
+				compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:0 \"$target/${2##*/}\""
+				esac
 			fi
 		}
 		write_reference() { # INDEX
@@ -291,7 +326,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			
 			for tr in ${@}
 			do	case "$INDEX" in
-				SBINDIR|BINDIR|MAN[1-9]DIR)
+				SBINDIR|BINDIR|MANDIR|MAN[1-9]DIR)
 					if [ -d "${tr}" ]
 					then	for e in "./$tr/"*
 						do 	[ -d "$e" ] && \
@@ -302,8 +337,15 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 					fi
 					;;
 				COMPLDIR)
-					tr="${tr/\$\{APP\}/$APP}"
-					echo "rm -f $DEST/${tr##*/}"
+					# Check if it is a single file or a dir with possible multiple files
+					if [ -d "$tr" ]
+					then	for this_compl in "$tr/"*
+						do 	tmp_compl="${this_compl/\$\{APP\}/$APP}"
+							echo "rm -f $DEST/${tmp_compl##*/}"
+						done
+					else	tr="${tr/\$\{APP\}/$APP}"
+						echo "rm -f $DEST/${tr##*/}"
+					fi
 					;;
 				*)	[ -d "$tr" ] && \
 						echo "rm -fr $DEST/${tr##*/}" || \
@@ -328,12 +370,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		do	echo "#!/usr/bin/env sh" > "make-$m"
 			if [ ! "$m" = "distclean" ] && ! $is_at_home 
 			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
-						printf '%s\n' \
-						"[ -z \$UID ] && UID=0" \
-						"[ \$UID -ne 0 ] && \\" \
-						"	echo \"To $m '$APP', root access is required.\" && \\" \
-						"	exit 99" >> "make-$m"
-			#else	echo "set -x" >> "make-$m"
+					printf '%s\n' \
+					"[ -z \$UID ] && UID=0" \
+					"[ \$UID -ne 0 ] && \\" \
+					"	echo \"To $m '$APP', root access is required.\" && \\" \
+					"	exit 99" >> "make-$m"
 			fi
 			echo "set -x" >> "make-$m"
 			chmod +x "make-$m"
@@ -347,7 +388,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		
 		# Write content of PRIOR tasks, if any
 		if [ -n "$(echo ${PRIOR[@]})" ]
-		then	source "$PWD/$REFERENCE"	# Just prefix yet
+		then	source "./$REFERENCE"	# Just prefix yet
 			C=0
 			echo >> "make-install"
 			while 	item="${PRIOR[$C]}"
@@ -380,11 +421,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				tmp_str="${FHS[${1,,}]}"
 				if [ ! -d "\${CHROOT}\${tmp_str%/*}" ]
 				then 	cd "\${CHROOT}/usr/.."
-				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && \\
-				 		ln -sf "./usr\${tmp_str%/*}" "./\${tmp_str%/*}" || \\
-				 		mkdir -p "\${CHROOT}\$tmp_str"
+				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && [ -n "\${tmp_str%/*}" ] && \\
+				 		ln -sf "usr\${tmp_str%/*}" "./\${tmp_str%/*}"
 				 	cd "\$OLDPWD"
 				fi
+				[ -d "\${CHROOT}\$tmp_str" ] || mkdir -p "\${CHROOT}\$tmp_str"
 				EOF
 				case "$num" in
 				1)	write_install "$index" "$tmp" >> "make-install"
@@ -450,7 +491,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			while 	item="${POST[$C]}"
 				[ ! -z "$item" ]
 			do 	[ -f "$item" ] && \
-					echo "sh ./$item" >> "make-install" || \
+					echo "bash ./$item" >> "make-install" || \
 					echo "$item" >> "make-install"
 				((C++))
 			done
@@ -486,7 +527,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 #
 	GETOPT=$(getopt \
 		--options	"h" \
-		--longoptions	"help,version,sample,sample-full,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:" \
+		--longoptions	"help,version,sample,sample-full,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,mandir,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:" \
 		--name 		"${0##*/}" -- "${@}"
 	)
 	eval set -- "$GETOPT"
@@ -497,7 +538,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		--sample)	show_sample	;;
 		--sample-full)	show_sample_full;;
 		--prefix|--bindir|--sbindir|--datarootdir|--datadir|\
-		--infodir|--sysconfdir|--man[1-9]dir|--docdir|--htmldir|\
+		--infodir|--sysconfdir|--mandir,--man[1-9]dir|--docdir|--htmldir|\
 		--compldir|--sharedstatedir|--localstatedir|--localedir)
 				FHS["${1/--}"]="$2"
 				shift 2		;;
@@ -535,23 +576,28 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			datarootdir)	tmp="${FHS[prefix]}/share"	;;
 			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
 			infodir)	tmp="${FHS[datarootdir]}/info"	;;
-			man[0-9]dir)	tmp="${FHS[datarootdir]}/man/${index:0:4}" ;;
+			mandir)		tmp="${FHS[datarootdir]}/man" ;;
+			man[0-9]dir)	tmp="${FHS[mandir]}/${index:0:4}" ;;
 			localedir)	tmp="${FHS[datarootdir]}/locale" ;;
 			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
 			htmldir)	tmp="${FHS[docdir]}" ;;
-			compldir)	tmp="${FHS[datarootdir]}/bash-completion/completions"	;;
+			compldir)	# Some systems have bash completion within the SYSCONFDIR
+					[ -d "${FHS[datarootdir]}/bash-completion/completions" ] && \
+						tmp="${FHS[datarootdir]}/bash-completion/completions"
+					[ -d "${FHS[sysconfdir]}/bash_completion.d" ] && \
+						tmp="${FHS[sysconfdir]}/bash_completion.d"	;;
 			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
 			localstatedir)	tmp="${FHS[prefix]}/var"	;;
 			esac
 			if [ "$index" = "prefix" ] && ! $etc_done
 			then	# Do special handling
-					[ "~" = "${tmp:0:1}" ] && tmp="${tmp/~/$HOME}"
-					if [ "${tmp:0:${#HOME}}" = "$HOME" ]
-					then	is_at_home=true
-						install_prefix=""
-						prefix_home="${{tmp/~/$HOME}/$HOME}"
-						tmp="$prefix_home"
-					fi
+				[ "~" = "${tmp:0:1}" ] && tmp="${tmp/~/$HOME}"
+				if [ "${tmp:0:${#HOME}}" = "$HOME" ]
+				then	is_at_home=true
+					install_prefix=""
+					prefix_home="${{tmp/~/$HOME}/$HOME}"
+					tmp="$prefix_home"
+				fi
 			fi
 			FHS["$index"]="$tmp"
 		fi

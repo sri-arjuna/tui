@@ -29,7 +29,11 @@
 	getpo() { # ITEM
 	#
 	#
-		xgettext --debug -kMSG_TR -kgettext -L Shell -o "$DEST/$1.po"  "bin/$1"
+		xgettext --debug -kMSG_TR --from-code=CP850 -kgettext -L Shell -o "$DEST/$1.po"  "bin/$1"
+		#case $1 in
+		#tuirc)		;;
+		#*)	xgettext --debug -kMSG_TR -kgettext -L Shell -o "$DEST/$1.po"  "bin/$1"	;;
+		#esac
 	}
 #
 #	Action

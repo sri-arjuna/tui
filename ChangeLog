@@ -1,3 +1,16 @@
+2015-09-27 - 0.8.9-GNU-RC17 (theoretical: 0.9.0 - RC1)
+* Fixed: tui-echo, tui-header, tui-printf, tui-title, tui-mv
+* Changed: scripts/make-po-files.sh
+* Added: tuirc.po
+* Fixed: tui-log, had issues when MESSAGE had leading --
+* Fixed: tui-bgjob-mgr, was still trying to source a previous language file
+* Updated: tui-progress.po
+* Moved injection protection into scripts/prepare.sh
+* Added README with copyright info to ./screenshots
+* YASSI was updated to 1.1 and fixes the symlink issue and ownage of bash-completion
+* Moved bash-completion file into a subdir, cleaner project root.
+* Removed temporary evaluation notice file 'eval'
+
 2015-09-27 - 0.8.9-GNU-RC16 (theoretical: 0.9.0 - RC1)
 * Added license and version info to:
   * ./docs/samples
@@ -152,3 +165,20 @@
 
 2015.07.05 - 0.8.5-GNU-RC1
 * Changed first time usage backend
+
+# -----------------------------------------------------------------------
+# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>

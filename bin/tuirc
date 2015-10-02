@@ -308,7 +308,7 @@ FILES
                                        Default username shown, default: $USER
 
                                 USER_EMAIL
-                                       Default email used, default: $USER AT $(hostname)
+                                       Default email used, default: $USER AT \044(hostname)
 
                                 USER_HOMEPAGE
                                        Default URL shown when $USER_HOMEPAGE is used
@@ -335,7 +335,7 @@ THEME
               Background:    red Font:          white
 
        default-red
-              The default 'root' theme.
+              The default "root" theme.
               Border:        "# |"
               Background:    red Font:          white
 
@@ -350,7 +350,7 @@ THEME
               Background:    red Font:          white
 
        floating
-               'Empty' theme, no border, no colors
+               "Empty" theme, no border, no colors
               Border:        ""
               Background:    - Font:          -
 

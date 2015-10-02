@@ -84,7 +84,7 @@ OPTIONS
   		If the counting exceeds the set max value, it prints a warning but continues.
 
 EXAMPLE
-  Please see "tuirc samples"
+  As this needs a more dynamic approach to serve as an example, please see "tuirc samples"
 
 BUGS
   Report bugs to: erat.simon@gmail.com

@@ -1,0 +1,6 @@
+Copyright (C) 2011-2015, Simon Arjuna Erat (sea), erat.simon@gmail.com
+The images stored in this folder and its subdirectories are part of the GNU TUI package.
+
+If this package is redistributed as a whole, the screenshots must be included
+An expection is granted by the author if you use the --tarball option of ./configure to redistribe the package inhouse.
+Likewise the exception is granted as well for distro-specific-packages (such as: aur, deb, rpm, etc).

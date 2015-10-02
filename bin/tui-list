@@ -115,15 +115,13 @@ AUTHOR
 #
 	help_text="$TR_MSG_TEXT_HELP
 "
-#	-r(oman)		Use roman letters as numbers
-
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
-	cat <-EOF
+	cat <<-EOF
 		$TR_MSG_TEXT_VERSION
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	while getopts "ahnr12v" opt
 	do 	case "$opt" in
 		h)	printf "$help_text"

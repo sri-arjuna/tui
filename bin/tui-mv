@@ -280,6 +280,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		#else
 		fi
 	done
+	TOTAL=${TOTAL:-0}
 	TOTAL_COUNT=$(( $MAX - $TOTAL ))
 	RET=$(<$TUI_FILE_TEMP)
 	$showtotal && tui-status  $RET "$(eval_gettext 'Moved $TOTAL_COUNT of $MAX items to $TARGET')"

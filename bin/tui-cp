@@ -280,7 +280,9 @@ AUTHOR
 		then	tui-status $(<"$FILE_TEMP") "$TR_MSG_WORD_COPIED $display_trgt"
 		#else
 		elif $showtotal
-		then	TOTAL=${TOTAL:-0}
+		then	echo $TOTAL
+			echo TOTAL=${TOTAL:-0}
+			MAX=${MAX:-0}
 			final_TOTAL=$(( $MAX - $TOTAL ))
 			
 			tui-status -r $(cat "$FILE_TEMP") "$TR_MSG_TEXT_COPIED"

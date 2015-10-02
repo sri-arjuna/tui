@@ -46,7 +46,7 @@
 #	Author: 	Simon Arjuna Erat (sea), erat.simon@gmail.com
 #	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
-#	Changed:	2015.09.17
+#	Changed:	2015.09.28
 #
 #	Description:	Simply writes a log file
 #
@@ -134,14 +134,15 @@ AUTHOR
 #
 #	Catching arguments
 #
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	[ -z "$2" ] && printf "$help_text" && exit 1
 	showVersion() { 
 	cat <<-EOF
 		$TR_MSG_TEXT_VERSION
 	EOF
+	exit 0
 	}
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
+	[ -z "$2" ] && printf "$help_text" && exit 1
 	while getopts "hedtp:us:v" opt
 	do 	case $opt in
 		h)	printf "$help_text"
@@ -149,7 +150,7 @@ AUTHOR
 		e)	leave_empty=true	;;
 		d)	PRE+=" $D"		;;
 		t)	PRE+=" $T"		;;
-		p)	PRE+=" $OPTARG"		;;
+		p)	PRE+=" ${OPTARG}"		;;
 		u)	PRE+=" $USER"		;;
 		s)	SEP="$OPTARG"		;;
 		v)	beVerbose=true		;;
@@ -174,15 +175,15 @@ AUTHOR
 		then	tui-status 1 "$(eval_gettext 'Failed to create $LOG')" 
 			exit 1
 		fi
-		printf "$daily_date_str\n" > "$LOG"
+		printf -- "$daily_date_str\n" > "$LOG"
 	else 	# LOG exists
 		D=$(date +'%F')
 		# If PRE does not not contain today's date, see if the log contains,
 		# if its missing there too, add today's date first
-		printf "${PRE}${MSG}" | $GREP -q "$D" || \
+		printf -- "${PRE}${MSG}" | $GREP -q "$D" || \
 			( $GREP -q "$D" "$LOG" || tui-log -e "$LOG" "$daily_date_str" )
 	fi
 	while [ " " = "${PRE:0:1}" ] ;do PRE="${PRE:1}";done	# Remove leading spaces
 	$beVerbose && tui-echo "$MSG"
-	printf "${PRE}${MSG}\n" >> "$LOG"
+	printf -- "${PRE}${MSG}\n" >> "$LOG"
 	
