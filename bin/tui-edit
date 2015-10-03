@@ -39,12 +39,12 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.09.17
+#	Changed:	2015.10.02
 #
 #
 #	Variable defaults
 #
-	script_version=1.5.2
+	script_version=1.5.3
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -110,7 +110,7 @@ AUTHOR
 			;;
 	"-h"|"--help"|"")
 		echo "$TR_MSG_TEXT_HELP"
-		exit "$RET_HELP"
+		exit $RET_HELP
 		;;
 	"-c")	MODE=cli
 		shift

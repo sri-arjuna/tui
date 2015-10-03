@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-29 11:55+0200\n"
+"POT-Creation-Date: 2015-10-03 16:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,15 +56,14 @@ msgstr ""
 msgid ""
 "\n"
 "NAME\n"
-"       TUI - Text User Interface\n"
+"       GNU TUI - Text User Interface, framework for scripts\n"
 "\n"
 "SYNOPSIS\n"
-"       #...SY tui #...OP config|reset|reset-yes|theme #...RI [ THEMENAME ]\n"
 "       tui-<tab>\n"
-"       source tui\n"
-"       tui config\n"
-"       tui theme default\n"
-"       tui theme floating\n"
+"       source tuirc\n"
+"       tuirc config\n"
+"       tuirc theme default\n"
+"       tuirc theme floating\n"
 "\n"
 "DESCRIPTION\n"
 "       An  easy  way  to give your scripts some bling bling is to use TUI, "
@@ -430,188 +429,197 @@ msgid ""
 "  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tuirc:426
+#: bin/tuirc:425
 msgid "Please attempt a fresh installation of TUI."
 msgstr ""
 
-#: bin/tuirc:540
+#: bin/tuirc:539
 #, sh-format
 msgid "* Created: $item"
 msgstr ""
 
-#: bin/tuirc:562
+#: bin/tuirc:561
 msgid "GNU TUI config - System Wide"
 msgstr ""
 
-#: bin/tuirc:564
+#: bin/tuirc:563
 #, sh-format
 msgid "GNU TUI config - Personal for $USER_NAME"
 msgstr ""
 
-#: bin/tuirc:569
+#: bin/tuirc:568
 msgid "GNU Text User Interface"
 msgstr ""
 
-#: bin/tuirc:577
+#: bin/tuirc:576
 msgid "System defaults"
 msgstr ""
 
-#: bin/tuirc:582
+#: bin/tuirc:581
 msgid "Personal settings"
 msgstr ""
 
-#: bin/tuirc:592
+#: bin/tuirc:591
 #, sh-format
 msgid "Are you sure to remove $RANGE in \\\"$CFG_DIR\\\"?"
 msgstr ""
 
-#: bin/tuirc:683
+#: bin/tuirc:682
 #, sh-format
-msgid "Hello $USER_NAME, it is ${hello_time} on ${hello_date}"
+msgid "$USER_NAME, ${hello_time} ${hello_date}"
 msgstr ""
 
-#: bin/tuirc:713
+#: bin/tuirc:712
 msgid "TUI - Samples"
 msgstr ""
 
-#: bin/tuirc:714
+#: bin/tuirc:713
 msgid "Quit"
 msgstr ""
 
-#: bin/tuirc:719
+#: bin/tuirc:718
 #, sh-format
 msgid "File: $item"
 msgstr ""
 
-#: bin/tuirc:721
+#: bin/tuirc:720
 #, sh-format
 msgid "Executing $item"
 msgstr ""
 
-#: bin/tuirc:732
+#: bin/tuirc:731
 msgid "TUI_THEME is set to:"
 msgstr ""
 
-#: bin/tuirc:739
+#: bin/tuirc:738
 #, sh-format
 msgid "Please use: ${TUI_FONT_BOLD}tuirc provides${TUI_RESET}"
 msgstr ""
 
-#: bin/tuirc:743 bin/tuirc:853
+#: bin/tuirc:742
 #, sh-format
 msgid "TUI ($TUI_VERSION) by sea"
 msgstr ""
 
-#: bin/tuirc:745 bin/tuirc:855
+#: bin/tuirc:744
 msgid "Text User Interface - Framework for Scripts"
 msgstr ""
 
-#: bin/tuirc:747
+#: bin/tuirc:746
 msgid "Variables provided by sourcing TUI"
 msgstr ""
 
-#: bin/tuirc:753
+#: bin/tuirc:752
 msgid "Variables provided by apps.conf"
 msgstr ""
 
-#: bin/tuirc:758
+#: bin/tuirc:757
 msgid "Variables provided by settings.conf"
 msgstr ""
 
-#: bin/tuirc:764
+#: bin/tuirc:763
 msgid "Variables provided by commands.conf"
 msgstr ""
 
-#: bin/tuirc:770
+#: bin/tuirc:769
 msgid "Variables provided by colors.conf"
 msgstr ""
 
-#: bin/tuirc:771
+#: bin/tuirc:770
 msgid "Be aware that using TUI_COLOR_* currently causes alignment issues."
 msgstr ""
 
-#: bin/tuirc:772
+#: bin/tuirc:771
 msgid "Any escape sequence for that matter."
 msgstr ""
 
-#: bin/tuirc:782
+#: bin/tuirc:781
 msgid "Variables provided by status.conf"
 msgstr ""
 
-#: bin/tuirc:795
+#: bin/tuirc:794
 msgid "Variables provided by sourcing TUI (User specific)"
 msgstr ""
 
-#: bin/tuirc:817
+#: bin/tuirc:816
 msgid "Variables provided by shorts.conf"
 msgstr ""
 
-#: bin/tuirc:823
+#: bin/tuirc:822
 #, sh-format
 msgid ""
 "Aliases provided by shorts-alias.conf (\\$TUI_DIR_CONF/shorts-alias.conf)"
 msgstr ""
 
-#: bin/tuirc:824
+#: bin/tuirc:823
 #, sh-format
 msgid ""
 "Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when "
 "sourcing this conf file."
 msgstr ""
 
-#: bin/tuirc:832
+#: bin/tuirc:831
 msgid "Showed what TUI provides"
 msgstr ""
 
-#: bin/tuirc:840
+#: bin/tuirc:839
 #, sh-format
 msgid "Reset $RANGE"
 msgstr ""
 
-#: bin/tuirc:847
+#: bin/tuirc:846
 msgid "hit-tab"
 msgstr ""
 
-#: bin/tuirc:856
+#: bin/tuirc:852
+#, sh-format
+msgid "GNU TUI ($TUI_VERSION), Copyright (c) 2015 by sea"
+msgstr ""
+
+#: bin/tuirc:854
+msgid "GNU Text User Interface, framework for Scripts"
+msgstr ""
+
+#: bin/tuirc:855
 msgid ""
 "Calling tuirc like this gives you an impression on how your future scripts "
 "could look like."
 msgstr ""
 
-#: bin/tuirc:858
+#: bin/tuirc:857
 msgid "If you are looking for the commands of TUI, try this:"
 msgstr ""
 
-#: bin/tuirc:860
+#: bin/tuirc:859
 msgid "If you are a developer, i highly recommend to read:"
 msgstr ""
 
-#: bin/tuirc:861
+#: bin/tuirc:860
 #, sh-format
 msgid "man tui[rc] // ${TUI_FONT_BOLD}info tui${TUI_RESET}"
 msgstr ""
 
-#: bin/tuirc:862
+#: bin/tuirc:861
 msgid "And to check the provided variables, see:"
 msgstr ""
 
-#: bin/tuirc:865
+#: bin/tuirc:864
 msgid "There are some sample scripts to get you started:"
 msgstr ""
 
-#: bin/tuirc:867
+#: bin/tuirc:866
 #, possible-sh-format
 msgid "To create a new script in $TUI_DIR_USER_SCRIPTS, type:"
 msgstr ""
 
-#: bin/tuirc:868
+#: bin/tuirc:867
 msgid "SCRIPTNAME"
 msgstr ""
 
-#: bin/tuirc:870
+#: bin/tuirc:869
 msgid "Arguments to this command are:"
 msgstr ""
 
-#: bin/tuirc:873
+#: bin/tuirc:872
 msgid "Configure it now?"
 msgstr ""

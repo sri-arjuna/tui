@@ -38,7 +38,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=0.9.1
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -79,7 +79,7 @@ EXAMPLE
 	tui-dd ./somefile.iso /dev/sda
 
 HINTS
-  If you know you're going to write an ISO to an USB device, you can leave out the target as:
+  If you know you are going to write an ISO to an USB device, you can leave out the target as:
   
 	tui-dd ./somefile.iso 
   

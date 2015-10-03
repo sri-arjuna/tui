@@ -35,7 +35,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=0.9.1
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -112,10 +112,10 @@ AUTHOR
 		a)	SHELL_EXT="application"	;;
 		m)	SHELL_EXT="minimal"	;;
 		h)	printf "$help_text"
-			exit "$RET_HELP"	;;
+			exit $RET_HELP	;;
 		*)	# If improper argument
 			printf "$help_text"
-			exit "$RET_HELP"	;;
+			exit $RET_HELP	;;
 		esac
 	done
 	SHELL_EXT="${SHELL_EXT:-$default_new_manpage_type}"
