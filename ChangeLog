@@ -1,3 +1,13 @@
+2015-10-02 - GNU TUI 0.9.0
+* Updated: tui-edit, tui-dd, tui-new-manpage, help screen now exits with number
+* Updated: configure.cfg, YASSI was updated
+* Updated: bin/tuirc, now shows copyright info
+* Updated: tuirc.po file
+* Added: intial ./scripts/distro/PKGBUILD for Arch packages
+* Added: ./scripts/distro/README, 
+* Changed: ./screenshots/README, license information to GFDL.txt
+* Changed: ./screenshots/README, screenshots are NOT to be installed
+
 2015-09-27 - 0.8.9-GNU-RC17 (theoretical: 0.9.0 - RC1)
 * Fixed: tui-echo, tui-header, tui-printf, tui-title, tui-mv
 * Changed: scripts/make-po-files.sh
@@ -8,7 +18,7 @@
 * Moved injection protection into scripts/prepare.sh
 * Added README with copyright info to ./screenshots
 * YASSI was updated to 1.1 and fixes the symlink issue and ownage of bash-completion
-* Moved bash-completion file into a subdir, cleaner project root.
+* Moved bash-completion file into a sub dir, cleaner project root.
 * Removed temporary evaluation notice file 'eval'
 
 2015-09-27 - 0.8.9-GNU-RC16 (theoretical: 0.9.0 - RC1)
@@ -21,18 +31,18 @@
   * Added: ./GFDL.txt and ./COPYING.LESSER (GLPL)
 * Updated docs
   * Removed ./docs/man, as they are now generated upon installation
-  * Removed ./docs/wiki, as they are on the github wiki only
+  * Removed ./docs/wiki, as they are on the GitHub wiki only
   * Removed ./docs/texi/tui-<command>.texi unused files
   * Updated ./docs/texi/tui.texi, prefixed Linux with GNU where missing.
   * Updated and spellchecked ./docs/samples, preview scripts for 'tuirc samples'
-  * Moved content of the old manpages to the helpscreen of the according command
+  * Moved content of the old man-pages to the help screen of the according command
 * Updated binaries  
   * Disabled code-injection-protection for tui-asroot, since it is meant to execute commands.
   * Updated 'tuirc', fixed USER_NAME issue when root user and fixed typo for gettext invocations
   * Updated 'tui-printf', handling for tui-status
   * Updated 'tui-bol-dir', '-c' now properly returns the count of failed scripts
   * Fixed 'tui-conf-editor' and 'tui-download', displaying errors
-* Updated po files for all commands, due to helptext change (
+* Updated po files for all commands, due to help text change (
 * Removed old and no longer used items: ./locale/old ./docs/old, ./docs/samples/old, ./screenshots/old
 * Updated conf.tui/commmands.conf, as both (of my main) systems have symlink 'awk' to 'gawk', figured it might be better to change that
 * Updated ./configure.cfg
@@ -51,7 +61,7 @@
 * Updated po file of tuirc
 
 2015-09-17 - 0.8.9-GNU-RC13
-* tui, renamed again to tui-browser, otherwise... --- SKIPED, due to upcoming rework ---
+* tui, renamed again to tui-browser, otherwise... --- SKIPPED, due to upcoming rework ---
 * tui-asroot, gettext
 * tui-bgjob, gettext
 * tui-bgjob-mgr, gettext
@@ -59,7 +69,7 @@
 * tui-bol-gui, gettext
 * tui-bool-root, gettext
 * tui-cat, gettext
-* tui-conf-editor, --- SKIPED, due to upcoming rework ---
+* tui-conf-editor, --- SKIPPED, due to upcoming rework ---
 * tui-conf-get, gettext
 * tui-conf-set, gettext
 * tui-cp, gettext
@@ -80,7 +90,7 @@
 * tui-press, gettext, fixed message/display
 * tui-printf, gettext
 * tui-progress, gettext
-* tuirc, gettext, removed unrequired loop
+* tuirc, gettext, removed unrequited loop
 * tui-read, gettext
 * tui-rnd, gettext
 * tui-select, gettext
@@ -141,9 +151,9 @@
 * Fixed variable in ./templates/scripts/regular
 
 2015.07.24
-* Spellchecked bin/* (aspell seems to forget words pretty fast, and dont know basic words such as 'favorite')
+* Spellchecked bin/* (Aspell seems to forget words pretty fast, and don't know basic words such as 'favourite')
 * Spellchecked docs/*
-* Skipping spellcheck of manpages, they will become generated from the commands.. later on
+* Skipping spellcheck of man-pages, they will become generated from the commands.. later on
 
 2015.07.18
 * Applied basic & general injection protection
@@ -164,7 +174,7 @@
 * Still writing/fixing texinfo manual
 
 2015.07.05 - 0.8.5-GNU-RC1
-* Changed first time usage backend
+* Changed first time usage back end
 
 # -----------------------------------------------------------------------
 # Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>

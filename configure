@@ -19,9 +19,9 @@
 #
 #
 #	Created:	2015.07.27
-#	Changed:	2015.09.30
+#	Changed:	2015.10.03
 	script_name=configure
-	script_version=1.1
+	script_version=1.1.1
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -37,64 +37,66 @@
 #		and the calculation of the paths is done according to: http://www.pathname.com/fhs/
 #
 #		This is not about auto magic compiling,
-#		this is about simply placing files.
+#		this is about simply placing files - with some required extras.
 #
 #
 #	To report bugs or suggestions about YASSI (configure), please raise an issue on:
-#		https://github.com/sri-arjuna/yassi/issues
-#	or send me an email.
-#
-# ------------------------------------------------------------------------
-#
-# Copyright (c) 2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
-# All rights reserved.
-#
-# This program is free software: you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#		* https://github.com/sri-arjuna/yassi/issues
+#	or send me an email with the subject YASSI.
 #
 # ------------------------------------------------------------------------
 #
 #	Configfile / Option defaults
 #
-	APP=""
-	APP_VER=""
-	APP_REQUIRES=""
-	CFG_REQUIRES=""
-	BUGS=""
-	ISSUE=""
-	doRef=false
-	doTarball=false
-	is_at_home=false
+	APP="<APPNAME>"		# Non-space-name of the application
+	APP_VER=""		# Version of the APP
+	APP_TITLE=""		# Full name with spaces
+	APP_DIR="/usr/local"	# Default if no --prefix=DIR is passed
+	
+	# External requirements
+	APP_REQUIRES=""		# Commands required by APP
+	CFG_REQUIRES=""		# Commands required for PREPARE
+	
+	# Author
+	APP_AUTHOR=""		# Author of the script project
+	APP_EMAIL=""		# Email of the author
+	APP_HOMEPAGE=""		# Homepage of the author
+	
+	# App/Code retrieving
+	APP_URL=""		# Homepage of $APP
+	APP_GIT=""		# Giturl to clone from
+	APP_URL=""		# Url to download the package
+	DOWNLOAD=""		# Url to download the package
+	
+	APP_LIC="GPLv3+"	# Default license for scripted projects
+	
+	BUGS=""			# Email adress to disply for bug repots
+	ISSUE=""		# Web adress to display for bug reports
+	
+	# Bools
+	doRef=false		# Copy the REFERENCE file to SYSCONFDIR?
+	doTarball=false		# Create a redist tarball?
+	is_at_home=false	# Is it a system or user installation?
 #
 #	Internal Variables
 #
 	unset FHS PREPARE PRIOR POST REMOVE
-	declare -A FHS
+	declare -A FHS		# This contains the directory strucutre by name
 	declare -a PREPARE	# This will be ran during ./configure --prefix=/usr
 	declare -a PRIOR	# This will be ran first during ./make-install
 	declare -a POST		# This will be ran last during ./make-install
 	declare -a REMOVE	# This will be ran during ./make-uninstall
 	declare -a CLEAN	# This will be ran during ./make-distclean
 	declare -a IGNORE	# These files will be ignored when running './configure --tarball --prefix=/usr'
-	AWK=\awk
-	GREP=\grep
-	SED=\sed
+	AWK=\awk		# Bypass aliases
+	GREP=\grep		# Bypass aliases
+	SED=\sed		# Bypass aliases
 	CONFIG="./$script_name.cfg"
 	which sudo 1>/dev/zero 2>/dev/zero && \
 		install_prefix="sudo " || \
 		install_prefix="su -c "
-	mandirs="$(echo man{1..9}dir)"
-	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir mandir $mandirs compldir sharedstatedir localstatedir"
+	mandirs="mandir $(echo man{1..9}dir)"
+	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs compldir sharedstatedir localstatedir"
 	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
 	TMP="$PWD/tmp.$$"
 	CHROOT=""
@@ -106,23 +108,25 @@
 	# Prints a sample configure.cfg
 	# and exits
 		cat <<-EOF
+		#!/usr/bin/env bash
 		#
 		#	Project Info
 		#
-		 	APP=projectname
+		 	APP=prjname
+		 	APP_TITLE="<Project Name>"
 		 	APP_REQUIRES="gawk bash grep sed"
 		#
 		#	Targets
 		#
 		 	BINDIR=bin
-		 	DOCDIR=docs/[A-Z]*
+		 	DOCDIR=docs/[CRL]*
 		 	MAN1DIR=docs/man/\*.1
 		 	INFODIR=docs/info/\*.info
 		 	DATADIR="./templates ./extra"
 		#
 		#	Contact
 		#
-		 	BUGS="$USER AT $HOSTNAME"
+		 	BUGS="${USER_EMAIL:-your@email.com}"
 		EOF
 		exit 0
 	}
@@ -135,7 +139,9 @@
 		#	Project Info
 		#
 		 	# Used for /usr/share/\$APP & /usr/share/doc/\$APP
-		 	APP=projectname
+		 	APP=prjname
+		 	# Used to show full name of the project
+		 	APP_TITLE=""
 		 	# This is required to run the script properly
 		 	APP_REQUIRES="gawk bash grep sed"
 		 	# This is required only until it is installed
@@ -145,13 +151,20 @@
 		 	APP_VER=0.1
 			
 		 	# Contact
-		 	APP_AUTHOR="${USER_NAME:-USER}"
+		 	APP_AUTHOR="${USER_NAME:-$USER}"
 		 	APP_EMAIL="${USER_EMAIL:-your@email.com}"
-		 	APP_SITE="https://github.com"
-			
+		 	# The authors homepage, not related to the project
+		 	APP_HOMEPAGE="${USER_HOMEPAGE:-http://your-homepage.com}"
+		 
+		 	# Visit & Download package locate
+		 	APP_URL="https://github.com/\$APP_AUTHOR/\$APP/"
+		 	APP_GIT="\$APP_URL.git"
+		 	DOWNLOAD="\$APP_URL/archive/v\${APP_VER}.tar.gz"
+			DOWNLOAD_DIR="\$APP-\$APP_VER"
+		 	
 		 	# If set, overwrites the default PREFIX (/usr/local) to assigned value.
 		 	#APP_DIR=~/.local
-			
+		 	
 		 	# Set true to install the reference file to $PREFIX/$SYSCONFDIR/\$APP.conf
 		 	# This will automaticly be uninstalled if set to true, no extra work.
 		 	#doRef=false
@@ -175,7 +188,7 @@
 		#
 		 	BINDIR=bin
 		 	# Do not use [A-Z], that might include a-z as well
-		 	DOCDIR=docs/[CLR]*
+		 	DOCDIR=docs/[CIRU]*
 		 	MAN1DIR=docs/man/*.1
 		 	INFODIR=docs/info/\$APP.info
 		 	HTMLDIR=docs/info/\$APP.html
@@ -194,7 +207,7 @@
 		#	Additional tasks for the uninstallation process
 		#
 		 	# In this example, TUI was installed, therefor the command 'tui-yesno' is available
-			REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-distclean && cd .."
+		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-distclean && cd .."
 		#
 		#	Contact
 		#
@@ -206,14 +219,31 @@
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		FINAL_NOTE=$(printf '\n%s\n' "YASSI (Yet Another Simple Script Installer, ./$script_name), was written in 2015 by Simon Arjuna Erat (sea) from Switzerland")
-		MSG_TR_CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\nReport bugs of \"$APP\" to <$BUGS>")$( [ ! -z "$ISSUE" ] && printf "\nReport bugs of \"$APP\" on <$ISSUE>\n\n")$(printf '\n')"
+		FINAL_NOTE=$(printf '\n%s\n' "YASSI $script_version (Yet Another Simple Script Installer), Copyright (c) 2015 GPLv3+ by Simon Arjuna Erat (sea)")
+		CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\nReport bugs of \"$APP\" to <$BUGS>")$( [ ! -z "$ISSUE" ] && printf "\nReport bugs of \"$APP\" on <$ISSUE>\n\n")$(printf '\n')"
 		
+		if [ -n "$APP_AUTHOR$APP_EMAIL$APP_HOMEPAGE" ]
+		then 	COPYRIGHTLINE="
+$APP"
+			[ -n "$APP_VER" ] && COPYRIGHTLINE+=" $APP_VER"
+			[ -n "$APP_TITLE" ] && COPYRIGHTLINE+=" ($APP_TITLE)"
+			COPYRIGHTLINE+=", Copyright (c) - $APP_LIC"
+			[ -n "$APP_AUTHOR" ] && COPYRIGHTLINE+=" - by $APP_AUTHOR"
+			[ -n "$APP_EMAIL" ] && \
+				COPYRIGHTLINE+=", (<${APP_EMAIL}>" && \
+				[ -n "$APP_HOMEPAGE" ] && \
+				COPYRIGHTLINE+=", <" || \
+				COPYRIGHTLINE+=", <"
+			[ -n "$APP_HOMEPAGE" ] && COPYRIGHTLINE+="${APP_HOMEPAGE}>"
+			[ -n "$APP_EMAIL" ] && COPYRIGHTLINE+=")
+"
+		fi
+			
 		MSG_TR_HELP="SYNOPSIS
   	./$script_name [options]
 
 DESCRIPTION
-	Routine to configure the installation of ${APP:-APPNAME} ${APP_VER}
+	Routine to configure the installation of ${APP_TITLE:-${APP:-APPNAME}} ${APP_VER}
 
 OPTIONS
 	-h|--help		Shows this screen and exits
@@ -223,7 +253,7 @@ OPTIONS
 	--sample-full		Prints an advanced sample 'configure.cfg' required by projects and exits
 	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
 	
-	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR:-/usr/local})
+	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR})
 	--chroot DIR		Sets the CHROOT to DIR		(for 'builddirs' or before chrooting into a partition)
 	
 	--bindir DIR		user executeables 		(\$prefix/bin)
@@ -252,8 +282,8 @@ NOTES
 	* /usr/local or /opt
 	* \$HOME
 	* \$HOME/local or \$HOME/.local
-  ${MSG_TR_CONTACT_INFO}
-  ${FINAL_NOTE}"
+  ${CONTACT_INFO}
+  ${COPYRIGHTLINE}${FINAL_NOTE}"
 		printf "%s\n" "$MSG_TR_HELP"
 		exit 99
 	}
@@ -560,7 +590,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		etc_done=false
 		if [ -z "$tmp" ]
 		then	case "$index" in
-			prefix)		tmp="${APP_DIR:-/usr/local}"	;;
+			prefix)		tmp="${APP_DIR}"	;;
 			"bindir")	tmp="${FHS[prefix]}/bin"	;;
 			"sbindir")	tmp="${FHS[prefix]}/sbin"	;;
 			sysconfdir)	tmp_prefix="${FHS[prefix]}"
@@ -582,10 +612,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
 			htmldir)	tmp="${FHS[docdir]}" ;;
 			compldir)	# Some systems have bash completion within the SYSCONFDIR
-					[ -d "${FHS[datarootdir]}/bash-completion/completions" ] && \
+					if [ -d "${FHS[datarootdir]}/bash-completion/completions" ]
+					then 	tmp="${FHS[datarootdir]}/bash-completion/completions"
+					elif [ -d "${FHS[sysconfdir]}/bash_completion.d" ]
+					then	tmp="${FHS[sysconfdir]}/bash_completion.d"
+					else # Use default as fallback
 						tmp="${FHS[datarootdir]}/bash-completion/completions"
-					[ -d "${FHS[sysconfdir]}/bash_completion.d" ] && \
-						tmp="${FHS[sysconfdir]}/bash_completion.d"	;;
+					fi ;;
 			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
 			localstatedir)	tmp="${FHS[prefix]}/var"	;;
 			esac
@@ -604,14 +637,51 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	done
 	export FHS
 	prefix="${FHS[prefix]}"
+	# Updated again - For the Arrays
 	source "$CONFIG"
+#
+#	Before we start, are there any other files beside configure?
+#
+	tmp=$(\ls -l|\grep -v configure)
+	if [ -z "$tmp" ]
+	then	# It is empty, so no other files available, get them now
+
+		if [ -n "$DOWNLOAD" ]
+		then 	# Tarball is available
+			curl -o "$APP.tar.gz" "$DOWNLOAD"
+			tar axf "$APP.tar.gz"
+			cd "$DOWNLOAD_DIR"
+			mv * ..
+			cd ..
+		elif [ -n "$APP_GIT" ]
+		then	# Git url is passed, lets check if it is required
+			# There are 'code' or '.git' urls
+			last_word="${APP_GIT##*/}"
+			check_word="${last_word/\.git}"
+			if [ "$last_word" = "$check_word" ]
+			then	# it is 'code'
+				git clone "$APP_GIT" "$APP"
+			else	# its *.git
+				git clone "$APP_GIT"
+			fi
+			mv "$APP" "$APP.$$"
+			cd "$APP.$$"
+			mv * ..
+			cd ..
+		else	printf '%s\n' \
+				"Fatal error, could not retrieve source code" \
+				"Please check if either DOWNLOAD ($DOWNLOAD + $DOWNLOAD_DIR) are set," \
+				"or if $APP_GIT provides a valid URL."
+			exit 1
+		fi
+	fi
 #
 #	Prepare installation script
 #
 	write_files
 	APP_REQUIRES=""
 	source "$CONFIG";missing=""
-	for req in $APP_REQUIRES;do
+	for req in $CFG_REQUIRES $APP_REQUIRES;do
 		which $req 2>/dev/zero 1>&2 || missing+=" $req"
 	done
 	[ ! -z "$missing" ] && \
@@ -646,7 +716,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		set +x
 	else	echo
 		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
-		echo "To install \"$APP\" now, please execute: '${install_prefix}./make-install'"
+		echo "To install \"${APP_TITLE:-$APP}\" now, please execute: '${install_prefix}./make-install'"
 		echo
 	fi
 	exit
