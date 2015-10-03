@@ -1,0 +1,45 @@
+# Maintainer: Simon Arjuna Erat (sea), erat.simon@gmail.com
+# -----------------------------------------------------------------------
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# -----------------------------------------------------------------------
+_hkgname=tui
+pkgname=tui
+pkgver=$(tmp=$(\grep APP_VER ../../configure.cfg);echo ${tmp/*=};tmp='')
+pkgrel=1
+pkgdesc="GNU TUI, Text User Interface, framework for scripts"
+url="https://github.com/sri-arjuna/tui"
+license=('GPL-3')
+arch=('any')
+depends=('bash', 'gawk', 'gettext', 'grep', 'sed')
+provides=('tui')
+makedepends=()
+conflicts=()
+replaces=()
+backup=()
+source=(https://github.com/sri-arjuna/tui/archive/v${pkgver}.tar.gz)
+##md5sums=('3ff075d8e620197ea9cd12df72d95184')
+
+build() {
+    cd ${srcdir}/${_hkgname}-${pkgver}
+    ./configure --prefix=/usr --chroot=$srcdir
+}
+
+package() {
+    cd ${srcdir}/${_hkgname}-${pkgver}
+    ./make-install
+}
