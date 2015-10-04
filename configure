@@ -19,9 +19,9 @@
 #
 #
 #	Created:	2015.07.27
-#	Changed:	2015.10.03
+#	Changed:	2015.10.04
 	script_name=configure
-	script_version=1.1.1
+	script_version=1.1.2
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -545,7 +545,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			done
 		fi
 		# Let the script exit with their proper exit code.
-		echo "echo;echo \"Finished installation of $APP\";exit \$RET" >> "make-install"
+		echo "echo;echo \"Finished installation of ${APP_TITLE:-$APP} with \$? (0=success)\";exit \$RET" >> "make-install"
 		echo "exit \$RET" >> "make-uninstall"
 		echo "exit \$RET" >> "make-distclean"
 		
@@ -581,6 +581,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	done
 	[ -z "$APP" ] && echo "Missing APP name..." && exit 1
 	REFERENCE="${APP}_dirs.conf"
+	[ -n "$CHROOT" ] &&  [ "$HOME" = "${CHROOT:0:${#HOME}}" ] && install_prefix=""
 #
 #	Prepare paths
 #
