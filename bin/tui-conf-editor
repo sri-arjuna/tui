@@ -310,7 +310,7 @@ AUTHOR
 		fi
 		edit_file "$FILES"
 		RET=$?
-		$be_clear && tui-wait $WAIT_SECONDS && clear
+		$be_clear && tui-wait $WAIT_SECONDS && clear && tui-header "$script_header"
 	done
 #
 # 	Clean up & exit
