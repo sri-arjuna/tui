@@ -18,20 +18,14 @@ Known Bugs:
 
 Security:
 ---------
-No issues know. :)
+No issues known. :)
 
 Fix:
 ----
-tui-conf-editor (tuirc?), logfile
-
+No issues known.
 
 Finalize:
 ---------
 tui-browser
-tui-conf-editor
 samples
 tuirc manpage --> still needs fixing/adjusting, but the info is there
-
-Roadmap:
---------
-Redo screenshots to reflect current state

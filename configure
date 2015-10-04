@@ -461,7 +461,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				1)	write_install "$index" "$tmp" >> "make-install"
 					write_uninstall "$index" "$tmp" >> "make-uninstall"
 					;;
-				*)	for s in $(echo "$tmp"|sed s,\",,g)
+				*)	for s in $(echo "$tmp"|sed s,\"," ",g)
 					do 	write_install "$index" "$s" >> "make-install"
 						write_uninstall "$index" "$s" >> "make-uninstall"
 					done
@@ -581,7 +581,6 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 	done
 	[ -z "$APP" ] && echo "Missing APP name..." && exit 1
 	REFERENCE="${APP}_dirs.conf"
-	[ -n "$CHROOT" ] &&  [ "$HOME" = "${CHROOT:0:${#HOME}}" ] && install_prefix=""
 #
 #	Prepare paths
 #
@@ -715,7 +714,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			$opt_exclude * && \
 			echo "Successfully created tarball ${tarball}!"
 		set +x
-	else	echo
+	else	[ -z "$CHROOT" ] &&  [ "$HOME" = "${prefix:0:${#HOME}}" ] && install_prefix=""
+		echo
 		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
 		echo "To install \"${APP_TITLE:-$APP}\" now, please execute: '${install_prefix}./make-install'"
 		echo
