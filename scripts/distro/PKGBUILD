@@ -1,4 +1,4 @@
-# Maintainer: Simon Arjuna Erat (sea), erat.simon@gmail.com
+# Creator: Simon Arjuna Erat (sea), erat.simon@gmail.com
 # -----------------------------------------------------------------------
 # Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
 # All rights reserved.
@@ -17,29 +17,45 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # -----------------------------------------------------------------------
-_hkgname=tui
-pkgname=tui
-pkgver=$(tmp=$(\gawk -F= '/TUI_VERSION/ {print $2}' ../../bin/tuirc);echo ${tmp/*=};tmp='')
-pkgrel=1
-pkgdesc="GNU TUI, Text User Interface, framework for scripts"
-url="https://github.com/sri-arjuna/tui"
-license=('GPL-3')
-arch=('any')
-#depends=('bash', 'gawk', 'gettext', 'grep', 'sed')
-provides=('tui')
-makedepends=()
-conflicts=()
-replaces=()
-backup=()
-source=(https://github.com/sri-arjuna/tui/archive/v${pkgver}.tar.gz)
-##md5sums=('3ff075d8e620197ea9cd12df72d95184')
-
-build() {
-    cd ${srcdir}/${_hkgname}-${pkgver}
-    ./configure --prefix=/usr --chroot=$srcdir
-}
-
-package() {
-    cd ${srcdir}/${_hkgname}-${pkgver}
-    ./make-install
-}
+#
+#	Variables
+#
+	# Prj info
+	_hkgname=tui
+	pkgname=tui
+	pkgdesc="GNU TUI, Text User Interface, framework for scripts"
+	license=('GPL-3')
+	
+	# Pkg info
+	arch=('any')
+	pkgver=$(tmp=$(\gawk -F= '/TUI_VERSION/ {print $2}' ../../bin/tuirc);echo ${tmp/*=};tmp='')
+	#pkgver=0.9.0.devel
+	pkgrel=1
+	
+	# Src info
+	url="https://github.com/sri-arjuna/tui"
+	source=($url/archive/v${pkgver}.tar.gz)
+	msg2 "Retrieve checksum"
+	not_secure="$(md5sum ${source##*/}|awk '{print $1}')"
+	md5sums=("$not_secure")
+	
+	# Bld info
+	provides=('tui')
+	msg2 "Checking for dependencies..."
+	depends=('bash' 'gawk' 'gettext' 'grep' 'sed')
+	msg2 "Checking for build dependencies..."
+	makedepends=('texinfo' 'txt2man')
+#
+#	Functions
+#
+	build() {
+		cd ${srcdir}/${_hkgname}-${pkgver}
+		msg2 "Building docs..."
+		./configure --prefix=/usr --chroot=$pkgdir 1>/dev/zero 2>/dev/zero
+	}
+	package() {
+		cd ${srcdir}/${_hkgname}-${pkgver}
+		msg2 "Installing..."
+		./make-install 1>/dev/zero 2>/dev/zero
+		msg2 Done
+	}
