@@ -19,13 +19,13 @@
 # -----------------------------------------------------------------------
 _hkgname=tui
 pkgname=tui
-pkgver=$(tmp=$(\grep APP_VER ../../configure.cfg);echo ${tmp/*=};tmp='')
+pkgver=$(tmp=$(\gawk -F= '/TUI_VERSION/ {print $2}' ../../bin/tuirc);echo ${tmp/*=};tmp='')
 pkgrel=1
 pkgdesc="GNU TUI, Text User Interface, framework for scripts"
 url="https://github.com/sri-arjuna/tui"
 license=('GPL-3')
 arch=('any')
-depends=('bash', 'gawk', 'gettext', 'grep', 'sed')
+#depends=('bash', 'gawk', 'gettext', 'grep', 'sed')
 provides=('tui')
 makedepends=()
 conflicts=()
