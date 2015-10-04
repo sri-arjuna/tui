@@ -8,114 +8,129 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-28 22:00+0200\n"
+"POT-Creation-Date: 2015-10-04 22:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bin/tui-conf-editor:45
+#: bin/tui-conf-editor:81
+#, sh-format
+msgid ""
+"${script_name}${script_package_txt}, Version $script_version\n"
+"Copyright (C) 2015 Simon Arjuna Erat (sea)\n"
+"License GNU General Public License (GPL) or later <http://www.gnu.org/"
+"licenses/gpl.html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-conf-editor:88
 #, sh-format
 msgid ""
 "\n"
 "NAME\n"
-"  $ME - The configuration editor\n"
+"  $script_name - Configuration Editor\n"
 "\n"
 "SYNOPSYS\n"
-"  $ME [-h|--help] [--version] [-L] [-l LOGFILE] [-t TITLE] FILE1 [FILE2 ..]\n"
+"  $script_name [-h|--help] [--version] [-cq] [-T|--title \\\"Custom Title\\"
+"\"] [--option OPTNAME [--values \\\"val1 val2 ...\\\"] [--default val1]] "
+"FILE1 [FILE2 ...]\n"
+"\t\t\n"
 "  \n"
 "DESCRIPTION\n"
-"  Advanced configuration editor, handles multiple files, reads them out and "
-"let the user change them.\n"
-"  Version 0.9.0 or later may even provide options to create a proper config "
-"file from a blank file.\n"
-"  \n"
-"  You can either change setting by setting, or edit the file in an editor, "
-"straight from the menu.\n"
-"  \n"
-"  By default, all changes done using the editor are loged in $LOG.\n"
-"  However, values of variables named \\\"pass, password, passwd, pw, pword\\"
-"\" will not be saved for security reasons.\n"
+"  Advanced configuration editor for configuration files.\n"
+"  Can be used to write a default configuration file, or to let the user "
+"select among predefined values.\n"
 "  \n"
 "OPTIONS\n"
 "  -h|--help\tShows help and exit with 99\n"
 "  --version\tShows version infoand exit with 0\n"
 "  \n"
-"  -L\t\tShows the LOG ($LOG) on PAGER ($PAGER) and exit with 0\n"
-"  -l LOG\tChanges \\\"$LOG\\\" to LOG\n"
-"  -t TITLE\tSet title to TITLE (default: \n"
-" \n"
+"  -H|--header \\\"HEADER\\\"\tSet a custom heading\n"
+"  -T|--title \\\"TITLE\\\"\tSet a custom title\n"
+"  -F|--file \\\"FILELABEL\\\"\tSet the display of the filename to FILELABEL\n"
+"  \n"
+"  --option OPTNAME\tCreates a new option OPTNAME\n"
+"  --values \\\"VALUE1 VALUE2 VALUE\\\" \tAssigns VALUES to OPTNAME\n"
+"  --default VALUE\tSet default VALUE for OPTNAME\n"
+"  \n"
+"  --conf-header\t\tWrites a custom heading into the config file, can be used "
+"multiple times\n"
+"  --kiosk\t\tDisable the manual editing of the current file\n"
+"  -q\t\t\tQuiet mode, just checks the file for passed OPTNAME, and writes "
+"default VALUE if missing\n"
+"  --write-no-exist\tWrites a default configuration file\n"
+"  -c\t\t\tClear the screen after each file or variable\n"
+"  -w|--wait WAIT_SECONDS\tWait WAIT_SECONDS before clearing the screen "
+"(default 1)\n"
+"  \n"
+"  \n"
 "EXAMPLE\n"
 "\n"
-"\t$ME /path/to/multiple/files*.conf\n"
+"\t$script_name\t-T \\\"Current GRUB config defaults\\\" /etc/default/grub\n"
 "\t\n"
-"\t$ME -t \\\"My Config Editor\\\" ./script.conf\n"
+"\t$script_name\t--option var_gender --default male --values=\\\"male female\\"
+"\" \\\t\t\t--option var_name --default \\\"\\044USER\\\" \\\t\t\t--option "
+"var_age --default 0 --values=\\\"1-13 14-21 22-44 44-62 63-90 90+\\\" \t\t"
+"\t--write-no-exist \t\t\t/path/to/file\n"
 "\n"
 "HINTS\n"
-"  Upcoming version will provide functionality to provide selectable options "
-"for variables, so you and your enduser can create a proper configuration "
-"file from empty.\n"
-"  It might even provide options for default values, and to automaticly write "
-"an initial config file from that.\n"
+"  If your script project requires a new variable after an update, use the \\"
+"\"-q\\\" toggle to update the user configuration file with the new default "
+"values.\n"
 "  \n"
 "SEE ALSO\n"
-"  bash(1), gawk(1), grep(1), sed(1), tui-conf-get(1), tui-conf-set(1), tui-"
-"select(1), tui-status(1), tui-yesno(1)\n"
+"  bash(1), gettext(1), tuirc(1), tui-conf-get(1), tui-conf-set(1), tui-"
+"wait(1)\n"
 "  \n"
 "BUGS\n"
-"  Report bugs to: erat.simon@gmail.com\n"
+"  Report bugs to: mailinglist ; <erat.simon ├ª gmail,com>\n"
 "  \n"
-"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  $script_name - Homepage: <$script_url>\n"
 "  \n"
 "  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 "\n"
 "AUTHOR\n"
-"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
+"  Simon Arjuna Erat (sea), <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-conf-editor:96
-msgid "Please select the configuration to edit:"
+#: bin/tui-conf-editor:146
+msgid "Back"
 msgstr ""
 
-#: bin/tui-conf-editor:97
-msgid "Please select which variable to change:"
+#: bin/tui-conf-editor:147
+msgid "Edit"
 msgstr ""
 
-#: bin/tui-conf-editor:98
-msgid "Do you want to change this?"
+#: bin/tui-conf-editor:148
+msgid "Please select a file to edit"
 msgstr ""
 
-#: bin/tui-conf-editor:99
-msgid "Please select the new value:"
-msgstr ""
-
-#: bin/tui-conf-editor:100
-msgid "Please type the new value:"
-msgstr ""
-
-#: bin/tui-conf-editor:101
+#: bin/tui-conf-editor:149
 #, sh-format
-msgid "$CONFIG: Does not exist."
+msgid "Select a variable to change or go back"
 msgstr ""
 
-#: bin/tui-conf-editor:152
+#: bin/tui-conf-editor:216
 #, sh-format
-msgid "Currently \\\"$VAR\\\" is set to \\\"$VAL\\\"."
+msgid "What is the new value for ${action}($curval)?"
 msgstr ""
 
-#: bin/tui-conf-editor:165
+#: bin/tui-conf-editor:219
 #, sh-format
-msgid "Changed \\\"$VAR\\\" from \\\"*******\\\" to \\\"*******\\\""
+msgid "Select the new value for ${action}($curval)?"
 msgstr ""
 
-#: bin/tui-conf-editor:166
-#, sh-format
-msgid "Changed \\\"$VAR\\\" from \\\"$VAL\\\" to \\\"$newval\\\""
+#: bin/tui-conf-editor:231
+msgid "No --options OPTNAME passed to write!"
 msgstr ""
 
-#: bin/tui-conf-editor:238
-msgid "Configuration:"
+#: bin/tui-conf-editor:232
+#, possible-sh-format
+msgid "Must provide a FILE to $FUNCNAME"
 msgstr ""
