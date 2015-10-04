@@ -1,4 +1,11 @@
-2015-10-02 - GNU TUI 0.9.0
+2015-10-04 - GNU TUI 0.9.0
+* tuirc, optimized the unset of TUI environment
+* templates/scripts/modul, fixed some typos
+* tui-conf-editor, now supports custom options, defaults and values
+* tui-conf-set, the rework got forgotton but is now done
+* Removed ./screenshots
+
+2015-10-02 - 0.8.9-GNU-RC18
 * Updated: tui-edit, tui-dd, tui-new-manpage, help screen now exits with number
 * Updated: configure.cfg, YASSI was updated
 * Updated: bin/tuirc, now shows copyright info

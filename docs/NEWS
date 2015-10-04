@@ -1,3 +1,13 @@
+2015.10.04
+----------
+As i was told that only the screenshot copyright and licensing thing
+was holding back the approval of the project, me decided to remove them
+alltogether, as they were outdated anyway.
+
+tui-conf-editor finally comes close to what I initialy wanted it to become.
+Please see either its help screen ("tui-conf-editor -h") or "info tui-conf-editor" for more details.
+
+
 2015.09.27
 ----------
 Releasing TUI 0.8.9-GNU-RC16, which now has been stripped off no longer used files.

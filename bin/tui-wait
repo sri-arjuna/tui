@@ -105,7 +105,7 @@ BUGS
 #
 #	Variables
 #
-	TIME="${1/[a-zA-Z]/}"
+	TIME="${1//[a-zA-Z]//}"
 	UNIT="$(printf ${1}|tr -d [:digit:])"
 	( [ -z "$TIME" ] || echo "${UNIT:-s}"|${GREP:-grep} -v ^[smh]$ ) && \
 		printf "$help_text" && exit 1

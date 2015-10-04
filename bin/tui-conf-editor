@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------
 #
-# Copyright (c) 2014-2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
+# Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon æ gmail,com
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License (GPL) for more details.
 #
 # You should have received a copy of the GNU General Public License (GPL)
@@ -19,227 +19,301 @@
 #
 # ------------------------------------------------------------------------
 #
-#	File:		tui-conf-editor
-#	Author: 	Simon Arjuna Erat (sea)
-#	Contact:	erat.simon@gmail.com
-#	License:	GNU General Public License (GPL)
-#	Created:	2014.11.03
-#	Changed:	2015.08.03
-	source tuirc && source gettext.sh
-	script_version=0.8.1
-#	Description:	Basic configuration file editor
+#	TUI Internals
 #
+	script_version=0.9.0
+	script_created="2014.11.03"
+	script_changed="2015.10.04"
+	
+	script_name="${0##*/}"
+	script_name="${script_name/.sh/}"
+	script_title="tui-conf-editor"
+	script_package="TUI"
+	script_url="http://www.gnu.org/software/tui"
+	
+	script_author="Simon Arjuna Erat (sea)"
+	script_contact="erat.simon æ gmail,com"
+	script_license="GNU General Public License (GPL)"
+	
+	script_header="$script_name ($script_version)"
 #
-#	Script Environment
+#	Internal preps
 #
-	ME="${0##*/}"				# Basename of tui-config-editor
-	LOG="$TUI_DIR_LOG/tui.log"		# Set default log file
-	TITLE="GNU TUI - Configuration Editor"
+	[ ! -z "$script_package" ] && script_package+=" " && script_package_txt=" ()"
 #
-#	Variable defaults (options)
+#	Shared variables & Language
 #
-	beVerbose=false
+	# Check the two default places for the core configuration
+	# First systemwide, second user only install
+	for tmp_task in "/etc" "/usr/local" "$HOME" "${HOME:-/root}/.local" 
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	then 	# Load required variables
+		source "$TUI_FILE_CONF_COMMANDS"
+	else	source tuirc
+	fi
+	break_on_injections "${@}" && exit 1
+	source gettext.sh
+	TEXTDOMAIN="$script_name"
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Assuming $script_package is installed to $TUI_DIR_SYSTEM as well...
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
-#	Help text
+#	Variables
 #
-	help_text="$(eval_gettext '
+	typeset -r CFG="$script_config"
+	typeset -r LOG="$TUI_DIR_LOGS/${script_name}.log"
+	declare TMP="${TUI_DIR_TEMP:-TMPDIR}/${script_name}-$$.tmp~"
+	declare -A OPTIONS DEFAULTS INDEX TYPE
+	declare -a FILES
+	FILE_LABEL=""
+	WAIT_SECONDS=1
+	write_file=false
+	hide_edit=false
+	be_quiet=false
+	be_clear=false
+	#printf '%s\n' "" > "$TMP"	# Clear content
+	>"$TMP"	# Clear content
+#
+#	Messages to translate:
+#
+	MSG_TR_VERSION="$(eval_gettext '${script_name}${script_package_txt}, Version $script_version
+Copyright (C) 2015 Simon Arjuna Erat (sea)
+License GNU General Public License (GPL) or later <http://www.gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	MSG_TR_HELP="$(eval_gettext '
 NAME
-  $ME - The configuration editor
+  $script_name - Configuration Editor
 
 SYNOPSYS
-  $ME [-h|--help] [--version] [-L] [-l LOGFILE] [-t TITLE] FILE1 [FILE2 ..]
+  $script_name [-h|--help] [--version] [-cq] [-T|--title \"Custom Title\"] [--option OPTNAME [--values \"val1 val2 ...\"] [--default val1]] FILE1 [FILE2 ...]
+		
   
 DESCRIPTION
-  Advanced configuration editor, handles multiple files, reads them out and let the user change them.
-  Version 0.9.0 or later may even provide options to create a proper config file from a blank file.
-  
-  You can either change setting by setting, or edit the file in an editor, straight from the menu.
-  
-  By default, all changes done using the editor are loged in $LOG.
-  However, values of variables named \"pass, password, passwd, pw, pword\" will not be saved for security reasons.
+  Advanced configuration editor for configuration files.
+  Can be used to write a default configuration file, or to let the user select among predefined values.
   
 OPTIONS
   -h|--help	Shows help and exit with 99
   --version	Shows version infoand exit with 0
   
-  -L		Shows the LOG ($LOG) on PAGER ($PAGER) and exit with 0
-  -l LOG	Changes \"$LOG\" to LOG
-  -t TITLE	Set title to TITLE (default: 
- 
+  -H|--header \"HEADER\"	Set a custom heading
+  -T|--title \"TITLE\"	Set a custom title
+  -F|--file \"FILELABEL\"	Set the display of the filename to FILELABEL
+  
+  --option OPTNAME	Creates a new option OPTNAME
+  --values \"VALUE1 VALUE2 VALUE\" 	Assigns VALUES to OPTNAME
+  --default VALUE	Set default VALUE for OPTNAME
+  
+  --conf-header		Writes a custom heading into the config file, can be used multiple times
+  --kiosk		Disable the manual editing of the current file
+  -q			Quiet mode, just checks the file for passed OPTNAME, and writes default VALUE if missing
+  --write-no-exist	Writes a default configuration file
+  -c			Clear the screen after each file or variable
+  -w|--wait WAIT_SECONDS	Wait WAIT_SECONDS before clearing the screen (default 1)
+  
+  
 EXAMPLE
 
-	$ME /path/to/multiple/files*.conf
+	$script_name	-T \"Current GRUB config defaults\" /etc/default/grub
 	
-	$ME -t \"My Config Editor\" ./script.conf
+	$script_name	--option var_gender --default male --values=\"male female\" \\
+			--option var_name --default \"\044USER\" \\
+			--option var_age --default 0 --values=\"1-13 14-21 22-44 44-62 63-90 90+\" \
+			--write-no-exist \
+			/path/to/file
 
 HINTS
-  Upcoming version will provide functionality to provide selectable options for variables, so you and your enduser can create a proper configuration file from empty.
-  It might even provide options for default values, and to automaticly write an initial config file from that.
+  If your script project requires a new variable after an update, use the \"-q\" toggle to update the user configuration file with the new default values.
   
 SEE ALSO
-  bash(1), gawk(1), grep(1), sed(1), tui-conf-get(1), tui-conf-set(1), tui-select(1), tui-status(1), tui-yesno(1)
+  bash(1), gettext(1), tuirc(1), tui-conf-get(1), tui-conf-set(1), tui-wait(1)
   
 BUGS
-  Report bugs to: erat.simon@gmail.com
+  Report bugs to: mailinglist ; <erat.simon æ gmail,com>
   
-  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  $script_name - Homepage: <$script_url>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
 AUTHOR
-  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+  Simon Arjuna Erat (sea), <http://linux-scripter.blogspot.ch>
 ')"
-# TODO :: -o OPTNAME opt1 opt2 ... Disables the scan of a file, but provides OPTNAME\'s
-#
-#	Messages
-#
-	MSG_FILE_SELECT="$(gettext 'Please select the configuration to edit:')"
-	MSG_CONF_VAR_SELECT="$(gettext 'Please select which variable to change:')"
-	MSG_CONF_VAR_CHANGE="$(gettext 'Do you want to change this?')"
-	MSG_CONF_VAL_SELECT="$(gettext 'Please select the new value:')"
-	MSG_CONF_VAL_TYPE="$(gettext 'Please type the new value:')"
-	MSG_FILE_DONT_EXIST="$(eval_gettext '$CONFIG: Does not exist.')"
-	
-	
+	MSG_TR_WORD_BACK="$(gettext 'Back')"
+	MSG_TR_WORD_EDIT="$(gettext 'Edit')"
+	MSG_TR_SELECT_FILE="$(gettext 'Please select a file to edit')"
+	MSG_TR_CHANGE_VALUE="$(eval_gettext 'Select a variable to change or go back')"
+	#MSG_TR_YY="$(eval_gettext '')"
 #
 #	Functions
 #
-	doLog() { # "MESSAGE STRING"
-	# Prints: Time & "Message STRING"
-	# See 'tui-log -h' for more info
-		tui-log -t "$LOG" "$1"
+	cleanup() { 
+	# Removes all known tempfiles and exits
+	# Is called at the end of the script and by the trap
+		declare -a arr_CLEANUP=(
+			"$TMP"
+			# Add your tempfiles
+			# here
+			)
+		for remove in "${arr_CLEANUP[@]}"
+		do 	( [ -f "$remove" ] || [ -p "$remove" ] ) && rm -f "$remove"
+		done
 	}
-	ConfigMenu() { # CONFIG
-	# Configures the variables/files used by the script
+	show_help() {
+	# Prints the helpscreen
+	# and exits
+		printf "$MSG_TR_HELP\n"
+		exit 99
+	}
+	show_version() {
+	# Prints the version of the script
+	# and exits
+		printf "$MSG_TR_VERSION\n"
+		exit 111
+	}
+	edit_file() { # /path/to/FILE
 	#
-	#	Check for config file
-		CONFIG="$1"
-		[ ! -f "$CONFIG" ] && \
-			tui-echo "$MSG_FILE_DONT_EXIST" "$TUI_FAIL" && \
-			return 1
-		
-		# Preview
-		for VAR in $(tui-conf-get -l "$CONFIG");do 
-			val="$(tui-conf-get $CONFIG $VAR)"
-			tui-echo "$VAR" "$val"
-		done
-		
-		
-		# Loop while is not going back
-		VAR=stay
-		
-		while [ Back != "$VAR" ];do
-			tui-echo "$MSG_CONF_VAR_SELECT"
-			VAR=$(tui-select Back Edit $(tui-conf-get -l "$CONFIG"))
-		
-			doSelect=false
-			msg=""
-			newval=""
+	#
+		#set -x
+		CONF="$1"
+		MODE=input
+		[ -n "$(echo ${INDEX[@]})" ] && \
+			OPTS_FOUND=(${INDEX[@]}) || \
+			OPTS_FOUND=($(tui-conf-get -l "$CONF"))
+		while 	# Preview
+			#clear
+			tui-title "${FILE_LABEL:-$CONF}"
+			for item in "${OPTS_FOUND[@]}"
+			do 	tui-echo "$item" "$(tui-conf-get -- $CONF $item)"
+			done
+			tui-echo
 			
-			case "$VAR" in
-			Back) 	break				;;
-			Edit)	tui-edit "$CONFIG"		;;
-			*)	VAL=$(tui-conf-get "$CONFIG" "$VAR")
-				[ " " = "${VAL:0:1}" ] && VAL="${VAL:1}"
-				case "$VAL" in
-				true|false)	doSelect=true
-						selection="true false"
-						;;
-				on|off)		doSelect=true
-						selection="on off"
-						;;
-				esac
-				MSG_CONF_VAL_CURRENT="$(eval_gettext 'Currently \"$VAR\" is set to \"$VAL\".')"
-				tui-echo "$MSG_CONF_VAL_CURRENT"
-				if tui-yesno "$MSG_CONF_VAR_CHANGE"
-				then 	if $doSelect
-					then	tui-echo "$MSG_CONF_VAL_SELECT"
-						newval=$(tui-select $selection)
-					else	newval=$(tui-read "$MSG_CONF_VAL_TYPE")
-					fi
-					
-					if [ ! -z "$newval" ]
-					then	if [ 0 -eq "$UID" ]
-						then	# pass, password, passwd, pw, pword
-							if ([ password = "${VAR,,}" ] || [ pw = "${VAR,,}" ] || [ "pass" = "${VAR,,}" ] || [ "passwd" = "${VAR,,}" ] || [ "pword" = "${VAR,,}" ])
-							then	msg="$(eval_gettext 'Changed \"$VAR\" from \"*******\" to \"*******\"')"
-							else	msg="$(eval_gettext 'Changed \"$VAR\" from \"$VAL\" to \"$newval\"')"
-							fi
-						else	msg="Changed \"$VAR\" from \"$VAL\" to \"$newval\""
-						fi
-						tui-conf-set -v "$CONFIG" "$VAR" "$newval"
-						RET=$?
-					else	tui-yesno "This will overwrite \"$VAR\" value ($VAL) with an empty string \"\", continue?" && \
-							tui-conf-set -v "$CONFIG" "$VAR" "$newval"
-						RET=$?
-					fi
-					
-					[ $RET -eq 0 ] && \
-						doLog "Setup: $msg" || \
-						doLog "Setup: Failed to c$(printf ${msg:1}|$SED s,ged,ge,g)"
-				fi
+			# Select value or back
+			tui-echo "$MSG_TR_CHANGE_VALUE"
+			[ "true" = "$hide_edit" ] && this_edit="" || this_edit="$MSG_TR_WORD_EDIT"
+			action=$(tui-select "$MSG_TR_WORD_BACK" $this_edit "${OPTS_FOUND[@]}" )
+			
+			# Back or prepare variables
+			[ ! "$MSG_TR_WORD_BACK" = "$action" ] || break
+		do	
+			# Edit
+			if [ "$action" = "$this_edit" ]
+			then	tui-edit "$CONF"
+				continue
+			fi
+			
+			# TODO  -- Bugfix this
+			#echo "$action" | $GREP '\\E\['
+			
+			curval=$(tui-conf-get "$CONF" "$action")
+			vTYP="${TYPE[$action]}"
+			[ -z "$vTYP" ] && vTYP=input
+			case "$vTYP" in
+			input)	QUESTION="$(eval_gettext 'What is the new value for ${action}($curval)?')"
+				newval=$(tui-read "$QUESTION")
+				;;
+			select)	QUESTION="$(eval_gettext 'Select the new value for ${action}($curval)?')"
+				tui-echo "$QUESTION"
+				newval=$(tui-select ${OPTIONS[$action]}) || break
 				;;
 			esac
+			tui-conf-set -v "$CONF" "$action" "$newval"
+			$be_clear && ./tui-wait "$WAIT_SECONDS" && clear && tui-header "$script_header"
 		done
 	}
+	write_default() { # FILE
+	# Writes the file if missing
+	# and fills in all default values if missing
+		[ -z "${INDEX[@]}" ] && tui-printf -S 1 "$(gettext 'No --options OPTNAME passed to write!')" && exit 1
+		thisConf="$1" ; [ -z "$thisConf" ] && echo "$(gettext 'Must provide a FILE to $FUNCNAME')" && return 1
+		doOverwrite=false;if [ ! -f "$thisConf" ]; then touch "$thisConf" && doOverwrite=true|| return 1 ;fi
+		$doOverwrite && cat "$TMP" > "$thisConf"
+		for thisOpt in "${INDEX[@]}";do
+			$GREP -q "$thisOpt" "$thisConf" || printf '%s\n' "${thisOpt}=${DEFAULTS[$thisOpt]}" >> "$thisConf"
+		done
+		$be_quiet && exit
+	}
 #
-#	Catching Arguments
+#	Traps are cool!
 #
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
-	version_text=$(gettext "
-GNU TUI ($ME, Version $script_version)
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-")
-	[ "--version" = "${1,,}" ] && printf "$version_text" && exit 0
-	while getopts "hLl:t:" opt
-	do 	case "$opt" in
-		h)	printf "$help_text"
-			exit $RET_HELP
-			;;
-		L)	$PAGER "$LOG"	
-			exit $RET_DONE
-			;;
-		t)	TITLE="$OPTARG"
-			;;
-		l)	LOG="$OPTARG"
-			;;
+	# TRAP FUNCTION/"COMMAND" MODE's ...
+	trap cleanup INT QUIT KILL ABRT
+#
+#	Get options
+#
+	# -a|--alternative ; to allow longoptions with a single leading '-'
+	GETOPT=$(getopt \
+		--options	"hT:H:qF:cw:" \
+		--longoptions	"help,version,wait:,kiosk,file:,title:,header:,conf-header:,option:,default:,values:,write-no-exist" \
+		--name 		"${0##*/}" -- "${@}" \
+	)
+	eval set -- "${GETOPT}";C=0
+	while true
+	do 	#unset OPTS[@]
+		case "$1" in
+		-h|--help)	show_help	;;
+		--version)	show_version	;;
+		--)		shift ; break	;;
+		# --------------------------------
+		-H|--header)	script_header="$2"
+				shift 2		;;
+		-T|--title)	script_title="$2"
+				shift 2		;;
+		-F|--file)	FILE_LABEL="$2"
+				shift 2		;;
+		--conf-header)	cat >> "$TMP" <<-EOF
+				# $2
+				EOF
+				shift 2 	;;
+		--option)	INDEX["$2"]="$2"
+				LASTOPT="$2"
+				shift 2 	;;
+		--default)	DEFAULTS[$LASTOPT]="$2"
+				shift 2 	;;
+		--values)	OPTIONS[$LASTOPT]="$2"
+				TYPE[$LASTOPT]="select"
+				shift 2 	;;
+		--write-no-exist)
+				write_file=true
+				shift		;;
+		-q)		be_quiet=true
+				shift 		;;
+		-c)		be_clear=true
+				shift 		;;
+		--kiosk)	hide_edit=true
+				shift		;;
+		--wait|-w)	WAIT_SECONDS="$2"
+				shift 2 	;;
 		esac
+		[ -z "$1" ] && LASTOPT=""
+		((C++));[ $C -gt 100 ] && break
 	done
-	shift $(($OPTIND - 1))
-	ARGS=( $(echo "${*}"))		# Remaining arguments
-	ARGS_COUNT=${#ARGS[@]}		# Amount of remaining
+	FILES=("${@}")
+	[ ${#FILES[@]} -lt 1 ] && show_help
 #
-#	Display & Action
+#	Action & Display
 #
-	show_menu=true
-	while "$show_menu";do
-		clear
-		tui-header "$TITLE" "$USER_NAME @ $(date +'%F %T')"
-		case "$ARGS_COUNT" in
-		0)	printf "$help_text"
-			exit $RET_HELP
-			;;
-		1)	tui-title "Configuration: $1"
-			ConfigMenu "$1"
-			exit $?
-			;;
-		*)	tui-title "$TITLE"
-			tui-echo "$MSG_FILE_SELECT"
-			config="$(tui-select Back ${ARGS[@]})"
-			case "$config" in
-			Back) 	show_menu=false
-				break
-				return 0
-				;;
-			*)	tui-title "$(gettext 'Configuration:') $config"
-				ConfigMenu "$config"
-				tui-echo "$MSG_FILE_SELECT"
-				;;
-			esac
-			;;
-		esac
+	$write_file && write_default "$1"
+	while 	tui-header "$script_header" "$(date +'%F %T')"
+		tui-title "$script_title"
+	do 	if [ ${#FILES[@]} -ne 1 ]
+		then 	tui-echo "$MSG_TR_SELECT_FILE"
+			thisFile=$(tui-select  "$MSG_TR_WORD_BACK" "${FILES[@]}")
+			[ -f "$thisFile" ] || break
+		else	edit_file "$FILES"
+			RET=$?
+			break
+		fi
+		edit_file "$FILES"
+		RET=$?
+		$be_clear && tui-wait $WAIT_SECONDS && clear
 	done
+#
+# 	Clean up & exit
+#
+	cleanup
+	exit $RET

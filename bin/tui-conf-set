@@ -58,7 +58,7 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(eval_gettext '
 NAME
-  $ME - SHORTDESC
+  $ME - Set a value of a variable within a config file
 
 SYNOPSYS
   $ME [-h|--help] [--version] [-options] [-option arg]
@@ -89,7 +89,7 @@ EXAMPLE
 	$ME -is /etc/default/grub GRUB_TIMEOUT 15	| Saves VALUENAME as valuename
 
 SEE ALSO
-  bash(1), cat(1), gawk(1), grep(1), read(1), sed(1)
+  bash(1), cat(1), gawk(1), grep(1), sed(1)
   
 BUGS
   Report bugs to: erat.simon@gmail.com
@@ -187,11 +187,8 @@ AUTHOR
 	if $need_sed
 	then	# Full line
 		SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=" | tail -n 1)"
-		
-	#	$need_quotes && \
-	#		REPLACE="$VARNAME=\"$VALUE\"" || \
-	#		REPLACE="$VARNAME=$VALUE"
-		
+		REPLACE="$VARNAME=$(<$TMP)"
+
 		# Set proper SED 'divider'
 		if $GREP $Q "$SD" "$TMP"
 		then 	# Coma was found
@@ -200,71 +197,22 @@ AUTHOR
 			[ ! "$SD" = "/" ] && \
 				printf "$REPLACE"|$GREP ","|$GREP "$SD"|$GREP -q "/" && SD="|"	# Forward slash was found
 		fi
+		sed s,"$SEARCH","$REPLACE", -i "$CONFFILE"
 	else	# Get leading spaces if applicable
 		lead_space=$(tail -n1 "$CONFFILE") # | $SED s,,,g)
 		lead_space="${lead_space/[a-zA-Z0-9]*}"
 		# Add the line
 		if $need_quotes
 		then	cat >> "$CONFFILE" <<-EOF
-			$lead_space$VARNAME="$1"
+			$lead_space$VARNAME="$(<$TMP)"
 			EOF
 		else	cat >> "$CONFFILE" <<-EOF
-			$lead_space$VARNAME=$1
+			$lead_space$VARNAME=$(<$TMP)
 			EOF
 		fi
 	fi
-	exit
-	
-	
-	
-	
-	
-	# Troubles with VARIABLES due to chars that need to be escaped
-        if echo "$REPLACE" | $GREP $Q '[%$+@\]'
-	then	hadDollar=true
-		str_checker="$(echo $VALUE|$SED s,'\\\$','$',g)"
-	else	str_checker="$VALUE"
-	fi
-#
-#	Display & Action
-#
-	# Save changes, Append or change var=value?
-	if ! $GREP "${VARNAME}=" "$CONFFILE" | $GREP $Q -v ^"#"
-	then	# Its not there yet, just append it
-		if $hadDollar
-		then	# It needs special treatment
-			echo "$(echo $REPLACE)" >> "$CONFFILE"
-		else	# Easy handling
-			echo "${REPLACE}" >> "$CONFFILE"
-			
-		fi
-	else	# Its already there, handling according to special chars
-		if $hadDollar
-		then	# It needs special treatment
-			SEARCH="$(echo $SEARCH|$SED s,'$','\$',g)"
-			cmd="$SED s${SD}\"${SEARCH}\"${SD}\"${REPLACE}\"${SD}g -i $CONFFILE"
-			eval "$cmd"
-		else	# It is simple to call
-			cmd="$SED s${SD}${SEARCH}${SD}${REPLACE}${SD}g -i $CONFFILE"
-			$cmd
-		fi
-	fi
-	
-	# Return true if replaced string was found
-	if $beVerbose
-	then	$GREP $Q "$str_checker" "$CONFFILE"
-		tui-status $? "Saved in \"${CONFFILE##*/}\"" "$VARNAME=$str_checker"
-		exit $?
-	else	$GREP $Q "$str_checker" "$CONFFILE"
-		exit $?
-	fi
-	exit 1
-	# Due to remove ?
-	if $GREP $Q "$str_checker" "$CONFFILE"
-	then	# Success, visual-report only if verbose is enabled
-		$beVerbose && tui-status 0 "$(gettext 'Saved in') \"${CONFFILE##*/}\"" "$VARNAME=$str_checker"
-		exit 0
-	else	# It failed, visual-report only if verbose
-		$beVerbose && tui-status 1 "$(eval_gettext 'Could not write to \"${CONFFILE}\"')"
-		exit 1
-	fi
+
+	$GREP "${VARNAME}" "$CONFFILE" | $GREP -q "$(<$TMP)"
+	RET=$?
+	$beVerbose && tui-printf -S $RET "$CONFFILE" "$VARNAME=$(<$TMP)"
+	exit $RET

@@ -73,7 +73,7 @@ cat > "$DEST" << EOF
 		source "\$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
 	fi
-	break_on_injections "$@" && exit 1
+	break_on_injections "\${@}" && exit 1
 	source gettext.sh
 	TEXTDOMAIN="\$script_name"
 	TEXTDOMAINDIR="\${TUI_DIR_SYSTEM/tui/locale}"	# Assuming \$script_package is installed to \$TUI_DIR_SYSTEM as well...
@@ -83,7 +83,7 @@ cat > "$DEST" << EOF
 #
 	typeset -r CFG="\$script_config"
 	typeset -r LOG="\$TUI_DIR_LOGS/\${script_name}.log"
-	delcare TMP="\${TUI_DIR_TEMP:-TMPDIR}/\${script_name}-\$\$.tmp~"
+	declare TMP="\${TUI_DIR_TEMP:-TMPDIR}/\${script_name}-\$\$.tmp~"
 #
 #	Messages to translate:
 #
@@ -96,10 +96,10 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	MSG_TR_HELP="\$(eval_gettext '
 NAME
-  $script_name - SHORTDESC
+  \$script_name - SHORTDESC
 
 SYNOPSYS
-  $script_name [-h|--help] [--version] [-abcx] [--option] [--more opt]
+  \$script_name [-h|--help] [--version] [-abcx] [--option] [--more opt]
   
 DESCRIPTION
   desc
@@ -121,17 +121,17 @@ HINTS
   Some_text
   
 SEE ALSO
-  tuirc(1), txt2man(1), gettext(1)
+  bash(1), gettext(1), tuirc(1), tui-read(1), tui-select(1), txt2man(1)
   
 BUGS
-  Report bugs to: mailinglist ; <$USER_EMAIL>
+  Report bugs to: mailinglist ; <\${script_contact:-$USER_EMAIL}>
   
-  $script_name - Homepage: <$USER_HOMEPAGE>
+  \$script_name - Homepage: <\${script_url:-$USER_HOMEPAGE}>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
 AUTHOR
-  $USER_NAME, <$USER_HOMEPAGE>
+  \${script_author:-$USER_NAME}, <$USER_HOMEPAGE>
 ')"
 	MSG_TR_XY="\$(gettext '')"
 	MSG_TR_XX="\$(gettext '')"
@@ -154,13 +154,13 @@ AUTHOR
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		echo "\$MSG_TR_HELP_LONG"
+		printf "\$MSG_TR_HELP_LONG\\n"
 		exit 99
 	}
 	show_version() {
 	# Prints the version of the script
 	# and exits
-		echo "\$MSG_TR_VERSION"
+		printf "\$MSG_TR_VERSION\\n"
 		exit 111
 	}
 #

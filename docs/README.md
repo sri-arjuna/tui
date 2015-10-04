@@ -10,7 +10,6 @@ A 'Text User Interface' framework for scripts
 * See the [COPYING.LESSER](COPYING.LESSER) (GNU LPLv3+) for copyright/copyleft related information.
 * Additional Licenses:
     * GNU Free Documentation License [GFDL.txt](docs/GFDL.txt) for the documention
-    * GNU Free Documentation License [GFDL.txt](docs/GFDL.txt) for all images in ./screenshots and its sub dirs (they are not installed)
     * All scripts in ./docs/samples are licensed as GPLv3+ too, 
 
 

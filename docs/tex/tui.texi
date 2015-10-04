@@ -667,7 +667,34 @@ A basic tool to edit a conf file.
 @example
 	su -c "tui-conf-editor /etc/default/grub"
 @end example
+This would let you edit the current settings of /etc/default/grub.
 
+@example
+	tui-conf-editor	-T "Human Configurator" --option var_gender --default male --values="male female" \
+			--option var_name --default "$USER" \
+			--option var_age --default 0 --values="1-13 14-21 22-44 44-62 63-90 90+" \
+			--write-no-exist \
+			/path/to/file
+@end example
+Would create a default config file, that will look like:
+@example
+	var_gender=male
+	var_name=<the users login name>
+	var_age=0
+@end example
+The user now can then change the values of these variables by selecting them from the menu, where he could leave the menu too.
+In this example, the user can select between male and female upon selecting @b{var_gender}, likewise for @b{var_age}, but among those age-ranges.
+For the @b{var_name} however, he must type a new name, since there are no values to select from.
+
+@example
+	tui-conf-editor	-T "Human Configurator" --option var_gender --default male --values="male female" \
+			--option var_name --default "$USER" \
+			--option var_age --default 0 --values="1-13 14-21 22-44 44-62 63-90 90+" \
+			--write-no-exist \
+			-q \
+			/path/to/file
+@end example
+Would simply check each variable to be present, and if not, save it with available default value.
 
 @subsection tui-conf-get
 Gets the value of a variable from a file.
