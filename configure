@@ -19,7 +19,7 @@
 #
 #
 #	Created:	2015.07.27
-#	Changed:	2015.10.04
+#	Changed:	2015.10.05
 	script_name=configure
 	script_version=1.1.2
 #
@@ -416,6 +416,18 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "CHROOT=$CHROOT" >> "make-uninstall"
 		fi
 		
+		# Do the PREPARE stuff, even before PRIOR
+		if [ -n "$(echo ${PREPARE[@]})" ]
+		then 	C=0
+			while 	item="${PREPARE[$C]}"
+				[ ! -z "$item" ]
+			do 	[ -f "$item" ] && \
+					bash ./"$item" || \
+					( echo "$item" > "$TMP" ; bash -x "$TMP" && rm -f "$TMP")
+				((C++))
+			done
+		fi
+		
 		# Write content of PRIOR tasks, if any
 		if [ -n "$(echo ${PRIOR[@]})" ]
 		then	source "./$REFERENCE"	# Just prefix yet
@@ -430,7 +442,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			done
 		fi
 		
-		# Search for the available/used variables
+		# Actualy write the make-{un,}install scripts
 		for index in $variable_list
 		do	# Expand index
 			tmp="${!index}"
@@ -533,17 +545,6 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				"set +x" >> "make-$m"
 		done
 		
-		# Do the PREPARE stuff, before telling to call ./make-install
-		if [ -n "$(echo ${PREPARE[@]})" ]
-		then 	C=0
-			while 	item="${PREPARE[$C]}"
-				[ ! -z "$item" ]
-			do 	[ -f "$item" ] && \
-					bash ./"$item" || \
-					( echo "$item" > "$TMP" ; bash -x "$TMP" && rm -f "$TMP")
-				((C++))
-			done
-		fi
 		# Let the script exit with their proper exit code.
 		echo "echo;echo \"Finished installation of ${APP_TITLE:-$APP} with \$? (0=success)\";exit \$RET" >> "make-install"
 		echo "exit \$RET" >> "make-uninstall"

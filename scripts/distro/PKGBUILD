@@ -25,16 +25,17 @@
 	pkgname=tui
 	pkgdesc="GNU TUI, Text User Interface, framework for scripts"
 	license=('GPL-3')
+	groups=(core)
 	
 	# Pkg info
 	arch=('any')
 	pkgver=$(tmp=$(\gawk -F= '/TUI_VERSION/ {print $2}' ../../bin/tuirc);echo ${tmp/*=};tmp='')
-	#pkgver=0.9.0.devel
+	#pkgver=0.9.0
 	pkgrel=1
 	
 	# Src info
-	url="https://github.com/sri-arjuna/tui"
-	source=($url/archive/v${pkgver}.tar.gz)
+	url="https://github.com/sri-arjuna"
+	source=($url/tui/archive/v${pkgver}.tar.gz)
 	msg2 "Retrieve checksum"
 	not_secure="$(md5sum ${source##*/}|awk '{print $1}')"
 	md5sums=("$not_secure")
