@@ -157,10 +157,13 @@ AUTHOR
 	visual_arrangement(){ # $1
 	# Prints default input line
 	# Either passed question or set default input char/sign
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		#BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		
 		POS="\033[$(( ${#BORDER_LEFT} + ${#1} +3 ))G"
 		
 		tui-printf "$1" >&2
-		printf "\r$BORDER_LEFT $1$POS" >&2
+		printf "\r${BORDER_COLOR}$BORDER_LEFT${TUI_RESET} $1$POS" >&2
 	
 	}
 	is_special() { # INPUT
@@ -205,5 +208,5 @@ AUTHOR
 	cat <<-EOF
 	$INPUT
 	EOF
-	printf "\r"
+	printf "\r" >&2
 	tui-printf -E "$1" "$INPUT" >&2

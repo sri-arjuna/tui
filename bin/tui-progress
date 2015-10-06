@@ -36,6 +36,9 @@
 		done
 	else	source tuirc
 	fi
+	# If there is a user theme directory, use that one instead
+	[ -f "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	source "$TUI_DIR_THEMES/${TUI_THEME:-default}"
 	break_on_injections "$@" && exit 1
 #
 #	Translate preps

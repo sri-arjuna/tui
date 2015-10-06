@@ -25,9 +25,9 @@ shopt -s expand_aliases
 	oME="$ME"	# Backup of variable 'ME' if sourced
 	oVER="$script_version"
 	ME=tuirc
-	script_version=2.9.1
+	script_version=2.9.2
 	unset ${!TUI_[ABCEG..Z*}
-	TUI_VERSION=0.9.0
+	TUI_VERSION=0.9.0a
 #
 #	Translate preps
 #
@@ -565,7 +565,7 @@ AUTHOR
 		
 		# Show & Edit files
 		cd "$thisconf"
-		tui-conf-editor -t "$(gettext 'GNU Text User Interface')" *conf
+		tui-conf-editor -T "$(gettext 'GNU Text User Interface')" *conf
 	}
 	ResetTUI() { #
 	# Removes the current configuration according to user level

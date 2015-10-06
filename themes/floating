@@ -13,6 +13,7 @@
 #
 	TUI_BACKGROUND=""
 	TUI_FOREGROUND=""
+	BORDER_COLOR=""
 #
 #	Char indicators
 #

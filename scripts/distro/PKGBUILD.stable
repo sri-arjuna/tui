@@ -17,7 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 # -----------------------------------------------------------------------
-# This file represents the 'devel' package from 'master' tree.
 #
 #	Variables
 #
@@ -30,13 +29,13 @@
 	
 	# Pkg info
 	arch=('any')
-	pkgver=$(tmp=$(\gawk -F= '/TUI_VERSION/ {print $2}' ../../bin/tuirc);echo ${tmp/*=};tmp='')
+	pkgver=0.9.0a
 	pkgrel=1
 	
 	# Src info
 	url="https://github.com/sri-arjuna"
 	source=($url/tui/archive/v${pkgver}.tar.gz)
-	msg2 "Retrieve devel"
+	msg2 "Retrieve checksum, fails on first"
 	not_secure="$(md5sum ${source##*/}|awk '{print $1}')"
 	md5sums=("$not_secure")
 	
@@ -49,9 +48,6 @@
 #
 #	Functions
 #
-	prepare() {
-		git clon
-	}
 	build() {
 		cd ${srcdir}/${_hkgname}-${pkgver}
 		msg2 "Building docs..."

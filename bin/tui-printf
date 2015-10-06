@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.4a
+	script_version=2.5
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU Linux}"
 #
@@ -333,11 +333,15 @@ AUTHOR
 #
 #	Prepare Colors & Strings
 #
+	BORDER_POS_MOVER=0	# Not needed for header
 	if [ $doEcho = true ] || [ $doStatus = true ]
 	then	COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		BORDER_POS_MOVER=$(( ${#TUI_RESET} + ${#BORDER_COLOR} ))
 	elif [ $doHeader = true ]
 	then	# Full line
 		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
@@ -350,20 +354,26 @@ AUTHOR
 		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
 		COLOR_LINE_CLOSE="${TUI_COLOR_RESET}"
 		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		BORDER_POS_MOVER=$(( ${#TUI_RESET} + ${#BORDER_COLOR} ))
 	else	# The default
 		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
 		COLOR_LINE_IDENT=""
 		COLOR_LINE_CLOSE=""
 		COLOR_LINE_END="${TUI_COLOR_RESET}"
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		BORDER_POS_MOVER=$(( ${#TUI_RESET} + ${#BORDER_COLOR} ))
 	fi
 #
 #	Arrange strings in order, with border and colors
 #
 	# Create POS_ID points, calculated from pos_id_num.
 	# pos_id_NUM's
-	pos_cli_num=$(( 0 + ${#BORDER_LEFT} + 2 ))
+	pos_cli_num=$(( 0 + ${#BORDER_LEFT} + 2 - $BORDER_POS_MOVER ))
 	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 2))
-	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} ))
+	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} +  $BORDER_POS_MOVER ))
 	# POS_ID
 	POS_CLS="\033[0G"	# This is always 0, and therefor does not require a pos_id_num calculation
 	POS_CLI="\033[${pos_cli_num}G"

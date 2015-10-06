@@ -48,24 +48,24 @@
 #
 #	This file is NOT meant to be changed.
 #
-	prefix="$prefix"
+	# The 'prefix', SYSCONFDIR and DATADIR variables are read from /etc/tui.conf
 	[ -z "\$TUI_DIR_CONF" ] && readonly \\
-		TUI_DIR_CONF=$SYSCONFDIR/tui
+		TUI_DIR_CONF=\$SYSCONFDIR/tui
 	[ -z "\$TUI_DIR_SYSTEM" ] && readonly \\
-		TUI_DIR_SYSTEM="$DATADIR"
+		TUI_DIR_SYSTEM="\$DATADIR"
 #
 #	Paths	:	Used to run TUI
 #
 	TUI_DIR_LOG=\${prefix}/var/log
 	[ -z "\$TUI_DIR_TEMPLATES" ] && readonly \\
 		TUI_DIR_TEMPLATES="\$TUI_DIR_SYSTEM/templates"
-	[ -z "\$TUI_DIR_THEMES" ] && readonly \\
+	[ -z "\$TUI_DIR_THEMES" ] && \\
 		TUI_DIR_THEMES="\$TUI_DIR_SYSTEM/themes"
 	[ -z "\$TUI_DIR_LIST" ] && readonly \\
 		TUI_DIR_LIST="\${TUI_DIR_SYSTEM}/lists"
 	[ -z "\$TUI_DIR_LOCALE" ] && readonly \\
 		TUI_DIR_LOCALE="\${TUI_DIR_SYSTEM}/locale"
-	TUI_DIR_TEMP="\${TUI_DIR_TEMP:-$HOME/.cache}"
+	TUI_DIR_TEMP="\${TUI_DIR_TEMP:-\$HOME/.cache}"
 #
 #	Files
 #	Direct access to the most important configuration files for the System
@@ -102,7 +102,7 @@
 		ac="$((ac+=1))"
 		case "$arg" in
 		(*[';´|<&>']*|*':('*|*':-'*)
-			printf "%s\n" "Aborting, injection detected! arg${ac}='$arg'"
+			printf "%s\n" "Aborting, injection detected! arg\${ac}='\$arg'"
 			return 0
 		;;
 		esac
@@ -112,4 +112,4 @@
 
 EOF
 #cat "scripts/injection_protection.sh" >> ./tuirc
-sed s,"$SYSCONFDIR/conf.tui","$SYSCONFDIR/tui",g -i "make-uninstall"
+sed s,"\$SYSCONFDIR/conf.tui","\$SYSCONFDIR/tui",g -i "make-uninstall"

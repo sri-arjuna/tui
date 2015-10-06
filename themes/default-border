@@ -3,19 +3,18 @@
 #	BORDER_RIGHT will be mirrored of BORDER_LEFT
 #	Set it manualy if it needs to be escaped.
 #
-	BORDER_LEFT="::"
-	BORDER_RIGHT=""
+	BORDER_LEFT="# |"
 #
 #	tui-header will use TUI_BACKGROUND as background color,
 #	and TUI_FOREGROUND as font color.
 #
 #	tui-title will use inverted colors
 #
-	TUI_BACKGROUND="$TUI_COLOR_BG_RED"
+	TUI_BACKGROUND="$TUI_COLOR_BG_BLUE"
 	TUI_FOREGROUND="$TUI_COLOR_FG_WHITE"
-	BORDER_COLOR=""
+	BORDER_COLOR="$TUI_BACKGROUND"
 #
 #	Char indicators
 #
-	TUI_INPUT_CHAR_READ=">>"
-	TUI_INPUT_CHAR_SELECT=">>"
+	TUI_INPUT_CHAR_READ="\076"
+	TUI_INPUT_CHAR_SELECT="\076"

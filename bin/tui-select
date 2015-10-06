@@ -55,7 +55,7 @@
 #	Variables
 #	
 	ME="${0##*/}"
-	script_version=0.9.1
+	script_version=0.9.1a
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -66,6 +66,7 @@
 	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
 	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
 	export TEXTDOMAIN TEXTDOMAINDIR
+	trap "exit 130" INT ABRT KILL
 #
 #	Translate strings
 #
@@ -185,7 +186,7 @@ AUTHOR
 	NUM=""
 	while $invalid
 	do	# Reset input line
-		printf "\r${BORDER_LEFT} >      \r${BORDER_LEFT} > " >&2
+		printf "\r${BORDER_LEFT} $TUI_INPUT_CHAR_SELECT      \r${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET} > " >&2
 		# Expect the best, but do checking for all the other cases
 		invalid=false
 		

@@ -15,6 +15,7 @@ Missing feedback for these types:
 Known Bugs:
 -----------
 * Bash-completion not working
+* tui-read, tui-yesno dont work properly with BORDER_COLOR yet
 
 Security:
 ---------

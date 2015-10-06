@@ -28,7 +28,6 @@
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
 	# Get the main config files
-	# 
 	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
@@ -38,8 +37,8 @@
 	fi
 	break_on_injections "$@" && exit 1
 	# If there is a user theme directory, use that one instead
-	[ -d "$TUI_DIR_USER_THEMES" ] && [ -z "$TUI_DIR_THEMES" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
-	source "$TUI_DIR_THEMES/$TUI_THEME" 
+	[ -f "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}" ] && TUI_DIR_THEMES="$TUI_DIR_USER_THEMES"
+	source "$TUI_DIR_THEMES/${TUI_THEME:-default}"
 	# Use custom BORDER_RIGHT if it was set
 	[ -z "$BORDER_RIGHT" ] && \
 		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
