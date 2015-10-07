@@ -1,3 +1,8 @@
+2015-10-06 - GNU TUI 0.9.0a
+* Added BORDER_COLOR to themes
+* -- tui-printf, tui-progress, tui-read, tui-select, tui-str-usb, tui-yesno, tuirc
+* /etc/tuirc, Fixed 'path not found' caused by wrong variable expansion during installation
+
 2015-10-04 - GNU TUI 0.9.0
 * tuirc, optimized the unset of TUI environment
 * templates/scripts/modul, fixed some typos

@@ -1,4 +1,4 @@
-README - GNU TUI - 0.9.0+
+README - TUI - 0.9.0+
 =========================
 
 A 'Text User Interface' framework for scripts
