@@ -37,10 +37,13 @@
 		exit $?
 	fi
 	script_version=0.9.1b
-#	[ 0 -eq $UID ] && \
-#		source $PREFIX/share/tui/themes/$TUI_THEME_ROOT || \
-#		source $PREFIX/share/tui/themes/$TUI_THEME
-
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
 #
 #	Variables
 #
@@ -156,7 +159,7 @@ SEE ALSO
 BUGS
   Report bugs to: erat.simon@gmail.com
   
-  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <http://www.gnu.org/software/tui/>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
@@ -277,7 +280,7 @@ AUTHOR
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
-		GNU TUI, Version $TUI_VERSION
+		TUI, Version $TUI_VERSION
 		Copyright (C) 2015 Simon Arjuna Erat
 		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 

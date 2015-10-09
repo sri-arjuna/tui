@@ -27,7 +27,7 @@ shopt -s expand_aliases
 	ME=tuirc
 	script_version=2.9.2
 	unset ${!TUI_[ABCEG..Z*}
-	TUI_VERSION=0.9.0b
+	TUI_VERSION=0.9.0c
 #
 #	Translate preps
 #
@@ -39,7 +39,7 @@ shopt -s expand_aliases
 #	Translate strings
 #
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU TUI $TUI_VERSION ($ME, Version $script_version)
+TUI $TUI_VERSION ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -63,7 +63,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
 	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
 NAME
-       GNU TUI - Text User Interface, framework for scripts
+       TUI - Text User Interface, framework for scripts
 
 SYNOPSIS
        tui-<tab>
@@ -373,7 +373,7 @@ SEE ALSO
 BUGS
   Report bugs to: erat.simon@gmail.com
   
-  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <http://www.gnu.org/software/tui/>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
@@ -558,9 +558,9 @@ AUTHOR
 		if [ 0 -eq "$UID" ] 
 		then 	# thisconf="${TUI_DIR_CONF/\/\//\/}"
 			thisconf="$TUI_DIR_CONF"
-			MSG_MENU_title="$(gettext 'GNU TUI config - System Wide')"
+			MSG_MENU_title="$(gettext 'TUI config - System Wide')"
 		else	thisconf="$TUI_DIR_USER"
-			MSG_MENU_title="$(eval_gettext 'GNU TUI config - Personal for $USER_NAME')"
+			MSG_MENU_title="$(eval_gettext 'TUI config - Personal for $USER_NAME')"
 		fi
 		
 		# Show & Edit files
@@ -685,7 +685,7 @@ AUTHOR
 		case "$1" in
 		"-h"|"--help"|"help")
 			help_screen
-			exit "$RET_HELP"
+			exit $RET_HELP
 			;;
 		esac
 		MODE="$1"
@@ -849,7 +849,7 @@ AUTHOR
 		n=$(( $COLUMNS - ${#BORDER_LEFT} - 14 ))
 		POS="\033[${n}G"
 		# Actual display
-		tui-printf -H 	"$(eval_gettext 'GNU TUI ($TUI_VERSION), Copyright (c) 2015 by sea')" \
+		tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION), Copyright (c) 2015 by sea')" \
 				"$MSG_TR_HELLO_USER"
 		tui-printf -T "$(gettext 'GNU Text User Interface, framework for Scripts')"
 		tui-printf -E "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"

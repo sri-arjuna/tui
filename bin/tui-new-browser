@@ -56,7 +56,7 @@
 #
 	TITLE="$(gettext 'Create a new TUI project')"
 	TR_MSG_TEXT_VERSION="$(eval_gettext '
-GNU TUI ($ME, Version $script_version)
+TUI ($ME, Version $script_version)
 Copyright (C) 2011-2015 Simon Arjuna Erat
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
@@ -89,7 +89,7 @@ EXAMPLE
 BUGS
   Report bugs to: erat.simon@gmail.com
   
-  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <http://www.gnu.org/software/tui/>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
@@ -128,7 +128,7 @@ AUTHOR
 	do 	case "$name" in
 		h|help)
 			printf "$help_text"
-			exit "$RET_HELP"
+			exit $RET_HELP
 			;;
 		a)	default_new_browser_manpage_type=application
 			;;
