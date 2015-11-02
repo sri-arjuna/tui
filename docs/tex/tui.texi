@@ -1052,7 +1052,7 @@ Early 2000 those ideas, thoughts and goals lost their focus pretty quickly when 
 Back in May 2011, i've got annoyed by Windows 7 - actually by the laptop it was installed on, as it didnt have a GPU (graphic processor unit) to play games - eventually i figured to try GNU/Linux again, after like 16 ears.
 As you are probaly aware, there is more than just one flavor of GNU/Linux. 
 
-There are more than just the mainstream 'brands' (like: Ubuntu, Mint, Fedora/RedHat, Debian, etc) but there is also a wide range of DE and WM's.
+There are more than just the mainstream 'brands' (like: Debian, Fedora/RedHat, Gentoo, Slackware, etc) but there is also a wide range of DE and WM's.
 So, still being a technical enthusiast, who likes to tinker around, break things and learn new things, i've enjoyed the diversity of so many distributions (also known as: distro / distros).
 
 Anyway, so end of May 2011, when Fedora 15 (LoveLock) was just released, i 'joined' GNU/Linux, as in, the distro hopping began.
@@ -1098,19 +1098,19 @@ Providing these functions as scripts/commands while sharing the same variables w
 Eventually, i thought it was done - besides of a few work-overs for one or two commands to improve usability, and therefor i thought i was ready to introduce TUI to GNU.
 After deleting some commands, there were still over 46 commands to be worked on, their manpage, their wiki.md, their infotext and their helpscreens.
 Preparing all the commands to be translateable was more of a mental challenge in regards of the count of the command, rather than the actual effort required.
+But getting this alltogether, working as intended, took quite some time anyway.
 
 
 @subsection About the Author
 Simon Arjuna Erat has first met a computer at the age of 8, at his dad's cellar office with a Commodore64.
 The first i remember about that computer is, that my dad was just changing the tape-drive with a 5.25" soft-floppy.
 
-Later on, i've had some plays with MSDOS 4,5 & 6, that GUI from 'Ensemble Studios' and Windows 3.1(1).
-
 Allthough i was very much into optimizing my system by tweaking the autoexec.bat and config.sys,
 i usualy just did it to gain more free memory over the 512k 'barrier', to play the games more fluently, 
-as they required an incredible high amount of RAM... up to 4MB!
+as they required an incredible high amount of RAM... up to 8MB!
 
-Later in 1995, i've had my hands on Slackware 3.0 and RedHat 2?, but returned quickly back to Windows 95, to play games.
+Later in 1995, i've had my hands on Slackware 3.0 and RedHat 2 or 3 (not RHEL, before Fedora).
+i've had some plays with a GUI from 'Ensemble Studios', which was a nice twitch compared to other DE of that time.
 
 Between 1997 and 2001 i was self-employed PC-Supporter helping private people as well as small- & medium companies in and around my town.
 In  between there was some army services, and afterwards i've raised a security company with some friends, which went well until 2004,
