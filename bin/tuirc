@@ -22,17 +22,17 @@ shopt -s expand_aliases
 #
 #	Internals
 #
-	oME="$ME"	# Backup of variable 'ME' if sourced
+	oME="${ME:-$script_name}"	# Backup of variable 'ME' if sourced
 	oVER="$script_version"
 	ME=tuirc
-	script_version=2.9.2
-	unset ${!TUI_[ABCEG..Z*}
-	TUI_VERSION=0.9.0c
+	script_version=2.9.5
+	unset ${!TUI_[ABCEG..Z]*}
+	TUI_VERSION=0.9.0d
 #
 #	Translate preps
 #
 	source gettext.sh
-	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAIN="tuirc"	# Will be changed over time, but easier to copy paste
 	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
 	export TEXTDOMAIN TEXTDOMAINDIR
 #
@@ -61,6 +61,12 @@ Report bugs to: erat.simon@gmail.com
 TUI home page: <http://www.gnu.org/software/tui/>
 General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
+	case "${0##*/}$1" in
+	tuirc-h|tuirc--help|tuirchelp)	
+		echo "$TR_MSG_TEXT_HELP"
+		exit 99
+		;;
+	esac
 	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
 NAME
        TUI - Text User Interface, framework for scripts
@@ -385,7 +391,7 @@ AUTHOR
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License v3 or later (GPLv3+)
 #	Created:        2013.05.03 (rev:3)
-#	Changed:	2015.09.17
+#	Changed:	2015.11.07
 #	Description:	The loader and configuration of TUI
 #
 #	Variables	:	Default
@@ -410,14 +416,18 @@ AUTHOR
 	[ -z "$HOME" ] && HOME="${k:-$(cd;pwd)}"
 	
 	# Regular definitions
-	TRC="${HOME}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
+	TRC="${HOME:-/root}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
 	TRC_SYS="$SYSCONFDIR/tuirc"
 	
 	# Get paths of where it was installed
 	SYSCONFDIR=""
-	for install_kind in "/" "/usr" "$HOME/.local" "$HOME"
-	do 	tmp_cfg="$install_kind/etc/tui.conf"
-		[ -f "$tmp_cfg" ] && source "$tmp_cfg" && break
+	while [ -z "$SYSCONFDIR" ]
+	do 	for install_kind in "/" "/usr" "$HOME/.local" "$HOME" "." "../conf.tui" 
+		do 	tmp_cfg="$install_kind/etc/tui.conf"
+			[ -f "$tmp_cfg" ] && source "$tmp_cfg" #&& break
+		done
+#		[ -f "./conf.tui/" ] && source ./conf.tui/$tmp_cfg && break
+		
 	done
 	
 	# Get system wide default configuration paths
@@ -565,7 +575,7 @@ AUTHOR
 		
 		# Show & Edit files
 		cd "$thisconf"
-		tui-conf-editor -T "$(gettext 'GNU Text User Interface')" *conf
+		tui-conf-editor -T "$(gettext 'Text User Interface')" *conf
 	}
 	ResetTUI() { #
 	# Removes the current configuration according to user level
@@ -624,7 +634,6 @@ AUTHOR
 #
 #	Load Environment	:	System wide / defaults
 #
-	source "$TRC_SYS" 	  2>/dev/zero	# Load tui user paths
 	list="" ; for F in ${!TUI_FILE_CONF_*} $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS} ${!TUI_FILE_USER_*};do list+=" ${!F}";done
 	for f in ${list}
 	do	[ loadlist.conf = "${f##*/}" ] && continue	# Skip this one - here
@@ -851,7 +860,7 @@ AUTHOR
 		# Actual display
 		tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION), Copyright (c) 2015 by sea')" \
 				"$MSG_TR_HELLO_USER"
-		tui-printf -T "$(gettext 'GNU Text User Interface, framework for Scripts')"
+		tui-printf -T "$(gettext 'Text User Interface, framework for Scripts')"
 		tui-printf -E "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"
 		tui-printf -E
 		tui-printf -E 	"$(gettext 'If you are looking for the commands of TUI, try this:')" \

@@ -21,7 +21,7 @@
 #	Init TUI environment
 #
 	ME="${0##*/}"	# Name
-	script_version=1.2
+	script_version=1.2.1
 	# Check the two default places for the core configuration
 	# First system wide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -29,7 +29,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_CONF_{APPS,COMMANDS,SETTINGS} $TUI_FILE_USER_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"

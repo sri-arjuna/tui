@@ -32,7 +32,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
@@ -46,7 +46,7 @@
 #	Author: 	Simon Arjuna Erat (sea), erat.simon@gmail.com
 #	License:	GNU General Public License (GPLv3)
 #	Created:	2014.05.20
-#	Changed:	2015.09.28
+#	Changed:	2015.11.07
 #
 #	Description:	Simply writes a log file
 #
@@ -54,7 +54,7 @@
 #	Variables
 #
 	ME="${0##*/}"			# Basename of $0
-	script_version=0.9
+	script_version=0.9.1
 	PRE=""
 	leave_empty=false
 	D="$(date +%F)"

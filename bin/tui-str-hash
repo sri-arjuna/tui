@@ -25,7 +25,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
@@ -37,8 +37,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.03.26
-#	Changed:	2015.09.17
-	script_version=0.9
+#	Changed:	2015.11.07
+	script_version=0.9.1
 #	Description:	hashing text on the fly
 #
 #

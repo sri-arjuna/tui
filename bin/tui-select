@@ -23,15 +23,7 @@
 #
 	# Check the two default places for the core configuration
 	# First system wide, second user only install
-	for tmp_task in "/etc" "$HOME/.local"
-	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && break
-	done
-	
-	if source ${tmp_task}/tuirc && source "${HOME:-/root}/.tuirc" 2>/dev/zero
-	then	for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS};do [ -f "$f" ] && source "$f";done
-	else	source tuirc
-	fi
-	TERM="${TERM:-GNU Linux}"
+	source tuirc
 #
 #	A simple tool which returns the string of the selected num-id
 #
@@ -55,7 +47,7 @@
 #	Variables
 #	
 	ME="${0##*/}"
-	script_version=0.9.1a
+	script_version=0.9.2
 	counter=0
 	AUTO=false
 	COLUMNS=$(tput cols)
@@ -174,7 +166,7 @@ AUTHOR
 		[ "$#" -eq 1 ] && \
 		printf '%s\n' "$ARGS" >&1 && \
 		exit 0
-	"$bash_read_numbers" && \
+	"${bash_read_numbers:-false}" && \
 		cmd="read -n ${#len}" || \
 		cmd="read"
 	# Show the entries

@@ -90,7 +90,7 @@
 #	Low level workaround
 #	As in: When called by a script during boot process
 #
-	TERM="\${TERM:-GNU Linux}"
+	TERM="\${TERM:-GNU\/Linux}"
 #
 #	Injection protection
 #

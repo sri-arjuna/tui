@@ -22,8 +22,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.09.17
-	script_version=0.9
+#	Changed:	2015.11.07
+	script_version=0.9.1
 #	Description:	Prints a random number between 0 and 100.
 #			Prints a random number up to MAX.
 #			Prints a random number between MAX and MIN.
@@ -36,7 +36,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"

@@ -22,11 +22,11 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.09.17
+#	Changed:	2015.11.07
 #
 #	Variable defaults
 #
-	script_version=0.9
+	script_version=0.9.1
 	ME="${0##*/}"
 	help_text="$ME ($script_version)
 		\rUsage: $ME
@@ -38,7 +38,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"

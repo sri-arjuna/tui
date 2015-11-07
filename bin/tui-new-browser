@@ -23,7 +23,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS,STATUS}
 		do	[ -f "$f" ] && source "$f"
@@ -37,8 +37,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.09.17
-	script_version=0.9
+#	Changed:	2015.11.07
+	script_version=0.9.1
 #	Description:	Helps to create a tui-browser project
 #
 #	Variables

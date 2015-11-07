@@ -21,7 +21,7 @@
 #	Internals
 #
 	ME="${0##*/}"
-	script_version=0.9
+	script_version=0.9.1
 	
 	# Check the two default places for the core configuration
 	# First system wide, second user only install
@@ -30,7 +30,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc

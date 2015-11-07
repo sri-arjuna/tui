@@ -23,7 +23,7 @@
 #	Variables
 #
 	ME="${0##*/}"
-	script_version=0.9b
+	script_version=0.9.1
 	beVerbose=false
 	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -31,7 +31,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
 	fi

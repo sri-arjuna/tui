@@ -23,7 +23,8 @@ No issues known. :)
 
 Fix:
 ----
-No issues known.
+* Either tui-read or tui-select seem to act weird on ctrl+c at some time
+
 
 Finalize:
 ---------

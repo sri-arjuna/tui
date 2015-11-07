@@ -26,9 +26,9 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" && source "$HOME/.tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
-		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
+		for f in $TUI_FILE_{CONF,USER}_{APPS,COLORS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done
 	else	source tuirc
@@ -40,7 +40,7 @@
 #
 #	Variable environment
 #
-	script_version=1.5
+	script_version=1.5.1
 	BORDER_RIGHT=""
 	#echo $TERM ;exit #TERM="${TERM:-GNU Linux}"
 	# Source only the most required files, 

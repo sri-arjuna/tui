@@ -49,10 +49,14 @@
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
 	# Get the main config files
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if [ -z "$SYSCONFDIR" ]
 	then 	# Load required variables
-		source "$TUI_FILE_CONF_COMMANDS"
-	else	source tuirc
+		source "${SYSCONFDIR}/tuirc" ||  [ -f ./tuirc ] && source ./tuirc || exit 1 
+		source "${HOME:-/root}/.tuirc" 2>/dev/zero
+		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
+		do	[ -f "$f" ] && source "$f"
+		done
+	else	source tuirc	
 	fi
 	break_on_injections "${@}" && exit 1
 	source gettext.sh

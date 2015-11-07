@@ -47,7 +47,49 @@ cat > "$DEST" << EOF
 #
 #	TUI
 #
-	source tuirc
+	missing_tui() { 
+	# Checks if tui is installed, if not, downloads it either using git or curl/wget
+	# Returns true (0) if tuirc was found or was installed with success
+		# Lazy function
+		function is_there() { which "\$1" 2>/dev/zero 1>/dev/zero ; return \$? ;}
+		local tarball=tui.tar.gz
+		# Check for existence
+		if is_there tuirc
+		then 	return 0
+		else 	# Check for write access temp path
+			if [ -w /tmp ]
+			then 	cd /tmp
+			else	# Check for write access in home dir, existin paths
+				for D in cache temp tmp .temp .tmp .cache
+				do 	for H in "\$HOME" "\$HOME/.local" "\$HOME/local"
+					do 	[ -d "\$H/\$D" ] && cd "\$H/\$D" && break
+					done
+				done
+			fi
+			# Download TUI
+			if is_there git
+			then 	# Latest master contains latest bugfixes
+				git clone git://git.savannah.nongnu.org/tui.git
+				cd tui
+			elif is_there wget
+			then 	wget -O "\$tarball"
+			else 	curl -O "\$tarball"
+			fi
+			# Extract tarball if required
+			[ -f "\$tarball" ] && \\
+				tar -axf "\$tarball" && \\
+				rm -f "\$tarball" && \\
+				cd tui
+			# Dont require root acces
+			# Using default fallback mode for root user = /usr/local
+			# If its a regular user, dont be too visible
+			[ 0 -eq \${UID:-0} ] && \\
+				./configure || \\
+				./configure --prefix="\$HOME/.local"
+			./make-install && return 0
+		fi
+	}
+	missing_tui && source tuirc || { echo "Installation of TUI (Text User Interface, framework for scripts) failed!" ; exit 0 ; }
 	script_name="\${0##*/}"
 	script_name="\${script_name/.sh/}"
 	script_title="${DEST##*/}"
@@ -63,10 +105,11 @@ cat > "$DEST" << EOF
 	[ ! "." = "\$(dirname \$0)" ] && \\
 		script_dir="\$(dirname \$0)" || \\
 		script_dir="\$(pwd)"
+	# Shorts
 	CFG="\$script_config"
 	LOG="\$TUI_DIR_LOGS/\${script_name}.log"
 	TMP="\${TMPDIR}/\${script_name}-\$\$.tmp~"
-	REQUIRES="awk grep sed ls"
+	REQUIRES="awk ls grep sed"
 #
 #	Gettext
 #
@@ -95,7 +138,7 @@ This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
 	MSG_TR_HELP="\$(eval_gettext 'SYNTAX
-	\$script_name [options] arguments ...')"
+	\$script_name [options] arguments ...
 
 OPTIONS
 	-h|--help		Shows this screen and exits
@@ -118,7 +161,7 @@ For more help on how to use GNU-Software: <http://www.gnu.org/gethelp/>
 #
 	first_use() {
 	# Write the initial configuration file
-	#
+	# Starting with a comment line indicating the author, script name and script version
 		tui-bol-dir "\$(dirname "\$script_config")"
 		cat > "\$script_config" <<-EOF
 		# \$MSG_TR_CONFIG_BY: \$script_name (\$script_version)

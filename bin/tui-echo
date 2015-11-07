@@ -25,14 +25,14 @@
 	done
 	# Get the main config files
 	# 
-	if ! source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	source tuirc
 	fi
 	
 	TERM="${TERM:-GNU Linux}"
 	break_on_injections "$@" && \
 		exit 1
-	script_version=0.9
+	script_version=0.9.1
 	ME="${0##*/}"
 #
 #	Translate preps

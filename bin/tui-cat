@@ -32,7 +32,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_CONF_COMMANDS "$TUI_DIR_THEMES/$TUI_THEME"
 		do	[ -f "$f" ] && source "$f"
@@ -40,7 +40,7 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	script_version=0.9
+	script_version=0.9.1
 #
 #	Translate preps
 #

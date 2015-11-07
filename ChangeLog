@@ -1,3 +1,6 @@
+2015-11-07 - TUI 0.9.0d
+* Fixed installation
+
 2015-10-06 - TUI 0.9.0c
 * Corrected misunderstanding of TUI beeing approved GNU
 * Fixed irrelevant error display during manpage generation

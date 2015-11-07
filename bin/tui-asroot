@@ -24,7 +24,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_CONF_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
@@ -41,8 +41,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.09.27
-	script_version=0.9.1-alpha
+#	Changed:	2015.11.07
+	script_version=0.9.2-alpha
 #	Description:	Executes passed command as root
 #
 #

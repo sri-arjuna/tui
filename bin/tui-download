@@ -26,7 +26,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
@@ -35,13 +35,13 @@
 	fi
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
-#	Changed:2015.09.28
+#	Changed:2015.11.07
 #
 #
 #	Variable defaults
 #
 	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-${HOME:-/root}/.cache}}"
-	script_version=0.9
+	script_version=0.9.1
 	ME="${0##*/}"
 #
 #	Translate preps

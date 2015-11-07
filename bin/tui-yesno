@@ -29,14 +29,15 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
-	then 	# Load required variables
-		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
-		do	[ -f "$f" ] && source "$f"
-		done
-	else	source tuirc
-	fi
-	TERM="${TERM:-GNU Linux}"
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
+        then    # Load required variables
+                source "${HOME:-/root}/.tuirc" 2>/dev/zero
+                for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SYSTEM}
+                do      [ -f "$f" ] && source "$f"
+                done
+        else    source tuirc
+        fi
+	TERM="${TERM:-GNU\/Linux}"
 	break_on_injections "$@" && exit 1
 	# If there is a user theme directory, use that one instead
 	[ -f "$TUI_DIR_USER_THEMES/$TUI_THEME" ] && \
@@ -49,7 +50,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.0d
+	script_version=0.9.1
 	ME="${0##*/}"
 #
 #	Translate preps
