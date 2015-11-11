@@ -126,7 +126,6 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #
 #	Variable handling
 #
-	[ -z "$3" ] && printf "$help_text" && exit 99
 	BG_RET="-1"
 	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	[ "--version" = "${1,,}" ] && printf "$TR_MSG_TEXT_VERSION" && exit 0
@@ -150,6 +149,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			;;
 		esac
 	done
+	[ -z "$3" ] && printf "$help_text" && exit 99
 	shift $(($OPTIND - 1))
 	JOB="$1"
 	TXT_PROGRESS="$2"

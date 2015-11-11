@@ -34,7 +34,7 @@
 	# Disabled code injection protection,
 	# as one can run a script (which contains whatever), which bypasses those checks anyway...
 	# break_on_injections "$@" && exit 1
-	TERM="${TERM:-GNU Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 #
 #	File:		tui-asroot
 #	Author: 	Simon Arjuna Erat (sea)
@@ -85,7 +85,7 @@ OPTIONS
   -m MSG	Prints "MSG" before asking for a password
  
 ENVIRONMENT
-  TERM	If TERM is not set, TUI will set it to GNU Linux, this is required to determine wether TUI runs in GUI or VT (cli only) mode.
+  TERM	If TERM is not set, TUI will set it to GNU/Linux, this is required to determine wether TUI runs in GUI or VT (cli only) mode.
   UID	Reads UID to determine wether the user is root or not.
   USER	If user is empty, it takes LOGINNAME to display the user name for sudo.
   
@@ -132,7 +132,7 @@ AUTHOR
 	if tui-bol-root
 	then	# When passing eg: bash /path/to/script, quotes causes a failure!
 		#eval "${@}"
-		${@} >&2
+		"${@}" #>&2
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
 	then	tui-echo "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2

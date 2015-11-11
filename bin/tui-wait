@@ -180,7 +180,8 @@ BUGS
 #
 #	Action - loop
 #
-	while [ "$seconds_total" -ge 0 ]
+	seconds_total="${seconds_total//\/}"
+	while [ $seconds_total -ge 0 ]
 	do 	# Get total TIME string and subtract 1 second
 		TIME_string="$(seconds2TIME $seconds_total)"
 		((seconds_total--))
@@ -190,7 +191,7 @@ BUGS
 		
 		# Verbose / Countdown?
 		if $beVerbose
-		then	[ "$seconds_total" -lt 0 ] && \
+		then	[ $seconds_total -lt 0 ] && \
 				tui-echo "$action_text" || \
 				printf "\n"
 		fi

@@ -25,6 +25,7 @@
 #
 	BORDER_RIGHT=""
 	ME="${0##*/}"
+	HOME="$(eval echo ~$(whoami))"
 	
 	
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -32,7 +33,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
+	if source "${SYSCONFDIR}/tuirc" && source "$HOME/.tuirc"|| ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_CONF_COMMANDS "$TUI_DIR_THEMES/$TUI_THEME"
 		do	[ -f "$f" ] && source "$f"

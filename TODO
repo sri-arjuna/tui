@@ -23,7 +23,7 @@ No issues known. :)
 
 Fix:
 ----
-* Either tui-read or tui-select seem to act weird on ctrl+c at some time
+* Either tui-read or tui-select seem to act weird on ctrl+c at some time ->  tui-conf-editor
 
 
 Finalize:

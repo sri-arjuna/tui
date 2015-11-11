@@ -26,7 +26,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
+	if source "${SYSCONFDIR}/tuirc" && source ~/.tuirc || ( [ -f ./tuirc ] && source ./tuirc )
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
@@ -100,8 +100,9 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	
 	FILE_TEMP="$TUI_DIR_TEMP/$ME.status"
 	FILE_CMD="$TUI_DIR_TEMP/bgjob"
-	TMP=$TUI_FILE_TEMP
-	touch $TMP
+	TMP="${TUI_FILE_TEMP}"
+	tui-bol-dir "$TUI_DIR_TEMP" 
+	touch "$TMP" || exit 1
 	umask 022 $FILE_CMD $FILE_TEMP
 	DEST=""
 	showBar=true
@@ -248,7 +249,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				display_trgt="${TARGET##*/}"
 		fi
 		
-		( mv "$thisFile" "$TARGET" ; echo $? > $TUI_FILE_TEMP ) &
+		( mv "$thisFile" "$TARGET" ; echo $? > $TMP ) &
 		pid=$!
 
 		sleep $waiting
@@ -265,7 +266,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 			else	tui-progress "${MSG_WORK/\.\.\.} ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actually represents the failures, TODO Error '127,130'
-				TOTAL=$(( $TOTAL + $(cat $TUI_FILE_TEMP) ))
+				TOTAL=$(( $TOTAL + $(cat $TMP) ))
 			fi
 			# Since there is no visual progress, this 'waiting' is hard coded
 			sleep $waiting
@@ -274,15 +275,15 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		# Final Message
 		showtotal=false
 		if $showRegular
-		then	tui-status $(cat $TUI_FILE_TEMP) "$MSG_DONE"
+		then	tui-status $(<$TMP) "$MSG_DONE"
 		elif $showBar
-		then	tui-status $(cat $TUI_FILE_TEMP) "$MSG_DONE"
+		then	tui-status $(<$TMP) "$MSG_DONE"
 		#else
 		fi
 	done
 	TOTAL=${TOTAL:-0}
 	TOTAL_COUNT=$(( $MAX - $TOTAL ))
-	RET=$(<$TUI_FILE_TEMP)
+	RET=$(<$TMP)
 	$showtotal && tui-status  $RET "$(eval_gettext 'Moved $TOTAL_COUNT of $MAX items to $TARGET')"
-	exit $RET
+	exit ${RET:-1}
 	

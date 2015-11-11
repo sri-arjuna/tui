@@ -18,9 +18,84 @@
 # Created: 2014.12.11 by sea
 # Changed: 2015.06.20 by sea
 # ---------------------------------
-if ! source ~/.tuirc
-then	source /etc/tuirc #|| return 1
-fi
+for conf in /etc /usr/etc /usr/local/etc $HOME/local/etc $HOME/.local/etc $HOME/etc
+do 	[ -f $conf/tui.conf ] && source $conf/tui.conf && source $SYSCONFDIR/tuirc && break
+done
+_tui_cmd()
+	{
+	#set -x
+	#
+	#	Variables
+	#
+		local cur prev OPTS ARGS
+		t_BASE="$DATADIR/struct"
+		t_BOL="$t_BASE/bol"
+		t_CONF="$t_BASE/conf"
+		t_NEW="$t_BASE/new"
+		t_STR="$t_BASE/str"
+		
+		COMPREPLY=()
+		cur="${COMP_WORDS[COMP_CWORD]}"
+		prev="${COMP_WORDS[COMP_CWORD-1]}"
+		OPTS="--version -h --help"
+		ARGS="$(cd $t_BASE;echo *)"
+	#
+	#	Action
+	#
+		# This completes the word you are currently writing
+		# These need manual maintainance
+		case "$cur" in
+		-*)	COMPREPLY=( $(compgen -W "$(echo ${OPTS[*]})" -- $cur) )
+			return 0
+			;;
+		[bcns]*)
+			[ $1 = tui ] && COMPREPLY=( $(compgen -W "$(echo ${ARGS[*]})" -- $cur) )
+			return 0
+			;;
+		esac
+
+		# This completes the custom entries from $DIR
+		# But only use this, if 'prev' was one using entries from $DIR
+		# This list is dynamicly (automaticly) updated
+		case "${prev/tui}" in
+		bol)	case "$cur" in
+			"")	COMPREPLY=( $( compgen -W "$(cd $t_BOL 2>/dev/null && echo *)" -- "$cur" ) )
+				return 0 ;;
+			*)	COMPREPLY=( $( compgen -W "$(cd $t_BOL 2>/dev/null && echo $cur*)" -- "$cur" ) ) 		
+				return 0 ;;
+			esac
+			;;
+		conf)	case "$cur" in
+			"")	COMPREPLY=( $( compgen -W "$(cd $t_CONF 2>/dev/null && echo *)" -- "$cur" ) )
+				return 0 ;;
+			*)	COMPREPLY=( $( compgen -W "$(cd $t_CONF 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
+				return 0 ;;
+			esac
+			;;
+		new)	case "$cur" in
+			"")	COMPREPLY=( $( compgen -W "$(cd $t_NEW 2>/dev/null && echo *)" -- "$cur" ) )
+				return 0 ;;
+			*)	COMPREPLY=( $( compgen -W "$(cd $t_NEW 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
+				return 0 ;;
+			esac
+			;;
+		str)	case "$cur" in
+			"")	COMPREPLY=( $( compgen -W "$(cd $t_STR 2>/dev/null && echo *)" -- "$cur" ) )
+				return 0 ;;
+			*)	COMPREPLY=( $( compgen -W "$(cd $t_STR 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
+				return 0 ;;
+			esac
+			;;
+		""|tui)	case "$cur" in
+			"")	COMPREPLY=( $( compgen -W "$(cd $t_BASE 2>/dev/null && echo *)" -- "$cur" ) )
+				return 0 ;;
+			*)	COMPREPLY=( $( compgen -W "$(cd $t_BASE 2>/dev/null && echo $cur*)" -- "$cur" ) ) 
+				return 0 ;;
+			esac
+			;;
+		
+		esac
+	}
 _tui()
 	{
 	#
@@ -43,7 +118,7 @@ _tui()
 		-*)	COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;
-		[prt]*)	COMPREPLY=( $(compgen -W "${ARGS[*]}" -- $cur) )
+		[prtis]*)	COMPREPLY=( $(compgen -W "${ARGS[*]}" -- $cur) )
 			return 0
 			;;
 		#*)	COMPREPLY=( $(compgen -W "${OPTS[*]} ${ARGS[*]}" -- $cur) )
@@ -987,6 +1062,7 @@ _tui_web()
 # Actualy make it available to the shell
 # RC
 complete -F _tui tuirc
+complete -F _tui_cmd tui
 
 # Core Display
 complete -F _tui_printf tui-printf

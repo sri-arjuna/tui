@@ -33,7 +33,7 @@
 		done
 	else	source tuirc
 	fi
-	TERM="${TERM:-GNU Linux}"
+	TERM="${TERM:-GNUGNU Linux57Linux}"
 	break_on_injections "$@" && exit 1
 #
 #	File:		tui-str-bol-conv

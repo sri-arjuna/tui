@@ -29,7 +29,7 @@
 #		* make
 #		* make-install
 #		* make-uninstall
-#		* make-distclean
+#		* make-clean
 #
 #		It can also create a REFERENCE file ($APP_dirs.conf) and if 'doRef=true',
 #		it will copy that file to $SYSCONFDIR automaticly, as well as remove it when uninstalling
@@ -56,7 +56,7 @@
 	
 	# External requirements
 	APP_REQUIRES=""		# Commands required by APP
-	CFG_REQUIRES=""		# Commands required for PREPARE
+	CFG_REQUIRES=""		# Commands required for MAKE
 	
 	# Author
 	APP_AUTHOR=""		# Author of the script project
@@ -82,14 +82,16 @@
 #
 #	Internal Variables
 #
-	unset FHS PREPARE PRIOR POST REMOVE
+	unset FHS MAKE PRIOR POST REMOVE	# Basic/Core arrays
+	unset HTML DVI PDF PS			# Documention arrays
 	declare -A FHS		# This contains the directory strucutre by name
-	declare -a PREPARE	# This will be ran during ./configure --prefix=/usr
+	declare -a MAKE	# This will be ran during ./configure --prefix=/usr
 	declare -a PRIOR	# This will be ran first during ./make-install
 	declare -a POST		# This will be ran last during ./make-install
 	declare -a REMOVE	# This will be ran during ./make-uninstall
-	declare -a CLEAN	# This will be ran during ./make-distclean
+	declare -a CLEAN	# This will be ran during ./make-clean
 	declare -a IGNORE	# These files will be ignored when running './configure --tarball --prefix=/usr'
+	declare -a HTML DVI PDF PS # Use for creating make-* scripts
 	AWK=\awk		# Bypass aliases
 	GREP=\grep		# Bypass aliases
 	SED=\sed		# Bypass aliases
@@ -107,27 +109,120 @@
 #
 #	Functions
 #
+	make_info() { # INFILE OUTDIR
+	#
+	#
+		INFILE="$1"
+		OUTDIR="${2:-./docs}"
+		OUTFILE="${1##*/}"
+		OUTFILE="${OUTFILE/\.*}.info"
+		
+		[ -f "$INFILE" ] || return 1
+		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
+		
+		echo "texi2any -o $OUTDIR/$OUTFILE --no-split $INFILE"
+		#echo "texi2any -o docs/info/$APP.info --no-split docs/info/$APP.texi"
+	}
+	make_doc() { # TYPE INFILE OUTDIR
+	#
+	#
+		EXT="$1"
+		INFILE="$2"
+		OUTDIR="${3:-./docs}"
+		OUTFILE="${1##*/}"
+		OUTFILE="${OUTFILE/\.*}.$EXT"
+		
+		[ -f "$INFILE" ] || return 1
+		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
+		
+		echo "texi2any  --$EXT -o $OUTDIR/$OUTFILE --no-split $INFILE"
+	}
+	make_html() { # INFILE OUTDIR
+	#
+	#
+		INFILE="$1"
+		OUTDIR="${2:-./docs}"
+		OUTFILE="${1##*/}"
+		OUTFILE="${OUTFILE/\.*}.html"
+		
+		[ -f "$INFILE" ] || return 1
+		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
+		
+		echo "texi2any  --html -o $OUTDIR/$OUTFILE --no-split $INFILE"
+	}
+	make_pdf() { # INFILE OUTDIR
+	#
+	#
+		INFILE="$1"
+		OUTDIR="${2:-./docs}"
+		OUTFILE="${1##*/}"
+		OUTFILE="${OUTFILE/\.*}.pdf"
+		
+		[ -f "$INFILE" ] || return 1
+		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
+		
+		echo "texi2any  --pdf -o $OUTDIR/$OUTFILE --no-split $INFILE"
+	}
+	make_dvi() { # INFILE OUTDIR
+	#
+	#
+		INFILE="$1"
+		OUTDIR="${2:-./docs}"
+		OUTFILE="${1##*/}"
+		OUTFILE="${OUTFILE/\.*}.dvi"
+		
+		[ -f "$INFILE" ] || return 1
+		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
+		
+		echo "texi2any  --dvi -o $OUTDIR/$OUTFILE --no-split $INFILE"
+	}
+	make_ps() { # INFILE OUTDIR
+	#
+	#
+		INFILE="$1"
+		OUTDIR="${2:-./docs}"
+		OUTFILE="${1##*/}"
+		OUTFILE="${OUTFILE/\.*}.ps"
+		
+		[ -f "$INFILE" ] || return 1
+		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
+		
+		echo "texi2any  --ps -o $OUTDIR/$OUTFILE --no-split $INFILE"
+	}
 	write_makefile() { 
 	# Checks for existing scripts and adds them to the makefile
 	#
 		# Clear / Init makefile
 		local M="./Makefile"
-		echo "SHELL = /bin/sh" > "$M"
+		printf '%s\n' \
+			"SHELL = /bin/sh" > "$M"
 		
-		for task in make install uninstall distclean
+		for task in ./make ./make-*
 		do 	case "$task" in
-			make)	[ -f "./make" ] && \
-					printf '%s\n' "PNONY: $task" \
-					"${task}:"  \
+			./make)	# Was PNONY ??
+				printf '%s\n' "options:"  \
 					"	./make"  >> "$M" 
 				;;
-			*)	[ -f "./make-$task" ] && \
-					printf '%s\n' "PNONY: $task" \
-					"${task}:"  \
-					"	./make-${task}"  >> "$M" 
+			# *-doc-*)
+			#	[ -f "$task" ] && \
+			#		printf '%s\n' \
+			#		"install: ${task/*-}"  \
+			#		"	${task}"  >> "$M" 
+			#	;;
+			make-install)
+				[ -f "$task" ] && \
+					printf '%s\n' \
+					"${task/*-}:"  \
+					"	DESTDIR=\$DESTDIR ${task}"  >> "$M" 
+				;;
+			*)	[ -f "$task" ] && \
+					printf '%s\n' \
+					"${task/*-}:"  \
+					"	${task}"  >> "$M" 
 				;;
 			esac
 		done
+		echo "PHONY: options $(echo make-*|sed s,make\-,,g|sed s,doc\-,,g)" >> "$M"
 	}
 	show_sample() {
 	# Prints a sample configure.cfg
@@ -197,10 +292,10 @@
 		#	Prepare, before making a tarball
 		#	So the CFG_REQUIRES are only needed on one machine, and the tarball then can be shared 
 		#
-		 	PREPARE[0]="texi2any -o docs/info/\$APP.info --no-split docs/info/\$APP.texi"
-		 	PREPARE[1]="texi2any --html -o docs/info/\$APP.html --no-split docs/info/\$APP.texi"
-		 	PREPARE[2]="which tuirc 1>/dev/zero 2>/dev/zero || git clone https://github.com/sri-arjuna/tui tui"
-		 	PREPARE[3]="bin/\$APP --help | txt2man -T \${APP^^} -r \$APP_VER > docs/man/\$APP.1"
+		 	MAKE[0]="texi2any -o docs/info/\$APP.info --no-split docs/info/\$APP.texi"
+		 	MAKE[1]="texi2any --html -o docs/info/\$APP.html --no-split docs/info/\$APP.texi"
+		 	MAKE[2]="which tuirc 1>/dev/zero 2>/dev/zero || git clone https://github.com/sri-arjuna/tui tui"
+		 	MAKE[3]="bin/\$APP --help | txt2man -T \${APP^^} -r \$APP_VER > docs/man/\$APP.1"
 		#
 		#	Tasks prior to installation, but after tarball
 		#
@@ -232,7 +327,7 @@
 		#	Additional tasks for the uninstallation process
 		#
 		 	# In this example, TUI was installed, therefor the command 'tui-yesno' is available
-		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-distclean && cd .."
+		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-clean && cd .."
 		#
 		#	Contact
 		#
@@ -329,7 +424,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		exit 111
 	}
 	write_files() { 
-	# Write the different types of make-{distclean,install,uninstall} scripts
+	# Write the different types of make-{clean,install,uninstall} scripts
 	# An run pre-'make-install'-tasks
 		# Abort with failure if not all required apllication are present
 		APP_REQUIRES=""
@@ -438,29 +533,21 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Remove the files that where created
 		#
 			echo "rm -f Makefile"
-			for task in make make-* $REFERENCE
+			for task in make* make-* $REFERENCE
 			do	write_remover "$task"
 			done
 			
 		}
 		
 		# Prepare script headers
-		if [ -n "$(echo ${PREPARE[@]})" ] 
+		if [ -n "$(echo ${MAKE[@]})" ] 
 		then	echo "#!/usr/bin/env sh" > "./make"
-			if ! $is_at_home 
-			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
-					printf '%s\n' \
-					"[ -z \$UID ] && UID=0" \
-					"[ \$UID -ne 0 ] && \\" \
-					"	echo \"To make preparations for '$APP', root access is required.\" && \\" \
-					"	exit 99" >> "./make"
-			fi
 			echo "set -x" >> "./make"
 			chmod +x "./make"
 		fi
-		for m in install uninstall distclean
+		for m in install uninstall clean
 		do	echo "#!/usr/bin/env sh" > "make-$m"
-			if [ ! "$m" = "distclean" ] && ! $is_at_home 
+			if [ ! "$m" = "clean" ] && ! $is_at_home 
 			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
 					printf '%s\n' \
 					"[ -z \$UID ] && UID=0" \
@@ -474,20 +561,21 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		
 		$is_at_home && FHS[prefix]="$prefix_home"
 		echo "prefix=${FHS[prefix]}">"$REFERENCE"
-		if [ -n "$CHROOT" ] 
-		then	echo "CHROOT=$CHROOT" >> "make-install"
-			echo "CHROOT=$CHROOT" >> "make-uninstall"
-		fi
+		echo "CHROOT=\${DESTDIR:-$CHROOT}" >> "make-install"
+		echo "CHROOT=\${DESTDIR:-$CHROOT}" >> "make-uninstall"
 		
-		# Do the PREPARE stuff, even before PRIOR
-		if [ -n "$(echo ${PREPARE[@]})" ]
+		# Do the MAKE stuff, even before PRIOR
+		if [ -n "$(echo ${MAKE[@]})" ]
 		then 	C=0
-			while 	item="${PREPARE[$C]}"
-				[ ! -z "$item" ]
+			touch ./make
+			echo "" >> "./make"
+			while 	item="${MAKE[$C]}"
+				[ -n "$item" ]
 			do 	write_executer "$item" >> "./make"
 				echo >> "./make"
 				((C++))
 			done
+		else 	echo "echo 'Nothing todo." >> "./make"
 		fi
 		
 		# Write content of PRIOR tasks, if any
@@ -496,7 +584,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			C=0
 			echo >> "make-install"
 			while 	item="${PRIOR[$C]}"
-			[ ! -z "$item" ]
+			[ -n "$item" ]
 			do 	write_executer "$item" >> "make-install"
 				((C++))
 			done
@@ -551,7 +639,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo >> "make-uninstall"
 			
 			while 	item="${REMOVE[$C]}"
-				[ ! -z "$item" ]
+				[ -n "$item" ]
 			do 	[ -f "$item" ] && \
 					echo "rm -f $item" >> "make-uninstall" || \
 					echo "$item" >> "make-uninstall"
@@ -568,16 +656,114 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Check for DISTCLEAN operations
 		if [ -n "$(echo ${CLEAN[@]})" ]
 		then 	C=0
-			echo >> "make-distclean"
+			echo >> "make-clean"
 			
 			while 	item="${CLEAN[$C]}"
 				[ -n "$item" ]
-			do 	write_executer "$item" >> "make-distclean"
+			do 	write_executer "$item" >> "make-clean"
 				((C++))
 			done
 		fi
-		write_distclean >> "make-distclean"
 		
+		if [ "true" = "${doRef:-false}" ]
+		then	echo >> "make-install"
+			echo "mkdir -p ${CHROOT}${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${CHROOT}${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
+			echo "rm -f ${CHROOT}${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
+		fi
+		
+		# Check for TEXI operations
+		if [ -n "$(echo ${TEXI[@]})" ]
+		then 	this_target=make-doc-info
+			C=0
+			touch "$this_target"
+			echo "#!/usr/bin/env bash" > "$this_target"
+			chmod +x "$this_target"
+			
+			while 	[ -n "${TEXI[$C]}" ]
+			do 	while read infile outdir
+				do 	make_info "$infile" "$outdir" >> "$this_target"
+					write_install "infodir" "$outdir/$(echo ${infile##*/}info|sed s,'texi','',)" >> "make-install"
+					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}info|sed s,'texi','',)" >> "make-uninstall"
+					break
+				done<<<"${TEXI[$C]}"
+				C=$(( $C + 1 ))
+			done
+		fi
+		# Check for HTML operations
+		if [ -n "$(echo ${HTML[@]})" ]
+		then 	this_target=make-doc-html
+			C=0
+			touch "$this_target"
+			echo "#!/usr/bin/env bash" > "$this_target"
+			chmod +x "$this_target"
+			
+			while 	[ -n "${HTML[$C]}" ]
+			do 	while read infile outdir
+				do 	make_doc html "$infile" "$outdir" >> "$this_target"
+					write_install "infodir" "$outdir/$(echo ${infile##*/}html|sed s,'texi','',)" >> "make-install"
+					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}html|sed s,'texi','',)" >> "make-uninstall"
+					break
+				done<<<"${HTML[$C]}"
+				C=$(( $C + 1 ))
+			done
+		fi
+		# Check for PDF operations
+		if [ -n "$(echo ${PDF[@]})" ]
+		then 	this_target=make-doc-pdf
+			C=0
+			touch "$this_target"
+			echo "#!/usr/bin/env bash" > "$this_target"
+			chmod +x "$this_target"
+			
+			while 	[ -n "${PDF[$C]}" ]
+			do 	while read infile outdir
+				do 	make_doc pdf "$infile" "$outdir" >> "$this_target"
+					write_install "infodir" "$outdir/$(echo ${infile##*/}pdf|sed s,'texi','',)" >> "make-install"
+					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}pdf|sed s,'texi','',)" >> "make-uninstall"
+					break
+				done<<<"${PDF[$C]}"
+				C=$(( $C + 1 ))
+			done
+		fi
+		# Check for DVI operations
+		if [ -n "$(echo ${DVI[@]})" ]
+		then 	this_target=make-doc-dvi
+			C=0
+			touch "$this_target"
+			echo "#!/usr/bin/env bash" > "$this_target"
+			chmod +x "$this_target"
+			
+			while 	[ -n "${DVI[$C]}" ]
+			do 	while read infile outdir
+				do 	make_doc dvi "$infile" "$outdir" >> "$this_target"
+					write_install "infodir" "$outdir/$(echo ${infile##*/}dvi|sed s,'texi','',)" >> "make-install"
+					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}dvi|sed s,'texi','',)" >> "make-uninstall"
+					break
+				done<<<"${DVI[$C]}"
+				C=$(( $C + 1 ))
+			done
+		fi
+		# Check for PS operations
+		if [ -n "$(echo ${PS[@]})" ]
+		then 	this_target=make-doc-ps
+			C=0
+			touch "$this_target"
+			echo "#!/usr/bin/env bash" > "$this_target"
+			chmod +x "$this_target"
+			
+			while 	[ -n "${PS[$C]}" ]
+			do 	while read infile outdir
+				do 	make_doc ps "$infile" "$outdir" >> "$this_target"
+					write_install "infodir" "$outdir/$(echo ${infile##*/}ps|sed s,'texi','',)" >> "make-install"
+					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}ps|sed s,'texi','',)" >> "make-uninstall"
+					break
+				done<<<"${PS[$C]}"
+				C=$(( $C + 1 ))
+			done
+		fi
+		
+		
+		# Use the REFERENCE file?
 		if [ "true" = "${doRef:-false}" ]
 		then	echo >> "make-install"
 			echo "mkdir -p ${CHROOT}${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${CHROOT}${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
@@ -596,11 +782,14 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				((C++))
 			done
 		fi
-		for m in install uninstall distclean
-		do	echo >> "make-$m"
-			printf '%s\n' \
-				"RET=\$?" \
-				"set +x" >> "make-$m"
+		write_distclean >> "make-clean"
+		for m in install uninstall clean doc-{info,html,dvi,ps,pdf}
+		do	if [ -f "-/make-$m" ]
+			then 	echo >> "make-$m"
+				printf '%s\n' \
+					"RET=\$?" \
+					"set +x" >> "make-$m"
+			fi
 		done
 		printf '%s\n' "RET=\$?" "set +x" >> "./make"
 		
@@ -608,10 +797,12 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		echo "echo;echo \"Finished installation of ${APP_TITLE:-$APP} with \$? (0=success)\";exit \$RET" >> "make-install"
 		[ -f "./make" ] && echo "exit \$RET" >> "make"
 		echo "exit \$RET" >> "make-uninstall"
-		echo "exit \$RET" >> "make-distclean"
+		echo "exit \$RET" >> "make-clean"
 		
 		sed s,'set -x',"set -x\nSYSCONFDIR=$SYSCONFDIR",g -i make-{uni,i}nstall
 		sed s,'~',"$HOME",g -i make-{uni,i}nstall
+		
+		
 	}
 #
 #	Get options
@@ -758,7 +949,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 #	Output
 #
 	if $doTarball
-	then	exclude_list="make-distclean"
+	then	exclude_list="make-clean"
 		for ex in "${IGNORE[@]}";do exclude_list+=" $ex";done
 		# Since we prepare the make-<files>, configure is no longer required
 		opt_exclude="--exclude-ignore=configure"
@@ -781,10 +972,16 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "Successfully created tarball ${tarball}!"
 		set +x
 	else	[ "$HOME" = "${prefix:0:${#HOME}}" ] && install_prefix=""
-		${doMakefile:-false} && write_makefile
+		${doMakefile} && write_makefile
 		echo
 		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
 		echo "To install \"${APP_TITLE:-$APP}\" now, please execute: '${install_prefix}./make-install'"
+		#	if ${doMakefile}
+		#	then	SRCH="exit \$RET"
+		#		REPL="echo 'Please use:	make info\n\t\tmake html\nAs well before\tmake install'\nexit \$RET"
+		#		sed s,"$SRCH","$REPL",g -i "./make"
+		#	else	echo "To install \"${APP_TITLE:-$APP}\" now, please execute:  './make && make info && make html &&  ${install_prefix}./make-install'"
+		#	fi
 		echo
 	fi
 	exit

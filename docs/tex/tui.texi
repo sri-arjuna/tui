@@ -111,11 +111,10 @@ in your scripts.
 You as the author of the script, don't have to worry about software the user has installed, 
 instead you call: tui-edit, tui-filemgr, tui-web or tui-terminal (tui-terminal is GUI only), 
 or which distribution the user is using, simply call tui-install to cover package manager 
-installations from Arch, over *BSD and Debian to Fedora/Red-Hat to Slackware or Tizen.
+installations from *BSD, Debian over Fedora/Red-Hat to Trisquel.
 
 
-It brings together the best of two worlds, the power of the console and the convenience of a graphical
-environment.
+It brings together the best of two worlds, the power of the console and the convenience of a graphical environment.
 
 
 
@@ -591,7 +590,7 @@ Well, Firefox might be a good choice, but some people do not have it installed, 
 just like tui-edit, tui-filemgr, and tui-terminal.
 
 @example
-	tui-web "http://www.linux.org"
+	tui-web "http://www.gnu.org"
 @end example
 
 
@@ -1110,7 +1109,6 @@ i usualy just did it to gain more free memory over the 512k 'barrier', to play t
 as they required an incredible high amount of RAM... up to 8MB!
 
 Later in 1995, i've had my hands on Slackware 3.0 and RedHat 2 or 3 (not RHEL, before Fedora).
-i've had some plays with a GUI from 'Ensemble Studios', which was a nice twitch compared to other DE of that time.
 
 Between 1997 and 2001 i was self-employed PC-Supporter helping private people as well as small- & medium companies in and around my town.
 In  between there was some army services, and afterwards i've raised a security company with some friends, which went well until 2004,

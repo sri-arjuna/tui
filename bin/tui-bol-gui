@@ -34,7 +34,7 @@
 	then 	source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
 	fi
-	TERM="${TERM:-GNU Linux}"
+	TERM="${TERM:-GNUGNU Linux57Linux}"
 #
 #	File:		tui-bol-gui
 #	Author: 	Simon Arjuna Erat (sea)

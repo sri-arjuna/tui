@@ -1,3 +1,9 @@
+2015-11-11 - TUI 0.9.0e
+* Fixing display issues
+* - status.conf
+* - tui-asroot, tui-download, tui-mv, tui-progress, tui-wait
+* Changed application defaults
+
 2015-11-07 - TUI 0.9.0d
 * Fixed installation
 

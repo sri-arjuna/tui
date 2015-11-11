@@ -21,18 +21,7 @@
 #	Init TUI environment
 #
 	ME="${0##*/}"
-	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
-	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
-	done
-	# Get the main config files
-	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
-	then 	# Load required variables
-		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
-		do	[ -f "$f" ] && source "$f"
-		done
-	else	source tuirc
-	fi
+	source tuirc
 	break_on_injections "$@" && exit 1
 #	Created: 2013.09.13
 #	Changed:2015.11.07
@@ -99,7 +88,7 @@ AUTHOR
 	LIST_APPS="wget curl"
 	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
 		CURLWGET="$(echo ${LIST_APP/$CURLWGET})"
-	TERM="${TERM:-GNU Linux}"
+	TERM="${TERM:-GNUGNU Linux57Linux}"
 	tui-bol-dir "$TUI_DIR_TEMP"
 	touch "$TUI_FILE_TEMP"
 #

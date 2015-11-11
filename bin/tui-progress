@@ -21,7 +21,7 @@
 #	Init TUI environment
 #
 	ME="${0##*/}"	# Name
-	script_version=1.2.1
+	script_version=1.2.2
 	# Check the two default places for the core configuration
 	# First system wide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -29,11 +29,15 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
-	then 	# Load required variables
-		for f in $TUI_FILE_CONF_{APPS,COMMANDS,SETTINGS} $TUI_FILE_USER_{APPS,COMMANDS,SETTINGS}
-		do	[ -f "$f" ] && source "$f"
-		done
+	if source "$HOME/.tuirc" 
+	then 	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
+		then 	# Load required variables
+			for f in $TUI_FILE_CONF_{APPS,COMMANDS,SETTINGS} $TUI_FILE_USER_{APPS,COMMANDS,SETTINGS}
+			do	[ -f "$f" ] && source "$f"
+			done
+		else	#total falback
+			source tuirc
+		fi
 	else	source tuirc
 	fi
 	# If there is a user theme directory, use that one instead
@@ -265,7 +269,7 @@ AUTHOR
 		[ "$VAL" -gt 3 ] && VAL=0
 		case $VAL in
 		0|1|2)	STATUS="[  ${INDI[$VAL]}   ]"	;;
-		3)	. $TUI_DIR_THEMES/$TUI_THEME
+		3)	. $TUI_DIR_THEMES/${TUI_THEME:-default}
 			n=$(( $WIDTH - ${#BORDER_LEFT} - 9 ))
 			POS="\033[${n}G"
 			STATUS="$POS[  \174   ]"	;;
