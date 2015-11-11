@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------
+#
+# Copyright (c) 2015 by sea, sea@toshiba.ocean
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License (GPL) as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License (GPL) for more details.
+#
+# You should have received a copy of the GNU General Public License (GPL)
+# along with this program.  If not, see http://www.gnu.org/licenses/gpl.html
+#
+# ------------------------------------------------------------------------
+#
+#	TUI Internals
+#
+	script_version=0.1
+	script_created="2015.11.08"
+	script_changed="2015.11.08"
+	
+	script_name="${0##*/}"
+	script_name="${script_name/.sh/}"
+	script_title="tui"
+	script_package=""
+	script_url=""
+	
+	script_author="sea"
+	script_contact="sea@toshiba.ocean"
+	script_license="GNU General Public License (GPL)"
+#
+#	Internal preps
+#
+	[ ! -z "$script_package" ] && script_package+=" " && script_package_txt=" ()"
+#
+#	Shared variables & Language
+#
+	# Check the two default places for the core configuration
+	# First systemwide, second user only install
+	for tmp_task in "/etc" "/usr/local" "$HOME" "${HOME:-/root}/.local" 
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	then 	# Load required variables
+		source "$TUI_FILE_CONF_COMMANDS"
+	else	source tuirc
+	fi
+	break_on_injections "${@}" && exit 1
+	source gettext.sh
+	TEXTDOMAIN="$script_name"
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Assuming $script_package is installed to $TUI_DIR_SYSTEM as well...
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Variables
+#
+	typeset -r CFG="$script_config"
+	typeset -r LOG="$TUI_DIR_LOGS/${script_name}.log"
+	declare TMP="${TUI_DIR_TEMP:-TMPDIR}/${script_name}-$$.tmp~"
+#
+#	Messages to translate:
+#
+	MSG_TR_VERSION="$(eval_gettext '${script_name}${script_package_txt}, Version $script_version
+Copyright (C) 2015 sea
+License GNU General Public License (GPL) or later <http://www.gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	MSG_TR_HELP="$(eval_gettext '
+NAME
+  $script_name - SHORTDESC
+
+SYNOPSYS
+  $script_name [-h|--help] [--version] [-abcx] [--option] [--more opt]
+  
+DESCRIPTION
+  desc
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -a		Some
+  -b		more
+  -c		text
+  --more opt	desc
+ 
+EXAMPLE
+
+	code
+
+HINTS
+  Some_text
+  
+SEE ALSO
+  bash(1), gettext(1), tuirc(1), tui-read(1), tui-select(1), txt2man(1)
+  
+BUGS
+  Report bugs to: mailinglist ; <${script_contact:-sea@toshiba.ocean}>
+  
+  $script_name - Homepage: <${script_url:-}>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  ${script_author:-sea}, <>
+')"
+#
+#	Functions
+#
+	cleanup() { 
+	# Removes all known tempfiles and exits
+	# Is called at the end of the script and by the trap
+		declare -a arr_CLEANUP=(
+			"$TMP"
+			# Add your tempfiles
+			# here
+			)
+		for remove in "${arr_CLEANUP[@]}"
+		do 	( [ -f "$remove" ] || [ -p "$remove" ] ) && rm -f "$remove"
+		done
+	}
+	show_help() {
+	# Prints the helpscreen
+	# and exits
+		printf "$MSG_TR_HELP_LONG\n"
+		exit 99
+	}
+	show_version() {
+	# Prints the version of the script
+	# and exits
+		printf "$MSG_TR_VERSION\n"
+		exit 111
+	}
+#
+#	Traps are cool!
+#
+	# TRAP FUNCTION/"COMMAND" MODE's ...
+	trap cleanup INT ERR QUIT KILL ABRT
+#
+#	Get options
+#
+	# -a|--alternative ; to allow longoptions with a single leading '-'
+	GETOPT=$(getopt \
+		--options	"h" \
+		--longoptions	"help,version,YOUROPT:" \
+		--name 		"${0##*/}" -- "${@}" \
+	)
+	eval set -- "${GETOPT}";
+	while true
+	do 	case "$1" in
+		-h|--help)	show_help	;;
+		--version)	show_version	;;
+		--)		shift ; break	;;
+		# --------------------------------
+		--YOUROPT)	opt_str="$2"
+				shift 2
+				;;
+		esac
+	done
+#
+#	Action
+#
+	MSG_TR_WANTLEARN="$(gettext 'Do you want to learn about TUI?')"
+	MSG_TR_FUTURE="$(gettext 'In the future you may want to call:')"
+	MSG_TR_LEARNMORE="$(gettext 'Learn more in a few seconds...')"
+	MSG_TR_TITLE_LEFT="$(eval_gettext 'The TUI Experience')"
+	MSG_TR_TITLE_RIGHT="$(eval_gettext 'Idea (1995) & Code (2011-today) by Simon Arjuna Erat, Switzerland')"
+	MSG_TR_TITLE_CENTER="$(eval_gettext 'Asks you an important question')"
+	MSG_TR_MSG_LATER="$(eval_gettext 'See you later')"
+#
+#	Display
+#
+	if [ -z "$1" ] 
+	then	tui-header "$MSG_TR_TITLE_LEFT" "$MSG_TR_TITLE_RIGHT"
+		tui-title "$MSG_TR_TITLE_CENTER"
+		tui-cat -d 0.04 "$MSG_TR_WANTLEARN"
+		if tui-yesno " "
+		then	tui-echo "${MSG_TR_FUTURE} tuirc"
+			tui-wait 3 "$MSG_TR_LEARNMORE"
+			tuirc
+			exit $?
+		else	tui-cat -d 0.03 "$MSG_TR_MSG_LATER"
+			tui-status 1 "$MSG_TR_MSG_LATER"
+		fi
+	else	echo todo ;)
+	fi
+#	
+# 	Clean up & exit
+#
+	cleanup
+	exit 0
