@@ -84,7 +84,7 @@ DESCRIPTION
        the limits of scripts) line based text interface.
        All the commands start with the prefix tui- followed by either the subsection, like bol-, conf-,
        str- or just the command its name/acronym/synonym.  Their names are chosen to  represent  either
-       their counterparts or to describe what it does. tui-printf beeing the exception, as its original
+       their counterparts or to describe what it does. tui-printline beeing the exception, as its original
        functionaly is now metaphoricly adapted for TUI.
 
        It also helps to start the proper application like editor, file manager or web  broswer,  so  it
@@ -101,7 +101,7 @@ USAGE
              * tui-header, to make the full line with a blue background and white font (theme:default)
              * tui-title, to make inner area with a blue background and white font (theme:default)
              * tui-echo, to make the full line with the terminal default colors.
-             * tui-printf, to make next tui-<command> "overwrite" the current output.
+             * tui-printline, to make next tui-<command> "overwrite" the current output.
        The biggest part of the TUI package however, are its additional commands.
        If  your  shell supports tab-completion, type: tui- and press tab one or two times to get a list
        of TUI its commands.  Otherwise you can see a list of the command by typing: ls /usr/bin/tui-\*
@@ -748,59 +748,59 @@ AUTHOR
 			exit $?
 			;;
 		provides)
-			tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION) by sea')" \
+			tui-printline -H 	"$(eval_gettext 'TUI ($TUI_VERSION) by sea')" \
 					"$MSG_TR_HELLO_USER"
-			tui-printf -T "$(gettext 'Text User Interface - Framework for Scripts')"
+			tui-printline -T "$(gettext 'Text User Interface - Framework for Scripts')"
 			
-			tui-printf -T "$(gettext 'Variables provided by sourcing TUI') ($TRC)"
+			tui-printline -T "$(gettext 'Variables provided by sourcing TUI') ($TRC)"
 			for foundVar in ${!TUI_THEME*} ${!TUI_PREFIX*} ${!TUI_DIR_*} ${!TUI_FILE_*} 
-			do	tui-printf -E "$foundVar" "${!foundVar}"
+			do	tui-printline -E "$foundVar" "${!foundVar}"
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "$(gettext 'Variables provided by apps.conf') (\$TUI_FILE_CONF_APPS)"
+			tui-printline -T "$(gettext 'Variables provided by apps.conf') (\$TUI_FILE_CONF_APPS)"
 			for foundVar in ${!EDITOR_*} ${!FILEMGR_*} ${!BROWSER_*} ${!TERMINAL*} ${!CURLWGET*}
-			do	tui-printf -E "$foundVar" "${!foundVar}"
+			do	tui-printline -E "$foundVar" "${!foundVar}"
 			done
 			
-			tui-printf -T "$(gettext 'Variables provided by settings.conf') (\$TUI_FILE_CONF_SETTINGS)"
+			tui-printline -T "$(gettext 'Variables provided by settings.conf') (\$TUI_FILE_CONF_SETTINGS)"
 			for txt in $(tui-conf-get -l $TUI_FILE_CONF_SETTINGS);do
 				val="\$${txt}"
-				tui-printf -E "$txt" "${!txt}"
+				tui-printline -E "$txt" "${!txt}"
 			done
 			
-			tui-printf -T "$(gettext 'Variables provided by commands.conf') (\$TUI_FILE_CONF_COMMANDS)"
+			tui-printline -T "$(gettext 'Variables provided by commands.conf') (\$TUI_FILE_CONF_COMMANDS)"
 			for txt in $(tui-conf-get -l $TUI_FILE_CONF_COMMANDS);do
-				tui-printf -E "$txt" "${!txt}"
+				tui-printline -E "$txt" "${!txt}"
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "$(gettext 'Variables provided by colors.conf') (\$TUI_FILE_CONF_COLORS)"
-			tui-printf -E "$(gettext 'Be aware that using TUI_COLOR_* currently causes alignment issues.')" "$TUI_INFO"
-			tui-printf -E "$(gettext 'Any escape sequence for that matter.')" "$TUI_INFO"
+			tui-printline -T "$(gettext 'Variables provided by colors.conf') (\$TUI_FILE_CONF_COLORS)"
+			tui-printline -E "$(gettext 'Be aware that using TUI_COLOR_* currently causes alignment issues.')" "$TUI_INFO"
+			tui-printline -E "$(gettext 'Any escape sequence for that matter.')" "$TUI_INFO"
 			for foundVar in ${!TUI_FONT_*} ${!TUI_COLOR_*}
-			do	#tui-printf -E \
+			do	#tui-printline -E \
 				#	"$foundVar" \
 				#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp)TEXT${TUI_RESET})"
-				tui-printf -E "$foundVar" "${!foundVar}TEXTS${TUI_RESET}"
+				tui-printline -E "$foundVar" "${!foundVar}TEXTS${TUI_RESET}"
 			done
-			tui-printf -E "TUI_RESET" "${TUI_RESET}TEXT"
+			tui-printline -E "TUI_RESET" "${TUI_RESET}TEXT"
 			
 			tui-echo;tui-press
-			tui-printf -T "$(gettext 'Variables provided by status.conf') (\$TUI_FILE_CONF_STATUS)"
+			tui-printline -T "$(gettext 'Variables provided by status.conf') (\$TUI_FILE_CONF_STATUS)"
 			for txt in ${STATUS_TEXT[@]};do
 				val="TUI_${txt}"
 				tui-echo "TUI_$txt" "${!val}"
 			done
 			for foundVar in ${!RET_*}
-			do	#tui-printf -E \
+			do	#tui-printline -E \
 				#	"$foundVar" \
 				#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
-				tui-printf -E "$foundVar" "${!foundVar}"
+				tui-printline -E "$foundVar" "${!foundVar}"
 			done
 			
 			tui-echo;tui-press
-			tui-printf -H "$(gettext 'Variables provided by sourcing TUI (User specific)')"
+			tui-printline -H "$(gettext 'Variables provided by sourcing TUI (User specific)')"
 			for task in user apps sets
 			do	list=""
 				case $task in
@@ -813,23 +813,23 @@ AUTHOR
 				esac
 				
 				for foundVar in $list # Quoting breaks the parsing
-				do	#tui-printf -E \
+				do	#tui-printline -E \
 					#	"$foundVar" \
 					#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
-					tui-printf -E "$foundVar" "${!foundVar}"
+					tui-printline -E "$foundVar" "${!foundVar}"
 				done
 				[ $task = apps ] && for t in EDITOR BROWSER FILEMGR;do tui-echo "${t^}" "\$${t}_$(tui-bol-gui && printf GUI || printf CLI)";done
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "$(gettext 'Variables provided by shorts.conf') (\$TUI_DIR_CONF/shorts.conf)"
+			tui-printline -T "$(gettext 'Variables provided by shorts.conf') (\$TUI_DIR_CONF/shorts.conf)"
 			for entry in $($GREP "=" "$TUI_DIR_CONF/shorts.conf"|$GREP -v ^"#")
 			do	tui-echo "${entry/=*}"	"${entry/*=}" 	#""
 			done
 			
 			tui-echo;tui-press
-			tui-printf -T "$(eval_gettext 'Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)')"
-			tui-printf -S 111 "$(eval_gettext 'Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file.')"
+			tui-printline -T "$(eval_gettext 'Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)')"
+			tui-printline -S 111 "$(eval_gettext 'Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file.')"
 			while 	IFS='=	'
 				read al var val
 			do	echo "$al $var $val" | $GREP -q "#" || \
@@ -858,26 +858,26 @@ AUTHOR
 		n=$(( $COLUMNS - ${#BORDER_LEFT} - 14 ))
 		POS="\033[${n}G"
 		# Actual display
-		tui-printf -H 	"$(eval_gettext 'TUI ($TUI_VERSION), Copyright (c) 2015 by sea')" \
+		tui-printline -H 	"$(eval_gettext 'TUI ($TUI_VERSION), Copyright (c) 2015 by sea')" \
 				"$MSG_TR_HELLO_USER"
-		tui-printf -T "$(gettext 'Text User Interface, framework for Scripts')"
-		tui-printf -E "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"
-		tui-printf -E
-		tui-printf -E 	"$(gettext 'If you are looking for the commands of TUI, try this:')" \
+		tui-printline -T "$(gettext 'Text User Interface, framework for Scripts')"
+		tui-printline -E "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"
+		tui-printline -E
+		tui-printline -E 	"$(gettext 'If you are looking for the commands of TUI, try this:')" \
 				"${POS}tui-\074${HIT_TAB}\076"
-		tui-printf -E 	"$(gettext 'If you are a developer, i highly recommend to read:')" \
+		tui-printline -E 	"$(gettext 'If you are a developer, i highly recommend to read:')" \
 				"$(eval_gettext 'man tui[rc] // ${TUI_FONT_BOLD}info tui${TUI_RESET}')"
-		tui-printf -E 	"$(gettext 'And to check the provided variables, see:')" \
+		tui-printline -E 	"$(gettext 'And to check the provided variables, see:')" \
 				"${TUI_FONT_BOLD}tuirc provides${TUI_RESET}"
-		tui-printf -E
-		tui-printf -E 	"$(gettext 'There are some sample scripts to get you started:')" \
+		tui-printline -E
+		tui-printline -E 	"$(gettext 'There are some sample scripts to get you started:')" \
 				"$DATADIR/samples"
-		tui-printf -E 	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
+		tui-printline -E 	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
 				"tui-new-script [-befrs] [./]$(gettext 'SCRIPTNAME')"
-		tui-printf -E
-		tui-printf -E 	"$(gettext 'Arguments to this command are:')" \
+		tui-printline -E
+		tui-printline -E 	"$(gettext 'Arguments to this command are:')" \
 				"config html info provides reset reset-yes samples theme"
-		tui-printf -E 
+		tui-printline -E 
 		tui-yesno "$(gettext 'Configure it now?')" || exit 0
 		ConfigTUI
 	else	# Set back possible original variables ME and script_version

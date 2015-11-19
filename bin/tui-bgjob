@@ -163,9 +163,9 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #	Send job to bg and get pid
 #
 	[ ! -f "$JOB" ] && \
-		tui-printf -rS 1 "$(eval_gettext 'Failed, job: $JOB not found!')" && \
+		tui-printline -rS 1 "$(eval_gettext 'Failed, job: $JOB not found!')" && \
 		exit 1
-	tui-printf -rS 2 "$(gettext 'Starting job...')"
+	tui-printline -rS 2 "$(gettext 'Starting job...')"
 	(
 		"$SHELL" "$JOB" && \
 			printf 0 >&1 > "$TMP" || \

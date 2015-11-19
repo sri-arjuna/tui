@@ -81,10 +81,10 @@ EXAMPLE
   
 HINTS
   If your script should feel too slow, 
-  you might get a slightly better performance using "tui-printf -T"
+  you might get a slightly better performance using "tui-printline -T"
   
 SEE ALSO
-  bash(1), tui-printf(1)
+  bash(1), tui-printline(1)
   
 BUGS
   Report bugs to: erat.simon@gmail.com
@@ -126,16 +126,16 @@ AUTHOR
 		while read LEFT CENTER RIGHT
 		do	set "$LEFT" "$CENTER" "$RIGHT"
 			case $# in
-			0)	tui-printf -T 					;;
-			1)	tui-printf -T $leadingDASHdummy "$1"		;;
-			2)	tui-printf -T $leadingDASHdummy "$1" "$2" 	;;
-			3)	tui-printf -T $leadingDASHdummy "$1" "$2" "$3"	;;
+			0)	tui-printline -T 					;;
+			1)	tui-printline -T $leadingDASHdummy "$1"		;;
+			2)	tui-printline -T $leadingDASHdummy "$1" "$2" 	;;
+			3)	tui-printline -T $leadingDASHdummy "$1" "$2" "$3"	;;
 			esac
 		done
 	else	case $# in
-		0)	tui-printf -T 					;;
-		1)	tui-printf -T $leadingDASHdummy "$1"		;;
-		2)	tui-printf -T $leadingDASHdummy "$1" "$2" 	;;
-		3)	tui-printf -T $leadingDASHdummy "$1" "$2" "$3"	;;
+		0)	tui-printline -T 					;;
+		1)	tui-printline -T $leadingDASHdummy "$1"		;;
+		2)	tui-printline -T $leadingDASHdummy "$1" "$2" 	;;
+		3)	tui-printline -T $leadingDASHdummy "$1" "$2" "$3"	;;
 		esac
         fi

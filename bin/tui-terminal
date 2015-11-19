@@ -97,7 +97,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #	Check for the environment to load
 #
 	! tui-bol-gui && \
-		tui-printf -S 1 "$(eval_gettext '$ME: Requires to be in GUI mode')" && \
+		tui-printline -S 1 "$(eval_gettext '$ME: Requires to be in GUI mode')" && \
 		exit 1
 	
 	if ! which "$TERMINAL" 2>/dev/zero 1>/dev/zero
@@ -109,7 +109,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		done
 		$found && tui-conf-set -v "${TUI_USER_CONF/user/apps/}" TERMINAL "$TERMINAL"
 		! $found && \
-			tui-printf -S 1 "$(eval_gettext 'FATAL ERROR: No terminal could be identified, please set one manually in $APPS!')" && \
+			tui-printline -S 1 "$(eval_gettext 'FATAL ERROR: No terminal could be identified, please set one manually in $APPS!')" && \
 			exit 1
 	fi
 #

@@ -163,7 +163,7 @@ AUTHOR
 	do 	THIS="${URL##*/}"
 		out_string="./$THIS"
 		
-		tui-printf -rS 2 "$MSG_INIT_ACT" #"$WORK"
+		tui-printline -rS 2 "$MSG_INIT_ACT" #"$WORK"
 		>$TUI_FILE_TEMP
 		echo "LC_ALL=C $CURLWGET $OPT_C $OPT_O \"$out_string\" \"$URL\" 1>/dev/zero 2>$TUI_FILE_TEMP" > "$FILE_CMD"
 		

@@ -140,9 +140,9 @@ AUTHOR
 #
 #	Display & Action
 #
-	tui-printf -H "$ME ($script_version)" "$(date +'%F %T')"
-	tui-printf -T "$TITLE"
-	tui-printf -E "$(gettext 'Starting with basic required configuration')"
+	tui-printline -H "$ME ($script_version)" "$(date +'%F %T')"
+	tui-printline -T "$TITLE"
+	tui-printline -E "$(gettext 'Starting with basic required configuration')"
 	if [ -z "$TUI_DIR_PROJECTS" ]
 	then	tui-echo
 		tui-echo "$(gettext 'You have not set \"$TUI_DIR_PROJECTS\" yet.')" \

@@ -29,10 +29,10 @@
 	script_name="${script_name/.sh/}"
 	script_title="tui"
 	script_package=""
-	script_url=""
+	script_url="http://nongnu.org/tui"
 	
-	script_author="sea"
-	script_contact="sea@toshiba.ocean"
+	script_author="Simon Arjuna Erat (sea)"
+	script_contact="erat.simon@gmail.com"
 	script_license="GNU General Public License (GPL)"
 #
 #	Internal preps
@@ -75,26 +75,27 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	MSG_TR_HELP="$(eval_gettext '
 NAME
-  $script_name - SHORTDESC
+  $script_name - Text User Interface, framework for scripts
 
 SYNOPSYS
-  $script_name [-h|--help] [--version] [-abcx] [--option] [--more opt]
+  $script_name [-h|--help] [--version] COMMAND|[SECTION COMMAND]
   
 DESCRIPTION
   desc
   
 OPTIONS
   -h|--help	Shows help and exit with 99
-  --version	Shows version infoand exit with 0
+  --version	Shows version info and exit with 0
   
-  -a		Some
-  -b		more
-  -c		text
-  --more opt	desc
+
  
 EXAMPLE
 
-	code
+	tui bol gui ; tui str boolconv $?
+	
+	su -c "tui-conf-editor /etc/default/grub"
+	
+	
 
 HINTS
   Some_text
@@ -130,7 +131,7 @@ AUTHOR
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		printf "$MSG_TR_HELP_LONG\n"
+		printf "$MSG_TR_HELP\n"
 		exit 99
 	}
 	show_version() {
@@ -187,10 +188,10 @@ AUTHOR
 			tui-wait 3 "$MSG_TR_LEARNMORE"
 			tuirc
 			exit $?
-		else	tui-cat -d 0.03 "$MSG_TR_MSG_LATER"
-			tui-status 1 "$MSG_TR_MSG_LATER"
+		else	show_help
+			exit 99
 		fi
-	else	echo todo ;)
+	else	echo "todo ;)"
 	fi
 #	
 # 	Clean up & exit

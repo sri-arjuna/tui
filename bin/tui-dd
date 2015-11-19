@@ -125,7 +125,7 @@ AUTHOR
 		;;
 	esac
 	[ "/dev" = "${TARGET:0:4}" ] && [ 0 -ne $UID ] && \
-		tui-printf -S 1 "$(gettext 'Requires root')" && \
+		tui-printline -S 1 "$(gettext 'Requires root')" && \
 		exit 1
 	SRC="${SOURCE##*/}"
 	TR_MSG_STRING_WORK="$(eval_gettext 'Writing $SRC to $TARGET...')"
@@ -135,7 +135,7 @@ AUTHOR
 #
 	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP" ; sync)   &
 	PID=$!
-	tui-printf -rS 2 "$(gettext 'Starting job, please wait...')"
+	tui-printline -rS 2 "$(gettext 'Starting job, please wait...')"
 	sleep 0.7
 #	PID=$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')
 	[ -b "$SOURCE" ] && \

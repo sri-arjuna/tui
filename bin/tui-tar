@@ -135,7 +135,7 @@ AUTHOR
 #
 	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
-	do 	tui-printf -rS 2 "$READING..."
+	do 	tui-printline -rS 2 "$READING..."
 		THIS="${FOLDER##*/}"
 		PWD_ORG="$(pwd)"
 		
@@ -197,7 +197,7 @@ AUTHOR
 			tui-status $RET "$(gettext 'Extracted:') $FOLDER"
 			RET=$?
 		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
-			tui-printf -rS 2 "$READING..."
+			tui-printline -rS 2 "$READING..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > "$FILE_CMD"
 			cd "$(dirname $FOLDER)"
 			chmod +x "$FILE_CMD"

@@ -390,7 +390,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		### tui-echo "TODO Download file" -- just copy pasted from the upload section
 		###
 		$beVerbose && \
-			tui-printf -rS 2 "$(gettext 'Generate download commands...')"
+			tui-printline -rS 2 "$(gettext 'Generate download commands...')"
 		count=0 ; total=${#REM_FILES[@]}
 		DEFAULT_DIR="${LOC_PATHS[0]}"
 		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
@@ -420,7 +420,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		action_done="$(gettext 'Downloaded file')"
 		;;
 	up)	$beVerbose && \
-			tui-printf -rS 2 "$(gettext 'Generate upload commands...')"
+			tui-printline -rS 2 "$(gettext 'Generate upload commands...')"
 		count=0 ; total=${#LOC_FILES[@]}
 		DEFAULT_DIR="${REM_PATHS[0]}"
 		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
@@ -460,7 +460,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		HOST_STRING="$HOST" || \
 		HOST_STRING="$USERNAME@$HOST"
 	[ -z "$HOST" ] && \
-		tui-printf -S 1 "$(gettext 'No host supplied.')" && \
+		tui-printline -S 1 "$(gettext 'No host supplied.')" && \
 		exit 1
 	
 	if ! $GREP -q "$HOST" ~/.netrc

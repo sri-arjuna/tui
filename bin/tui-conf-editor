@@ -232,7 +232,7 @@ AUTHOR
 	write_default() { # FILE
 	# Writes the file if missing
 	# and fills in all default values if missing
-		[ -z "${INDEX[@]}" ] && tui-printf -S 1 "$(gettext 'No --options OPTNAME passed to write!')" && exit 1
+		[ -z "${INDEX[@]}" ] && tui-printline -S 1 "$(gettext 'No --options OPTNAME passed to write!')" && exit 1
 		thisConf="$1" ; [ -z "$thisConf" ] && echo "$(gettext 'Must provide a FILE to $FUNCNAME')" && return 1
 		doOverwrite=false;if [ ! -f "$thisConf" ]; then touch "$thisConf" && doOverwrite=true|| return 1 ;fi
 		$doOverwrite && cat "$TMP" > "$thisConf"

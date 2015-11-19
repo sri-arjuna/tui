@@ -1,0 +1,512 @@
+#!/usr/bin/env bash
+#
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	Script Environment
+#
+	ME="${0##*/}"
+	script_version=2.6
+	BORDER_RIGHT=""
+	TERM="${TERM:-GNUGNU Linux57Linux}"
+#
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License (GPL)
+#	Created:	2013.05.03
+#	Changed:	2015.11.07
+#	Description:	The absolute core display function for TUI
+#
+#	Variables
+#
+	# Check the two default places for the core configuration
+	# First system wide, second user only install
+	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	# 
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc ) ## || exit 1
+	then 	# Load required variables
+		source "${HOME:-/root}/.tuirc" 2>/dev/zero
+		for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
+		do	[ -f "$f" ] && source "$f"
+		done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+	# If there is a user theme directory, use that one instead
+	if [ -f "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}" ]
+	then	# User has a custom theme
+		source "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}"
+	else	# This should always work, absolute default anyway
+		source "$TUI_DIR_THEMES/${TUI_THEME:-default}"
+	fi
+	# Use custom BORDER_RIGHT if it was set
+	[ -z "$BORDER_RIGHT" ] && \
+		for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+	HEAD_BG="$TUI_BACKGROUND"
+	HEAD_FG="$TUI_FOREGROUND"
+	TITLE_BG="$TUI_COLOR_INVERT$TUI_BACKGROUND"
+	TITLE_FG="$TUI_COLOR_INVERT$TUI_FOREGROUND"
+#
+#	Regular data
+#	
+	ME="${0##*/}"
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+TUI ($ME, Version $script_version)
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - The core display command of TUI
+
+SYNOPSYS
+  $ME [-h|--help] [--version] [[-] | [str1] [str2] [str3]]
+  
+DESCRIPTION
+  Prints one string on the left
+  Prints two strings left and right
+  Prints three strings left, entered and right
+
+  Pass \"-\" to read input from pipe
+  One can pass empty strings to align the desired output.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -		Read input from pipe
+  -E		Prints the echo
+  -H		Prints the header
+  -r		Returns cursors to line start
+  -S NUM	Prints status, without exit status
+  -T		Prints the title
+EXAMPLE
+
+	$ME "Replace me" 
+	$ME "Replaced above line"
+	$ME -E "Replace again"
+	$ME -H "No more replacing"
+	$ME -T "Can you feel it?"
+	$ME -S \044? "Last command worked!"
+	$ME -rS 2 "Loading, and replace me..."
+  
+HINTS
+  If your script should feel too slow, 
+  you might get a slightly better performance using "tui-printline -E"
+  
+SEE ALSO
+  bash(1), console_codes(4), gawk(1), grep(1), printf(1),
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
+	help_text="$TR_MSG_TEXT_HELP
+"
+	FIRST=""
+	SECOND=""
+	THIRD=""
+	COLUMNS="${COLUMNS:-$(tput cols)}"
+	WIDTH="${COLUMNS:-40}"
+	doEcho=false
+	doHeader=false
+	doStatus=false
+	doTitle=false
+	doReturn=false
+	optStyle=""
+	NL="\n"
+	NUM_ID=""
+#
+#	Catching Arguments
+#
+	case "$1" in
+	"--version")	cat <<-EOF
+				$TR_MSG_TEXT_VERSION
+			EOF
+			exit 0
+			;;
+	"-h"|"--help")
+		printf '%s\n' \
+			"$help_text"
+		exit 99
+		;;
+	"-")	# Read pipe, expect one line
+		# tui-cat, or at least tui-echo is expected to be used for multiple lines
+		read LEFT CENTER RIGHT 
+		set "$LEFT" "$CENTER" "$RIGHT"
+		;;
+	esac
+	while getopts "EHTS:hr" name
+	do 	case "$name" in
+		E|echo) 	doEcho=true
+				optStyle="-E"	;;
+		H|header)	doHeader=true
+				optStyle="-H"	;;
+		T|title)	doTitle=true
+				optStyle="-T"	;;
+		S|status)	doStatus=true
+				optStyle="-S"
+				# Status requires first to be numeric
+				NUM_ID="$(echo $OPTARG|tr -d [:alpha:])"
+				[ -z "$NUM_ID" ] && \
+					tui-printline -S 1 "$(eval_gettext '$ME: For option \"-S\" the first argument must be numeric!')" && \
+					exit 1	;;
+		r|return)	doReturn=true
+				NL="\r" 	;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	ARGS_COUNT=$#
+	
+	if $doStatus
+	then	# It is tui-status which needs special treatment
+	#
+	#	Fill array according to return value
+	#
+		# get the vars, load this only on demand, its a tiny, but still a speed increase!
+		source "$TUI_FILE_CONF_STATUS"
+		unset retvalue[@]
+		retvalue[0]="$TUI_DONE" ;	retvalue[1]="$TUI_FAIL"
+		retvalue[2]="$TUI_WORK" ;	retvalue[3]="$TUI_TODO"
+		retvalue[4]="$TUI_SKIP" ;	retvalue[5]="$TUI_NEXT"
+		retvalue[6]="$TUI_BACK" ;	retvalue[7]="$TUI_CANC"
+		retvalue[10]="$TUI_ON"	;	retvalue[11]="$TUI_OFF"
+		retvalue[99]="$TUI_HELP";	retvalue[111]="$TUI_INFO"
+		retvalue[127]="$TUI_NFOUND";	retvalue[130]="$TUI_CANC"
+		
+		# Make arguments in order
+		case "$ARGS_COUNT" in
+		0)	FIRST=" "
+			SECOND=" "
+			;;
+		1)	FIRST="$1"
+			SECOND=" "
+			;;
+		2)	FIRST="$1"
+			SECOND="$2"
+			;;
+		*)	tui-printline -S 1 "$(gettext 'Too many arguments (check quoting)')!"
+			exit 1
+			;;
+		esac
+		# For tui-status always use '3' strings
+		ARGS_COUNT=3
+		THIRD="${retvalue[${NUM_ID:-1}]}"	2>/dev/zero
+		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
+	else
+		[ ! -z "$1" ] && FIRST="$1"
+		[ ! -z "$2" ] && SECOND="$2"
+		[ ! -z "$3" ] && THIRD="$3"
+		len_strings=$[ ${#FIRST} + ${#SECOND} + ${#THIRD} ]
+	fi
+	# Prepare temporary display style according to $MODE
+	[ ! -z "$4" ] && doMore=true || doMore=false
+	[ -z "$optStyle" ] && optStyleTMP="-E" || optStyleTMP="$optStyle"
+	$doStatus && optStyleTMP="-E"
+#
+#	Verify all fit on 1 line
+#
+	if [ 25 -gt "${WIDTH:-0}" ]
+	then	# Screen is too small, should not happen
+		for S in "$FIRST" "$SECOND" "$THIRD"
+		do 	[ -z "$S" ] || printf "\r%s\n" "$S"
+		done
+		exit ${NUM_ID:-0}
+	fi
+	
+	if [ "${len_strings:-0}" -gt "${WIDTH:-0}" ]
+	then 	# All vars are larger than the line supports
+		# Splitting required
+		case $ARGS_COUNT in
+		1)	# Split up the only argument passed
+			half=$[ ${#FIRST} / 2 ]
+			part1="${FIRST:0:$half}"
+			part2="${FIRST:$half}"
+			tui-printline $optStyleTMP "$part1"
+			$doStatus && \
+				$0 $optStyle "$NUM_ID" " " "$part2" || \
+				$0 $optStyle " " "$part2"
+			;;
+		2)	# Print each of the 2 arguments on a single line...
+			if [ "" = "$(echo $FIRST|tr -d '[[:space:]]')" ]
+			then	# It is left aligned
+				half=$[ ${#SECOND} / 2 ]
+				part1="${SECOND:0:$half}"
+				part2="${SECOND:$half}"
+				tui-printline $optStyleTMP " " "$part1"
+				$doStatus && \
+					$0 $optStyle "$NUM_ID" " " "$part2" || \
+					$0 $optStyle " " "$part2"
+			elif [ $WIDTH -lt ${#FIRST} ]
+			then	half=$[ ${#FIRST} / 2 ]
+				part1="${FIRST:0:$half}"
+				part2="${FIRST:$half}"
+				tui-printline $optStyleTMP "$part1"
+				# Remains.. still required? -- at least the 'fail' is!
+				$doStatus && \
+					$0 $optStyle "$NUM_ID" " " "$part2" || \
+					$0 $optStyle " " "$part2"
+			else	# OLD WORKING
+				$0 $optStyleTMP "$FIRST"
+				$0 $optStyle " " "$SECOND"
+			fi
+			;;
+		3)	# Print only 2 on the first line
+			if $doStatus
+			then	[ -z "$FIRST" ] || tui-printline $optStyleTMP "$FIRST" 
+				[ ${#SECOND} -gt $WIDTH ] && \
+					tui-printline $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}" && \
+					tui-printline $optStyle "$NUM_ID" " " "${SECOND:($WIDTH - 3)}"|| \
+					tui-printline $optStyle "$NUM_ID" " " "$SECOND"
+					
+			else	# Regular output, header, title, echo, printf
+				# Treat each argument by itself - lengthiness
+				if [ ${#FIRST} -gt $WIDTH ]
+				then	# The first one is too long
+					[ -z "$FIRST" ] || tui-printline $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
+					[ -z "$SECOND" ] && \
+						tui-printline $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
+						tui-printline $optStyle $NUM_ID "$SECOND"
+				elif [ ${#SECOND} -gt $WIDTH ]
+				then	# The second one is too long
+					[ -z "$FIRST" ] || tui-printline $optStyleTMP "$FIRST" 
+					tui-printline $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
+					tui-printline $optStyle " " "${SECOND:($WIDTH - 3)}" "$THIRD"
+				elif [ ${#THIRD} -gt $WIDTH ]
+				then	# The third one is too long
+					tui-printline $optStyleTMP "$FIRST" "$SECOND"
+					tui-printline $optStyle " " "$THIRD" ""
+				else	# Regular output, just re-arrange strings
+					if [ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]
+					then	tui-printline $optStyleTMP "$FIRST" "$SECOND" " "
+						tui-printline $optStyle 	" " 	"$THIRD"
+					else	tui-printline $optStyleTMP "$FIRST" 
+						tui-printline $optStyle " " 	"$SECOND" "$THIRD"
+					fi
+				fi
+			fi
+			;;
+		esac
+		# Since this is special handling, 
+		# calling itself with reduced string lengths
+		# so we can exit after this is done
+		exit
+	# else # just continue with the script below, for regular/final output handling
+	fi
+#
+#	Prepare Colors & Strings
+#
+	BORDER_POS_MOVER=0	# Not needed for header
+	if [ $doEcho = true ] || [ $doStatus = true ]
+	then	COLOR_LINE_START="\r${TUI_COLOR_RESET}"
+		COLOR_LINE_IDENT=""
+		COLOR_LINE_CLOSE=""
+		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		BORDER_POS_MOVER=$(( ${#TUI_RESET} + ${#BORDER_COLOR} ))
+	elif [ $doHeader = true ]
+	then	# Full line
+		COLOR_LINE_START="\r${HEAD_BG}${HEAD_FG}"
+		COLOR_LINE_IDENT=""
+		COLOR_LINE_CLOSE=""
+		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
+	elif [ $doTitle = true ]
+	then	# 'Inlay'
+		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
+		COLOR_LINE_IDENT="${TITLE_FG}${TITLE_BG}"
+		COLOR_LINE_CLOSE="${TUI_COLOR_RESET}"
+		COLOR_LINE_END="${TUI_COLOR_RESET}${NL}${TUI_COLOR_RESET}"
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		BORDER_POS_MOVER=$(( ${#TUI_RESET} + ${#BORDER_COLOR} ))
+	else	# The default
+		COLOR_LINE_START="\r${TUI_COLOR_RESET}"
+		COLOR_LINE_IDENT=""
+		COLOR_LINE_CLOSE=""
+		COLOR_LINE_END="${TUI_COLOR_RESET}"
+		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
+		BORDER_POS_MOVER=$(( ${#TUI_RESET} + ${#BORDER_COLOR} ))
+	fi
+#
+#	Arrange strings in order, with border and colors
+#
+	# Create POS_ID points, calculated from pos_id_num.
+	# pos_id_NUM's
+	pos_cli_num=$(( 0 + ${#BORDER_LEFT} + 2 - $BORDER_POS_MOVER ))
+	pos_clc_num=$(( $WIDTH - ${#BORDER_RIGHT} - 2))
+	pos_cle_num=$(( $WIDTH - ${#BORDER_RIGHT} +  $BORDER_POS_MOVER ))
+	# POS_ID
+	POS_CLS="\033[0G"	# This is always 0, and therefor does not require a pos_id_num calculation
+	POS_CLI="\033[${pos_cli_num}G"
+	POS_CLC="\033[${pos_clc_num}G"
+	POS_CLE="\033[${pos_cle_num}G"
+	# Center for last task
+	pos_center_num=""
+	pos_third_num=""
+	POS_CENTER=""
+	POS_THIRD=""
+#
+#	Passing colour escape sequences increases the chars required, but lowers the chars shown
+#	This part is to fix this part for the alignment
+#
+	
+	# Calculate missing positions and generate output strings
+	case $ARGS_COUNT in
+	0)	if $doStatus
+		then	set ""
+		fi
+		;;
+	1)	if $doTitle #&& ! $doStatus
+		then	SECOND="$FIRST"
+			FIRST=" "
+			THIRD=" "
+			center=$(( $WIDTH / 2 ))
+			half=$(( ${#SECOND} / 2 ))
+			pos_center_num=$(( $center - $half  ))
+			POS_CENTER="\033[${pos_center_num}G"
+			SECOND="${POS_CENTER}$SECOND"
+		fi
+		;;
+	2)	if ! $doStatus
+		then	THIRD="$SECOND"
+			SECOND=""
+			long=${#THIRD}
+			# New pos
+			chkval=$(printf "${THIRD}")
+			short=${#chkval}
+			[ $short -eq $long ] && \
+				num=-1 || \
+				num=$(( $long - $short + 1 ))
+			pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+			POS_THIRD="\033[${pos_third_num}G"
+		else	#echo it is status
+			chkval=$(printf "${SECOND}")
+			short=${#chkval}
+
+			[ $short -eq $long ] && \
+				num=-1 || \
+				num=$(( $long - $short + 1 ))
+
+			half=$(( ${#chkval} / 2 ))
+			pos_center_num=$(( $(( $center - $half )) + $(( $num / 2 ))  ))
+			POS_CENTER="\033[${pos_center_num}G"
+
+		fi
+		;;
+	3)	long=${#SECOND}
+		center=$(( $WIDTH / 2 ))
+		chkval=$(printf "${SECOND}")
+		short=${#chkval}
+		
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		
+		half=$(( ${#chkval} / 2 ))
+		pos_center_num=$(( $(( $center - $half )) + $(( $num / 2 ))  ))
+		POS_CENTER="\033[${pos_center_num}G"
+		long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
+		;;
+	esac
+	if $doStatus
+	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for colour and reset
+		case $NUM_ID in
+		0|1|2|3|7|10|11|127|130)	# These are colored, was 21
+			pos_three_adder=3	;;
+		4|5|6|99|111)		# These are not
+			pos_three_adder=0	;;
+		esac
+		long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
+	else	long=${#THIRD}
+		chkval=$(printf "${THIRD}")
+		short=${#chkval}
+		[ $short -eq $long ] && \
+			num=-1 || \
+			num=$(( $long - $short + 1 ))
+		pos_third_num=$(( $pos_cle_num + $pos_three_adder - $short + $num ))
+		POS_THIRD="\033[${pos_third_num}G"
+		# Fix one position place if there was a %
+		# Need to improve, if multiple '%' occours
+		echo "$THIRD" | $GREP -q '%' && \
+			pos_third_num=$(( $pos_third_num + 1 ))
+		POS_THIRD="\033[${pos_third_num}G"
+	fi
+#
+#	Generate output strings
+#
+	CL="\e[2K"
+	if $doTitle || $doHeader
+	then	# See 'man console_codes' and figure an algorithm to clear those fields, rather than print space
+		str=$(printf '%*s' $(( $WIDTH - 4)))
+	else	str=""
+	fi
+	# Generate borders
+	START="${CL}${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}${str}"
+	END="${POS_CLC}${COLOR_LINE_CLOSE}${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
+#
+#	Display & Action
+#
+	printf "${START}"
+	[ -z "$FIRST" ]  || printf "${POS_CLI}$FIRST"
+	if [ ! -z "$SECOND" ] 
+	then	num_tmp=$(( $pos_cli_num + ${#FIRST} ))
+		[ $num_tmp -gt $pos_center_num ] && \
+			POS_CENTER="\033[$(( $num_tmp + 1 ))G"
+		printf  "${POS_CENTER}$SECOND"
+	fi
+	[ -z "$THIRD" ]  || printf "${POS_THIRD}$THIRD"
+	printf "${END}"

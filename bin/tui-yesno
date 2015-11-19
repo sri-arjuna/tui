@@ -148,7 +148,7 @@ AUTHOR
 #	Display
 #
 	while ! echo "${answer,,}" | "$GREP" -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
-	do	tui-printf -r "$1" >&2
+	do	tui-printline -r "$1" >&2
 		#printf "\r$POS"
 		printf "\r$BORDER_LEFT $1 ($MSG_TR_YESNO) " >&2
 		"$bash_read_numbers" && \

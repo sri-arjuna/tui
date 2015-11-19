@@ -162,7 +162,7 @@ AUTHOR
 		
 		POS="\033[$(( ${#BORDER_LEFT} + ${#1} +3 ))G"
 		
-		tui-printf "$1" >&2
+		tui-printline "$1" >&2
 		printf "\r${BORDER_COLOR}$BORDER_LEFT${TUI_RESET} $1$POS" >&2
 	
 	}
@@ -209,4 +209,4 @@ AUTHOR
 	$INPUT
 	EOF
 	printf "\r" >&2
-	tui-printf -E "$1" "$INPUT" >&2
+	tui-printline -E "$1" "$INPUT" >&2

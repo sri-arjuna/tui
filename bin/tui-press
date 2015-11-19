@@ -114,7 +114,7 @@ AUTHOR
 	COLUMNS=${COLUMNS:-$(tput cols)}
 	LEN="${#MESSAGE}"
 	if [ $(( 2 * $LEN + 12 )) -lt $COLUMNS ]
-	then	tui-printf "$MESSAGE" "$MESSAGE"
-	else	tui-printf  "" "$MESSAGE" ""
+	then	tui-printline "$MESSAGE" "$MESSAGE"
+	else	tui-printline  "" "$MESSAGE" ""
 	fi
 	read buffer
