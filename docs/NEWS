@@ -1,8 +1,7 @@
-2015.11.10
+2015.11.18
 ----------
-
-
-
+RENAMED: tui-printf --> tui-printline
+A symlink is currently preserved to keep existing scripts working.
 
 
 2015.10.04
