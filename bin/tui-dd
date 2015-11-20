@@ -38,7 +38,7 @@
 #
 #	Variable defaults
 #
-	script_version=0.9.1
+	script_version=0.9.2
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -73,13 +73,20 @@ DESCRIPTION
 OPTIONS
   -h|--help	Shows help and exit with 99
   --version	Shows version infoand exit with 0
+  
+  All options of "dd --help" are available, however, they need to be passed like:
+  
+  -o|--options="bs=BYTES,seek=N,..."
+  
+  Understand that for tui-dd, IF= is taken as the first argument and the second argument is used as OF=.
+  
  
 EXAMPLE
 
-	tui-dd ./somefile.iso /dev/sda
+	tui-dd -o "bs=10M,seek=5,count=3" /dev/sda2 imagefile.bin
 
 HINTS
-  If you know you are going to write an ISO to an USB device, you can leave out the target as:
+  If you know you are going to write an ISO to an USB device, you can leave out the target (OF=) as TUI will ask for a /dev/disk/by-id/usb-* target.
   
 	tui-dd ./somefile.iso 
   
@@ -99,6 +106,47 @@ AUTHOR
 	help_text="$TR_MSG_TEXT_HELP
 "
 #
+#	Functions
+#
+	showVersion() { 
+	cat <<-EOF
+		$TR_MSG_TEXT_VERSION
+	EOF
+	}
+#
+#	Get argumetns
+#
+	case "$SOURCE" in
+	"-h"|"--help")	printf 
+		exit $RET_HELP
+	esac
+	[ "--version" = "${1,,}" ] && showVersion && exit 0
+	
+	
+	
+	# -a|--alternative ; to allow longoptions with a single leading '-'
+	GETOPT=$(getopt \
+		--options	"ho" \
+		--longoptions	"help,version,options" \
+		--name 		"${0##*/}" -- "${@}" \
+	)
+	eval set -- "${GETOPT}";
+	opts_passed=""
+	
+	while true
+	do 	case "$1" in
+		# --- Basic args -----
+		-h|--help)	echo "$TR_MSG_TEXT_HELP" ; exit 0	;;
+		--version)	show_version	;;
+		--)		shift ; break	;;
+		# ------ arg ------------
+		--options|-o)
+				opts_passed+=" ${2//,/\ }"
+				shift 2
+				;;
+		esac
+	done
+#
 #	Variable handling
 #
 	SOURCE="$1"
@@ -106,16 +154,7 @@ AUTHOR
 	[ -f "$TUI_FILE_TEMP" ] && \
 		>"$TUI_FILE_TEMP" || \
 		touch "$TUI_FILE_TEMP"
-	case "$SOURCE" in
-	"-h"|"--help")	printf "$help_text"
-		exit $RET_HELP
-	esac
-	showVersion() { 
-	cat <<-EOF
-		$TR_MSG_TEXT_VERSION
-	EOF
-	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
+	
 	case "$TARGET" in
 	"")	if tui-yesno "Use USB as target?"
 		then	TARGET="$(tui-str-usb)"
@@ -133,7 +172,7 @@ AUTHOR
 #
 #	Display
 #
-	(dd if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP" ; sync)   &
+	(dd $opts_passed if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP" ; sync)   &
 	PID=$!
 	tui-printline -rS 2 "$(gettext 'Starting job, please wait...')"
 	sleep 0.7

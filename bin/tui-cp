@@ -20,6 +20,7 @@
 #
 #	Init TUI environment
 #
+	script_version=0.9.2
 	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
@@ -57,20 +58,26 @@ NAME
   $ME - Copy, TUI-Style
 
 SYNOPSYS
-  $ME [-h|--help] [--version] [-dflq] SOURCE [SOURCE2 ..] TARGET
+  $ME [-h|--help] [--version] [-dflq] SOURCE1 [..] TARGET
 
 OPTIONS
   -h|--help	Shows help and exit with 99
   --version	Shows version infoand exit with 0
   
-  -d	Switch to (animated) dash-mode
-  -f	Force to overwrite if target exists
-  -l	Show long names (full passed target path)
-  -q	Be quiet, as in: print all on one line.
+  In addition to the default options of "cp"
+  
+  (please see "cp --help"), you have these options:
+  
+  --dash	Switch to (animated) dash-mode
+  --line	Print all items on one line.
+  --long	Show long names (full passed target path)
  
 EXAMPLE
-
-	tui-cp * $TARGET
+	tui-cp * /path/to/destination[/file]
+	
+	tui-cp --long * /path/to/destination[/file]
+	
+	tui-cp --dash --line * /path/to/destination[/file]
  
 SEE ALSO
   bash(1), cp(1), tui-progress(1)
@@ -91,8 +98,6 @@ AUTHOR
 #
 #	Variable defaults
 #
-	script_version=0.5.5
-	ME="${0##*/}"
 	help_text="$TR_MSG_TEXT_HELP"
 	
 	FILE_TEMP="$TUI_DIR_TEMP/$ME.$$.status"
@@ -111,31 +116,63 @@ AUTHOR
 #	Variable handling
 #
 	opts=""
-	[ "--help" = "$1" ] && printf "$help_text" && exit 99
 	showVersion() { 
 	cat <<-EOF
 		$$TR_MSG_TEXT_VERSION
 	EOF
 	}
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	while getopts hfdlq opt
-	do	case "$opt" in
-		d)	showBar=false
+#
+#	Get options
+#
+	# -a|--alternative ; to allow longoptions with a single leading '-'
+	GETOPT=$(getopt \
+		--options	"habdfiHlLnPprRsS:tTuvxZ" \
+		--longoptions	"help,version,archieve,attributes-only,backup::,copy-contents,force,interactive,link,dereference,no-clobber,no-dereference,preserve::,no-preserve:,parents,recursive,reflink::,remove-destination,sparse:,strip-trailing-slashes,symbolic-link,suffix:,target-directory:,no-target-directory,update,verbose,one-file-system,dash,long,line" \
+		--name 		"${0##*/}" -- "${@}" \
+	)
+	eval set -- "${GETOPT}";
+	opts_passed=""
+	
+	while true
+	do 	case "$1" in
+		# --- Basic args -----
+		-h|--help)	echo "$TR_MSG_TEXT_HELP" ; exit 0	;;
+		--version)	show_version	;;
+		--)		shift ; break	;;
+		# ------no arg ------------
+	--archieve|--attributes-only|--copy-contents|--interactive|--link|--dereference|--no-clobber|--no-dereference|--parents|--recursive|--remove-destination|--strip-trailing-slashes|--symbolic-link|--no-target-directory|--update|--verbose|--one-file-system|-a|-b|-d|-i|-H|-l|-n|-P|-p|-r|-R|-s|-t|-T|-u|-v|-x|-Z)
+				opts_passed+=" $1"
+				shift 1
+				;;
+		# ------ arg ------------
+		--no-preserve|--sparse|--suffix|--target-directory|-S)
+				opts_passed+=" $1=$2"
+				shift 2
+				;;
+		# ------opt arg ------------
+		--backup|--preserve|--reflink)
+				if [ "-" = "${2:0:1}" ] 
+				then 	opts_passed+=" $1=$2"
+					shift 2
+				else 	opts_passed+=" $1"
+					shift
+				fi
+				;;
+		# --- original args ---
+		--dash)	showBar=false
 			showRegular=true
 			;;
-		f)	doForce=true
+		--long)	showLong=true
 			;;
-		l)	showLong=true
-			;;
-		q)	showRegular=false
+		--line)	showRegular=false
 			showBar=false
 			showtotal=true
 			;;
-		"")	unset ARGS[@]
-			ARGS[0]=$(tui-read "$(gettext 'Enter (absolute) path to copy:')")
+		-f|--force)	# The "Force" is handled by me ;)
+			doForce=true
 			;;
-		h|*)	echo -e "$help_text" ; exit $RET_HELP
-			;;
+		--verbose)	echo "irrelevant, as using TUI" > /dev/zero
+				;;
 		esac
 	done
 	shift $(($OPTIND - 1))
@@ -148,7 +185,7 @@ AUTHOR
 		TARGET="$2"
 		;;
 	*)	last=$[${#ARGS[@]}-1]
-		TARGET=${ARGS[$last]}
+		TARGET="${ARGS[$last]}"
 		unset ARGS[$last]
 		SOURCE=("${ARGS[@]}")
 		;;
@@ -222,7 +259,7 @@ AUTHOR
 		then	c_opt=""
 			ORG=$(FileSize "$thisFile")
 		else	# Skipping
-			ls -l $(dirname $thisFile)
+			ls -l "$(dirname $thisFile)"
 			if $showBar || $showRegular
 			then	tui-status 4 "$(gettext 'Skipped') \"${thisFile##*/}\"."
 			fi
@@ -248,7 +285,7 @@ AUTHOR
 				display_trgt="${TARGET##*/}"
 		fi
 		
-		( cp $c_opt "$thisFile" "$TARGET" ; echo "$?" > "$FILE_TEMP" ) &
+		( sleep $waiting ; cp $opts_passed $c_opt "$thisFile" "$TARGET" ; echo "$?" > "$FILE_TEMP" ) &
 		pid=$!
 
 		sleep $waiting
@@ -265,7 +302,7 @@ AUTHOR
 			else	tui-progress "$TR_MSG_WORD_COPYING $display_trgt ($COUNTER/$MAX)..."
 				COUNTER=$(( $COUNTER + 1 ))
 				# This actually represents the failures, TODO Error '127,130'
-				cat_num=$(cat $FILE_TEMP)
+				cat_num=$(<$FILE_TEMP)
 				TOTAL=$(( $TOTAL + ${cat_num:-0} ))
 			fi
 			# Since there is no visual progress, this 'waiting' is hard coded

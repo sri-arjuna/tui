@@ -2,7 +2,7 @@ Feedback / Suggestions wanted:
 ------------------------------
 If you do not like the 'default' theme, or any other of the provided themes,
 you are encouraged to create your own theme - and send me for implementation,
-so others can get the benefit of a cooler and/or nicer theme as well.
+so others can get the benefit of your theme as well.
 
 
 Missing feedback for these types:
@@ -12,18 +12,22 @@ Missing feedback for these types:
 - Raspberry PI
 - Solaris
 
+
 Known Bugs:
 -----------
 * Bash-completion not working
 * tui-read, tui-yesno dont work properly with BORDER_COLOR yet
 
+
+
 Security:
 ---------
 No issues known. :)
 
+
 Fix:
 ----
-* Either tui-read or tui-select seem to act weird on ctrl+c at some time ->  tui-conf-editor
+* tui-conf-editor, might 'erease' the selected variable and its value when aborting
 
 
 Finalize:
