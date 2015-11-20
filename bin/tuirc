@@ -725,7 +725,7 @@ AUTHOR
 			do
 				clear
 				tui-title "$(eval_gettext 'File: $item')"
-				tui-cat "$item"
+				tui-printfile "$item"
 				tui-header "" "$(eval_gettext 'Executing $item')" ""
 				tui-press
 				bash "$item"

@@ -469,7 +469,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		if tui-yesno "$(eval_gettext 'Add $HOST to $HOME/.netrc for automatic login?')"
 		then	echo "machine $HOST login $USERNAME password $PASSWORD" >> "$HOME/.netrc"
 			tui-title "$HOME/.netrc"
-			tui-cat "$HOME/.netrc"
+			tui-printfile "$HOME/.netrc"
 			tui-print
 			tui-yesno "$(gettext 'Change any login name / password?')" && \
 				tui-edit "$HOME/.netrc"

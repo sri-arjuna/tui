@@ -144,7 +144,7 @@ TEXTMODE
   This said, and since one has the ability to write anyway, i also wanted to give you the possibility to block certain words. Similar to the numeric mode, at all times you have the option to go back or quit, by entering: b, B, BACK, back, Back or q, Q, quit, QUIT, Quit
 
 SEE ALSO
-  tuirc(1), tui-bol-dir(1), tui-bol-gui(1), tui-bol-root(1), tui-cat(1), 
+  tuirc(1), tui-bol-dir(1), tui-bol-gui(1), tui-bol-root(1), tui-printfile(1), 
   tui-cp(1), tui-download(1), tui-print(1), tui-edit(1), tui-header(1),
   tui-install(1), tui-list(1), tui-log(1), tui-mv(1), tui-new-browser(1), 
   tui-new-manpage(1), tui-new-script(1), tui-press(1), tui-printline(1), 
@@ -360,7 +360,7 @@ AUTHOR
 					".cmd")		. "$e"
 							;;
 					info)		#echo "Show the INFO!"
-							tui-cat "$e"
+							tui-printfile "$e"
 							tui-print
 							;;
 					esac
@@ -582,7 +582,7 @@ AUTHOR
 						source "$SPECIAL_NAME.cmd"
 					;;
 				info)	[ -f "$SPECIAL_NAME.$T" ] && \
-						tui-cat "$SPECIAL_NAME.$T"
+						tui-printfile "$SPECIAL_NAME.$T"
 					;;
 				#help)	[ -f $SPECIAL_NAME.help ] && tui-printline -E "TODO: $(pwd) help" ;;
 				esac
@@ -644,7 +644,7 @@ AUTHOR
 					[ -f "$SPECIAL_NAME.help" ] && \
 						tui-printline -E && \
 						tui-title "Help" && \
-						tui-cat "$SPECIAL_NAME.help" && \
+						tui-printfile "$SPECIAL_NAME.help" && \
 						tui-printline -E && \
 						tui-press || \
 						tui-wait 5s "Sorry, no help found."

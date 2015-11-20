@@ -79,11 +79,11 @@ OPTIONS
   -T		Prints the file name with tui-title before it prints its content
 EXAMPLE
 
-	tui-cat file.txt
+	tui-printfile file.txt
 	
-	tui-cat -T /path/to/multiple/files*
+	tui-printfile -T /path/to/multiple/files*
 	
-	tui-cat -t "Hello $USER_STRING, how are you today?"
+	tui-printfile -t "Hello $USER_STRING, how are you today?"
 
 HINTS
   In typewriter mode you can pass a mixed list of files and strings.
