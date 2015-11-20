@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-28 22:00+0200\n"
+"POT-Creation-Date: 2015-11-20 22:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU TUI ($ME, Version $script_version)\n"
+"TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -48,29 +48,54 @@ msgid ""
 "OPTIONS\n"
 "  -h|--help\tShows help and exit with 99\n"
 "  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  All options of \"dd --help\" are available, however, they need to be "
+"passed like:\n"
+"  \n"
+"  -o|--options=\"bs=BYTES,seek=N,...\"\n"
+"  \n"
+"  Understand that for tui-dd, IF= is taken as the first argument and the "
+"second argument is used as OF=.\n"
+"  \n"
 " \n"
 "EXAMPLE\n"
 "\n"
-"\ttui-dd ./somefile.iso /dev/sda\n"
+"\ttui-dd -o \"bs=10M,seek=5,count=3\" /dev/sda2 imagefile.bin\n"
 "\n"
 "HINTS\n"
-"  If you know youre"
+"  If you know you are going to write an ISO to an USB device, you can leave "
+"out the target (OF=) as TUI will ask for a /dev/disk/by-id/usb-* target.\n"
+"  \n"
+"\ttui-dd ./somefile.iso \n"
+"  \n"
+"SEE ALSO\n"
+"  bash(1), dd(1), ps(1)\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: erat.simon@gmail.com\n"
+"  \n"
+"  TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-dd:128
+#: bin/tui-dd:167
 msgid "Requires root"
 msgstr ""
 
-#: bin/tui-dd:131
+#: bin/tui-dd:170
 #, sh-format
 msgid "Writing $SRC to $TARGET..."
 msgstr ""
 
-#: bin/tui-dd:132
+#: bin/tui-dd:171
 #, sh-format
 msgid "Written $SRC to $TARGET"
 msgstr ""
 
-#: bin/tui-dd:138
+#: bin/tui-dd:177
 msgid "Starting job, please wait..."
 msgstr ""

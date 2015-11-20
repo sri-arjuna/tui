@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-28 22:00+0200\n"
+"POT-Creation-Date: 2015-11-20 22:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 #, sh-format
 msgid ""
 "\n"
-"GNU TUI ($ME, Version $script_version)\n"
+"TUI ($ME, Version $script_version)\n"
 "Copyright (C) 2011-2015 Simon Arjuna Erat\n"
 "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
 "html>\n"
@@ -43,22 +43,26 @@ msgid ""
 "OPTIONS\n"
 "  -h|--help\tShows help and exit with 99\n"
 "  --version\tShows version infoand exit with 0\n"
+"\n"
+"  In addition to the default options of \"mv\"\n"
 "  \n"
-"  -d\tSwitch to (animated) dash-mode\n"
-"  -f\tForce to overwrite if target exists\n"
-"  -l\tShow long names (full passed target path)\n"
-"  -q\tBe quiet, as in: print all on one line.\n"
+"  (please see \"mv --help\"), you have these options:\n"
+"  \n"
+"  --dash\tSwitch to (animated) dash-mode\n"
+"  --line\tPrint all items on one line.\n"
+"  --long\tShow long names (full passed target path)\n"
 " \n"
 "EXAMPLE\n"
-"\n"
-"\t$ME SOURCE SOURCE2 TARGET\n"
+"\ttui-mv * /path/to/destination[/file]\n"
 "\t\n"
-"\t$ME -qfl SOURCE SOURCE2 SOURCE3 TARGET\n"
+"\ttui-mv --long * /path/to/destination[/file]\n"
+"\t\n"
+"\ttui-mv --dash --line * /path/to/destination[/file]\n"
 "\n"
 "BUGS\n"
 "  Report bugs to: erat.simon@gmail.com\n"
 "  \n"
-"  GNU TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
 "  \n"
 "  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 "\n"
@@ -70,27 +74,27 @@ msgid ""
 "General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 msgstr ""
 
-#: bin/tui-mv:220
+#: bin/tui-mv:257
 #, sh-format
 msgid "Reading $thisFile..."
 msgstr ""
 
-#: bin/tui-mv:227
+#: bin/tui-mv:264
 #, sh-format
 msgid "Skipped $thisFile."
 msgstr ""
 
-#: bin/tui-mv:255
+#: bin/tui-mv:292
 #, sh-format
 msgid "Moving to $display_trgt..."
 msgstr ""
 
-#: bin/tui-mv:256
+#: bin/tui-mv:293
 #, sh-format
 msgid "Moved to $display_trgt"
 msgstr ""
 
-#: bin/tui-mv:285
+#: bin/tui-mv:323
 #, sh-format
 msgid "Moved $TOTAL_COUNT of $MAX items to $TARGET"
 msgstr ""
