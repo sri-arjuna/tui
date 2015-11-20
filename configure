@@ -129,7 +129,7 @@
 		EXT="$1"
 		INFILE="$2"
 		OUTDIR="${3:-./docs}"
-		OUTFILE="${1##*/}"
+		OUTFILE="${INFILE##*/}"
 		OUTFILE="${OUTFILE/\.*}.$EXT"
 		
 		[ -f "$INFILE" ] || return 1
@@ -975,7 +975,20 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		${doMakefile} && write_makefile
 		echo
 		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
-		echo "To install \"${APP_TITLE:-$APP}\" now, please execute: '${install_prefix}./make-install'"
+		if [ -n "$(echo ./make-doc-*)" ] 
+		then
+			[ -f Makefile ] && \
+				echo "You might want to run:" && \
+				grep ":" Makefile | awk '{print $1}' | \
+					grep -ve tall -ve opt -ve clea -ve PH|\
+					while read var;do echo "* make ${var/\:}";done || \
+				echo "You might to run $(echo ./make-doc-*)."
+		fi
+		[ -f Makefile ] && \
+			echo "To install \"${APP_TITLE:-$APP}\" now, please execute: make && ${install_prefix}'make install'" || \
+			echo "To install \"${APP_TITLE:-$APP}\" now, please execute: ./make && ${install_prefix}'./make-install'"
+			
+
 		#	if ${doMakefile}
 		#	then	SRCH="exit \$RET"
 		#		REPL="echo 'Please use:	make info\n\t\tmake html\nAs well before\tmake install'\nexit \$RET"
