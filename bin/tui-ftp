@@ -312,7 +312,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				found+=" $f"
 		done
 		if [ $count -gt 1 ]
-		then	tui-echo "$(gettext 'Please select which ftp command you want to use:')"
+		then	tui-printline -E "$(gettext 'Please select which ftp command you want to use:')"
 			FTP=$(tui-select $found)
 			printf "\n"
 		else	FTP=$(echo $found|$AWK '{print $1}')
@@ -364,7 +364,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	
 	# Fill the command list
 	case "$MENU" in
-	cmd)	#tui-echo "TODO Generate command list"
+	cmd)	#tui-printline -E "TODO Generate command list"
 		oIFS="$IFS"
 		IFS=";"
 		C=0
@@ -387,7 +387,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
 		;;
 	down)	###
-		### tui-echo "TODO Download file" -- just copy pasted from the upload section
+		### tui-printline -E "TODO Download file" -- just copy pasted from the upload section
 		###
 		$beVerbose && \
 			tui-printline -rS 2 "$(gettext 'Generate download commands...')"
@@ -470,7 +470,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		then	echo "machine $HOST login $USERNAME password $PASSWORD" >> "$HOME/.netrc"
 			tui-title "$HOME/.netrc"
 			tui-cat "$HOME/.netrc"
-			tui-echo
+			tui-print
 			tui-yesno "$(gettext 'Change any login name / password?')" && \
 				tui-edit "$HOME/.netrc"
 		fi

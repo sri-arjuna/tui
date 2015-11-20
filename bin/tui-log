@@ -101,7 +101,7 @@ OPTIONS
   -p ARG	Adds the PID  (ARG) in front
   -u		Adds the USER ($USER) in front
   -s ARG	Changes the the separator ($SEP) to ARG
-  -v		Prints the MESSAGE also to screen using tui-echo
+  -v		Prints the MESSAGE also to screen using tui-print
  
 EXAMPLE
 
@@ -184,6 +184,6 @@ AUTHOR
 			( $GREP -q "$D" "$LOG" || tui-log -e "$LOG" "$daily_date_str" )
 	fi
 	while [ " " = "${PRE:0:1}" ] ;do PRE="${PRE:1}";done	# Remove leading spaces
-	$beVerbose && tui-echo "$MSG"
+	$beVerbose && tui-printline -E "$MSG"
 	printf -- "${PRE}${MSG}\n" >> "$LOG"
 	

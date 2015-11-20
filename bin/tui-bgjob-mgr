@@ -320,13 +320,13 @@ AUTHOR
 		done
 		
 		if ! "$QUIET"
-		then	tui-echo
+		then	tui-print
 			tui-title "$TR_MSG_WORD_SUMMARY"
-			tui-echo "$TR_MSG_TEXT_COMPLETED" 	"$DONE/$MAX"
-			tui-echo "$TR_MSG_TEXT_CURRENTLY" 	"$RUN/$LIMIT"
-			tui-echo "$TR_MSG_TEXT_EXECUTED" 	"$GOOD"
+			tui-printline -E "$TR_MSG_TEXT_COMPLETED" 	"$DONE/$MAX"
+			tui-printline -E "$TR_MSG_TEXT_CURRENTLY" 	"$RUN/$LIMIT"
+			tui-printline -E "$TR_MSG_TEXT_EXECUTED" 	"$GOOD"
 			
-			tui-echo
+			tui-print
 			tui-wait "${WAIT:-5}" "$TR_MSG_TEXT_UPDATE"
 			echo
 		else	sleep "${WAIT:-5}"

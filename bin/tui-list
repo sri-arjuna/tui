@@ -258,13 +258,13 @@ AUTHOR
 			then	OUT["$CUR"]="${count}${SEP}${OPT}"
 				shown=false
 				CUR="$(( $CUR + 1 ))"
-			else	tui-echo "${OUT[@]}" >&2
+			else	tui-printline -E "${OUT[@]}" >&2
 				CUR=0 && unset OUT[@] 
 				[ -z "$OPT" ] && shown=true
 				OUT["$CUR"]="${count}${SEP}${OPT}"
 				CUR="$(( $CUR + 1 ))"
 			fi
-		else 	tui-echo "${OUT[@]}" >&2
+		else 	tui-printline -E "${OUT[@]}" >&2
 			CUR=0 && unset OUT[@] 
 			[ -z "$OPT" ] && shown=true
 			OUT["$CUR"]="${count}${SEP}$OPT"
@@ -272,5 +272,5 @@ AUTHOR
 		fi
 	done
 	# Print unprinted
-	! $shown && tui-echo "${OUT[@]}" >&2 # && printf "\n"
+	! $shown && tui-printline -E "${OUT[@]}" >&2 # && printf "\n"
 	exit 0

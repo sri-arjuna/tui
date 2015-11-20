@@ -133,7 +133,7 @@ AUTHOR
 	then 	# The EDITOR is not available, search for default
 		FILEMGR=$(GetAvailableApp $MODE)
 		[ -z "$FILEMGR" ] && \
-			tui-echo "$(eval_gettext 'No file manager for $MODE mode could be found, please change \"$CONF\" manually!')" && \
+			tui-printline -E "$(eval_gettext 'No file manager for $MODE mode could be found, please change \"$CONF\" manually!')" && \
 			exit 1
 		tui-conf-set "$TUI_FILE_USER_APPS" $var $FILEMGR
 	fi

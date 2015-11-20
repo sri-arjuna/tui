@@ -159,13 +159,13 @@ AUTHOR
 	#echo "if [ "$(echo $list|wc -l)" -eq 1 ] && [ -z "$usbAsk" ] "
 	if [ "$(echo $list|wc -w)" -eq 1 ] && [ -z "$usbAsk" ] 
 	then	# There is no setting yet, first time usage
-		tui-echo "$(gettext 'The only device available is:')" "${list}" >&2
+		tui-printline -E "$(gettext 'The only device available is:')" "${list}" >&2
 		if tui-yesno "$(gettext 'Is this a card reader that is always listed?')" >&2
 		then	if tui-yesno "$(gettext 'Ignore this device in future calls?')" >&2
 			then	# Save the card reader
 				tui-conf-set -v "$TUI_FILE_USER_SETTINGS" usbIgnore "\"$list\""
 				RET=1
-			else	tui-echo "$(gettext 'Do you want to be asked to select this device every time?')" >&2
+			else	tui-printline -E "$(gettext 'Do you want to be asked to select this device every time?')" >&2
 				tui-yesno "$(gettext 'No, might result in that device being auto-selected!')" >&2
 				RET=$?
 			fi

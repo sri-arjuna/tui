@@ -145,7 +145,7 @@ TEXTMODE
 
 SEE ALSO
   tuirc(1), tui-bol-dir(1), tui-bol-gui(1), tui-bol-root(1), tui-cat(1), 
-  tui-cp(1), tui-download(1), tui-echo(1), tui-edit(1), tui-header(1),
+  tui-cp(1), tui-download(1), tui-print(1), tui-edit(1), tui-header(1),
   tui-install(1), tui-list(1), tui-log(1), tui-mv(1), tui-new-browser(1), 
   tui-new-manpage(1), tui-new-script(1), tui-press(1), tui-printline(1), 
   tui-progress(1), tui-read(1), tui-select(1), tui-status(1), tui-tar(1), 
@@ -338,7 +338,7 @@ AUTHOR
 		[ -z "$1" ] && printf "Missing argument" && return 1
 		if [ "" = "$(ls)" ]
 		then 	tui-status 1 "Location is empty"
-			tui-echo
+			tui-print
 		else	unset folders[@] files[@] ARRAY[@]
 			L=M=R=""
 			CD=0 ; CF=0	# Counters : dir + files
@@ -361,7 +361,7 @@ AUTHOR
 							;;
 					info)		#echo "Show the INFO!"
 							tui-cat "$e"
-							tui-echo
+							tui-print
 							;;
 					esac
 				fi
@@ -584,7 +584,7 @@ AUTHOR
 				info)	[ -f "$SPECIAL_NAME.$T" ] && \
 						tui-cat "$SPECIAL_NAME.$T"
 					;;
-				#help)	[ -f $SPECIAL_NAME.help ] && tui-echo "TODO: $(pwd) help" ;;
+				#help)	[ -f $SPECIAL_NAME.help ] && tui-printline -E "TODO: $(pwd) help" ;;
 				esac
 			done
 		fi			
@@ -604,7 +604,7 @@ AUTHOR
 		#
 		#	Fetch input
 		#
-			tui-echo
+			tui-print
 			#read -p "$BORDER_LEFT What is your choice: " mode item newval spare
 			action=$(tui-read "What is your choice:")
 			action_done=false
@@ -642,10 +642,10 @@ AUTHOR
 				case $action in
 				help|HELP|h|?)
 					[ -f "$SPECIAL_NAME.help" ] && \
-						tui-echo && \
+						tui-printline -E && \
 						tui-title "Help" && \
 						tui-cat "$SPECIAL_NAME.help" && \
-						tui-echo && \
+						tui-printline -E && \
 						tui-press || \
 						tui-wait 5s "Sorry, no help found."
 					;;

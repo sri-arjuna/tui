@@ -143,7 +143,7 @@ AUTHOR
 		if $doExtract
 		then	if [ -f "$FOLDER" ]
 			then	size_tarball=$($LS -l "$FOLDER"|$AWK '{print $5}')
-				[ -z "$size_tarball" ] && tui-echo "$(gettext 'Failure reading') $FOLDER!" && exit
+				[ -z "$size_tarball" ] && tui-printline -E "$(gettext 'Failure reading') $FOLDER!" && exit
 				
 				#list_tarball=($(tar tf "$FOLDER"))
 				touch "$TUI_FILE_TEMP".2
@@ -191,7 +191,7 @@ AUTHOR
 					done
 					RET=$(cat $TUI_FILE_TEMP)
 				fi
-			else	tui-echo "$FOLDER $(gettext 'is not a file or could not be found!')"
+			else	tui-printline -E "$FOLDER $(gettext 'is not a file or could not be found!')"
 			fi
 
 			tui-status $RET "$(gettext 'Extracted:') $FOLDER"

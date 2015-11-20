@@ -135,7 +135,7 @@ AUTHOR
 		OPT_Q="-q"
 		OPT_C="-c"	;;
 	"")	tui-status 1 "$MSG_NOTFOUND"
-		tui-echo "$MSG_SELECT"
+		tui-printline -E "$MSG_SELECT"
 		CURLWGET="$(tui-select curl wget)"
 		which "$CURLWGET" 1>/dev/zero && \
 			tui-conf-set "$TUI_FILE_USER_APPS" CURLWGET $CURLWGET || \

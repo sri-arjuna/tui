@@ -156,7 +156,7 @@ AUTHOR
 			"$READ" answer
 	done
 	printf "\r"   >&2
-	tui-echo "$1 ($MSG_TR_YESNO) " "$answer"  >&2
+	tui-printline -E "$1 ($MSG_TR_YESNO) " "$answer"  >&2
 	case "$answer" in
 	    y|o|j|s|Y|O|J|S)
 	    		# First letter of the meaning "yes" in these languages:

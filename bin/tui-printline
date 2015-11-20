@@ -169,7 +169,7 @@ AUTHOR
 		exit 99
 		;;
 	"-")	# Read pipe, expect one line
-		# tui-cat, or at least tui-echo is expected to be used for multiple lines
+		# tui-cat, or at least tui-printline -E is expected to be used for multiple lines
 		read LEFT CENTER RIGHT 
 		set "$LEFT" "$CENTER" "$RIGHT"
 		;;

@@ -163,7 +163,7 @@ AUTHOR
 			else	if ! $wasPipe
 				then	RET=1
 					tui-printline -S $RET "$(eval_gettext 'File not found: $arg')"
-				else	tui-echo "$arg"
+				else	tui-printline -E "$arg"
 				fi
 			fi
 		done

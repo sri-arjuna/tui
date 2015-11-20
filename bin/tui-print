@@ -18,26 +18,21 @@
 #
 # ------------------------------------------------------------------------
 #
-#	System defaults
+#	Variable defaults
 #
-	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
 	# Get the main config files
 	# 
 	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
-	then 	# Load required variables
-		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
-		do	[ -f "$f" ] && source "$f"
-		done
-	else	source tuirc
+	then 	source tuirc
 	fi
-	break_on_injections "$@" && exit 1
-#
-#	Variable defaults
-#
-	script_version=0.9
+	
+	TERM="${TERM:-GNUGNU Linux57Linux}"
+	break_on_injections "$@" && \
+		exit 1
+	script_version=0.9.1
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -57,23 +52,39 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software; you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 ')"
-	TR_MSG_TEXT_HELP="$(gettext '
+	TR_MSG_TEXT_HELP="$(eval_gettext '
 NAME
-  $ME - Opens passed URLs in the favorite web browser (gui/cli)
+  $ME - echo, TUI-style
 
 SYNOPSYS
-  $ME [-h|--help] [--version] URL URL2 ..
+  $ME [-h|--help] [--version] [[-] | [str1] [str2] [str3]]
   
 DESCRIPTION
-  Does only work in GUI, unless the end user (you) has a cli-filebrowser installed.
-  Opens provided directories in the preferred file manager according to environment.
-  In multi-user or emergency stage it will open \"$FILEMGR_CLI\" and in graphical stage it will open \"$FILEMGR_GUI\"
+  Prints one string on the left
+  Prints two strings left and right
+  Prints three strings left, entered and right
+
+  Pass \"-\" to read input from pipe
+  One can pass empty strings to align the desired output.
   
 OPTIONS
   -h|--help	Shows help and exit with 99
   --version	Shows version infoand exit with 0
   
-  -c		Force CLI mode
+  -		Read input from pipe
+ 
+EXAMPLE
+
+	$ME "Hello World" 
+	$ME "i am left"  "i am right"
+	$ME "" "i am centered" ""
+  
+HINTS
+  If your script should feel too slow, 
+  you might get a slightly better performance using "tui-printline -E"
+  
+SEE ALSO
+  bash(1), tui-printline(1)
   
 BUGS
   Report bugs to: erat.simon@gmail.com
@@ -85,76 +96,45 @@ BUGS
 AUTHOR
   Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
 ')"
-
-
 #
 #	Variable handling
 #
-	# Get the mode
-	tui-bol-gui && \
-		MODE=gui || \
-		MODE=cli
-	for A in "${@}";do
+	showVersion() { 
+	cat <<-EOF
+		$TR_MSG_TEXT_VERSION
+	EOF
+	}
 	case "$1" in
-	"--version")	cat <<-EOF
-				$TR_MSG_TEXT_VERSION
-			EOF
+	"--version")	showVersion
 			exit 0
 			;;
-	"-h"|"--help"|"")
-		## 'URL2' ..."
+	"-h"|"--help")
 		echo "$TR_MSG_TEXT_HELP"
-		exit $RET_HELP
+		exit 99
 		;;
-	"-c")	MODE="cli"
-		shift
+	*)	[ "-" = "${1:0:1}" ] && \
+			leadingDASHdummy="--" || \
+			leadingDASHdummy=""
 		;;
 	esac
-	done
-	#ARGS=($(echo "${@}"))
-#
-#	Functions
-#
-	GetAvailableApp() {
-	# Returns the first found browser for either GUI or CLI
-	#
-		#[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
-		LIST="$(<$TUI_DIR_LIST/web_${MODE})"
-		for L in $LIST;do
-			which $L 2>/dev/zero && \
-				return 0
-		done
-		return 1
-	}
 #
 #	Display
 #
-	if [ -z "$BROWSER" ]
-	then	case "$MODE" in
-		cli)	BROWSER=$(which "$BROWSER_CLI" 2>/dev/zero)
-			wasFound=$?
-			;;
-		gui)	BROWSER=$(which "$BROWSER_GUI" 2>/dev/zero)
-			wasFound=$?
-			;;
+	if [ "-" = "$1" ] || [ "--" = "$1" ]
+	then	# Do pipe handling
+		while read LEFT CENTER RIGHT
+		do	set "$LEFT" "$CENTER" "$RIGHT"
+			case $# in
+			0)	tui-printline -E 					;;
+			1)	tui-printline -E $leadingDASHdummy "$1"		;;
+			2)	tui-printline -E $leadingDASHdummy "$1" "$2" 	;;
+			3)	tui-printline -E $leadingDASHdummy "$1" "$2" "$3"	;;
+			esac
+		done
+	else	case $# in
+		0)	tui-printline -E 					;;
+		1)	tui-printline -E $leadingDASHdummy "$1"		;;
+		2)	tui-printline -E $leadingDASHdummy "$1" "$2" 	;;
+		3)	tui-printline -E $leadingDASHdummy "$1" "$2" "$3"	;;
 		esac
-		#export BROWSER
-	fi
-	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $BROWSER 2>/dev/zero 1>/dev/zero
-	then 	# The EDITOR is not available, search for default
-		BROWSER=$(GetAvailableApp)
-		[ $MODE = cli ] && \
-			var=BROWSER_CLI || \
-			var=BROWSER_GUI
-		[ -z "$BROWSER" ] && \
-			tui-printline -E "No web browser for $MODE mode could be found, please change \"$CONF\" manually!" && \
-			exit 1
-		# It was found, so save it
-		tui-conf-set -v "$CONF" "$var" "$BROWSER"
-	fi
-	
-	#for A in "${ARGS[@]}";do
-	#	$BROWSER "$A"
-		$BROWSER "$1"	# Do not get spammy
-	#done
+        fi

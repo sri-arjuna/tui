@@ -87,7 +87,7 @@ until i figured that extracting all these displaying functions, provide its very
 TUI was born, a command based framework to give scripts an interface like feeling.
 
 This said, when executed alone, a single tui-<command>, it doesn't look that much like an interface.
-However, as soon you append a few tui-echo after another or use tui-cat to print a small text file to
+However, as soon you append a few tui-print after another or use tui-printfile to print a small text file to
 the screen, you will feel the difference.
 
 @subsection Why TUI?
@@ -212,30 +212,30 @@ Usually scripts not only summaries several commands into a single file, it also 
 This handles the commands that are used to display information to the user.
 
 
-@subsection tui-printf
+@subsection tui-printline
 This is the heart of TUI, as it provides the core functionality to display everything TUI will display.
-But usually you will use it to update the current printed line of the previous/initial call of tui-printf.
+But usually you will use it to update the current printed line of the previous/initial call of tui-printline.
 
 It handles up to three (3) quoted strings, printing the first one on the left side.
 If there are 2 strings passed, the 2nd will be on the right side.
 If there are 3 strings passed, the 2nd will be in the center, and the 3rd on the right side.
 
-This said, @b {tui-printf} provides the core display functionality for all the other core display command's,
-such as @b {tui-echo}, @b {tui-header},  @b {tui-title},  @b {tui-cat}, @b {tui-status} and  @b {tui-progress}.
+This said, @b {tui-printline} provides the core display functionality for all the other core display command's,
+such as @b {tui-print}, @b {tui-header},  @b {tui-title},  @b {tui-printfile}, @b {tui-status} and  @b {tui-progress}.
 
 Only the 2 optical dividers,  @b {tui-header} and  @b {tui-title} are colored according to the set theme.
 
-Please see @b {tui-echo} for a simple example.
+Please see @b {tui-print} for a simple example.
 
-@subsection tui-echo
-Like its regular counterpart @b {echo}, but provides the same output alignment as tui-printf.
+@subsection tui-print
+Like its regular counterpart @b {echo}, but provides the same output alignment as tui-printline.
 
 Example:
 @example
-    tui-echo    
-    tui-echo one
-    tui-echo one two
-    tui-echo one two three
+    tui-print    
+    tui-print one
+    tui-print one two
+    tui-print one two three
 @end example
 
 Which would then output as:
@@ -302,25 +302,25 @@ The option @b {-1} is great for list with long entry strings.
 @end example
 
 
-@subsection tui-cat
+@subsection tui-printfile
 
 This command simply prints the content of a file within TUI borders.
 
 To print the content of a file, simply pass its name or full path as argument.
 @example
-	tui-cat /etc/os-release 
+	tui-printfile /etc/os-release 
 @end example
 
 As an Easter egg it also provides a typewriter mode, which accepts strings as well.
 @example
-	tui-cat -t message_file.txt
-	tui-cat -t "some string"
-	tui-cat -d 0.5 "Message string" ~/message_file.txt "Another string" ...
+	tui-printfile -t message_file.txt
+	tui-printfile -t "some string"
+	tui-printfile -d 0.5 "Message string" ~/message_file.txt "Another string" ...
 @end example
 
 One can even pipe output:
 @example
-	echo "$(uname -a)" | tui-cat -t
+	echo "$(uname -a)" | tui-printfile -t
 	# | Linux cyberdyne.ocean 4.1.2-2-ARCH #1 SMP PRE| #
 	# | EMPT Wed Jul 15 08:30:32 UTC 2015 x86_64 GNU/| #
 	# | Linux                                        | #
@@ -351,7 +351,7 @@ For a more professional look and feel, one needs also a bit more preparations:
 	declare -a list
 	list=$(ls)
 	count=$@{#list[@@]@}
-	tui-echo "Updating the file its timestamp"
+	tui-print "Updating the file its timestamp"
 	tui-progress -r
 	
 	for file in "$@{#list[@@]@}"
@@ -644,7 +644,7 @@ A basic example could be:
 
 One could also display which DE the user is running:
 @example
-	tui-echo "Your GUI/DE is:" "$(tui-bol-gui -v)"
+	tui-print "Your GUI/DE is:" "$(tui-bol-gui -v)"
 @end example
 Which outputs like:
 @example
@@ -1082,7 +1082,7 @@ so that project 'script-tools' contained everything, from tweaking grub1 & grub2
 Now 'script-tools' was already part of that idea, you could call it like 'st tweak grub 2 timeout 4' or browse there by just calling 'st'.
 
 @subsection The extraction of TUI
-Those (not really) first functions where: sS, yesno, sE, sT and sH, representing the todays commands tui-status, tui-yesno, tui-echo, tui-title and tui-header.
+Those (not really) first functions where: sS, yesno, sE, sT and sH, representing the todays commands tui-status, tui-yesno, tui-print, tui-title and tui-header.
 At first, i thought i might keep them as functions, due to the one time reading to the memory, it would be very fast afterwards.
 Figured, having the display functions and the working functions mixed up, causes unneeded trouble and could be avoided by extracting the display fuctions as their own project -- TUI.
 

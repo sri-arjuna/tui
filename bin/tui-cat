@@ -1,1 +1,231 @@
-tui-printfile
+#!/usr/bin/env bash
+#
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+# File		cat and typewriter
+# Description:	Simply prints a string char by char, waiting a certain delay in between.
+# ------------------------------------------------------
+#
+#	Variables
+#
+	BORDER_RIGHT=""
+	ME="${0##*/}"
+	HOME="$(eval echo ~$(whoami))"
+	
+	
+	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	# 
+	if source "${SYSCONFDIR}/tuirc" && source "$HOME/.tuirc"|| ( [ -f ./tuirc ] && source ./tuirc )
+	then 	# Load required variables
+		for f in $TUI_FILE_CONF_COMMANDS "$TUI_DIR_THEMES/$TUI_THEME"
+		do	[ -f "$f" ] && source "$f"
+		done
+	else	source tuirc
+	fi
+	break_on_injections "$@" && exit 1
+	script_version=0.9.1
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+TUI ($ME, Version $script_version)
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	USER_STRING=$(printf "\044USER")
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - Print a file to screen and wrap TUI borders around it
+
+SYNOPSYS
+  $ME [-h|--help] [--version] [-d DELAY] [-tT] FILE "Some String" ...
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -d DELAY	Waits DELAY seconds before it prints the next char.
+  		DELAY may be an integer or flaoting point like "0.007"
+		This also triggers the typewriter "-t"
+  -t		Enables typewriter mode, using default delay of 0.05
+  -T		Prints the file name with tui-title before it prints its content
+EXAMPLE
+
+	tui-cat file.txt
+	
+	tui-cat -T /path/to/multiple/files*
+	
+	tui-cat -t "Hello $USER_STRING, how are you today?"
+
+HINTS
+  In typewriter mode you can pass a mixed list of files and strings.
+  
+BUGS
+  Report bugs to: erat.simon@gmail.com
+  
+  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
+#
+#	Default variables
+#
+	for((i=${#BORDER_LEFT}-1;i>=0;i--)); do BORDER_RIGHT="$BORDER_RIGHT${BORDER_LEFT:$i:1}"; done
+	WIDTH=$[ $(tput cols) - ( 2 * ${#BORDER_LEFT} ) - 2 ]
+	EMPTY="$(printf '%*s' $WIDTH)"
+	
+	DELAY=0.05
+	TITLE=false
+	wasPipe=false
+	MODE=cat
+	
+	help_text="$TR_MSG_TEXT_HELP"
+#
+#	Getting options
+#
+	[ "--help" = "$1" ] && printf "$help_text" && exit 99
+	showVersion() { 
+	cat <<-EOF
+		$TR_MSG_TEXT_VERSION
+	EOF
+	}
+	[ "--version" = "${1,,}" ] && showVersion && exit 0
+	while getopts hd:tT opt
+	do	case $opt in
+		h)	echo "$help_text"
+			exit 1
+			;;
+		t)	MODE=typewriter
+			;;
+		d)	DELAY="$OPTARG"
+			MODE=typewriter
+			;;
+		T)	TITLE=true
+			;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+	[ -z "$1" ] && \
+		wasPipe=true && \
+		while IFS= read -r ARG
+		do	set -- "$@" "$ARG"
+		done
+	ARGS=("${@}")
+#
+#	Display & Action
+#
+	
+	case $MODE in
+	cat)	for arg in "${ARGS[@]}"
+		do 	if [ -f "$arg" ]
+			then 	$TITLE && tui-title "$(eval_gettext 'File: $arg')"
+				while IFS="" read -er content #|sed s,"	","    ",g
+				do	# Leading dash
+					[ "-" = "${content:0:1}" ] && \
+						leadingDASHdummy="--" || \
+						leadingDASHdummy=""
+					# Tabs, become 4 spaces
+					content="$(echo "$content"|sed s,'	','    ',g)"
+					# Print content
+					tui-printline -E $leadingDASHdummy "${content}"
+				done<"$arg"
+			else	if ! $wasPipe
+				then	RET=1
+					tui-printline -S $RET "$(eval_gettext 'File not found: $arg')"
+				else	tui-printline -E "$arg"
+				fi
+			fi
+		done
+		;;
+	typewriter)
+		for arg in "${ARGS[@]}"
+		do	# Pass every argument (each separate STRING) by its own.
+			[ -f "$arg" ] && \
+				STRING="$(cat $arg)" && \
+				($TITLE && tui-title "$(eval_gettext 'File: $arg')" || exit 0) || \
+				STRING="$arg"
+			
+			echo "$STRING" | while IFS="" read -er  line
+			do	COUNT=0		# Chars of line
+				PRINTED=0	# Chars printed, to compare with available borders
+				LEN="${#line}"
+			
+			
+				printf "$BORDER_LEFT "
+				while [ $COUNT -lt $LEN ]
+				#while [ $PRINTED -lt $WIDTH ]
+				do 	char="${line:$COUNT:1}"
+					double="${line:$COUNT:2}"
+					#triple="${line:$COUNT:3}"
+					case "$double" in
+#					"\t"|"	")	char="    "
+#						;;
+#					"\n"|"\r")	# |"\\"
+#						char="${double/\\/\\\\}"
+#						COUNT=$(( $COUNT + 2 ))
+#						;;
+					*)	case "$char" in
+						"	"|'\t')
+							char="    "	;;
+						"%")	char="%%"	;;
+						#'\')	char='\\'	;;
+						#'	')
+						#	char="    "	;;
+						#'$')	char='\$'	;;
+						#"{")	char="\{"	;;
+						#"}")	char="\}"	;;
+						esac
+						COUNT=$(( $COUNT + 1 ))
+						;; 
+					esac
+					
+					# Add char to line and print if required
+					#char="${char/\\/\\\\}"
+					printf "$char"
+					PRINTED=$(( $PRINTED + ${#char} ))
+					if [ $PRINTED -eq $WIDTH ] #|| [ "$double" = "\r" ]
+					then	printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n$BORDER_LEFT "
+						PRINTED=0
+					fi
+					sleep $DELAY
+				done
+				
+				# Close the line
+				printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n"
+			done
+		done
+		;;
+	esac
+	#printf "\n"
+	exit $RET

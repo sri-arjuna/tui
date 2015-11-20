@@ -137,7 +137,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		[ -z "$1" ] && opt="" || opt="-e "
 		# Fill the fallback, to avoid empty calls
 		TERMINAL="${TERMINAL:-xterm}"
-		tui-echo "$(eval_gettext '$TERMINAL: Using default option \"$opt\", please report your terminal ($TERMINAL) and its command execution option.')" >&2
+		tui-printline -E "$(eval_gettext '$TERMINAL: Using default option \"$opt\", please report your terminal ($TERMINAL) and its command execution option.')" >&2
 		;;
 	esac
 #

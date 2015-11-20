@@ -100,18 +100,18 @@ USAGE
        While for the basic "display" task, one only needs one of these four commands:
              * tui-header, to make the full line with a blue background and white font (theme:default)
              * tui-title, to make inner area with a blue background and white font (theme:default)
-             * tui-echo, to make the full line with the terminal default colors.
+             * tui-print, to make the full line with the terminal default colors.
              * tui-printline, to make next tui-<command> "overwrite" the current output.
        The biggest part of the TUI package however, are its additional commands.
        If  your  shell supports tab-completion, type: tui- and press tab one or two times to get a list
        of TUI its commands.  Otherwise you can see a list of the command by typing: ls /usr/bin/tui-\*
        Simply said, they should perform their task while producing output with the same output-style as
-       tui-echo.
+       tui-print.
        Please see their according helpscreen (tui-<cmd> -h) or its manpage.
 
 USAGE as TOOLS
        The tools can also be used to make your terminal usage safer...
-            cmd=tui-echo
+            cmd=tui-print
             for f in * ; do \044cmd "\044f" "\044{f:5:\044{#f}-15}" ; done
 
        then, when i like what i see, i simply type:
@@ -737,7 +737,7 @@ AUTHOR
 			YES=true
 			;;
 		theme)	if [ -z "$2" ]
-			then	tui-echo "$(gettext 'TUI_THEME is set to:')" \
+			then	tui-printline -E "$(gettext 'TUI_THEME is set to:')" \
 					"${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
 				exit $?
 			else	tui-conf-set -v "$TRC" "TUI_THEME" "$2"
@@ -757,7 +757,7 @@ AUTHOR
 			do	tui-printline -E "$foundVar" "${!foundVar}"
 			done
 			
-			tui-echo;tui-press
+			tui-print;tui-press
 			tui-printline -T "$(gettext 'Variables provided by apps.conf') (\$TUI_FILE_CONF_APPS)"
 			for foundVar in ${!EDITOR_*} ${!FILEMGR_*} ${!BROWSER_*} ${!TERMINAL*} ${!CURLWGET*}
 			do	tui-printline -E "$foundVar" "${!foundVar}"
@@ -774,7 +774,7 @@ AUTHOR
 				tui-printline -E "$txt" "${!txt}"
 			done
 			
-			tui-echo;tui-press
+			tui-print;tui-press
 			tui-printline -T "$(gettext 'Variables provided by colors.conf') (\$TUI_FILE_CONF_COLORS)"
 			tui-printline -E "$(gettext 'Be aware that using TUI_COLOR_* currently causes alignment issues.')" "$TUI_INFO"
 			tui-printline -E "$(gettext 'Any escape sequence for that matter.')" "$TUI_INFO"
@@ -786,11 +786,11 @@ AUTHOR
 			done
 			tui-printline -E "TUI_RESET" "${TUI_RESET}TEXT"
 			
-			tui-echo;tui-press
+			tui-print;tui-press
 			tui-printline -T "$(gettext 'Variables provided by status.conf') (\$TUI_FILE_CONF_STATUS)"
 			for txt in ${STATUS_TEXT[@]};do
 				val="TUI_${txt}"
-				tui-echo "TUI_$txt" "${!val}"
+				tui-printline -E "TUI_$txt" "${!val}"
 			done
 			for foundVar in ${!RET_*}
 			do	#tui-printline -E \
@@ -799,7 +799,7 @@ AUTHOR
 				tui-printline -E "$foundVar" "${!foundVar}"
 			done
 			
-			tui-echo;tui-press
+			tui-print;tui-press
 			tui-printline -H "$(gettext 'Variables provided by sourcing TUI (User specific)')"
 			for task in user apps sets
 			do	list=""
@@ -818,25 +818,25 @@ AUTHOR
 					#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
 					tui-printline -E "$foundVar" "${!foundVar}"
 				done
-				[ $task = apps ] && for t in EDITOR BROWSER FILEMGR;do tui-echo "${t^}" "\$${t}_$(tui-bol-gui && printf GUI || printf CLI)";done
+				[ $task = apps ] && for t in EDITOR BROWSER FILEMGR;do tui-printline -E "${t^}" "\$${t}_$(tui-bol-gui && printf GUI || printf CLI)";done
 			done
 			
-			tui-echo;tui-press
+			tui-print;tui-press
 			tui-printline -T "$(gettext 'Variables provided by shorts.conf') (\$TUI_DIR_CONF/shorts.conf)"
 			for entry in $($GREP "=" "$TUI_DIR_CONF/shorts.conf"|$GREP -v ^"#")
-			do	tui-echo "${entry/=*}"	"${entry/*=}" 	#""
+			do	tui-printline -E "${entry/=*}"	"${entry/*=}" 	#""
 			done
 			
-			tui-echo;tui-press
+			tui-print;tui-press
 			tui-printline -T "$(eval_gettext 'Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)')"
 			tui-printline -S 111 "$(eval_gettext 'Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file.')"
 			while 	IFS='=	'
 				read al var val
 			do	echo "$al $var $val" | $GREP -q "#" || \
-					tui-echo "$var" "$val" #"" #"($al)"
+					tui-printline -E "$var" "$val" #"" #"($al)"
 			done<"$TUI_DIR_CONF/shorts-alias.conf"
 			
-			tui-echo
+			tui-print
 			tui-status 0 "$(gettext 'Showed what TUI provides')"
 			exit $?
 			;;

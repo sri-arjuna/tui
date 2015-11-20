@@ -192,12 +192,12 @@ AUTHOR
 			#clear
 			tui-title "${FILE_LABEL:-$CONF}"
 			for item in "${OPTS_FOUND[@]}"
-			do 	tui-echo "$item" "$(tui-conf-get -- $CONF $item)"
+			do 	tui-printline -E "$item" "$(tui-conf-get -- $CONF $item)"
 			done
-			tui-echo
+			tui-print
 			
 			# Select value or back
-			tui-echo "$MSG_TR_CHANGE_VALUE"
+			tui-printline -E "$MSG_TR_CHANGE_VALUE"
 			[ "true" = "$hide_edit" ] && this_edit="" || this_edit="$MSG_TR_WORD_EDIT"
 			action=$(tui-select "$MSG_TR_WORD_BACK" $this_edit "${OPTS_FOUND[@]}" )
 			
@@ -221,7 +221,7 @@ AUTHOR
 				newval=$(tui-read "$QUESTION")
 				;;
 			select)	QUESTION="$(eval_gettext 'Select the new value for ${action}($curval)?')"
-				tui-echo "$QUESTION"
+				tui-printline -E "$QUESTION"
 				newval=$(tui-select ${OPTIONS[$action]}) || break
 				;;
 			esac
@@ -305,7 +305,7 @@ AUTHOR
 	while 	tui-header "$script_header" "$(date +'%F %T')"
 		tui-title "$script_title"
 	do 	if [ ${#FILES[@]} -ne 1 ]
-		then 	tui-echo "$MSG_TR_SELECT_FILE"
+		then 	tui-printline -E "$MSG_TR_SELECT_FILE"
 			thisFile=$(tui-select  "$MSG_TR_WORD_BACK" "${FILES[@]}")
 			[ -f "$thisFile" ] || break
 		else	edit_file "$FILES"

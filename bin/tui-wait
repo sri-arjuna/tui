@@ -192,7 +192,7 @@ BUGS
 		# Verbose / Countdown?
 		if $beVerbose
 		then	[ $seconds_total -lt 0 ] && \
-				tui-echo "$action_text" || \
+				tui-printline -E "$action_text" || \
 				printf "\n"
 		fi
 		sleep 1

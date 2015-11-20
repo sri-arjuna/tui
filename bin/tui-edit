@@ -148,7 +148,7 @@ AUTHOR
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
 		[ -z "$EDITOR" ] && \
-			tui-echo "$(eval_gettext 'No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manually!')" && \
+			tui-printline -E "$(eval_gettext 'No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manually!')" && \
 			exit 1
 		tui-conf-set "$TUI_FILE_USER_APPS" "$var" "$EDITOR"
 	fi

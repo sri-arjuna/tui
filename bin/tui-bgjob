@@ -199,7 +199,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	BG_RET=$(<"$TMP")
 	rm -f "$TMP"
 	if [ "$BG_RET" = "-1" ]
-	then	tui-echo "$TXT_EXIT" "$(gettext 'Could not retrieve return value')" "$INFO"
+	then	tui-printline -E "$TXT_EXIT" "$(gettext 'Could not retrieve return value')" "$INFO"
 		exit "$RET_INFO"
 	else	tui-status "$BG_RET" "$TXT_EXIT"
 		exit "$?"

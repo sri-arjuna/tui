@@ -184,7 +184,7 @@ AUTHOR
 		tui-title "$MSG_TR_TITLE_CENTER"
 		tui-cat -d 0.04 "$MSG_TR_WANTLEARN"
 		if tui-yesno " "
-		then	tui-echo "${MSG_TR_FUTURE} tuirc"
+		then	tui-printline -E "${MSG_TR_FUTURE} tuirc"
 			tui-wait 3 "$MSG_TR_LEARNMORE"
 			tuirc
 			exit $?

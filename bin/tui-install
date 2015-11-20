@@ -215,7 +215,7 @@ AUTHOR
 #	Display & Action
 #
 	[ 0 -ne $UID ] && \
-		tui-echo "$(eval_gettext '$ME requires root access!')" "$FAIL" && \
+		tui-printline -E "$(eval_gettext '$ME requires root access!')" "$FAIL" && \
 		exit 1
 	tui-printline -E "$(gettext 'Installing as dependency:')" "$(echo $@)"
 #	if ! $doYes
@@ -301,7 +301,7 @@ AUTHOR
 		done
 		ERR_NO="$[ $count_total - $count_good ]"
 		[ -z "$bad_ones" ] && \
-			tui-echo "$(eval_gettext 'There were $ERR_NO errors, namely these:')" "$bad_ones"
+			tui-printline -E "$(eval_gettext 'There were $ERR_NO errors, namely these:')" "$bad_ones"
 	else	# Do all in one bunch, but shorten the names to display
 		all_pkgs=""
 		for a in "${@}";do all_pkgs+=" $(basename $a)";done

@@ -83,7 +83,7 @@ EXAMPLE
 
 	if tui-bol-gui
 	then 	zenity --info --text="You are in GUI!"
-	else	tui-echo "Your terminal say it is: \044(tui-bol-gui -v)"
+	else	tui-printline -E "Your terminal say it is: \044(tui-bol-gui -v)"
 	
 	fi
 
