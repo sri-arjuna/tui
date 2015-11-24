@@ -154,7 +154,7 @@ AUTHOR
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		printf "\$MSG_TR_HELP_LONG\\n"
+		printf "\$MSG_TR_HELP\\n"
 		exit 99
 	}
 	show_version() {
