@@ -93,9 +93,9 @@ SEE ALSO
   bash(1), ps(1), tui-bgjob-mgr(1), tui-progress(1)
   
 BUGS
-  Report bugs to: erat.simon@gmail.com
+  Report bugs to: <tui-support@nongnu.org>
   
-  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
@@ -114,7 +114,7 @@ Executes SCRIPTFILE and prints 'Progress String' while running.
 Prints 'Exit String' when done, regardless of exit code (0,1,?) it uses.
 WAIT is optional wait time between updates, default is 0.7 (seconds).
 
-Report bugs to: erat.simon@gmail.com
+Report bugs to: <tui-support@nongnu.org>
 TUI home page: <http://www.gnu.org/software/tui/>
 General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"

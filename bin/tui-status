@@ -92,9 +92,9 @@ EXAMPLE
 	$ME -r 2 "Loading data..." ; sleep 1 ; $ME \044? "Loaded data."
 
 BUGS
-  Report bugs to: erat.simon@gmail.com
+  Report bugs to: <tui-support@nongnu.org>
   
-  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 

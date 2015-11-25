@@ -57,7 +57,7 @@ Where options are:
 	samples		View samples files, first code then executed
 	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
 
-Report bugs to: erat.simon@gmail.com
+Report bugs to: <tui-support@nongnu.org>
 TUI home page: <http://www.gnu.org/software/tui/>
 General help using GNU software: <http://www.gnu.org/gethelp/>
 ')"
@@ -377,9 +377,9 @@ SEE ALSO
   bash(1), console_codes(4), gawk(1), grep(1), sed(1), 
   
 BUGS
-  Report bugs to: erat.simon@gmail.com
+  Report bugs to: <tui-support@nongnu.org>
   
-  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 

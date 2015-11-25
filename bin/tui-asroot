@@ -99,8 +99,8 @@ SEE ALSO
   su(1), sudo(1)
   
 BUGS
-  Report bugs to: erat.simon@gmail.com
-  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  Report bugs to: <tui-support@nongnu.org>
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
 AUTHOR
@@ -132,7 +132,7 @@ AUTHOR
 	if tui-bol-root
 	then	# When passing eg: bash /path/to/script, quotes causes a failure!
 		#eval "${@}"
-		"${@}" #>&2
+		eval "${@}" #>&2
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
 	then	tui-printline -E "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2

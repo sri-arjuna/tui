@@ -152,9 +152,9 @@ SEE ALSO
   tui-terminal(1), tui-title(1), tui-wait(1), tui-web(1), tui-yesno(1)
   
 BUGS
-  Report bugs to: erat.simon@gmail.com
+  Report bugs to: <tui-support@nongnu.org>
   
-  TUI - Homepage: <http://www.gnu.org/software/tui/>
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
