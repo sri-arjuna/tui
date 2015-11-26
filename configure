@@ -19,9 +19,9 @@
 #
 #
 #	Created:	2015.07.27
-#	Changed:	2015.11.02
+#	Changed:	2015.11.20
 	script_name=configure
-	script_version=1.2
+	script_version=1.2.2
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -101,7 +101,7 @@
 		install_prefix="sudo " || \
 		install_prefix="su -c "
 	mandirs="mandir $(echo man{1..9}dir)"
-	index_list="prefix bindir sbindir sysconfdir datarootdir datadir docdir htmldir infodir $mandirs dvidir pdfdir psdir compldir sharedstatedir localstatedir"
+	index_list="prefix bindir sbindir  sysconfdir datarootdir appdir icondir datadir docdir htmldir infodir $mandirs dvidir pdfdir psdir compldir sharedstatedir localstatedir"
 	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
 	TMP="$PWD/tmp.$$"
 	CHROOT=""
@@ -137,65 +137,14 @@
 		
 		echo "texi2any  --$EXT -o $OUTDIR/$OUTFILE --no-split $INFILE"
 	}
-	make_html() { # INFILE OUTDIR
-	#
-	#
-		INFILE="$1"
-		OUTDIR="${2:-./docs}"
-		OUTFILE="${1##*/}"
-		OUTFILE="${OUTFILE/\.*}.html"
-		
-		[ -f "$INFILE" ] || return 1
-		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
-		
-		echo "texi2any  --html -o $OUTDIR/$OUTFILE --no-split $INFILE"
-	}
-	make_pdf() { # INFILE OUTDIR
-	#
-	#
-		INFILE="$1"
-		OUTDIR="${2:-./docs}"
-		OUTFILE="${1##*/}"
-		OUTFILE="${OUTFILE/\.*}.pdf"
-		
-		[ -f "$INFILE" ] || return 1
-		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
-		
-		echo "texi2any  --pdf -o $OUTDIR/$OUTFILE --no-split $INFILE"
-	}
-	make_dvi() { # INFILE OUTDIR
-	#
-	#
-		INFILE="$1"
-		OUTDIR="${2:-./docs}"
-		OUTFILE="${1##*/}"
-		OUTFILE="${OUTFILE/\.*}.dvi"
-		
-		[ -f "$INFILE" ] || return 1
-		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
-		
-		echo "texi2any  --dvi -o $OUTDIR/$OUTFILE --no-split $INFILE"
-	}
-	make_ps() { # INFILE OUTDIR
-	#
-	#
-		INFILE="$1"
-		OUTDIR="${2:-./docs}"
-		OUTFILE="${1##*/}"
-		OUTFILE="${OUTFILE/\.*}.ps"
-		
-		[ -f "$INFILE" ] || return 1
-		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
-		
-		echo "texi2any  --ps -o $OUTDIR/$OUTFILE --no-split $INFILE"
-	}
 	write_makefile() { 
 	# Checks for existing scripts and adds them to the makefile
 	#
 		# Clear / Init makefile
 		local M="./Makefile"
-		printf '%s\n' \
-			"SHELL = /bin/sh" > "$M"
+		#printf '%s\n' \
+		#	"SHELL = /bin/sh" > "$M"
+		echo "PHONY: options $(echo make-*|sed s,make\-,,g|sed s,doc\-,,g)" >> "$M"
 		
 		for task in ./make ./make-*
 		do 	case "$task" in
@@ -222,7 +171,7 @@
 				;;
 			esac
 		done
-		echo "PHONY: options $(echo make-*|sed s,make\-,,g|sed s,doc\-,,g)" >> "$M"
+		
 	}
 	show_sample() {
 	# Prints a sample configure.cfg
@@ -387,6 +336,8 @@ OPTIONS
 	--infodir DIR		info documentation		(\$DATAROOTDIR/info)
 	dvidir|pdfdir|psdir
 	
+	--appdir DIR		.desktop files			(\$DATAROOTDIR/applications)
+	--icondir DIR		Icons for the desktop files	(\$DATAROOTDIR/icons)
 	--compldir DIR		bash completion			(\$DATAROOTDIR/bash-completion/completions)
 	--localedir		locale-dependent data		(\$DATAROOTDIR/locale)
 	--localstatedir		modifiable single-machine data	(\$prefix/var)
@@ -441,27 +392,58 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		#
 			fullPath="${2/$CHROOT}"
 			target="${CHROOT}${FHS[${1,,}]}"
-			if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
-			then	# Its a directory, go recursive
-				echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
-			else	tmp_check="${2##*/}"
-				check_char="${tmp_check:0:1}"
-				isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
+		#	tui-header " --> $1 -- $target" >&2 #; exit 100
+			case "$1" in
+			INFODIR|HTML*)
+				if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
+				then	# Its a directory, go recursive
+					tui-header "$2 DIR" >&2
+					echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
+				else	# It is a single entry but not a directory
+			#		tui-header "$1 $2 FILE" >&2
+					tmp_check="${2##*/}"
+					check_char="${tmp_check:0:1}"
+					isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
 				
-				case "$isAsterix" in
-				true|false)	isAsterix=$isAsterix	;;
-				*)		isAsterix=false		;;
-				esac
+					case "$isAsterix" in
+					true|false)	isAsterix=$isAsterix	;;
+					*)		isAsterix=false		;;
+					esac
+			#	tui-header "$(dirname $2)/$tmp_check" >&2
+					if $isAsterix
+					then 	echo "[ -f \"$(dirname $2)/$tmp_check\" ] && cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
+					else	echo "[ -f \"$2\" ] && cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
+					fi
 				
-				if $isAsterix
-				then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
-				else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
+					case "${1,,}" in
+					compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:nobody \"$target/${2##*/}\""
+					esac
+				fi 
+				;;
+			*)
+				if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
+				then	# Its a directory, go recursive
+					echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
+				else	tmp_check="${2##*/}"
+					check_char="${tmp_check:0:1}"
+					isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
+				
+					case "$isAsterix" in
+					true|false)	isAsterix=$isAsterix	;;
+					*)		isAsterix=false		;;
+					esac
+				
+					if $isAsterix
+					then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
+					else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
+					fi
+				
+					case "${1,,}" in
+					compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:nobody \"$target/${2##*/}\""
+					esac
 				fi
-				
-				case "${1,,}" in
-				compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:0 \"$target/${2##*/}\""
-				esac
-			fi
+				;;
+			esac
 		}
 		write_reference() { # INDEX
 		# Prints the index reference used
@@ -575,7 +557,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				echo >> "./make"
 				((C++))
 			done
-		else 	echo "echo 'Nothing todo." >> "./make"
+		else 	echo "echo 'Nothing todo.'" >> "./make"
 		fi
 		
 		# Write content of PRIOR tasks, if any
@@ -861,6 +843,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 						;;
 					esac ; etc_done=true				;;
 			datarootdir)	tmp="${FHS[prefix]}/share"	;;
+			appdir)		tmp="${FHS[datarootdir]}/applications"	;;
+			icondir)	tmp="${FHS[datarootdir]}/icons"	;;
 			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
 			infodir)	tmp="${FHS[datarootdir]}/info"	;;
 			mandir)		tmp="${FHS[datarootdir]}/man" ;;
@@ -977,12 +961,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
 		if [ -n "$(echo ./make-doc-*)" ] 
 		then
-			[ -f Makefile ] && \
+			[ -f Makefile ] && [ -f make-doc* ] && \
 				echo "You might want to run:" && \
 				grep ":" Makefile | awk '{print $1}' | \
 					grep -ve tall -ve opt -ve clea -ve PH|\
-					while read var;do echo "* make ${var/\:}";done || \
-				echo "You might to run $(echo ./make-doc-*)."
+					while read var;do echo "* make ${var/\:}";done
+		#	 && \
+		#		echo "You might to run $(echo ./make-doc-*)."
 		fi
 		[ -f Makefile ] && \
 			echo "To install \"${APP_TITLE:-$APP}\" now, please execute: make && ${install_prefix}'make install'" || \
