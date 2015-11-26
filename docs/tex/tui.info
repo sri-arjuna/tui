@@ -1,0 +1,1138 @@
+This is tui.info, produced by texi2any version 6.0 from tui.texi.
+
+This manual is for GNU TUI (version 0.9.0, 2015.06.15) Copyright (C)
+2011-2015 Simon Arjuna Erat TUI is licensed as GPLv3.  The manual is
+licensed as GFDL.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with no Front-Cover Texts,
+     and with no Back-Cover Texts.  A copy of the license is included in
+     the section entitled "GNU Free Documentation License".
+
+
+File: tui.info,  Node: Top,  Next: Introduction to TUI,  Up: (dir)
+
+GNU TUI
+*******
+
+This manual is for GNU TUI (version 0.9.0, 2015.06.15).
+
+   GNU TUI is a command based Text User Interface framework for scripts.
+
+   Although it requires BASH to be installed, the commands can be called
+from other SHELLS as well.  But be aware of their differences, such as
+string formatting and possible exit codes as examples.
+
+* Menu:
+
+* Introduction to TUI :: 
+* Installation :: Optimal installation & de-installation
+* Configuration :: What is where done
+* Usage :: Some basic description
+* Appendix :: 
+
+
+File: tui.info,  Node: Introduction to TUI,  Next: Installation,  Prev: Top,  Up: Top
+
+1 Introduction to TUI
+*********************
+
+TUI is a bash framework to write scripts with a Text User Interface.
+
+1.1 Idea
+========
+
+In today's world, everything is about presenting.  There are many tasks
+that can be faster accomplished using a script rather than writing an
+application for it as others require to use it.  This said, it is known
+many end-users don't like the terminal screen.  That is usually because
+the commands in terminals have their output not very well structured,
+usually just text-by-text-by-newline-by-text.  This is if you
+need/want/have to provide scripts for users to use, and make it (a
+little) easier for them to 'read' the terminal, without to have to write
+'presentation' handlers.  Thus user.conf in ~/.config/tui provides
+variables that may be used for any script that sources tui, same goes
+for apps.conf, which will provide EDITOR, BROWSER, FILEMGR, TERMINAL
+with your set favorite applications.  Now in the combination with
+tui-edit, you don't even need to source tuirc to have tui-edit open the
+given filename with your favorite editor.
+
+1.1.1 What is TUI?
+------------------
+
+It is a command based framework which wraps the task (executed command
+name represents task or description) into an adaptive Text User
+Interface (TUI). It is a framework to be used in the shell or shell
+scripts, though the usage of scripts is recommended to preserve the
+interface feeling.
+
+   It was the core display part of another script-dream I have, and it
+took me almost 2.5 years until i figured that extracting all these
+displaying functions, provide its very own project.  TUI was born, a
+command based framework to give scripts an interface like feeling.
+
+   This said, when executed alone, a single tui-<command>, it doesn't
+look that much like an interface.  However, as soon you append a few
+tui-print after another or use tui-printfile to print a small text file
+to the screen, you will feel the difference.
+
+1.1.2 Why TUI?
+--------------
+
+Many script authors write their collection of code helpers, display
+features or task assistants.  As such functions, they have to copy them
+to each of the scripts, and manually maintain and adjust the function
+inside that script, or update all those scripts just to be sure that
+function is updated.
+
+   TUI jumps in here, providing a 3-Way-Interface between the Author of
+a script, the System (and its installed software) and the User who is
+executing it.
+
+1.1.3 What TUI is about
+-----------------------
+
+In fact, TUI is tui!
+
+   'tui' is meant to make a directory a simple but highly configurable
+script menu, and display its sub-directories as sections and browse
+among the tree structure, with its entrance point as root.  All the
+other commands, are merely the code helpers, display tools, list
+library, variable providers, gathered as commands for easy availability,
+so you can access them straight forward like any command in your
+scripts.
+
+   You as the author of the script, don't have to worry about software
+the user has installed, instead you call: tui-edit, tui-filemgr, tui-web
+or tui-terminal (tui-terminal is GUI only), or which distribution the
+user is using, simply call tui-install to cover package manager
+installations from *BSD, Debian over Fedora/Red-Hat to Trisquel.
+
+   It brings together the best of two worlds, the power of the console
+and the convenience of a graphical environment.
+
+
+File: tui.info,  Node: Installation,  Next: Configuration,  Prev: Introduction to TUI,  Up: Top
+
+2 Installation
+**************
+
+2.1 Getting the code
+====================
+
+It is recommended by FHS
+(http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSRCSOURCECODE) to save
+source code in /usr/src.
+         su
+         cd /usr/src
+         git clone https://github.com/sri-arjuna/tui.git
+         cd tui
+
+2.2 A basic installation procedure looks like:
+==============================================
+
+         ./configure --prefix=/
+         make
+         make install
+
+   By default this will install TUI using the default prefix /usr/local,
+so the binaries will be available in PREFIX/bin.
+
+2.3 Uninstall
+=============
+
+         su
+         cd /usr/src/tui
+         make uninstall
+
+
+File: tui.info,  Node: Configuration,  Next: Usage,  Prev: Installation,  Up: Top
+
+3 Configuration
+***************
+
+Is done either by the (End-)User, the applications installed and the
+system the user is using.  Default themes are 'default' for the user,
+and 'default-red' for root.
+
+   First and for the most, you can change the theme.  A theme defines
+the left and right border, the font and background color of tui-header
+and tui-title, as well as the input character for tui-select.
+
+   Application invokes by either one of tui-edit, tui-filemgr, tui-web
+or tui-terminal which will search through a list of known applications,
+diverted by cli or gui abilities if the default applications are not
+found.  If you have WINE installed, it may happened that 'notepad' is
+started as editor rather than 'scribes'.
+
+   If your favorite application is missing on its list, please contact
+the author of TUI to append it/them.
+
+   Calling
+         tuirc config
+   will bring up a screen to select which conf file to edit.
+
+3.1 Apps / $TUI_FILE_USER_CONF
+==============================
+
+Upon first call, you will probably see the values listed as variable
+names with a '$'-prefix.  This setting will use the system defaults set
+in /etc/tui/apps.conf.  If you are calling the above command as root,
+you will edit the system defaults, and not the user preferences.
+CURLWGET will be 'curl' or 'wget' if found, if neither is found,
+tui-download will ask to install either one.
+
+3.2 Loadlist
+============
+
+Can only be edited, but should not be changed or expanded.  This file
+defines the order in which the user configuration files are read.  You
+may add custom entries, but be aware these functions or values will not
+be available if you share your scripts using them.
+
+3.3 Settings / $TUI_FILE_USER_SETTINGS
+======================================
+
+Here, the behavior or default values for tui-commands is defined.  Like
+your prefered shell, the byteisze used or how the tui-new-<COMMAND>s
+behave.
+
+3.4 User / $TUI_FILE_USER
+=========================
+
+Here you can set or change your USER_NAME, your USER_EMAIL you'd like to
+use for your scripts, as well as the USER_HOMEPAGE. Moreover, you could
+change the default license DEFAULT_LICENSE and DEFAULT_LICENSE_URL.
+
+
+File: tui.info,  Node: Usage,  Next: Appendix,  Prev: Configuration,  Up: Top
+
+4 Usage
+*******
+
+This is a summary description of each command, grouped into different
+categories.
+
+   If you are looking for code samples, try:
+         tuirc samples
+
+4.1 Display Commands
+====================
+
+Usually scripts not only summaries several commands into a single file,
+it also enables us to display 'selected information'.
+
+   This handles the commands that are used to display information to the
+user.
+
+4.1.1 tui-printline
+-------------------
+
+This is the heart of TUI, as it provides the core functionality to
+display everything TUI will display.  But usually you will use it to
+update the current printed line of the previous/initial call of
+tui-printline.
+
+   It handles up to three (3) quoted strings, printing the first one on
+the left side.  If there are 2 strings passed, the 2nd will be on the
+right side.  If there are 3 strings passed, the 2nd will be in the
+center, and the 3rd on the right side.
+
+   This said, tui-printline provides the core display functionality for
+all the other core display command's, such as tui-print, tui-header,
+tui-title, tui-printfile, tui-status and tui-progress.
+
+   Only the 2 optical dividers, tui-header and tui-title are colored
+according to the set theme.
+
+   Please see tui-print for a simple example.
+
+4.1.2 tui-print
+---------------
+
+Like its regular counterpart echo, but provides the same output
+alignment as tui-printline.
+
+   Example:
+         tui-print
+         tui-print one
+         tui-print one two
+         tui-print one two three
+
+   Which would then output as:
+         # |                                                                      | #
+         # | one                                                                  | #
+         # | one                                                              two | #
+         # | one                             two                            three | #
+
+4.1.3 tui-header
+----------------
+
+With its full line background color, tui-header is meant - where
+applicable - as 'constant' header/footer of a loop based script.  Or
+just as a one time application information header.
+
+4.1.4 tui-title
+---------------
+
+Is using the inverted colors of tui-header, having only the inlay line
+with a background.
+
+   tui-title handles the first string argument differently, as it
+centers it.  With any further string argument, it behaves like the
+others.
+
+4.1.5 tui-list
+--------------
+
+Is nice handy tool to print different kinds of list.  * no numbering *
+Arabic numbering (regular) * roman numbering (from 1 to 9999) *
+alphabetic numbering
+
+   Examples Lets see how a default call handles an array containing 3
+strings
+     	array=("Some value" "Another one" "Watch out")
+     	tui-list "${array[@]}"
+
+   Looks like:
+     	# | 1) Some value               2) Another one              3) Watch out | #
+
+   Lets keep the array, and just use the roman toggle (**-r**), which
+looks like:
+     	array=("Some value" "Another one" "Watch out" "Some value" "Another one" "Watch out")
+     	tui-list -r "${array[@]}"
+     	# | I. Some value             II. Another one             III. Watch out | #
+     	# | IV. Some value              V. Another one             VI. Watch out | #
+
+   To print a list with only one column, or just two, simply use the
+number as an option.  The option -1 is great for list with long entry
+strings.
+     	$ tui-list -1 "${array[@]}"
+     	# | Some value                                   | #
+     	# | Another one                                  | #
+     	# | Watch out                                    | #
+
+     	$ tui-list -2r "${array[@]}"
+     	# | I. Some value                II. Another one | #
+     	# | III. Watch out                  IV. a fourth | #
+
+4.1.6 tui-printfile
+-------------------
+
+This command simply prints the content of a file within TUI borders.
+
+   To print the content of a file, simply pass its name or full path as
+argument.
+     	tui-printfile /etc/os-release
+
+   As an Easter egg it also provides a typewriter mode, which accepts
+strings as well.
+     	tui-printfile -t message_file.txt
+     	tui-printfile -t "some string"
+     	tui-printfile -d 0.5 "Message string" ~/message_file.txt "Another string" ...
+
+   One can even pipe output:
+     	echo "$(uname -a)" | tui-printfile -t
+     	# | Linux cyberdyne.ocean 4.1.2-2-ARCH #1 SMP PRE| #
+     	# | EMPT Wed Jul 15 08:30:32 UTC 2015 x86_64 GNU/| #
+     	# | Linux                                        | #
+
+4.1.7 tui-progress
+------------------
+
+A very powerful tool to display several kinds of different progress
+indications.
+
+   From a single animated dash, simple numbering, numbering up to a max
+value, and even a progress bar with additional percent display.
+
+   Its default animation is an animated dash.  This setup allows to show
+an animation with an unknown maximum by either time or invokes.
+     	for entry in $list
+     	do 	tui-progress "Working with:" 	"$entry"
+     	done
+
+   Which will be seen as:
+     	# | Working with:                     entry                     [  |   ] | #
+
+   For a more professional look and feel, one needs also a bit more
+preparations:
+     	declare -a list
+     	list=$(ls)
+     	count=${#list[@]}
+     	tui-print "Updating the file its timestamp"
+     	tui-progress -r
+
+     	for file in "${#list[@]}"
+     	do 	tui-progress -m $count "Working on file:" 	"$file"
+     		touch "$file"
+     		sleep 0.3
+     	done
+
+   Which will be shown as:
+     	# | Working on file:                     file                     7 / 20 | #
+
+   Last but not least, the one view you do expect of a progress - a bar:
+     	cur=1
+     	max=87
+     	while [ $cur -le $max ]
+     	do	# Optionally, you could use/add '-l' to display the progress percentage.
+     		tui-progress -b -m $max -c $cur "Working on XY..."
+     		((cur++))
+     		echo ""
+     	done
+
+   Would output (each as a single line):
+     	# | Working on XY...     [                     ] | #
+     	# | Working on XY...     [=                    ] | #
+     	# | Working on XY...     [===                  ] | #
+     	# | Working on XY...     [====                 ] | #
+
+
+     	# | Working on XY...     [=          ][ 16.09% ] | #
+     	# | Working on XY...     [=====      ][ 45.97% ] | #
+     	# | Working on XY...     [========== ][ 98.85% ] | #
+
+4.1.8 tui-status
+----------------
+
+A nice and handy tool to display the exit code of the previous
+condition.
+
+   Although thought to help to display either success or failure of a
+task, it provides much more.
+
+   Lets display a simple check if a file exist:
+     	[ -f filename ]
+     	tui-status $? "File exists"
+   Which would output as either of the 2 lines:
+     	# | File exists                        [  ✓   ] | #
+     	# | File exists                        [  ✗   ] | #
+
+   It could also be used for wizard like scripts:
+     	tui-yesno "Do you want to do XY?" && ret=0 || ret=4
+     	if tui-status "$ret" "Doing XY"
+     	then	echo todo
+     	fi
+   Which would return the following output, depending on your answer:
+     	# | Do you want to do XY? (y/n)                y | #
+     	# | Doing XY                            [  ✓  ] | #
+     	todo
+
+     	# | Do you want to do XY? (y/n)                n | #
+     	# | Doing XY                            [  »   ] | #
+
+   If you start another command which takes some time before it displays
+anything, you could use:
+     	 tui-status -r 2 "Starting something" ; sleep 4 && tui-status $? "Started something now..."
+
+4.2 Interactive Commands
+========================
+
+Ever wanted to start an editor at a users computer, but he had not
+installed it?
+
+   Do not worry, the interactive tools provide a solution for this, and
+more.
+
+4.2.1 tui-yesno
+---------------
+
+One of the most used tools in TUI, a simple bool returning command
+showing a question to the user.  And easy for the coder to handle.
+
+   But see for yourself:
+     	tui-yesno "Show grub defaults?" && cat /etc/default/grub
+
+     	if tui-yesno "Show grub defaults?"
+     	then	cat /etc/default/grub
+     	fi
+
+     	tui-yesno "Continue (y) or close terminal window (n)?" || exit 0
+
+4.2.2 tui-download
+------------------
+
+Has the user curl or wget installed, both or none?  Do not worry, this
+tool handles this, it selects the first command found (or set in the
+configuration) to download.  While it does show how much data it
+downloaded (filesize), it cant show a progress bar - this is in plan but
+very low priority.
+
+   Basically one call it simply like this:
+     	tui-download "http://download.server.com/file.zip"
+
+4.2.3 tui-edit
+--------------
+
+So, you want the user to edit a file, but do not know which editor he
+has installed?
+
+   Call tui-edit, it looks for default editors, if none is found, it
+searches a list of known ones, if none is found it asks the user to
+install one of the known ones.
+
+   Usually, one simply uses:
+     	tui-edit ./somedir/file.txt
+
+4.2.4 tui-filemgr
+-----------------
+
+So, you want the user to see some file, but do not know which file
+manager he has installed?
+
+   Call tui-filemgr, it looks for default file managers, if none is
+found, it searches a list of known ones, if none is found it asks the
+user to install one of the known ones.
+
+   Usually, one simply uses:
+     	tui-filemgr "$HOME/projects/this"
+
+4.2.5 tui-press
+---------------
+
+Does what it says, asks the user to 'press enter to continue'.
+
+     	tui-press
+
+   Looks like:
+     	# | Press [ENTER] to continue     Press [ENTER] to continue | #
+
+4.2.6 tui-read
+--------------
+
+Well, it reads the user input
+
+   Usually this is to get a string of a user, like either one of these:
+     	answer=$(tui-read "What is your hometown?")
+     	tui-read "What is your hometown?" > /tmp/answer
+   So you then can work with either the variable or the file.
+
+4.2.7 tui-select
+----------------
+
+Select an item from passed arguments.  If your 'read' supports it, it
+wont require 'enter' to select an item which its digit count is as long
+as the digit count of the arguments passed (ex:: item 10 of 99) If you
+want to select item 1 out of 11, you will have to press 'enter' though.
+
+   By default, it prints up to 3 values per line and lets you select
+among it.
+     	choice=$(tui-select 1 2 3)
+     	tui-select 1 2 3 > /tmp/choice
+
+   Either of these, look like:
+     	# | 1) 1               2) 2                 3) 3 | #
+     	# | > 2
+
+   However, if you want a only a single column, or just two, you may
+pass -1 or -2.  Specially for long menu name selection, this can be a
+nice trick:
+
+     	choice=$(tui-select -1 1 2 3)
+   Will look like:
+     	# | 1) 1                                         | #
+     	# | 2) 2                                         | #
+     	# | 3) 3                                         | #
+     	# | >
+
+   Also there might be situation, specially if you are working with
+dynamically generated lists, that only 1 entry is available.
+
+   You might auto select that single entry by:
+     	answer=$(tui-select -a "I'm all alone!")
+     	echo $answer
+
+4.2.8 tui-terminal
+------------------
+
+Obviously this will only work in GUI mode and will open the
+selected/preferred terminal emulator.
+
+     	tui-terminal "tui-conf-editor $HOME/.config/user-dirs.dirs"
+
+4.2.9 tui-wait
+--------------
+
+Waits given time (s/m/h), counting down and showing optional message.
+This is good to indicate passed times, in case of a timeout or planned
+delay.
+
+   One could be crazy and wait several hours:
+     	tui-wait 5h "I need to clean up my desktop icons!"
+   Showing the full countdown:
+     	# | I need to clean up my desktop icons!                         4:59:58 | #
+
+   Or some more practical delay between an attempt:
+     	tui-wait 5m "Could not reach host, trying again in:"
+   Showing the full countdown:
+     	# | Could not reach host, trying again in:                          4:58 | #
+
+4.2.10 tui-web
+--------------
+
+Well, Firefox might be a good choice, but some people do not have it
+installed, this takes care of it, just like tui-edit, tui-filemgr, and
+tui-terminal.
+
+     	tui-web "http://www.gnu.org"
+
+4.3 Code Helpers (groups)
+=========================
+
+Small things to make your life easier, sorted by groups.
+
+4.3.1 tui-bol-dir
+-----------------
+
+Returns true if passed dir was found or could be created.  If verbose
+mode is enabled, it shows tui-status.
+
+   As in:
+     	tui-bol-dir -v bin
+   Prints output as:
+     	# | Found: bin                          [  ✓   ] | #
+
+   Likewise for a path that can be created:
+     	tui-bol-dir -v tmp
+   Prints output as:
+     	# | Created: tmp                        [  ✓   ] | #
+
+   And a path that can not be created (due to missing rights):
+     	tui-bol-dir -v /a/new/path  || exit 1
+   Prints output as:
+     	# | Created: /a/new/path                [  ✗   ] | #
+
+4.3.2 tui-bol-gui
+-----------------
+
+Returns true if the user is in GUI mode.  Returns DE name if verbose.
+
+   A basic example could be:
+     	if tui-bol-gui
+     	then	filezilla
+     	else	ftp
+     	fi
+
+   One could also display which DE the user is running:
+     	tui-print "Your GUI/DE is:" "$(tui-bol-gui -v)"
+   Which outputs like:
+     	# | Your GUI/DE is:                      awesome | #
+
+4.3.3 tui-bol-root
+------------------
+
+Returns true if user is root.
+
+     	tui-bol-root && \
+     		echo "You're root" || \
+     		echo "You're a regular user!"
+
+4.3.4 tui-conf-editor
+---------------------
+
+A basic tool to edit a conf file.
+
+     	su -c "tui-conf-editor /etc/default/grub"
+   This would let you edit the current settings of /etc/default/grub.
+
+     	tui-conf-editor	-T "Human Configurator" --option var_gender --default male --values="male female" \
+     			--option var_name --default "$USER" \
+     			--option var_age --default 0 --values="1-13 14-21 22-44 44-62 63-90 90+" \
+     			--write-no-exist \
+     			/path/to/file
+   Would create a default config file, that will look like:
+     	var_gender=male
+     	var_name=<the users login name>
+     	var_age=0
+   The user now can then change the values of these variables by
+selecting them from the menu, where he could leave the menu too.  In
+this example, the user can select between male and female upon selecting
+var_gender, likewise for var_age, but among those age-ranges.  For the
+var_name however, he must type a new name, since there are no values to
+select from.
+
+     	tui-conf-editor	-T "Human Configurator" --option var_gender --default male --values="male female" \
+     			--option var_name --default "$USER" \
+     			--option var_age --default 0 --values="1-13 14-21 22-44 44-62 63-90 90+" \
+     			--write-no-exist \
+     			-q \
+     			/path/to/file
+   Would simply check each variable to be present, and if not, save it
+with available default value.
+
+4.3.5 tui-conf-get
+------------------
+
+Gets the value of a variable from a file.
+
+     	CFG=/etc/default/grub
+     	KEY=GRUB_TIMEOUT
+
+     	value=$(tui-conf-get $CFG $KEY)
+     	echo $value
+
+4.3.6 tui-conf-set
+------------------
+
+Set the value of a variable in a file.  Similar as tui-conf-get but
+saves a value.
+
+     	CFG=/etc/default/grub
+     	KEY=GRUB_TIMEOUT
+     	VAL=3
+
+     	tui-conf-get $CFG $KEY $VAL
+
+   It also provides a verbose mode:
+     	tui-conf-get -v  $CFG $KEY $VAL
+   Which would output like:
+     	# | Saved in "grub"   GRUB_TIMEOUT=5    [  ✓   ] | #
+
+4.3.7 tui-str-bol-conv
+----------------------
+
+Converts '0|1|$?'  (return codes) to text.  Like: done/fail ; true/false
+; yes/no
+
+   True / False
+     	[ -d /bin ]
+     	tui-str-bol-conv -t $?
+
+     	true
+
+   Yes / No
+     	[ -d /bin ]
+     	tui-str-bol-conv -y $?
+
+     	yes
+
+   Done / Fail (in caps)
+     	[ -d /bin ]
+     	tui-str-bol-conv -dC $?
+
+     	DONE
+
+4.3.8 tui-str-extension
+-----------------------
+
+Returns the last string after a dot, empty if no dot is found.
+
+     	for F in *;do
+     		EXT=$(tui-str-extension $F)
+     		echo "This file has the ext: $EXT"
+     	done
+   Could output as:
+     	This file has the ext: am
+     	This file has the ext: ac
+     	This file has the ext:
+     	This file has the ext: log
+     	This file has the ext: in
+     	This file has the ext:
+     	This file has the ext: md
+
+4.3.9 tui-str-genfilename
+-------------------------
+
+Generates a numbered file, optionally sets a new file extension.
+     	template=rawfile.raw
+     	workfile=$(tui-str-genfilename $template tpl)
+     	touch $workfile
+     	workfile=$(tui-str-genfilename $template tpl)
+     	touch $workfile
+   Could output like:
+     	ls *tpl
+     	rawfile.tpl rawfile.0.tpl rawfile.1.tpl
+
+4.3.10 tui-str-hash
+-------------------
+
+Hashes a passed string to different sha's or md5.
+     	tui-str-hash "string"
+     	b80fa55b1234f1935cea559d9efbc39a
+
+     	hash=$(tui-str-hash "string")
+     	echo $hash
+     	b80fa55b1234f1935cea559d9efbc39a
+
+     	echo "string" | tui-str-hash
+
+4.3.11 tui-str-usb
+------------------
+
+Lets the user select an USB storage and returns the device path.
+(/dev/sdx)
+
+   To let the user select an USB device, simply invoke it like:
+     	DEVICE=$(tui-str-usb)
+   Which could be presented to the user as:
+     	# | 1) usb-Multiple_Card_Reader_058F63666485-0:0                         | #
+     	# |                           2) usb-SWISSBIT_Twist_99999999F900011d-0:0 | #
+     	# | > 2
+   Upon selecting an entry, the variable DEVICE would be filled with the
+device path (ex:: /dev/sdc).
+
+4.4 Code Helpers (singles)
+==========================
+
+4.4.1 tui-asroot
+----------------
+
+Executes passed (quoted) command as root, uses sudo where applicable or
+set.
+
+4.4.2 tui-cp
+------------
+
+Copy a file, displays progress bar.
+
+4.4.3 tui-dd
+------------
+
+Thought to write images to usb devices.
+
+   Need feedback to cover more use cases.
+
+4.4.4 tui-mv
+------------
+
+Moves a file, displays a progress bar.
+
+4.4.5 tui-tar
+-------------
+
+Tarballs a directory or file.
+
+4.5 Advanced Commands
+=====================
+
+The tools provides in this section are usually for those who just want
+more.
+
+4.5.1 tui-bgjob
+---------------
+
+Executes a script in background.
+
+   Prints first string while running, second when done.
+
+   To start a script to run in background and print a message while
+running:
+     	tui-bgjob "/path/to/script" "Running script" "Ran Script"
+   While "Running script" is shown while the script is running, the exit
+status of the script is show with the 2nd string "Ran Script" in the
+style of tui-status.
+
+   While the default animation mode is the animated dash, if you are
+'generating' a (larger) file, you might want to display its size:
+     	tui-bgjob -f "/path/to/generated/file" "/path/to/script" "Running script" "Ran Script"
+
+   If you have a specific filesize to expect, you may change to progress
+bar display by supplying the expected byte size:
+     	tui-bgjob -f "/path/to/generated/file" -e 4294967296 "/path/to/script" "Running script" "Ran Script"
+
+4.5.2 tui-bgjob-mgr
+-------------------
+
+Executes multiple scripts at once.
+
+   Lets you define how many scripts shall run simultaneously.
+
+   Can run in quiet mode and return (as exit code) how many scripts were
+ended with success.
+
+   The basic usage is plain convenience, execute all files in this
+folder (expecting them to be scripts!)
+     	tui-bgjob-mgr *
+   This will show 'progress' of the working through all these scripts.
+However, it will just show if a script is planed to, running or how it
+ended.
+
+     Something of importance to know is the that the wait option ("-w
+     SECS") has influence on the interval it checks if scripts have
+     completed.
+
+     The shorter the interval, the faster scripts can be processed, but
+     it should not be set lower than 1 sec for a longer period of time.
+
+     The longer the interval, the more time the CPU has to work on its
+     jobs.
+
+     The interval should be set to at max 50% of the slowest job
+     expected, and should be no lower than 1 sec.
+
+   Runs all KSH scripts with an interval of 5 minutes between visual
+(and actual working-) updates.
+     	tui-bgjob-mgr -w 360 *.ksh
+
+   If you have just 3 or 4 scripts to monitor, you might like this in a
+GUI/(D)WM environment
+     	tui-bgjob-mgr -v window1.sh window2.sh window3.ksh script4.csh
+
+   However, when working with multiple scripts, it may occur than some
+scripts shall only be executed if some previous scripts were executed
+successfully.
+     	TASK="script1.sh script2.sh script3.sh"
+     	MAX=$(echo $TASK | wc -w)
+
+     	RET=$(tui-bgjob-mgr -qc $TASK)
+     	[ "$RET" -eq "$MAX" ] && \
+     		./script4.sh
+
+4.5.3 tui-install
+-----------------
+
+Can be used to identify what distro the system is.
+
+   Is meant to install dependencies that might be found in the distro
+its repository.
+
+   Due to the nature of the different package managers used, it is not
+yet possible to capture each package managers its own verification
+within TUI, so that output is (by default and for security) untouched.
+
+   For scripts you share, it is recommend to leave the default handling
+as described here.
+     	tui-install pluma
+
+   Could output on arch like:
+     	# tui-install  pluma
+
+     	# | Installing as dependency:              pluma | #
+     	resolving dependencies...
+     	looking for conflicting packages...
+
+     	Packages (1) pluma-1.10.2-1
+
+     	Total Installed Size:  15.11 MiB
+     	Net Upgrade Size:       0.00 MiB
+
+     	:: Proceed with installation? [Y/n] y
+     	(1/1) checking keys in keyring
+     	(1/1) checking package integrity
+     	(1/1) loading package files
+     	(1/1) checking for file conflicts
+     	(1/1) checking available disk space
+     	(1/1) reinstalling pluma
+     	# | Installed package: pluma            [  ✓   ] | #
+
+     	tui-install -y pluma
+
+   Would output as slick as:
+     	# | Installing as dependency:              pluma | #
+     	# | Installed package: pluma            [  ✓   ] | #
+
+4.5.4 tui-log
+-------------
+
+A tool to manage/write your custom logfiles with ease.
+
+   As most logfiles provides several basic information on the left side,
+tui-log has options for that.
+
+   To create a custom logfile header, you could use:
+     	echo "# Logfile for XY, created on DATE" >> "/path/to/logfile.log"
+   tui-log -e "logfile.log" "# Logfile for XY, created on DATE"
+
+   Because, every writing to a logfile checks first if the current date
+is found in the logfile.
+
+   If that is not the case, it first prints the current date before
+writing the passed message.  Like this basic usage example shows:
+     	rm logfile.log
+     	tui-log -t logfile.log "Logfile created."
+     	cat logfile.log
+
+     	#### 2015-08-02 ####
+     	06:34:09 	 Logfile created.
+
+   Likewise for the other options, date (would be very repetitive, but
+anyway), time, pid, user ; alone or in any combination.
+     	tui-log -up logfile.log "What is my name and the pid"
+     	cat logfile.log
+
+     	#### 2015-08-02 ####
+     	06:34:09 	 Logfile created.
+     	sea 3821 	 What is my name and the pid
+
+4.6 tui
+=======
+
+This command is the core element and was the main purpose for me to
+write TUI.
+
+   It is THE automated menu you were always looking for.
+
+   Define a folder as your home menu, pass that folder as the '-p dir',
+to use as as browsable menu.  You can even direct access scripts in
+copyright/copyleft related information.  straight from the command line.
+
+   Scripts executed by 'tui' iption / What is it?: have to be in BASH,
+though, if they are not BASH, you must set the 'SHELL' with '-x' and all
+files shown must be that SHELL. Note, that in this case, SHELL could
+also be: Python or Perl, aside from ash, csh, zsh...
+
+
+
+
+
+
+File: tui.info,  Node: Appendix,  Prev: Usage,  Up: Top
+
+5 Appendix
+**********
+
+5.1 History of TUI
+==================
+
+5.1.1 Original Origin
+---------------------
+
+Around 1995 i've met the MSDOS command 'net', which allowed me to send
+messages to a friends computer in the like of: 'net send <IP> "msg"'.
+
+   That kind of usage feeling impressed me, to some extend, it was
+'speech control', and i wanted to make something like that available.
+Not literal 'speech control' but allow 'words' to form a 'command' which
+then is executed.
+
+   A bit later, a friend asked me if we wanted to try to write an
+interface for the console, but we failed badly because he was pushing
+for GUI actions too much, which text just doesnt allow that easily.
+Sadly, my BATCH and QBASIC skills werent that trained, and beeing a
+teenager, i had other interests too, so that idea never got realized.
+
+   Early 2000 those ideas, thoughts and goals lost their focus pretty
+quickly when i joined the army for some service.
+
+5.1.2 First year of GNU/Linux
+-----------------------------
+
+Back in May 2011, i've got annoyed by Windows 7 - actually by the laptop
+it was installed on, as it didnt have a GPU (graphic processor unit) to
+play games - eventually i figured to try GNU/Linux again, after like 16
+ears.  As you are probaly aware, there is more than just one flavor of
+GNU/Linux.
+
+   There are more than just the mainstream 'brands' (like: Debian,
+Fedora/RedHat, Gentoo, Slackware, etc) but there is also a wide range of
+DE and WM's.  So, still being a technical enthusiast, who likes to
+tinker around, break things and learn new things, i've enjoyed the
+diversity of so many distributions (also known as: distro / distros).
+
+   Anyway, so end of May 2011, when Fedora 15 (LoveLock) was just
+released, i 'joined' GNU/Linux, as in, the distro hopping began.
+
+   As i been 'at home' among diffrent distros/de/wm combinations, i
+quickly figured, the most powerfull tool to get things done on any
+possibe combination, while giving me the power to maintain/change the
+tool even at init 1, was scripts.
+
+   In the end, I ended up having tons of scripts doing almost the same,
+just for every different distro i had tried.  But all those scripts had
+something in common, they did the very same things
+(tweakings/installations) on different ways (apt-get, brewer, pacman,
+yum...)  or with different paths set.  Oh boy did i start writing
+scripts, at first each script/task for its own distro, then i started to
+sort them in folders, but could no longer access them easily from
+anywhere of the terminal.
+
+5.1.3 Getting used to GNU/Linux and the birth of 'script-tools'
+---------------------------------------------------------------
+
+Due to that process of repeative installation and configuration of the
+system, i wanted to ease that task of writing scripts.  Seeing other
+scripts, the GNU/Linux loading text of the console, and the urge to
+simply some scripting tasks, i started to write some first functions.
+
+   At some later time, that project was renamed several times, ending up
+with the name 'script-tools'.  This said, you probably can imagine that
+'TUI' was just a very part of 'script-tools', which - due to several sub
+sections - had functions stored in external files, so all the scripts
+spread across different folders could just source those
+function-scripts, so i would not need to edit several files to apply a
+single char change.
+
+   When i started to figure that i had several functions twice, with a
+slightly different name in another function-script, but doing the very
+same task, i thought avoidance might be the key.
+
+   This was in 2014, 3 years after my joining to the GNU/Linux
+community, 'constantly' working on that project, so that project
+'script-tools' contained everything, from tweaking grub1 & grub2,
+plymouth, signature generator, project manager (rpm, mock,
+kickstart/specs, git/sf, ftp, rpm repo, cron) to name a few...
+
+   Now 'script-tools' was already part of that idea, you could call it
+like 'st tweak grub 2 timeout 4' or browse there by just calling 'st'.
+
+5.1.4 The extraction of TUI
+---------------------------
+
+Those (not really) first functions where: sS, yesno, sE, sT and sH,
+representing the todays commands tui-status, tui-yesno, tui-print,
+tui-title and tui-header.  At first, i thought i might keep them as
+functions, due to the one time reading to the memory, it would be very
+fast afterwards.  Figured, having the display functions and the working
+functions mixed up, causes unneeded trouble and could be avoided by
+extracting the display fuctions as their own project - TUI.
+
+   But then i thought of all the other shells i havent tried yet, but
+beeing aware that most of them work generally the same way, i wanted to
+make TUI also available to them - to some extend.  Keeping TUI as plain
+BASH functions was no longer an option.  Providing these functions as
+scripts/commands while sharing the same variables was the next obvious
+and usable option.
+
+5.1.5 Finalizing TUI
+--------------------
+
+Eventually, i thought it was done - besides of a few work-overs for one
+or two commands to improve usability, and therefor i thought i was ready
+to introduce TUI to GNU. After deleting some commands, there were still
+over 46 commands to be worked on, their manpage, their wiki.md, their
+infotext and their helpscreens.  Preparing all the commands to be
+translateable was more of a mental challenge in regards of the count of
+the command, rather than the actual effort required.  But getting this
+alltogether, working as intended, took quite some time anyway.
+
+5.1.6 About the Author
+----------------------
+
+Simon Arjuna Erat has first met a computer at the age of 8, at his dad's
+cellar office with a Commodore64.  The first i remember about that
+computer is, that my dad was just changing the tape-drive with a 5.25"
+soft-floppy.
+
+   Allthough i was very much into optimizing my system by tweaking the
+autoexec.bat and config.sys, i usualy just did it to gain more free
+memory over the 512k 'barrier', to play the games more fluently, as they
+required an incredible high amount of RAM... up to 8MB!
+
+   Later in 1995, i've had my hands on Slackware 3.0 and RedHat 2 or 3
+(not RHEL, before Fedora).
+
+   Between 1997 and 2001 i was self-employed PC-Supporter helping
+private people as well as small- & medium companies in and around my
+town.  In between there was some army services, and afterwards i've
+raised a security company with some friends, which went well until 2004,
+where i went back to my origins, and created homepages and flyers for
+several bars, clubs, discotheques and other etablissements.
+
+   Then finaly in 2011, i've had enough of Windows and 'joined the
+GNU/Linux Community'.  Providing my part to it, by realizing/writing an
+idea i've had almost 20 years ago...  TUI for scripts.
+
+
+
+Tag Table:
+Node: Top634
+Node: Introduction to TUI1232
+Node: Installation4706
+Node: Configuration5486
+Node: Usage7742
+Node: Appendix31241
+
+End Tag Table
