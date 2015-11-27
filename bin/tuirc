@@ -27,7 +27,7 @@ shopt -s expand_aliases
 	ME=tuirc
 	script_version=2.9.5
 	unset ${!TUI_[ABCEG..Z]*}
-	TUI_VERSION=0.9.0e
+	TUI_VERSION=0.9.1
 #
 #	Translate preps
 #
