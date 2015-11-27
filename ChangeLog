@@ -8,7 +8,7 @@
 * tui-read: Fixed non-empty requirement for default behaviour
 * tui-typewriter: Added, extracted functionality from tui-printfile, former tui-cat
 * tui-typewriter: Created po file
-
+* ./configure: YASSI updated, made make work
 
 2015-11-18 - TUI 0.9.0f
 * RENAMED: tui-echo --> tui-print

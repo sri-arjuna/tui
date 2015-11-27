@@ -29,7 +29,7 @@
 #		* make
 #		* make-install
 #		* make-uninstall
-#		* make-clean
+#		* make-distclean
 #
 #		It can also create a REFERENCE file ($APP_dirs.conf) and if 'doRef=true',
 #		it will copy that file to $SYSCONFDIR automaticly, as well as remove it when uninstalling
@@ -89,7 +89,7 @@
 	declare -a PRIOR	# This will be ran first during ./make-install
 	declare -a POST		# This will be ran last during ./make-install
 	declare -a REMOVE	# This will be ran during ./make-uninstall
-	declare -a CLEAN	# This will be ran during ./make-clean
+	declare -a CLEAN	# This will be ran during ./make-distclean
 	declare -a IGNORE	# These files will be ignored when running './configure --tarball --prefix=/usr'
 	declare -a HTML DVI PDF PS # Use for creating make-* scripts
 	AWK=\awk		# Bypass aliases
@@ -142,9 +142,10 @@
 	#
 		# Clear / Init makefile
 		local M="./Makefile"
+		>$M
 		#printf '%s\n' \
 		#	"SHELL = /bin/sh" > "$M"
-		echo "PHONY: options $(echo make-*|sed s,make\-,,g|sed s,doc\-,,g)" >> "$M"
+		#echo "PHONY: options make $(echo make-*|sed s,make\-,,g|sed s,doc\-,,g)" > "$M"
 		
 		for task in ./make ./make-*
 		do 	case "$task" in
@@ -276,7 +277,7 @@
 		#	Additional tasks for the uninstallation process
 		#
 		 	# In this example, TUI was installed, therefor the command 'tui-yesno' is available
-		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-clean && cd .."
+		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-distclean && cd .."
 		#
 		#	Contact
 		#
@@ -527,9 +528,9 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			echo "set -x" >> "./make"
 			chmod +x "./make"
 		fi
-		for m in install uninstall clean
+		for m in install uninstall distclean
 		do	echo "#!/usr/bin/env sh" > "make-$m"
-			if [ ! "$m" = "clean" ] && ! $is_at_home 
+			if [ ! "$m" = "distclean" ] && ! $is_at_home 
 			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
 					printf '%s\n' \
 					"[ -z \$UID ] && UID=0" \
@@ -638,11 +639,11 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		# Check for DISTCLEAN operations
 		if [ -n "$(echo ${CLEAN[@]})" ]
 		then 	C=0
-			echo >> "make-clean"
+			echo >> "make-distclean"
 			
 			while 	item="${CLEAN[$C]}"
 				[ -n "$item" ]
-			do 	write_executer "$item" >> "make-clean"
+			do 	write_executer "$item" >> "make-distclean"
 				((C++))
 			done
 		fi
@@ -764,8 +765,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				((C++))
 			done
 		fi
-		write_distclean >> "make-clean"
-		for m in install uninstall clean doc-{info,html,dvi,ps,pdf}
+		write_distclean >> "make-distclean"
+		for m in install uninstall distclean doc-{info,html,dvi,ps,pdf}
 		do	if [ -f "-/make-$m" ]
 			then 	echo >> "make-$m"
 				printf '%s\n' \
@@ -777,9 +778,9 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		
 		# Let the script exit with their proper exit code.
 		echo "echo;echo \"Finished installation of ${APP_TITLE:-$APP} with \$? (0=success)\";exit \$RET" >> "make-install"
-		[ -f "./make" ] && echo "exit \$RET" >> "make"
+		[ -f "./make" ] && echo "exit \$RET" >> "make" && chmod +x "./make"
 		echo "exit \$RET" >> "make-uninstall"
-		echo "exit \$RET" >> "make-clean"
+		echo "exit \$RET" >> "make-distclean"
 		
 		sed s,'set -x',"set -x\nSYSCONFDIR=$SYSCONFDIR",g -i make-{uni,i}nstall
 		sed s,'~',"$HOME",g -i make-{uni,i}nstall
@@ -933,7 +934,7 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 #	Output
 #
 	if $doTarball
-	then	exclude_list="make-clean"
+	then	exclude_list="make-distclean"
 		for ex in "${IGNORE[@]}";do exclude_list+=" $ex";done
 		# Since we prepare the make-<files>, configure is no longer required
 		opt_exclude="--exclude-ignore=configure"

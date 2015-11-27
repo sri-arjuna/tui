@@ -1,3 +1,11 @@
+2015.11.27
+----------
+Documentation, such as info, html and manpages,
+are no longer needed to create upon installation.
+
+Made make work.
+
+
 2015.11.18
 ----------
 RENAMED: tui-echo --> tui-print
