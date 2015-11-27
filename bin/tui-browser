@@ -20,18 +20,18 @@
 #
 #	Init TUI environment
 #
-	source tuirc || sourcce ./tuirc
+	source tuirc || source ./tuirc
 	break_on_injections "$@" && exit 1
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.26
-#	Changed:	2015.07.13
+#	Changed:	2015.11.27
 #	Description:	A script to browse a folder recursively,
 #			using its start directory as 'BASE' which it wont leave ".."
 #			Highly modifiable.
-	script_version=0.9.1b
+	script_version=0.9.1c
 #
 #	Translate preps
 #
