@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-04 22:54+0200\n"
+"POT-Creation-Date: 2015-11-27 11:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bin/tui-conf-editor:81
+#: bin/tui-conf-editor:90
 #, sh-format
 msgid ""
 "${script_name}${script_package_txt}, Version $script_version\n"
@@ -29,7 +29,7 @@ msgid ""
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
 
-#: bin/tui-conf-editor:88
+#: bin/tui-conf-editor:97
 #, sh-format
 msgid ""
 "\n"
@@ -99,38 +99,43 @@ msgid ""
 "  Simon Arjuna Erat (sea), <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-conf-editor:146
+#: bin/tui-conf-editor:155
 msgid "Back"
 msgstr ""
 
-#: bin/tui-conf-editor:147
+#: bin/tui-conf-editor:156
 msgid "Edit"
 msgstr ""
 
-#: bin/tui-conf-editor:148
+#: bin/tui-conf-editor:157
 msgid "Please select a file to edit"
 msgstr ""
 
-#: bin/tui-conf-editor:149
+#: bin/tui-conf-editor:158
 #, sh-format
 msgid "Select a variable to change or go back"
 msgstr ""
 
-#: bin/tui-conf-editor:216
+#: bin/tui-conf-editor:225
 #, sh-format
 msgid "What is the new value for ${action}($curval)?"
 msgstr ""
 
-#: bin/tui-conf-editor:219
+#: bin/tui-conf-editor:230
 #, sh-format
 msgid "Select the new value for ${action}($curval)?"
 msgstr ""
 
-#: bin/tui-conf-editor:231
+#: bin/tui-conf-editor:238
+#, sh-format
+msgid "Set $action to \"\"?"
+msgstr ""
+
+#: bin/tui-conf-editor:248
 msgid "No --options OPTNAME passed to write!"
 msgstr ""
 
-#: bin/tui-conf-editor:232
+#: bin/tui-conf-editor:249
 #, possible-sh-format
 msgid "Must provide a FILE to $FUNCNAME"
 msgstr ""

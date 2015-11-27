@@ -21,9 +21,9 @@
 #
 #	TUI Internals
 #
-	script_version=0.9.0
+	script_version=0.9.1
 	script_created="2014.11.03"
-	script_changed="2015.10.04"
+	script_changed="2015.11.27"
 	
 	script_name="${0##*/}"
 	script_name="${script_name/.sh/}"
@@ -79,6 +79,11 @@
 	be_clear=false
 	#printf '%s\n' "" > "$TMP"	# Clear content
 	>"$TMP"	# Clear content
+#
+#	Traps
+#
+	trap "exit 130" INT ABRT KILL
+	trap "exit $?" QUIT
 #
 #	Messages to translate:
 #
@@ -218,14 +223,22 @@ AUTHOR
 			[ -z "$vTYP" ] && vTYP=input
 			case "$vTYP" in
 			input)	QUESTION="$(eval_gettext 'What is the new value for ${action}($curval)?')"
-				newval=$(tui-read "$QUESTION")
+				if ! newval=$(tui-read "$QUESTION")
+				then	return 1
+				fi
 				;;
 			select)	QUESTION="$(eval_gettext 'Select the new value for ${action}($curval)?')"
 				tui-printline -E "$QUESTION"
-				newval=$(tui-select ${OPTIONS[$action]}) || break
+				newval=$(tui-select ${OPTIONS[$action]}) || return 1
 				;;
 			esac
-			tui-conf-set -v "$CONF" "$action" "$newval"
+			
+			if [ -z "$newval" ]
+			then 	printf "\n"
+				tui-yesno "$(eval_gettext 'Set $action to ""?')" && \
+					tui-conf-set -v "$CONF" "$action" "$newval"
+			else 	tui-conf-set -v "$CONF" "$action" "$newval"
+			fi
 			$be_clear && ./tui-wait "$WAIT_SECONDS" && clear && tui-header "$script_header"
 		done
 	}

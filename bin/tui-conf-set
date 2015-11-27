@@ -21,7 +21,7 @@
 #	Internals
 #
 	ME="${0##*/}"
-	script_version=1.5.1
+	script_version=1.5.2
 	
 	# Check the two default places for the core configuration
 	# First system wide, second user only install
@@ -37,6 +37,10 @@
 	fi
 	TERM="${TERM:-GNUGNU Linux57Linux}"
 	break_on_injections "$@" && exit 1
+#
+#	Traps
+#
+	trap "[ -f $TMP] && rm $TMP" INT KILL ABRT QUIT
 #
 #	Translate preps
 #
@@ -106,7 +110,7 @@ AUTHOR
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2014.04.24
-#	Changed:	2015.09.17
+#	Changed:	2015.11.27
 #	Description:	Set a value in an 'conf/ini' file
 #
 #	Variables
@@ -184,10 +188,14 @@ AUTHOR
 #
 # 	Preformat strings
 #
+	lead_space=$(tail -n1 "$CONFFILE") # | $SED s,,,g)
+	lead_space="${lead_space/[a-zA-Z0-9]*}"
 	if $need_sed
 	then	# Full line
-		SEARCH="$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=" | tail -n 1)"
-		REPLACE="$VARNAME=$(<$TMP)"
+		SEARCH=$( $GREP $OPT -v ^# "$CONFFILE"|$GREP "${VARNAME}=" | tail -n 1)
+		$need_quotes && \
+			REPLACE="$lead_space$VARNAME=\"$(<$TMP)\"" || \
+			REPLACE="$lead_space$VARNAME=$(<$TMP)"
 
 		# Set proper SED 'divider'
 		if $GREP $Q "$SD" "$TMP"
@@ -197,10 +205,8 @@ AUTHOR
 			[ ! "$SD" = "/" ] && \
 				printf "$REPLACE"|$GREP ","|$GREP "$SD"|$GREP -q "/" && SD="|"	# Forward slash was found
 		fi
-		sed s,"$SEARCH","$REPLACE", -i "$CONFFILE"
+		$SED s,"$SEARCH","$REPLACE", -i "$CONFFILE"
 	else	# Get leading spaces if applicable
-		lead_space=$(tail -n1 "$CONFFILE") # | $SED s,,,g)
-		lead_space="${lead_space/[a-zA-Z0-9]*}"
 		# Add the line
 		if $need_quotes
 		then	cat >> "$CONFFILE" <<-EOF
@@ -215,4 +221,5 @@ AUTHOR
 	$GREP "${VARNAME}" "$CONFFILE" | $GREP -q "$(<$TMP)"
 	RET=$?
 	$beVerbose && tui-printline -S $RET "$CONFFILE" "$VARNAME=$(<$TMP)"
+	rm "$TMP"
 	exit $RET
