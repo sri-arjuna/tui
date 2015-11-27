@@ -1,6 +1,8 @@
 2015.11.18
 ----------
+RENAMED: tui-echo --> tui-print
 RENAMED: tui-printf --> tui-printline
+RENAMED: tui-cat --> tui-printfile
 A symlink is currently preserved to keep existing scripts working.
 
 

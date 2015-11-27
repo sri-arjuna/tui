@@ -1,4 +1,4 @@
-2015-11-18 - TUI 0.9.1 - GNU RC22
+2015-11-27 - TUI 0.9.1 - GNU RC22
 * tui-conf-editor: Asks now wether saving empty variables if aborting/empty or not
 * tui-conf-editor: Updated po file
 * tui-conf-set: Fixed quoting for values with space

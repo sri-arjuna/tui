@@ -1,4 +1,4 @@
-This document is about how to install GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
+This document is about how to install TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 
 INSTALL
 -------
@@ -15,7 +15,17 @@ INSTALL
 
 3. Use the auto-tools behaviour, provided by [YASSI (Yet Another Simple Script Installer)](https://github.com/sri-arjuna/yassi)
 
-        ./configure [--prefix=/usr] [--chroot=$HOME/buildroot] && ( sudo ./make-install || su -c ./make-install )
+        ./configure [--prefix=/usr] [--chroot=$HOME/buildroot]
+
+
+You may then call either
+
+        make && sudo make install
+
+or
+
+        ./make
+        sudo ./make-install
 
 
 
@@ -27,25 +37,15 @@ UNINSTALL
         su
         cd /usr/src/tui
 
-2. Use the auto-tools behaviour
+2. Use the auto-tools behaviour by either invoking:
+
+
+        make uninstall
+
+or
 
         ./make-uninstall
 
 
 
-Manual Installation
--------------------
 
-Create the target directories (if required):
-
-        mkdir -p /etc/tui /usr/bin \
-                /usr/share/{man/man1,doc/tui,tui,bash-completions/completions}
-
-Then copy all files to their supposed places:
-
-        cp -r ./docs/*             /usr/share/doc/tui/
-        cp -r ./conf.home          /usr/share/tui/
-        cp ./conf.tui/*            /etc/tui/
-        cp ./bin/*                 /usr/bin/
-        cp ./man/*1                /usr/share/man/man1/
-        cp ./tui_compl.bash        /usr/share/bash-completions/completions/
