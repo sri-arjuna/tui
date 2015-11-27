@@ -16,7 +16,7 @@ Missing feedback for these types:
 Known Bugs:
 -----------
 * Bash-completion not working
-* tui-read, tui-yesno dont work properly with BORDER_COLOR yet
+* tui-yesno dont work properly with BORDER_COLOR yet
 
 
 
@@ -27,7 +27,7 @@ No issues known. :)
 
 Fix:
 ----
-* tui-conf-editor, might 'erease' the selected variable and its value when aborting
+No issues known. :)
 
 
 Finalize:

@@ -1,11 +1,13 @@
-2015-11-18 - TUI 0.9.1 -- GNU RC18
+2015-11-18 - TUI 0.9.1 - GNU RC22
 * tui-conf-editor: Asks now wether saving empty variables if aborting/empty or not
 * tui-conf-editor: Updated po file
 * tui-conf-set: Fixed quoting for values with space
 * tui-conf-set: Fixed leading space issue
 * tui-conf-set: Fixed tempfile is removed now
-* tui-typewriter: Extracted this functionality from tui-printfile
-* tui-typewriter: Create po file
+* tui-read: Fixed spacing issue
+* tui-read: Fixed non-empty requirement for default behaviour
+* tui-typewriter: Added, extracted functionality from tui-printfile, former tui-cat
+* tui-typewriter: Created po file
 
 
 2015-11-18 - TUI 0.9.0f

@@ -40,7 +40,7 @@
 #
 #	Variable environment
 #
-	script_version=1.5.1
+	script_version=1.5.2
 	BORDER_RIGHT=""
 	#echo $TERM ;exit #TERM="${TERM:-GNUGNU Linux57Linux}"
 	# Source only the most required files, 
@@ -157,20 +157,23 @@ AUTHOR
 	visual_arrangement(){ # $1
 	# Prints default input line
 	# Either passed question or set default input char/sign
-		BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		[ -z "$BORDER_LEFT" ] && \
+			BORDER_LEFT="${BORDER_COLOR}${BORDER_LEFT}${TUI_RESET}"
+		
 		#BORDER_RIGHT="${BORDER_COLOR}${BORDER_RIGHT}${TUI_RESET}"
 		
 		POS="\033[$(( ${#BORDER_LEFT} + ${#1} +3 ))G"
 		
 		tui-printline "$1" >&2
-		printf "\r${BORDER_COLOR}$BORDER_LEFT${TUI_RESET} $1$POS" >&2
+		printf "\r${BORDER_LEFT} $1$POS" >&2
 	
 	}
 	is_special() { # INPUT
 	# Checks if passed INPUT is either empty,
 	# an arrow or other escaped chars (^[[...)
 		# Its empty, so input is required
-		[ -z "$1" ] && return 0
+		[ " " = "$1" ] && return 0
+		[ -z "$1" ] && ! $noEmpty && return 1
 		# It is escaped
 		if [ "${1:0:1}" = "" ]
 		then	return 0
@@ -190,23 +193,26 @@ AUTHOR
 #
 #	Action
 #
-	if "$noEmpty"
+	if $noEmpty
 	then	while [ -z "$INPUT" ]
 		do	visual_arrangement "$1"
 			$READ ${doPassword} INPUT #</dev/tty
 			echo "${INPUT:0:3}" | $GREP -q ^"\[\[" && INPUT=""
 		done
-	else	INPUT=""
-		while is_special "$INPUT"
+	else	while INPUT=""
 		do	visual_arrangement "$1"
 			$READ -r ${doPassword} INPUT
+			is_special "$INPUT" || break
 		done
 	fi
 #
 #	Display
 #
-	cat <<-EOF
-	$INPUT
-	EOF
+	if [ -z "$doPassword" ] 
+	then	echo $INPUT
+	else	cat <<-EOF
+		$INPUT
+		EOF
+	fi
 	printf "\r" >&2
 	tui-printline -E "$1" "$INPUT" >&2
