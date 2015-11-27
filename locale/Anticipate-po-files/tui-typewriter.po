@@ -1,0 +1,75 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-11-27 11:14+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bin/tui-typewriter:55
+#, sh-format
+msgid ""
+"\n"
+"TUI ($ME, Version $script_version)\n"
+"Copyright (C) 2011-2015 Simon Arjuna Erat\n"
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl."
+"html>\n"
+"\n"
+"This is free software; you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: bin/tui-typewriter:64
+#, sh-format
+msgid ""
+"\n"
+"NAME\n"
+"  $ME - Print a file to screen and wrap TUI borders around it\n"
+"\n"
+"SYNOPSYS\n"
+"  $ME [-h|--help] [--version] [-d DELAY=0.05] [-T] FILE \"Some String\" ...\n"
+"  \n"
+"OPTIONS\n"
+"  -h|--help\tShows help and exit with 99\n"
+"  --version\tShows version infoand exit with 0\n"
+"  \n"
+"  -d DELAY\tWaits DELAY seconds before it prints the next char.\n"
+"  \t\tDELAY may be an integer or flaoting point like \"0.007\"\n"
+"  -T\t\tPrints the file name with tui-title before it prints its content\n"
+"EXAMPLE\n"
+"\n"
+"\ttui-typewriter file.txt\n"
+"\t\n"
+"\ttui-typewriter -T /path/to/multiple/files*\n"
+"\t\n"
+"\ttui-typewriter \"Hello $USER_STRING, how are you today?\"\n"
+"\n"
+"HINTS\n"
+"  You can pass a mixed list of files and strings.\n"
+"  \n"
+"BUGS\n"
+"  Report bugs to: <tui-support@nongnu.org>\n"
+"  \n"
+"  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>\n"
+"  \n"
+"  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
+"\n"
+"AUTHOR\n"
+"  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
+msgstr ""
+
+#: bin/tui-typewriter:147
+#, sh-format
+msgid "File: $arg"
+msgstr ""

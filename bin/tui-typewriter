@@ -66,19 +66,25 @@ NAME
   $ME - Print a file to screen and wrap TUI borders around it
 
 SYNOPSYS
-  $ME [-h|--help] [--version] [-t] FILE ...
+  $ME [-h|--help] [--version] [-d DELAY=0.05] [-T] FILE "Some String" ...
   
 OPTIONS
   -h|--help	Shows help and exit with 99
   --version	Shows version infoand exit with 0
   
-  -t		Prints the file name with tui-title before it prints its content
-  
+  -d DELAY	Waits DELAY seconds before it prints the next char.
+  		DELAY may be an integer or flaoting point like "0.007"
+  -T		Prints the file name with tui-title before it prints its content
 EXAMPLE
 
-	tui-printfile file.txt
+	tui-typewriter file.txt
 	
-	tui-printfile -T /path/to/multiple/files*
+	tui-typewriter -T /path/to/multiple/files*
+	
+	tui-typewriter "Hello $USER_STRING, how are you today?"
+
+HINTS
+  You can pass a mixed list of files and strings.
   
 BUGS
   Report bugs to: <tui-support@nongnu.org>
@@ -112,12 +118,14 @@ AUTHOR
 	EOF
 	}
 	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	while getopts ht opt
+	while getopts hd:tT opt
 	do	case $opt in
 		h)	echo "$help_text"
 			exit 1
 			;;
-		t)	TITLE=true
+		d)	DELAY="$OPTARG"
+			;;
+		T)	TITLE=true
 			;;
 		esac
 	done
@@ -133,24 +141,60 @@ AUTHOR
 #
 	
 	for arg in "${ARGS[@]}"
-	do 	if [ -f "$arg" ]
-		then 	$TITLE && tui-title "$(eval_gettext 'File: $arg')"
-			while IFS="" read -er content #|sed s,"	","    ",g
-			do	# Leading dash
-				[ "-" = "${content:0:1}" ] && \
-					leadingDASHdummy="--" || \
-					leadingDASHdummy=""
-				# Tabs, become 4 spaces
-				content="$(echo "$content"|sed s,'	','    ',g)"
-				# Print content
-				tui-printline -E $leadingDASHdummy "${content}"
-			done<"$arg"
-		else	if ! $wasPipe
-			then	RET=1
-				tui-printline -S $RET "$(eval_gettext 'File not found: $arg')"
-			else	tui-printline -E "$arg"
-			fi
-		fi
+	do	# Pass every argument (each separate STRING) by its own.
+		[ -f "$arg" ] && \
+			STRING="$(cat $arg)" && \
+			($TITLE && tui-title "$(eval_gettext 'File: $arg')" || exit 0) || \
+			STRING="$arg"
+		
+		echo "$STRING" | while IFS="" read -er  line
+		do	COUNT=0		# Chars of line
+			PRINTED=0	# Chars printed, to compare with available borders
+			LEN="${#line}"
+		
+		
+			printf "$BORDER_LEFT "
+			while [ $COUNT -lt $LEN ]
+			#while [ $PRINTED -lt $WIDTH ]
+			do 	char="${line:$COUNT:1}"
+				double="${line:$COUNT:2}"
+				#triple="${line:$COUNT:3}"
+				case "$double" in
+#					"\t"|"	")	char="    "
+#						;;
+#					"\n"|"\r")	# |"\\"
+#						char="${double/\\/\\\\}"
+#						COUNT=$(( $COUNT + 2 ))
+#						;;
+				*)	case "$char" in
+					"	"|'\t')
+						char="    "	;;
+					"%")	char="%%"	;;
+					#'\')	char='\\'	;;
+					#'	')
+					#	char="    "	;;
+					#'$')	char='\$'	;;
+					#"{")	char="\{"	;;
+					#"}")	char="\}"	;;
+					esac
+					COUNT=$(( $COUNT + 1 ))
+					;; 
+				esac
+				
+				# Add char to line and print if required
+				#char="${char/\\/\\\\}"
+				printf "$char"
+				PRINTED=$(( $PRINTED + ${#char} ))
+				if [ $PRINTED -eq $WIDTH ] #|| [ "$double" = "\r" ]
+				then	printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n$BORDER_LEFT "
+					PRINTED=0
+				fi
+				sleep $DELAY
+			done
+			
+			# Close the line
+			printf "${EMPTY:$PRINTED}$BORDER_RIGHT\n"
+		done
 	done
 	#printf "\n"
 	exit $RET
