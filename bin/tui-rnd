@@ -22,11 +22,11 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License 3 (GPLv3)
 #	Created:	2011.07.10
-#	Changed:	2015.11.07
-	script_version=0.9.1
+#	Changed:	2015.11.28
+	script_version=0.9.2
 #	Description:	Prints a random number between 0 and 100.
 #			Prints a random number up to MAX.
-#			Prints a random number between MAX and MIN.
+#			Prints a random number between MIN and MAX.
 #
 #	Variables
 #
@@ -44,6 +44,14 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+	doPerm=false
+	doList=false
+	PERM_NUM=""
+	LIST_NUM=""
+	MIN=""
+	MAX=""
+	c=0
+	
 #
 #	Translate preps
 #
@@ -64,22 +72,34 @@ There is NO WARRANTY, to the extent permitted by law.
 ')"
 	TR_MSG_TEXT_HELP="$(gettext '
 NAME
-  $ME - Prints a random number within range
+  $ME - Prints a random number within range (1-100 by without arguments)
 
 SYNOPSYS
-  $ME [-h|--help] [--version] MAXVAL [MINVAL]
+  $ME [-h|--help] [--version] [-p|--perm COUNT [STARTVALUE]] [MAXVAL] [MINVAL MAXVAL]
   
 OPTIONS
   -h|--help	Shows help and exit with 99
   --version	Shows version infoand exit with 0
+  
+  -p|--perm COUNT	Print COUNT different random numbers
  
 EXAMPLE
 
 	$ME
+	35
 	
 	$ME 15
+	14
 	
-	$ME 320 300
+	$ME 300 320
+	303
+	
+	$ME -p 5 200
+	203 204 201 202 200
+	
+	$ME -l 3 100 200
+	176 109 133
+	
 
 BUGS
   Report bugs to: <tui-support@nongnu.org>
@@ -104,26 +124,83 @@ AUTHOR
 	EOF
 	}
 	case "$1" in
-	"--version")	showVersion
-			exit 0
+	"--version")
+		showVersion
+		exit 0
+		;;
+	"-p"|"--perm")
+		doPerm=true
+		PERM_NUM="$2"
+		shift 2
+		# Permutation requires some calulations
+		case $# in
+		1|2)	# If 2, too many arguments, ignoring...
+			MIN=$(( $1 ))
+			MAX=$(( $1 + $PERM_NUM ))
 			;;
+		esac
+		;;
+	"-l"|"--list")
+		doList=true
+		LIST_NUM="$2"
+		shift 2
+		;;
 	"-h"|"--help")
 		printf "$help_text"
 		exit 99
 		;;
 	esac
-	[ -z "$1" ] && MAX=100 || MAX=$1
-	[ -z "$2" ] && MIN=0 || MIN=$2
-#		;;
-#	esac
+	case $# in
+	0)	MIN=${MIN:-1}
+		MAX=${MAX:-100}
+		;;
+	1)	MIN=${MIN:-1}
+		MAX=${MAX:-$1}
+		;;
+	2)	MIN=${MIN:-$1}
+		MAX=${MAX:-$2}
+		;;
+	esac
+#
+#	Functions
+#
+	myRND() { #
+	#
+	#
+		VAR=$[ $RANDOM % $MAX ]
+		while  [ $VAR -lt $MIN ] || [ $VAR -gt $MAX ] 
+		do	VAR=$[ $RANDOM % $MAX ]
+			# This is required, otherwise one never gets the 'max' value.
+			VAR=$(( $VAR + 1 ))
+		done
+		printf "$VAR\n"
+	}
 #
 #	Display & Action
 #
 #
-	VAR=$[ $RANDOM % $MAX ]
-	while  [ $VAR -lt $MIN ] || [ $VAR -gt $MAX ] 
-	do	VAR=$[ $RANDOM % $MAX ]
-		# This is required, otherwise one never gets the 'max' value.
-		VAR=$(( $VAR + 1 ))
-	done
-	printf "$VAR\n"
+	if $doPerm
+	then 	# This part (permutation) is originaly from http://forums.fedoraforum.org/showpost.php?p=1748816&postcount=6
+		declare -A P
+		for x in $(eval echo {${MIN}..${MAX}}); do
+			P[$RANDOM]="$x"
+			((c++))
+			[ $c -eq $PERM_NUM ] && break
+		done
+		echo "${P[@]}"
+		unset P
+	elif $doList
+	then	declare -A L
+		while [ $c -lt $LIST_NUM ]
+		do
+			n=$(myRND)
+			while echo "${L[@]}" | $GREP -q $n
+			do	n=$(myRND)
+			done
+			L[$c]=$n
+			((c++))
+		done
+		echo "${L[@]}"
+		unset L
+	else	myRND		
+	fi
