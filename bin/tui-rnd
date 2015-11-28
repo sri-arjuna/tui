@@ -180,12 +180,13 @@ AUTHOR
 #
 #
 	if $doPerm
-	then 	# This part (permutation) is originaly from http://forums.fedoraforum.org/showpost.php?p=1748816&postcount=6
+	then 	# This part (permutation) is originaly from RupertPumpkin
+		# http://forums.fedoraforum.org/showpost.php?p=1748816&postcount=6
 		declare -A P
 		for x in $(eval echo {${MIN}..${MAX}}); do
 			P[$RANDOM]="$x"
-			((c++))
-			[ $c -eq $PERM_NUM ] && break
+		#	((c++))
+		#	[ $c -eq $PERM_NUM ] && break
 		done
 		echo "${P[@]}"
 		unset P
