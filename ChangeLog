@@ -1,4 +1,15 @@
-2015-11-27 - TUI 0.9.1 - GNU RC22
+2015-12-03 - TUI 0.9.1 GNU RC23 - sea
+* tui-rnd: Added permutation and random picked number lists
+* tui-rnd: Updated po file
+* scripts/prepare.sh: Added debug output if sourcing fails
+* Fixed TERM setting in: tui-bol-gui, tui-bol-root, tui-cat(tui-printfile), 
+*                        tui-conf-get, tui-conf-setm tui-echo(tui-print), 
+*                        tui-printf(tui-printline), tui-log, tui-read,
+*                        tui-status and tui-str-bol-conv
+* Updated YASSI
+* tui-dd: Displaying the progress stoped working... (in progress)
+
+2015-11-27 - TUI 0.9.1 GNU RC22 - sea
 * tui-conf-editor: Asks now wether saving empty variables if aborting/empty or not
 * tui-conf-editor: Updated po file
 * tui-conf-set: Fixed quoting for values with space

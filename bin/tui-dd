@@ -21,20 +21,10 @@
 #	Init TUI environment
 #
 	ME="${0##*/}"
-	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
-	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
-	done
-	# Get the main config files
-	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
-	then 	# Load required variables
-		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
-		do	[ -f "$f" ] && source "$f"
-		done
-	else	source tuirc
-	fi
+	source tuirc
 	break_on_injections "$@" && exit 1
-	TERM="${TERM:-GNUGNU Linux57Linux}"
+	#source "$HOME/.tuirc"
+	TERM="${TERM:-GNU\057Linux}"
 #
 #	Variable defaults
 #
@@ -116,14 +106,6 @@ AUTHOR
 #
 #	Get argumetns
 #
-	case "$SOURCE" in
-	"-h"|"--help")	printf 
-		exit $RET_HELP
-	esac
-	[ "--version" = "${1,,}" ] && showVersion && exit 0
-	
-	
-	
 	# -a|--alternative ; to allow longoptions with a single leading '-'
 	GETOPT=$(getopt \
 		--options	"ho" \
@@ -131,13 +113,14 @@ AUTHOR
 		--name 		"${0##*/}" -- "${@}" \
 	)
 	eval set -- "${GETOPT}";
-	opts_passed=""
+	opts_passed="status=progress"
 	
 	while true
 	do 	case "$1" in
 		# --- Basic args -----
-		-h|--help)	echo "$TR_MSG_TEXT_HELP" ; exit 0	;;
-		--version)	show_version	;;
+		-h|--help)	echo "$TR_MSG_TEXT_HELP" ; exit 99	;;
+		--version)	show_version
+				exit 0	;;
 		--)		shift ; break	;;
 		# ------ arg ------------
 		--options|-o)
@@ -149,43 +132,168 @@ AUTHOR
 #
 #	Variable handling
 #
+	#echo " --------------------- "
+	#echo " --------------------- "
+	#echo " --------------------- "
+	#echo " --------------------- "
 	SOURCE="$1"
 	TARGET="$2"
-	[ -f "$TUI_FILE_TEMP" ] && \
-		>"$TUI_FILE_TEMP" || \
-		touch "$TUI_FILE_TEMP"
-	
-	case "$TARGET" in
-	"")	if tui-yesno "Use USB as target?"
-		then	TARGET="$(tui-str-usb)"
-		else	printf "$help_text"
-			exit 1
-		fi
-		;;
-	esac
-	[ "/dev" = "${TARGET:0:4}" ] && [ 0 -ne $UID ] && \
-		tui-printline -S 1 "$(gettext 'Requires root')" && \
-		exit 1
+	TMP="$TUI_FILE_TEMP"
+	MAX=0
 	SRC="${SOURCE##*/}"
 	TR_MSG_STRING_WORK="$(eval_gettext 'Writing $SRC to $TARGET...')"
 	TR_MSG_STRING_DONE="$(eval_gettext 'Written $SRC to $TARGET')"
+	TR_MSG_WRONG_TYPE="$(eval_gettext 'Could not get type of "$SOURCE"!')"
+	TR_MSG_STARTING="$(gettext 'Starting job, please wait...')"
+	export LC_ALL=C
+	[ -f "$TMP" ] && \
+		>"$TMP" || \
+		touch "$TMP"
+	if [ -z "${opts_passed/status=progress}" ]
+	then 	case "$TARGET" in
+		"")	if tui-yesno "Use USB as target?"
+			then	TARGET="$(tui-str-usb)"
+			else	printf "$help_text"
+				exit 1
+			fi
+			;;
+		esac
+	fi
+	# Add default bytesize if none is passed
+	echo "$opts_passed" | $GREP -q "bs=" || opts_passed+=" bs=${DD_BS:-4M}"
+	
+	# If target is within /dev, root access is required
+	[ "/dev" = "${TARGET:0:4}" ] && [ 0 -ne $UID ] && \
+		tui-printline -S 1 "$(gettext 'Requires root')" && \
+		exit 1
+#
+#	Functions
+#
+	bytes2mb() { echo "${1:-0}" | $AWK '{print int ($1 / 1024 / 1024),"MB"}';}
+	write_dd() { #
+	# Starts dd, prints the exit status
+	# syncs device if required
+		dd $opts_passed \
+			if="$SOURCE" \
+			of="$TARGET" \
+			1>"$TMP"
+	 	printf $? > "$TMP"
+	 	sync
+	}
+	transfered_bytes() { #
+	# Parses the tempfile and prints the bytes transfered
+	# tempfile is similar garabe/hexdump as a curl transfer rate
+		value="$(
+			$AWK 	-vRS=$'\r' \
+				'END{NR=1}END {print $1}' \
+				"$TMP" 
+			)"
+		>"$TMP" 	# | tail -n1
+		printf '%s' "$value" | $SED s,"[(|)]","",g
+	}
+	transfered_mb() { #
+	# Simply parses the tempfile which contains the current data
+	# Return the MB
+		#value="$($AWK  -vRS=$'\r' 'END{NR=1}END {print $3,$4}' \
+		#	"$TUI_FILE_TEMP" | tail -n1)"
+		#printf '%s' "$value" | $SED s,"[(|)]",,g
+		bytes2mb $(transfered_bytes)
+	}
+	
+	get_size() { # ITEM
+	# Identifies type of ITEM (target,destination,trafered)
+	# Returns its current ITEM byte-size, physical reading
+		[ -z "$1" ] && echo "-0" && return 1
+		item="$1"
+		size=""
+		of_file() { #
+		# Simply list the file
+		#
+			$LS -l "$1"|$AWK '{print $5}' >&1
+		}
+		of_dir() { #
+		# Use 'du' to parse the size of the dir its content
+		#
+			DIRNAME="$1"
+			tui-printline -rS 2 "$(eval_gettext 'Calculating size of ${DIRNAME}...')" >&2
+			du -c "$DIRNAME" | tail -n1 | $AWK '{print $1}' >&1
+		}
+		of_block() { #
+		# Depending of blocktype and system, the partitioning-tool 
+		# cannot be granted, prefer gdisk, as UEFI seems to be upcoming
+			BLOCK="$1"
+			tui-printline -rS 2 "$(eval_gettext 'Calculating size of ${BLOCK}...')" >&2
+			if which gdisk 2>/dev/zero 1>/dev/zero
+			then	cmd="gdisk -p"
+			else	cmd="fdisk -l"
+			fi
+			# Written using fdisk, though :p
+			LC_ALL=C $cmd "$BLOCK" | $GREP Disk | \
+				$AWK -v D="$1" '/D/ {print $5}'| head -n1 >&1
+		}
+		# Decide action according to type
+		if [ -b "$item" ]
+		then	size=$(of_block "$item")
+		elif [ -d "$item" ]
+		then	size=$(of_bdir "$item")
+		elif [ -f "$item" ]
+		then	size=$(of_file "$item")
+		else	tui-printline -S 1 "$TR_MSG_WRONG_TYPE"
+			exit 1
+		fi
+		[ -n "$size" ] && \
+			echo "$size" && \
+			return 0
+		return 1
+	}
+	
+#
+#	Action
+#
+	# Inform the user
+	tui-printline -rS 2 "$TR_MSG_STARTING"
+	>"$TMP"
+	
+	# Start the bg job
+	write_dd &
+	PID=$!
+	
+	# Update one time variables for the progress bar
+	MAX=$(get_size "$SOURCE")	# One time calc for the max value
+	[ -z "$MAX" ] && \
+		tui-printline -S 1 "$(eval_gettext 'Could not read SOURCE ($SOURCE)')" && \
+		exit 1
+	MAX_MB=$(bytes2mb ${MAX})	# One time invoke to display the max value
 #
 #	Display
 #
-	(dd $opts_passed if="$SOURCE" of="$TARGET" 2> "$TUI_FILE_TEMP" ; printf $? > "$TUI_FILE_TEMP" ; sync)   &
-	PID=$!
-	tui-printline -rS 2 "$(gettext 'Starting job, please wait...')"
-	sleep 0.7
-#	PID=$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')
-	[ -b "$SOURCE" ] && \
-		MAX=$(gdisk -l $SOURCE|$AWK -v DEV_NUM="$(echo $TARGET|tr -d [:alpha:])" '/ DEV_NUM / {print $4,$5}') || \
-		MAX=$($LS -l "$SOURCE"|$AWK '{print $5}')
-	while [ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
-	do 	kill -USR1 $PID 2>&1
-	 	SIZE=($(tail -n 3 "$TUI_FILE_TEMP" | $GREP "Bytes"|$AWK '{print $1}'))
-		MB=($(tail -n 3 "$TUI_FILE_TEMP" | $GREP "Bytes"|$AWK '{print $3}'))
-		tui-progress -lbm $MAX -c ${SIZE:-$MAX} "$TR_MSG_STRING_WORK" "$MB"
+	while 	[ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
 		sleep 0.7
+	do 	# Debug
+		DEBUG=true
+		
+		# Variables
+		MB="$(transfered_mb)"		# Get data from tempfile
+		$DEBUG && set -x
+		CUR="$(transfered_bytes)"	# Get data from tempfile
+		$DEBUG && set +x
+		#tui-title "$(transfered_bytes)"
+		
+		
+		#Prepare displayed string to user
+		if $DEBUG
+		then 	[ -z "$(echo $CUR)" ] && \
+				echo " -- **** EMPTY \$CUR **** -- " && \
+				hexdump -CL "$TMP"
+			TXT="DBG:: MB:$MB CUR:$CUR MAX_MB:$MAX_MB SRC:$SRC TARGET:$TARGET"
+		else	TXT="$(eval_gettext 'Written $MB/$MAX_MB of $SRC to $TARGET')"
+		fi
+		
+		# Visual output
+		$DEBUG && \
+			(set -x ; tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT" ) || \
+			tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT"
 	done
-	tui-status $(<$TUI_FILE_TEMP) "$TR_MSG_STRING_DONE"
+	LC_ALL=""
+	tui-status $(<$TMP) "$TR_MSG_STRING_DONE"
 

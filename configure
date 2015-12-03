@@ -19,9 +19,9 @@
 #
 #
 #	Created:	2015.07.27
-#	Changed:	2015.11.20
+#	Changed:	2015.11.27
 	script_name=configure
-	script_version=1.2.2
+	script_version=1.2.3
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -151,7 +151,10 @@
 		do 	case "$task" in
 			./make)	# Was PNONY ??
 				printf '%s\n' "options:"  \
-					"	./make"  >> "$M" 
+					"	./make"  >> "$M"
+				[ -f ./make-doc-info ] && \
+					printf '%s\n' \
+						"	./make-doc-info" >> "$M"
 				;;
 			# *-doc-*)
 			#	[ -f "$task" ] && \
@@ -319,8 +322,8 @@ OPTIONS
 	-h|--help		Shows this screen and exits
 	--version		Shows the version and exits
 	
-	--sample		Prints a sample 'configure.cfg' required by projects and exits
-	--sample-full		Prints an advanced sample 'configure.cfg' required by projects and exits
+	--sample		Prints a sample '$CONFIG' required by projects and exits
+	--sample-full		Prints an advanced sample '$CONFIG' required by projects and exits
 	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
 	
 	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR})
@@ -481,6 +484,15 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 						echo "rm -f $DEST/${tr##*/}"
 					fi
 					;;
+				APPDIR|ICONDIR)
+					(
+						. ./$CONFIG
+						for F in $(cd ${!INDEX}/ ; find -type f )
+						do
+							[ ! -d "$F" ] && echo "rm -f $DEST/${F##/*}"
+						done
+					)
+					;;
 				*)	[ -d "$tr" ] && \
 						echo "rm -fr $DEST/${tr##*/}" || \
 						echo "rm -f $DEST/${tr##*/}"
@@ -507,13 +519,33 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 				exit 1
 			elif [ -f "$1" ]
 			then	[ "/" = "${1:0:1}" ] && \
-					echo "sh \"$1\"" || \
-					echo "sh \"./$1\""
+					echo "bash \"$1\"" || \
+					echo "bash \"./$1\""
 			else	echo "$1"
 			fi
 		}
-		write_distclean() { 
+		write_clean() { 
 		# Remove the files that where created
+		# from 'make' or make 'html'
+			if [ -n "$(echo ${TEXI[@]})" ]
+			then	#tui-header "DEBUG:: TODO It has info files"
+				for T in "${TEXI[@]}";do
+					first="$(echo ${T}|$AWK '{print $1}')"
+					tt="${first/\.texi}.info"
+					echo $T | awk -vtt="$tt" '{print "rm -fr ",tt}'
+				done
+			fi
+			if [ -n "$(echo ${HTML[@]})" ]
+			then	#tui-header "DEBUG:: TODO It has html files"
+				for T in "${TEXI[@]}";do
+					first="$(echo ${T}|$AWK '{print $1}')"
+					tt="${first/\.texi}.html"
+					echo $T | awk -vtt="$tt" '{print "rm -fr ",tt}'
+				done
+			fi
+		}
+		write_distclean() { 
+		# Remove all the files that where created
 		#
 			echo "rm -f Makefile"
 			for task in make* make-* $REFERENCE
@@ -524,13 +556,13 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		
 		# Prepare script headers
 		if [ -n "$(echo ${MAKE[@]})" ] 
-		then	echo "#!/usr/bin/env sh" > "./make"
+		then	echo "#!/usr/bin/env bash" > "./make"
 			echo "set -x" >> "./make"
 			chmod +x "./make"
 		fi
-		for m in install uninstall distclean
-		do	echo "#!/usr/bin/env sh" > "make-$m"
-			if [ ! "$m" = "distclean" ] && ! $is_at_home 
+		for m in install uninstall distclean clean
+		do	echo "#!/usr/bin/env bash" > "make-$m"
+			if [ ! "$m" = "distclean" ] &&  [ ! "$m" = "clean" ] && !  $is_at_home 
 			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
 					printf '%s\n' \
 					"[ -z \$UID ] && UID=0" \
@@ -547,18 +579,19 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		echo "CHROOT=\${DESTDIR:-$CHROOT}" >> "make-install"
 		echo "CHROOT=\${DESTDIR:-$CHROOT}" >> "make-uninstall"
 		
-		# Do the MAKE stuff, even before PRIOR
-		if [ -n "$(echo ${MAKE[@]})" ]
+		# Create the basic ./make content
+		if [ -n "$(echo ${PREPARE[@]} ${MAKE[@]})" ]
 		then 	C=0
 			touch ./make
-			echo "" >> "./make"
+			chmod +x ./make
+			#echo "#!/usr/bin/env bash" > "./make"
 			while 	item="${MAKE[$C]}"
 				[ -n "$item" ]
 			do 	write_executer "$item" >> "./make"
 				echo >> "./make"
 				((C++))
 			done
-		else 	echo "echo 'Nothing todo.'" >> "./make"
+		else 	echo "echo 'Nothing todo.'" > "./make"
 		fi
 		
 		# Write content of PRIOR tasks, if any
@@ -766,8 +799,9 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			done
 		fi
 		write_distclean >> "make-distclean"
-		for m in install uninstall distclean doc-{info,html,dvi,ps,pdf}
-		do	if [ -f "-/make-$m" ]
+		write_clean >> "make-clean"
+		for m in install uninstall clean distclean doc-{info,html,dvi,ps,pdf}
+		do	if [ -f "./make-$m" ]
 			then 	echo >> "make-$m"
 				printf '%s\n' \
 					"RET=\$?" \
@@ -854,8 +888,8 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
 			htmldir|dvidir|pdfdir|psdir)	tmp="${FHS[docdir]}" ;;
 			compldir)	# Some systems have bash completion within the SYSCONFDIR
-					if [ -d "${FHS[datarootdir]}/bash-completion/completions" ]
-					then 	tmp="${FHS[datarootdir]}/bash-completion/completions"
+					if [ -d "${FHS[datarootdir]}/bash_completion/completions" ]
+					then 	tmp="${FHS[datarootdir]}/bash_completion/completions"
 					elif [ -d "${FHS[sysconfdir]}/bash_completion.d" ]
 					then	tmp="${FHS[sysconfdir]}/bash_completion.d"
 					else # Use default as fallback
@@ -945,7 +979,6 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="_${APP_VER}"
-		#./configure --prefix="${FHS[prefix]}"
 		for t in "${PRIOR[@]}"
 		do 	(set -x ; $t )
 		done
@@ -962,25 +995,22 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
 		if [ -n "$(echo ./make-doc-*)" ] 
 		then
-			[ -f Makefile ] && [ -f make-doc* ] && \
-				echo "You might want to run:" && \
-				grep ":" Makefile | awk '{print $1}' | \
-					grep -ve tall -ve opt -ve clea -ve PH|\
-					while read var;do echo "* make ${var/\:}";done
+			if [ -f Makefile ]
+			then 	for mm in ./make-doc-*
+				do
+					[ ! -f make-doc-info ] && \
+						echo "You might want to run:" && \
+						grep ":" Makefile | awk '{print $1}' | \
+							grep -ve tall -ve opt -ve clea -ve PH|\
+							while read var;do echo "* make ${var/\:}";done
+				done
+			fi
 		#	 && \
 		#		echo "You might to run $(echo ./make-doc-*)."
 		fi
 		[ -f Makefile ] && \
-			echo "To install \"${APP_TITLE:-$APP}\" now, please execute: make && ${install_prefix}'make install'" || \
-			echo "To install \"${APP_TITLE:-$APP}\" now, please execute: ./make && ${install_prefix}'./make-install'"
-			
-
-		#	if ${doMakefile}
-		#	then	SRCH="exit \$RET"
-		#		REPL="echo 'Please use:	make info\n\t\tmake html\nAs well before\tmake install'\nexit \$RET"
-		#		sed s,"$SRCH","$REPL",g -i "./make"
-		#	else	echo "To install \"${APP_TITLE:-$APP}\" now, please execute:  './make && make info && make html &&  ${install_prefix}./make-install'"
-		#	fi
+			echo "To install \"${APP_TITLE:-$APP} ($APP_VER)\" now, please execute: make && ${install_prefix}'make install'" || \
+			echo "To install \"${APP_TITLE:-$APP} ($APP_VER)\" now, please execute: ./make && ${install_prefix}'./make-install'"
 		echo
 	fi
 	exit

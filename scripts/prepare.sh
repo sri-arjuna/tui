@@ -19,7 +19,7 @@
 #
 #	Prepare the RC file
 #
-	source ./configure.cfg
+	source ./configure.cfg || echo "Error:: Missing PATH? :: $PATH" >&2
 	source ./tui_dirs.conf
 #
 #	Write it

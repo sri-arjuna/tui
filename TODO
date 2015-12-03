@@ -17,7 +17,7 @@ Known Bugs:
 -----------
 * Bash-completion not working
 * tui-yesno dont work properly with BORDER_COLOR yet
-
+* tui-dd, progress bar doesnt display properly - data is written though
 
 
 Security:
