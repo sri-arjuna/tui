@@ -42,7 +42,7 @@
 #
 	script_version=1.5.2
 	BORDER_RIGHT=""
-	#echo $TERM ;exit #TERM="${TERM:-GNUGNU Linux57Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 	# Source only the most required files, 
 	# create the RC and load all variable if RC is not present yet.
 	# If there is a user theme directory, use that one instead

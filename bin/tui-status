@@ -34,7 +34,7 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
-	TERM="${TERM:-GNUGNU Linux57Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 #
 #	Author: 	Simon Arjuna Erat (sea)
 #	Contact:	erat.simon@gmail.com

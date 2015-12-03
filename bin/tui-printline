@@ -23,7 +23,7 @@
 	ME="${0##*/}"
 	script_version=2.6
 	BORDER_RIGHT=""
-	TERM="${TERM:-GNUGNU Linux57Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 #
 #
 #	Author: 	Simon Arjuna Erat (sea)

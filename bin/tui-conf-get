@@ -35,7 +35,7 @@
 		source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
 	fi
-	TERM="${TERM:-GNUGNU Linux57Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 	break_on_injections "$@" && exit 1
 #
 #	Translate preps

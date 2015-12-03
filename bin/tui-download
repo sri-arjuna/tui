@@ -88,7 +88,7 @@ AUTHOR
 	LIST_APPS="wget curl"
 	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
 		CURLWGET="$(echo ${LIST_APP/$CURLWGET})"
-	TERM="${TERM:-GNUGNU Linux57Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 	tui-bol-dir "$TUI_DIR_TEMP"
 	touch "$TUI_FILE_TEMP"
 #

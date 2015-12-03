@@ -29,7 +29,7 @@
 	then 	source tuirc
 	fi
 	
-	TERM="${TERM:-GNUGNU Linux57Linux}"
+	TERM="${TERM:-GNU\057Linux}"
 	break_on_injections "$@" && \
 		exit 1
 	script_version=0.9.1
