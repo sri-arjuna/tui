@@ -132,6 +132,16 @@ AUTHOR
 #
 #	Variable handling
 #
+	func_cancel() { # 
+	#
+	#
+		tui-printline -S 1 \
+			"$(eval_gettext 'Aborted writing of $SRC')"
+		kill -9 $PID
+		exit $? 
+	}
+	trap func_cancel SIGINT SIGABRT
+	trap "exit $?" SIGQUIT
 	#echo " --------------------- "
 	#echo " --------------------- "
 	#echo " --------------------- "
@@ -149,7 +159,10 @@ AUTHOR
 	[ -f "$TMP" ] && \
 		>"$TMP" || \
 		touch "$TMP"
-	if [ -z "${opts_passed/status=progress}" ]
+	if [ -z "$1" ]
+	then	echo "$TR_MSG_TEXT_HELP"
+		exit 1
+	elif [ -z "${opts_passed/status=progress}" ]
 	then 	case "$TARGET" in
 		"")	if tui-yesno "Use USB as target?"
 			then	TARGET="$(tui-str-usb)"
@@ -176,9 +189,10 @@ AUTHOR
 		dd $opts_passed \
 			if="$SOURCE" \
 			of="$TARGET" \
-			1>"$TMP"
-	 	printf $? > "$TMP"
-	 	sync
+			2>"$TMP"
+		#printf "\n"
+		#tui-title $count
+	 	printf $? > "$TMP" && sync
 	}
 	transfered_bytes() { #
 	# Parses the tempfile and prints the bytes transfered
@@ -188,7 +202,7 @@ AUTHOR
 				'END{NR=1}END {print $1}' \
 				"$TMP" 
 			)"
-		>"$TMP" 	# | tail -n1
+		#>"$TMP" 	# | tail -n1
 		printf '%s' "$value" | $SED s,"[(|)]","",g
 	}
 	transfered_mb() { #
@@ -264,35 +278,55 @@ AUTHOR
 		tui-printline -S 1 "$(eval_gettext 'Could not read SOURCE ($SOURCE)')" && \
 		exit 1
 	MAX_MB=$(bytes2mb ${MAX})	# One time invoke to display the max value
+	>"$TMP"
+	size=0
+	hasRaised=false
 #
 #	Display
 #
-	while 	[ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
+	while 	ps $PID >/dev/zero
+		#[ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
 		sleep 0.7
 	do 	# Debug
-		DEBUG=true
+		DEBUG=false
+		kill -USR1 $PID || exit 1
+		
 		
 		# Variables
-		MB="$(transfered_mb)"		# Get data from tempfile
 		$DEBUG && set -x
 		CUR="$(transfered_bytes)"	# Get data from tempfile
 		$DEBUG && set +x
+		MB="$(bytes2mb $CUR)"		# Get data from tempfile
 		#tui-title "$(transfered_bytes)"
 		
 		
-		#Prepare displayed string to user
-		if $DEBUG
-		then 	[ -z "$(echo $CUR)" ] && \
-				echo " -- **** EMPTY \$CUR **** -- " && \
-				hexdump -CL "$TMP"
-			TXT="DBG:: MB:$MB CUR:$CUR MAX_MB:$MAX_MB SRC:$SRC TARGET:$TARGET"
-		else	TXT="$(eval_gettext 'Written $MB/$MAX_MB of $SRC to $TARGET')"
-		fi
+		count=$(<$TMP)
+		case "$count" in
+		0|1)	tui-progress "$(eval_gettext 'Synchronizing $TARGET')"
+			;;
+		*)	#tui-header $count
+			#Prepare displayed string to user
+			if $DEBUG
+			then 	[ -z "$(echo $CUR)" ] && \
+					echo " -- **** EMPTY \$CUR **** -- " && \
+					hexdump -CL "$TMP"
+				TXT="DBG:: MB:$MB CUR:$CUR MAX_MB:$MAX_MB SRC:$SRC TARGET:$TARGET"
+				(set -x ; tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT" )
+			else 	if [ -n "$(echo ${CUR/\ })" ]
+				then 	size="$MB"
+					TXT="$(eval_gettext 'Written $SRC to $TARGET ($size/$MAX_MB)')"
+				else	
+					CUR=""
+					TXT="$(eval_gettext '$SRC ($MB) to $TARGET')"
+				fi
+			fi
 		
-		# Visual output
-		$DEBUG && \
-			(set -x ; tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT" ) || \
-			tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT"
+			# Visual output
+			[ -n "$CUR" ] && \
+					tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT" || \
+					tui-progress "$TXT"
+			;;
+		esac
 	done
 	LC_ALL=""
 	tui-status $(<$TMP) "$TR_MSG_STRING_DONE"

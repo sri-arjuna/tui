@@ -1,3 +1,7 @@
+2015-12-03 - TUI 0.9.2 - sea
+* tui-dd: Fixed and improved progress display
+* tui-dd: Updated po file
+
 2015-12-03 - TUI 0.9.1 GNU RC23 - sea
 * tui-rnd: Added permutation and random picked number lists
 * tui-rnd: Updated po file

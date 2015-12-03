@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-20 22:39+0100\n"
+"POT-Creation-Date: 2015-12-03 22:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bin/tui-dd:53
+#: bin/tui-dd:43
 #, sh-format
 msgid ""
 "\n"
@@ -30,7 +30,7 @@ msgid ""
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
 
-#: bin/tui-dd:61
+#: bin/tui-dd:51
 #, sh-format
 msgid ""
 "\n"
@@ -72,9 +72,9 @@ msgid ""
 "  bash(1), dd(1), ps(1)\n"
 "  \n"
 "BUGS\n"
-"  Report bugs to: erat.simon@gmail.com\n"
+"  Report bugs to: <tui-support@nongnu.org>\n"
 "  \n"
-"  TUI - Homepage: <http://www.gnu.org/software/tui/>\n"
+"  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>\n"
 "  \n"
 "  General help using GNU software: <http://www.gnu.org/gethelp/>\n"
 "\n"
@@ -82,20 +82,60 @@ msgid ""
 "  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>\n"
 msgstr ""
 
-#: bin/tui-dd:167
-msgid "Requires root"
+#: bin/tui-dd:139
+#, sh-format
+msgid "Aborted writing of $SRC"
 msgstr ""
 
-#: bin/tui-dd:170
+#: bin/tui-dd:154
 #, sh-format
 msgid "Writing $SRC to $TARGET..."
 msgstr ""
 
-#: bin/tui-dd:171
+#: bin/tui-dd:155
 #, sh-format
 msgid "Written $SRC to $TARGET"
 msgstr ""
 
-#: bin/tui-dd:177
+#: bin/tui-dd:156
+#, sh-format
+msgid "Could not get type of \"$SOURCE\"!"
+msgstr ""
+
+#: bin/tui-dd:157
 msgid "Starting job, please wait..."
+msgstr ""
+
+#: bin/tui-dd:180
+msgid "Requires root"
+msgstr ""
+
+#: bin/tui-dd:232
+#, sh-format
+msgid "Calculating size of ${DIRNAME}..."
+msgstr ""
+
+#: bin/tui-dd:239
+#, sh-format
+msgid "Calculating size of ${BLOCK}..."
+msgstr ""
+
+#: bin/tui-dd:278
+#, sh-format
+msgid "Could not read SOURCE ($SOURCE)"
+msgstr ""
+
+#: bin/tui-dd:305
+#, sh-format
+msgid "Synchronizing $TARGET"
+msgstr ""
+
+#: bin/tui-dd:317
+#, sh-format
+msgid "Written $SRC to $TARGET ($size/$MAX_MB)"
+msgstr ""
+
+#: bin/tui-dd:320
+#, sh-format
+msgid "$SRC ($MB) to $TARGET"
 msgstr ""
