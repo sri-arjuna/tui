@@ -2,11 +2,11 @@
 @comment %**start of header
 @setfilename tui.info
 @include _version.texi
-@settitle Manual 1.0 for GNU Text User Interface (TUI)
+@settitle Manual 1.0 for Text User Interface (TUI)
 @syncodeindex pg cp
 @comment %**end of header
 @copying
-This manual is for GNU TUI (version @value{VERSION}, @value{UPDATED})
+This manual is for TUI (version @value{VERSION}, @value{UPDATED})
 Copyright @copyright{} 2011-2015 Simon Arjuna Erat
 TUI is licensed as GPLv3.
 The manual is licensed as GFDL.
@@ -41,11 +41,11 @@ gnu,linux,script,bash,ash,csh,zsh,tui,cli
 
 @ifnottex
 @node Top
-@top GNU TUI
-This manual is for GNU TUI (version @value{VERSION}, @value{UPDATED}).
+@top TUI
+This manual is for TUI (version @value{VERSION}, @value{UPDATED}).
 @end ifnottex
 
-GNU TUI is a command based Text User Interface framework for scripts.
+TUI is a command based Text User Interface framework for scripts.
 
 Although it requires BASH to be installed, the commands can be called from other SHELLS as well.
 But be aware of their differences, such as string formatting and possible exit codes as examples.
