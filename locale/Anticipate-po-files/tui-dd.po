@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-03 22:07+0100\n"
+"POT-Creation-Date: 2015-12-04 01:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,17 +125,22 @@ msgstr ""
 msgid "Could not read SOURCE ($SOURCE)"
 msgstr ""
 
-#: bin/tui-dd:305
+#: bin/tui-dd:294
+#, sh-format
+msgid "Successfully written $SRC to $TARGET."
+msgstr ""
+
+#: bin/tui-dd:309
 #, sh-format
 msgid "Synchronizing $TARGET"
 msgstr ""
 
-#: bin/tui-dd:317
+#: bin/tui-dd:321
 #, sh-format
 msgid "Written $SRC to $TARGET ($size/$MAX_MB)"
 msgstr ""
 
-#: bin/tui-dd:320
+#: bin/tui-dd:324
 #, sh-format
 msgid "$SRC ($MB) to $TARGET"
 msgstr ""
