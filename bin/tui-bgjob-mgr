@@ -322,9 +322,9 @@ AUTHOR
 		if ! "$QUIET"
 		then	tui-print
 			tui-title "$TR_MSG_WORD_SUMMARY"
-			tui-printline -E "$TR_MSG_TEXT_COMPLETED" 	"$DONE/$MAX"
-			tui-printline -E "$TR_MSG_TEXT_CURRENTLY" 	"$RUN/$LIMIT"
-			tui-printline -E "$TR_MSG_TEXT_EXECUTED" 	"$GOOD"
+			tui-print -E  "$TR_MSG_TEXT_COMPLETED" 	"$DONE/$MAX"
+			tui-print -E  "$TR_MSG_TEXT_CURRENTLY" 	"$RUN/$LIMIT"
+			tui-print -E  "$TR_MSG_TEXT_EXECUTED" 	"$GOOD"
 			
 			tui-print
 			tui-wait "${WAIT:-5}" "$TR_MSG_TEXT_UPDATE"

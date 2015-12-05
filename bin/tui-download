@@ -135,7 +135,7 @@ AUTHOR
 		OPT_Q="-q"
 		OPT_C="-c"	;;
 	"")	tui-status 1 "$MSG_NOTFOUND"
-		tui-printline -E "$MSG_SELECT"
+		tui-print -E  "$MSG_SELECT"
 		CURLWGET="$(tui-select curl wget)"
 		which "$CURLWGET" 1>/dev/zero && \
 			tui-conf-set "$TUI_FILE_USER_APPS" CURLWGET $CURLWGET || \
@@ -163,7 +163,7 @@ AUTHOR
 	do 	THIS="${URL##*/}"
 		out_string="./$THIS"
 		
-		tui-printline -rS 2 "$MSG_INIT_ACT" #"$WORK"
+		tui-print -rS 2 "$MSG_INIT_ACT" #"$WORK"
 		>$TUI_FILE_TEMP
 		echo "LC_ALL=C $CURLWGET $OPT_C $OPT_O \"$out_string\" \"$URL\" 1>/dev/zero 2>$TUI_FILE_TEMP" > "$FILE_CMD"
 		

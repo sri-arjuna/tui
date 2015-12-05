@@ -163,9 +163,9 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 #	Send job to bg and get pid
 #
 	[ ! -f "$JOB" ] && \
-		tui-printline -rS 1 "$(eval_gettext 'Failed, job: $JOB not found!')" && \
+		tui-print -rS 1 "$(eval_gettext 'Failed, job: $JOB not found!')" && \
 		exit 1
-	tui-printline -rS 2 "$(gettext 'Starting job...')"
+	tui-print -rS 2 "$(gettext 'Starting job...')"
 	(
 		"$SHELL" "$JOB" && \
 			printf 0 >&1 > "$TMP" || \
@@ -199,7 +199,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	BG_RET=$(<"$TMP")
 	rm -f "$TMP"
 	if [ "$BG_RET" = "-1" ]
-	then	tui-printline -E "$TXT_EXIT" "$(gettext 'Could not retrieve return value')" "$INFO"
+	then	tui-print -E  "$TXT_EXIT" "$(gettext 'Could not retrieve return value')" "$INFO"
 		exit "$RET_INFO"
 	else	tui-status "$BG_RET" "$TXT_EXIT"
 		exit "$?"

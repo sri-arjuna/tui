@@ -246,12 +246,12 @@ BUGS
 		((seconds_total--))
 		
 		# Display to user
-		tui-printline  "$MSG" "$TIME_string" 
+		tui-print  "$MSG" "$TIME_string" 
 		
 		# Verbose / Countdown?
 		if $beVerbose
 		then	[ $seconds_total -lt 0 ] && \
-				tui-printline -E "$action_text" || \
+				tui-print -E  "$action_text" || \
 				printf "\n"
 		fi
 		sleep 0.999

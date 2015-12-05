@@ -197,12 +197,12 @@ AUTHOR
 			#clear
 			tui-title "${FILE_LABEL:-$CONF}"
 			for item in "${OPTS_FOUND[@]}"
-			do 	tui-printline -E "$item" "$(tui-conf-get -- $CONF $item)"
+			do 	tui-print -E  "$item" "$(tui-conf-get -- $CONF $item)"
 			done
 			tui-print
 			
 			# Select value or back
-			tui-printline -E "$MSG_TR_CHANGE_VALUE"
+			tui-print -E  "$MSG_TR_CHANGE_VALUE"
 			[ "true" = "$hide_edit" ] && this_edit="" || this_edit="$MSG_TR_WORD_EDIT"
 			action=$(tui-select "$MSG_TR_WORD_BACK" $this_edit "${OPTS_FOUND[@]}" )
 			
@@ -228,7 +228,7 @@ AUTHOR
 				fi
 				;;
 			select)	QUESTION="$(eval_gettext 'Select the new value for ${action}($curval)?')"
-				tui-printline -E "$QUESTION"
+				tui-print -E  "$QUESTION"
 				newval=$(tui-select ${OPTIONS[$action]}) || return 1
 				;;
 			esac
@@ -245,7 +245,7 @@ AUTHOR
 	write_default() { # FILE
 	# Writes the file if missing
 	# and fills in all default values if missing
-		[ -z "${INDEX[@]}" ] && tui-printline -S 1 "$(gettext 'No --options OPTNAME passed to write!')" && exit 1
+		[ -z "${INDEX[@]}" ] && tui-print -S 1 "$(gettext 'No --options OPTNAME passed to write!')" && exit 1
 		thisConf="$1" ; [ -z "$thisConf" ] && echo "$(gettext 'Must provide a FILE to $FUNCNAME')" && return 1
 		doOverwrite=false;if [ ! -f "$thisConf" ]; then touch "$thisConf" && doOverwrite=true|| return 1 ;fi
 		$doOverwrite && cat "$TMP" > "$thisConf"
@@ -318,7 +318,7 @@ AUTHOR
 	while 	tui-header "$script_header" "$(date +'%F %T')"
 		tui-title "$script_title"
 	do 	if [ ${#FILES[@]} -ne 1 ]
-		then 	tui-printline -E "$MSG_TR_SELECT_FILE"
+		then 	tui-print -E  "$MSG_TR_SELECT_FILE"
 			thisFile=$(tui-select  "$MSG_TR_WORD_BACK" "${FILES[@]}")
 			[ -f "$thisFile" ] || break
 		else	edit_file "$FILES"

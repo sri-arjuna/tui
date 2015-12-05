@@ -215,9 +215,9 @@ AUTHOR
 #	Display & Action
 #
 	[ 0 -ne $UID ] && \
-		tui-printline -E "$(eval_gettext '$ME requires root access!')" "$FAIL" && \
+		tui-print -E  "$(eval_gettext '$ME requires root access!')" "$FAIL" && \
 		exit 1
-	tui-printline -E "$(gettext 'Installing as dependency:')" "$(echo $@)"
+	tui-print -E  "$(gettext 'Installing as dependency:')" "$(echo $@)"
 #	if ! $doYes
 #	then	tui-yesno "Continue?" || exit 0
 #	fi
@@ -284,7 +284,7 @@ AUTHOR
 			$doLog && tui-log "$LOG" "$(gettext 'Execute:') $cmd_all"
 			
 			tui-progress -m $# "$MSG_TR_WORD_INSTALLING: $app_name" #> /dev/zero
-			tui-printline -rS 2 "$MSG_TR_WORD_INSTALLING $app_name"
+			tui-print -rS 2 "$MSG_TR_WORD_INSTALLING $app_name"
 			
 			if $doYes
 			then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
@@ -301,11 +301,11 @@ AUTHOR
 		done
 		ERR_NO="$[ $count_total - $count_good ]"
 		[ -z "$bad_ones" ] && \
-			tui-printline -E "$(eval_gettext 'There were $ERR_NO errors, namely these:')" "$bad_ones"
+			tui-print -E  "$(eval_gettext 'There were $ERR_NO errors, namely these:')" "$bad_ones"
 	else	# Do all in one bunch, but shorten the names to display
 		all_pkgs=""
 		for a in "${@}";do all_pkgs+=" $(basename $a)";done
-		tui-printline -rS 2 "$MSG_TR_WORD_INSTALLING $all_pkgs"
+		tui-print -rS 2 "$MSG_TR_WORD_INSTALLING $all_pkgs"
 		cmd_all="$APP $cmd $@"
 		$doLog && tui-log "$LOG" "$(gettext 'Trying to execute'): $cmd_all"
 		

@@ -148,7 +148,7 @@ AUTHOR
 			var=EDITOR_CLI || \
 			var=EDITOR_GUI
 		[ -z "$EDITOR" ] && \
-			tui-printline -E "$(eval_gettext 'No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manually!')" && \
+			tui-print -E  "$(eval_gettext 'No editor for $MODE mode could be found, please change \"$TUI_FILE_USER_APPS\" manually!')" && \
 			exit 1
 		tui-conf-set "$TUI_FILE_USER_APPS" "$var" "$EDITOR"
 	fi
@@ -156,6 +156,6 @@ AUTHOR
 	# as not all editors support to open multiple files at once
 	for A in "${ARGS[@]}";do
 		[ ! -z "$A" ] && \
-			tui-printline -E "$(gettext 'Opening:')" "$A" && \
+			tui-print -E  "$(gettext 'Opening:')" "$A" && \
 			"$EDITOR" "$A"
 	done

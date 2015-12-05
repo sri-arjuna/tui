@@ -135,7 +135,7 @@ AUTHOR
 #
 	[ -z "$1" ] && echo -e "$help_text" && exit $RET_HELP
 	for FOLDER in "${ARGS[@]}"
-	do 	tui-printline -rS 2 "$READING..."
+	do 	tui-print -rS 2 "$READING..."
 		THIS="${FOLDER##*/}"
 		PWD_ORG="$(pwd)"
 		
@@ -143,7 +143,7 @@ AUTHOR
 		if $doExtract
 		then	if [ -f "$FOLDER" ]
 			then	size_tarball=$($LS -l "$FOLDER"|$AWK '{print $5}')
-				[ -z "$size_tarball" ] && tui-printline -E "$(gettext 'Failure reading') $FOLDER!" && exit
+				[ -z "$size_tarball" ] && tui-print -E  "$(gettext 'Failure reading') $FOLDER!" && exit
 				
 				#list_tarball=($(tar tf "$FOLDER"))
 				touch "$TUI_FILE_TEMP".2
@@ -191,13 +191,13 @@ AUTHOR
 					done
 					RET=$(cat $TUI_FILE_TEMP)
 				fi
-			else	tui-printline -E "$FOLDER $(gettext 'is not a file or could not be found!')"
+			else	tui-print -E  "$FOLDER $(gettext 'is not a file or could not be found!')"
 			fi
 
 			tui-status $RET "$(gettext 'Extracted:') $FOLDER"
 			RET=$?
 		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
-			tui-printline -rS 2 "$READING..."
+			tui-print -rS 2 "$READING..."
 			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > "$FILE_CMD"
 			cd "$(dirname $FOLDER)"
 			chmod +x "$FILE_CMD"

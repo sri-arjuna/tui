@@ -426,7 +426,7 @@ AUTHOR
 					conf="$(echo $conf)"
 					var=$(tui-conf-get -l "$conf")
 					cat "$conf" >> "$THE_MEGA_CONFIG"
-				else	tui-printline -S 111 "Warning! No file to source found (in): $conf"
+				else	tui-print -S 111 "Warning! No file to source found (in): $conf"
 					tui-wait 3s "Continue in:"
 				fi
 			done
@@ -584,7 +584,7 @@ AUTHOR
 				info)	[ -f "$SPECIAL_NAME.$T" ] && \
 						tui-printfile "$SPECIAL_NAME.$T"
 					;;
-				#help)	[ -f $SPECIAL_NAME.help ] && tui-printline -E "TODO: $(pwd) help" ;;
+				#help)	[ -f $SPECIAL_NAME.help ] && tui-print -E  "TODO: $(pwd) help" ;;
 				esac
 			done
 		fi			
@@ -642,10 +642,10 @@ AUTHOR
 				case $action in
 				help|HELP|h|?)
 					[ -f "$SPECIAL_NAME.help" ] && \
-						tui-printline -E && \
+						tui-print -E  && \
 						tui-title "Help" && \
 						tui-printfile "$SPECIAL_NAME.help" && \
-						tui-printline -E && \
+						tui-print -E  && \
 						tui-press || \
 						tui-wait 5s "Sorry, no help found."
 					;;

@@ -124,7 +124,7 @@ EXAMPLE
   
 HINTS
   If your script should feel too slow, 
-  you might get a slightly better performance using "tui-printline -E"
+  you might get a slightly better performance using "tui-print -E "
   
 SEE ALSO
   bash(1), console_codes(4), gawk(1), grep(1), printf(1),
@@ -169,7 +169,7 @@ AUTHOR
 		exit 99
 		;;
 	"-")	# Read pipe, expect one line
-		# tui-printfile, or at least tui-printline -E is expected to be used for multiple lines
+		# tui-printfile, or at least tui-print -E  is expected to be used for multiple lines
 		read LEFT CENTER RIGHT 
 		set "$LEFT" "$CENTER" "$RIGHT"
 		;;
@@ -187,7 +187,7 @@ AUTHOR
 				# Status requires first to be numeric
 				NUM_ID="$(echo $OPTARG|tr -d [:alpha:])"
 				[ -z "$NUM_ID" ] && \
-					tui-printline -S 1 "$(eval_gettext '$ME: For option \"-S\" the first argument must be numeric!')" && \
+					tui-print -S 1 "$(eval_gettext '$ME: For option \"-S\" the first argument must be numeric!')" && \
 					exit 1	;;
 		r|return)	doReturn=true
 				NL="\r" 	;;
@@ -223,7 +223,7 @@ AUTHOR
 		2)	FIRST="$1"
 			SECOND="$2"
 			;;
-		*)	tui-printline -S 1 "$(gettext 'Too many arguments (check quoting)')!"
+		*)	tui-print -S 1 "$(gettext 'Too many arguments (check quoting)')!"
 			exit 1
 			;;
 		esac
@@ -260,7 +260,7 @@ AUTHOR
 			half=$[ ${#FIRST} / 2 ]
 			part1="${FIRST:0:$half}"
 			part2="${FIRST:$half}"
-			tui-printline $optStyleTMP "$part1"
+			tui-print $optStyleTMP "$part1"
 			$doStatus && \
 				$0 $optStyle "$NUM_ID" " " "$part2" || \
 				$0 $optStyle " " "$part2"
@@ -271,7 +271,7 @@ AUTHOR
 				half=$[ ${#SECOND} / 2 ]
 				part1="${SECOND:0:$half}"
 				part2="${SECOND:$half}"
-				tui-printline $optStyleTMP " " "$part1"
+				tui-print $optStyleTMP " " "$part1"
 				$doStatus && \
 					$0 $optStyle "$NUM_ID" " " "$part2" || \
 					$0 $optStyle " " "$part2"
@@ -279,7 +279,7 @@ AUTHOR
 			then	half=$[ ${#FIRST} / 2 ]
 				part1="${FIRST:0:$half}"
 				part2="${FIRST:$half}"
-				tui-printline $optStyleTMP "$part1"
+				tui-print $optStyleTMP "$part1"
 				# Remains.. still required? -- at least the 'fail' is!
 				$doStatus && \
 					$0 $optStyle "$NUM_ID" " " "$part2" || \
@@ -291,35 +291,35 @@ AUTHOR
 			;;
 		3)	# Print only 2 on the first line
 			if $doStatus
-			then	[ -z "$FIRST" ] || tui-printline $optStyleTMP "$FIRST" 
+			then	[ -z "$FIRST" ] || tui-print $optStyleTMP "$FIRST" 
 				[ ${#SECOND} -gt $WIDTH ] && \
-					tui-printline $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}" && \
-					tui-printline $optStyle "$NUM_ID" " " "${SECOND:($WIDTH - 3)}"|| \
-					tui-printline $optStyle "$NUM_ID" " " "$SECOND"
+					tui-print $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}" && \
+					tui-print $optStyle "$NUM_ID" " " "${SECOND:($WIDTH - 3)}"|| \
+					tui-print $optStyle "$NUM_ID" " " "$SECOND"
 					
 			else	# Regular output, header, title, echo, printf
 				# Treat each argument by itself - lengthiness
 				if [ ${#FIRST} -gt $WIDTH ]
 				then	# The first one is too long
-					[ -z "$FIRST" ] || tui-printline $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
+					[ -z "$FIRST" ] || tui-print $optStyleTMP "${FIRST:0:($WIDTH - 2)}"
 					[ -z "$SECOND" ] && \
-						tui-printline $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
-						tui-printline $optStyle $NUM_ID "$SECOND"
+						tui-print $optStyleTMP " " "${FIRST:($WIDTH - 2)}" || \
+						tui-print $optStyle $NUM_ID "$SECOND"
 				elif [ ${#SECOND} -gt $WIDTH ]
 				then	# The second one is too long
-					[ -z "$FIRST" ] || tui-printline $optStyleTMP "$FIRST" 
-					tui-printline $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
-					tui-printline $optStyle " " "${SECOND:($WIDTH - 3)}" "$THIRD"
+					[ -z "$FIRST" ] || tui-print $optStyleTMP "$FIRST" 
+					tui-print $optStyleTMP " " "${SECOND:0:($WIDTH - 3)}"
+					tui-print $optStyle " " "${SECOND:($WIDTH - 3)}" "$THIRD"
 				elif [ ${#THIRD} -gt $WIDTH ]
 				then	# The third one is too long
-					tui-printline $optStyleTMP "$FIRST" "$SECOND"
-					tui-printline $optStyle " " "$THIRD" ""
+					tui-print $optStyleTMP "$FIRST" "$SECOND"
+					tui-print $optStyle " " "$THIRD" ""
 				else	# Regular output, just re-arrange strings
 					if [ $[ ${#FIRST} + ${#SECOND} ] -lt $WIDTH  ]
-					then	tui-printline $optStyleTMP "$FIRST" "$SECOND" " "
-						tui-printline $optStyle 	" " 	"$THIRD"
-					else	tui-printline $optStyleTMP "$FIRST" 
-						tui-printline $optStyle " " 	"$SECOND" "$THIRD"
+					then	tui-print $optStyleTMP "$FIRST" "$SECOND" " "
+						tui-print $optStyle 	" " 	"$THIRD"
+					else	tui-print $optStyleTMP "$FIRST" 
+						tui-print $optStyle " " 	"$SECOND" "$THIRD"
 					fi
 				fi
 			fi

@@ -135,7 +135,7 @@ AUTHOR
 	func_cancel() { # 
 	#
 	#
-		tui-printline -S 1 \
+		tui-print -S 1 \
 			"$(eval_gettext 'Aborted writing of $SRC')"
 		kill -9 $PID
 		exit $? 
@@ -177,7 +177,7 @@ AUTHOR
 	
 	# If target is within /dev, root access is required
 	[ "/dev" = "${TARGET:0:4}" ] && [ 0 -ne $UID ] && \
-		tui-printline -S 1 "$(gettext 'Requires root')" && \
+		tui-print -S 1 "$(gettext 'Requires root')" && \
 		exit 1
 #
 #	Functions
@@ -229,14 +229,14 @@ AUTHOR
 		# Use 'du' to parse the size of the dir its content
 		#
 			DIRNAME="$1"
-			tui-printline -rS 2 "$(eval_gettext 'Calculating size of ${DIRNAME}...')" >&2
+			tui-print -rS 2 "$(eval_gettext 'Calculating size of ${DIRNAME}...')" >&2
 			du -c "$DIRNAME" | tail -n1 | $AWK '{print $1}' >&1
 		}
 		of_block() { #
 		# Depending of blocktype and system, the partitioning-tool 
 		# cannot be granted, prefer gdisk, as UEFI seems to be upcoming
 			BLOCK="$1"
-			tui-printline -rS 2 "$(eval_gettext 'Calculating size of ${BLOCK}...')" >&2
+			tui-print -rS 2 "$(eval_gettext 'Calculating size of ${BLOCK}...')" >&2
 			if which gdisk 2>/dev/zero 1>/dev/zero
 			then	cmd="gdisk -p"
 			else	cmd="fdisk -l"
@@ -252,7 +252,7 @@ AUTHOR
 		then	size=$(of_bdir "$item")
 		elif [ -f "$item" ]
 		then	size=$(of_file "$item")
-		else	tui-printline -S 1 "$TR_MSG_WRONG_TYPE"
+		else	tui-print -S 1 "$TR_MSG_WRONG_TYPE"
 			exit 1
 		fi
 		[ -n "$size" ] && \
@@ -265,7 +265,7 @@ AUTHOR
 #	Action
 #
 	# Inform the user
-	tui-printline -rS 2 "$TR_MSG_STARTING"
+	tui-print -rS 2 "$TR_MSG_STARTING"
 	>"$TMP"
 	
 	# Start the bg job
@@ -275,7 +275,7 @@ AUTHOR
 	# Update one time variables for the progress bar
 	MAX=$(get_size "$SOURCE")	# One time calc for the max value
 	[ -z "$MAX" ] && \
-		tui-printline -S 1 "$(eval_gettext 'Could not read SOURCE ($SOURCE)')" && \
+		tui-print -S 1 "$(eval_gettext 'Could not read SOURCE ($SOURCE)')" && \
 		exit 1
 	MAX_MB=$(bytes2mb ${MAX})	# One time invoke to display the max value
 	>"$TMP"
@@ -291,7 +291,7 @@ AUTHOR
 		DEBUG=false
 		if ! kill -USR1 $PID 2>/dev/zero
 		then	# All has been written, and sync'd
-			tui-printline -S $(<$TMP) "$(eval_gettext 'Successfully written $SRC to $TARGET.')"
+			tui-print -S $(<$TMP) "$(eval_gettext 'Successfully written $SRC to $TARGET.')"
 			exit $?
 		fi
 		

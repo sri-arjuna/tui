@@ -143,12 +143,12 @@ AUTHOR
 				# Tabs, become 4 spaces
 				content="$(echo "$content"|sed s,'	','    ',g)"
 				# Print content
-				tui-printline -E $leadingDASHdummy "${content}"
+				tui-print -E  $leadingDASHdummy "${content}"
 			done<"$arg"
 		else	if ! $wasPipe
 			then	RET=1
-				tui-printline -S $RET "$(eval_gettext 'File not found: $arg')"
-			else	tui-printline -E "$arg"
+				tui-print -S $RET "$(eval_gettext 'File not found: $arg')"
+			else	tui-print -E  "$arg"
 			fi
 		fi
 	done

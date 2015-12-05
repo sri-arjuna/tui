@@ -165,7 +165,7 @@ AUTHOR
 		FAILED=$(( $FAILED + $RET ))
 	done
 	if $beVerbose
-	then	$countFails && tui-printline -S 111 "$(eval_gettext 'There has been $FAILED errors.')" && RET=$FAILED
+	then	$countFails && tui-print -S 111 "$(eval_gettext 'There has been $FAILED errors.')" && RET=$FAILED
 	else	$countFails && RET=$FAILED
 	fi
 	exit $RET

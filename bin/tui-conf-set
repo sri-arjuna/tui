@@ -164,7 +164,7 @@ AUTHOR
 #	Prechecks
 #
 	[ $# -lt 3 ] && \
-		tui-printline -S 1 "$(eval_gettext '$ME: Requires 3 arguments: CONFFILE VARNAME VALUE')" && \
+		tui-print -S 1 "$(eval_gettext '$ME: Requires 3 arguments: CONFFILE VARNAME VALUE')" && \
 		exit 1
 	# Handle file
 	CONFFILE="$1"	;	shift
@@ -220,6 +220,6 @@ AUTHOR
 
 	$GREP "${VARNAME}" "$CONFFILE" | $GREP -q "$(<$TMP)"
 	RET=$?
-	$beVerbose && tui-printline -S $RET "$CONFFILE" "$VARNAME=$(<$TMP)"
+	$beVerbose && tui-print -S $RET "$CONFFILE" "$VARNAME=$(<$TMP)"
 	rm "$TMP"
 	exit $RET

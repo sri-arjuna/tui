@@ -148,5 +148,5 @@ AUTHOR
 		exit 1
 	fi
 
-	tui-printline -${R}S "${@}"
+	tui-print -${R}S "${@}"
 	exit ${1:-1}

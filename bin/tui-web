@@ -148,7 +148,7 @@ AUTHOR
 			var=BROWSER_CLI || \
 			var=BROWSER_GUI
 		[ -z "$BROWSER" ] && \
-			tui-printline -E "No web browser for $MODE mode could be found, please change \"$CONF\" manually!" && \
+			tui-print -E  "No web browser for $MODE mode could be found, please change \"$CONF\" manually!" && \
 			exit 1
 		# It was found, so save it
 		tui-conf-set -v "$CONF" "$var" "$BROWSER"

@@ -164,7 +164,7 @@ AUTHOR
 		
 		POS="\033[$(( ${#BORDER_LEFT} + ${#1} +3 ))G"
 		
-		tui-printline "$1" >&2
+		tui-print "$1" >&2
 		printf "\r${BORDER_LEFT} $1$POS" >&2
 	
 	}
@@ -215,4 +215,4 @@ AUTHOR
 		EOF
 	fi
 	printf "\r" >&2
-	tui-printline -E "$1" "$INPUT" >&2
+	tui-print -E  "$1" "$INPUT" >&2

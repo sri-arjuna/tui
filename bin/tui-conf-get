@@ -139,7 +139,7 @@ AUTHOR
 #
 	CONFFILE="$1"
 	VARNAME="$2"
-	[ ! -f "$CONFFILE" ]  && tui-printline -S 1 "$(eval_gettext '$CONFFILE does not exist!')" && exit 1
+	[ ! -f "$CONFFILE" ]  && tui-print -S 1 "$(eval_gettext '$CONFFILE does not exist!')" && exit 1
 	[ "$CONFFILE" = "${CONFFILE##*/}" ] && CONFFILE="./$CONFFILE"
 	
 	# If VARNAME starts with Pass|password|pw, do not source the conf file but use awk

@@ -194,7 +194,7 @@ AUTHOR
 		if ! echo "$NUM" | "$GREP" -q ^[0-9] 
 		then	NUM="" 
 			invalid=true 
-			tui-printline "" "" ""
+			tui-print "" "" ""
 			continue
 		fi
 		

@@ -81,7 +81,7 @@ EXAMPLE
   
 HINTS
   If your script should feel too slow, 
-  you might get a slightly better performance using "tui-printline -E"
+  you might get a slightly better performance using "tui-print -E "
   
 SEE ALSO
   bash(1), tui-printline(1)
@@ -125,16 +125,16 @@ AUTHOR
 		while read LEFT CENTER RIGHT
 		do	set "$LEFT" "$CENTER" "$RIGHT"
 			case $# in
-			0)	tui-printline -E 					;;
-			1)	tui-printline -E $leadingDASHdummy "$1"		;;
-			2)	tui-printline -E $leadingDASHdummy "$1" "$2" 	;;
-			3)	tui-printline -E $leadingDASHdummy "$1" "$2" "$3"	;;
+			0)	tui-print -E  					;;
+			1)	tui-print -E  $leadingDASHdummy "$1"		;;
+			2)	tui-print -E  $leadingDASHdummy "$1" "$2" 	;;
+			3)	tui-print -E  $leadingDASHdummy "$1" "$2" "$3"	;;
 			esac
 		done
 	else	case $# in
-		0)	tui-printline -E 					;;
-		1)	tui-printline -E $leadingDASHdummy "$1"		;;
-		2)	tui-printline -E $leadingDASHdummy "$1" "$2" 	;;
-		3)	tui-printline -E $leadingDASHdummy "$1" "$2" "$3"	;;
+		0)	tui-print -E  					;;
+		1)	tui-print -E  $leadingDASHdummy "$1"		;;
+		2)	tui-print -E  $leadingDASHdummy "$1" "$2" 	;;
+		3)	tui-print -E  $leadingDASHdummy "$1" "$2" "$3"	;;
 		esac
         fi

@@ -135,10 +135,10 @@ AUTHOR
 		eval "${@}" #>&2
 		exit "$?"
 	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/zero 1>/dev/zero
-	then	tui-printline -E "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2
+	then	tui-print -E  "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2
 		"${SUDO:-sudo}" ${@} 	>&2
 		exit "$?"
-	else	tui-printline -E "${MSG:-$TR_MSG_TEXT_ROOT}"
+	else	tui-print -E  "${MSG:-$TR_MSG_TEXT_ROOT}"
 		su -c "$(echo $@)" 		>&2
 		exit "$?"
 	fi

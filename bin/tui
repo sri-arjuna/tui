@@ -23,7 +23,7 @@
 #
 	script_version=0.1
 	script_created="2015.11.08"
-	script_changed="2015.11.08"
+	script_changed="2015.12.05"
 	
 	script_name="${0##*/}"
 	script_name="${script_name/.sh/}"
@@ -32,7 +32,8 @@
 	script_url="http://nongnu.org/tui"
 	
 	script_author="Simon Arjuna Erat (sea)"
-	script_contact="erat.simon@gmail.com"
+	script_email="erat.simon@gmail.com"
+	script_contact="tui-support@nongnu.org"
 	script_license="GNU General Public License (GPL)"
 #
 #	Internal preps
@@ -104,14 +105,14 @@ SEE ALSO
   bash(1), gettext(1), tuirc(1), tui-read(1), tui-select(1), txt2man(1)
   
 BUGS
-  Report bugs to: mailinglist ; <${script_contact:-sea@toshiba.ocean}>
+  Report bugs to: mailinglist ; <$script_contact>
   
-  $script_name - Homepage: <${script_url:-}>
+  $script_name - Homepage: <$script_url>
   
   General help using GNU software: <http://www.gnu.org/gethelp/>
 
 AUTHOR
-  ${script_author:-sea}, <>
+  $script_author, <$script_email>
 ')"
 #
 #	Functions
@@ -184,7 +185,7 @@ AUTHOR
 		tui-title "$MSG_TR_TITLE_CENTER"
 		tui-typewriter -d 0.04 "$MSG_TR_WANTLEARN"
 		if tui-yesno " "
-		then	tui-printline -E "${MSG_TR_FUTURE} tuirc"
+		then	tui-print -E  "${MSG_TR_FUTURE} tuirc"
 			tui-wait 3 "$MSG_TR_LEARNMORE"
 			tuirc
 			exit $?

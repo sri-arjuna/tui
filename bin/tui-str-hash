@@ -151,7 +151,7 @@ AUTHOR
 			for T in $TOOLS
 			do	str=$(echo -e "$stream" | $T | $AWK '{print $1}')
 				$beVerbose && \
-					tui-printline -E "$T:" "$str" || \
+					tui-print -E  "$T:" "$str" || \
 					echo "$str"
 			done
 		done
@@ -160,7 +160,7 @@ AUTHOR
 			for T in $TOOLS
 			do	str=$(echo -e "$A" | $T | $AWK '{print $1}')
 				$beVerbose && \
-					tui-printline -E "$T:" "$str" || \
+					tui-print -E  "$T:" "$str" || \
 					echo "$str"
 			done
 		done

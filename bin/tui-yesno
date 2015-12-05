@@ -148,7 +148,7 @@ AUTHOR
 #	Display
 #
 	while ! echo "${answer,,}" | "$GREP" -q ^[yoijsYOJISNn] #= "${answer:0:1}" ] #|| [ ! "^[A-Z]" = "$answer" ]
-	do	tui-printline -r "$1" >&2
+	do	tui-print -r "$1" >&2
 		#printf "\r$POS"
 		printf "\r$BORDER_LEFT $1 ($MSG_TR_YESNO) " >&2
 		"$bash_read_numbers" && \
@@ -156,7 +156,7 @@ AUTHOR
 			"$READ" answer
 	done
 	printf "\r"   >&2
-	tui-printline -E "$1 ($MSG_TR_YESNO) " "$answer"  >&2
+	tui-print -E  "$1 ($MSG_TR_YESNO) " "$answer"  >&2
 	case "$answer" in
 	    y|o|j|s|Y|O|J|S)
 	    		# First letter of the meaning "yes" in these languages:

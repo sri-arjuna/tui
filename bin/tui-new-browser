@@ -140,12 +140,12 @@ AUTHOR
 #
 #	Display & Action
 #
-	tui-printline -H "$ME ($script_version)" "$(date +'%F %T')"
-	tui-printline -T "$TITLE"
-	tui-printline -E "$(gettext 'Starting with basic required configuration')"
+	tui-print -H "$ME ($script_version)" "$(date +'%F %T')"
+	tui-print -T "$TITLE"
+	tui-print -E  "$(gettext 'Starting with basic required configuration')"
 	if [ -z "$TUI_DIR_PROJECTS" ]
 	then	tui-print
-		tui-printline -E "$(gettext 'You have not set \"$TUI_DIR_PROJECTS\" yet.')" \
+		tui-print -E  "$(gettext 'You have not set \"$TUI_DIR_PROJECTS\" yet.')" \
 			"$(gettext 'All future projects will take that as their top dir.')"
 		MSG_MANUAL="$(gettext 'Enter Manual')"
 		oPWD="$PWD";cd "$HOME"
@@ -197,21 +197,21 @@ AUTHOR
 			APP_USER_LABEL)
 				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 				Q="$(eval_gettext "What is the label for $task:")"
-				tui-printline -E "$Q"
+				tui-print -E  "$Q"
 				TASK="$(tui-read)"
 				APP_USER_LABEL="${TASK:-\$USER}}"
 				;;
 			APP_LOC_LABEL)
 				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 				Q="$(eval_gettext "What is the label for $task:")"
-				tui-printline -E "$Q"
+				tui-print -E  "$Q"
 				TASK="$(tui-read)"
 				APP_LOC_LABEL="${TASK:-$(gettext 'Location:')}}"
 				;;
 			APP_POS_LABEL)
 				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 				Q="$(eval_gettext "What is the label for $task:")"
-				tui-printline -E "$Q"
+				tui-print -E  "$Q"
 				TASK="$(tui-read)"
 				APP_LOC_LABEL="${TASK:-\$(MakeCurStr \$(pwd))}}"
 				;;
@@ -224,14 +224,14 @@ AUTHOR
 				APP_DIR_LABEL)
 					tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 					Q="$(eval_gettext "What is the label for $task:")"
-					tui-printline -E "$Q"
+					tui-print -E  "$Q"
 					TASK="$(tui-read)"
 					APP_DIR_LABEL="${TASK:-$(gettext 'Sections')}}"
 					;;
 				APP_FILES_LABEL)
 					tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 					Q="$(eval_gettext "What is the label for $task:")"
-					tui-printline -E "$Q"
+					tui-print -E  "$Q"
 					TASK="$(tui-read)"
 					APP_FILES_LABEL="${TASK:-$(gettext 'Tasks')}}"
 					;;
@@ -248,21 +248,21 @@ AUTHOR
 			APP_CONFIG_FILE)
 				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 				Q="$(eval_gettext 'What is the relative path ($APP_BASE/) of the installed configuration file:')"
-				tui-printline -E "$Q"
+				tui-print -E  "$Q"
 				TASK="$(tui-read)"
 				APP_CONFIG_FILE="${TASK:-$APP_FILE.conf}"
 				;;
 			APP_SOURCE_THIS)
 				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 				Q="$(eval_gettext 'What is the relative path ($APP_BASE/) of the folder to source configuration and/or function files?:')"
-				tui-printline -E "$Q"
+				tui-print -E  "$Q"
 				TASK="$(tui-read)"
 				APP_SOURCE_THIS="${TASK:-includes}"
 				;;
 			APP_SHELL)
 				tui-yesno "$(eval_gettext 'Set the value for $task?')" || continue
 				Q="$(eval_gettext 'What type are your scripts?')"
-				tui-printline -E "$Q"
+				tui-print -E  "$Q"
 				TASK="$(tui-select ash bash csh dash ksh perl python tcsh zsh)"
 				APP_SHELL="${TASK:-bash}"
 				;;

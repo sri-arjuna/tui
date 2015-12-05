@@ -322,25 +322,25 @@ AUTHOR
 		;;
 	#	*)	tui-status 1 "Error, type ($TYPE) is unhandled"	;;
 	esac
-	#[ -z "$PROGRESS" ] && tui-printline -S 1 "Something went terrible wrong..." && exit 1
+	#[ -z "$PROGRESS" ] && tui-print -S 1 "Something went terrible wrong..." && exit 1
 #
 #	Display & Action
 #
 	$CLEARLINE && printf "\e[2K" &
 	case "${TYPE}" in
 	DASH|NUM)
-		tui-printline "$MESSAGE" "$STATUS"
+		tui-print "$MESSAGE" "$STATUS"
 		$doSave && \
 			num_save=$(( $VAL + 1 )) && \
 			save_tmp $num_save
 		;;
 	BAR)	if $longBar
 		then	[ -z "$MESSAGE" ] && \
-				tui-printline "${PROGRESS}" "$STATUS" || \
-				tui-printline "$MESSAGE" "${PROGRESS}${STATUS}"
+				tui-print "${PROGRESS}" "$STATUS" || \
+				tui-print "$MESSAGE" "${PROGRESS}${STATUS}"
 		else	[ -z "$MESSAGE" ] && \
-				tui-printline "${PROGRESS}" || \
-				tui-printline "$MESSAGE" "${PROGRESS}"
+				tui-print "${PROGRESS}" || \
+				tui-print "$MESSAGE" "${PROGRESS}"
 		fi
 		;;
 	esac

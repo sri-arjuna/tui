@@ -312,7 +312,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 				found+=" $f"
 		done
 		if [ $count -gt 1 ]
-		then	tui-printline -E "$(gettext 'Please select which ftp command you want to use:')"
+		then	tui-print -E  "$(gettext 'Please select which ftp command you want to use:')"
 			FTP=$(tui-select $found)
 			printf "\n"
 		else	FTP=$(echo $found|$AWK '{print $1}')
@@ -364,7 +364,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 	
 	# Fill the command list
 	case "$MENU" in
-	cmd)	#tui-printline -E "TODO Generate command list"
+	cmd)	#tui-print -E  "TODO Generate command list"
 		oIFS="$IFS"
 		IFS=";"
 		C=0
@@ -387,10 +387,10 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		BATCHES[${#BATCHES[@]}]="$TEMPFILE"
 		;;
 	down)	###
-		### tui-printline -E "TODO Download file" -- just copy pasted from the upload section
+		### tui-print -E  "TODO Download file" -- just copy pasted from the upload section
 		###
 		$beVerbose && \
-			tui-printline -rS 2 "$(gettext 'Generate download commands...')"
+			tui-print -rS 2 "$(gettext 'Generate download commands...')"
 		count=0 ; total=${#REM_FILES[@]}
 		DEFAULT_DIR="${LOC_PATHS[0]}"
 		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
@@ -420,7 +420,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		action_done="$(gettext 'Downloaded file')"
 		;;
 	up)	$beVerbose && \
-			tui-printline -rS 2 "$(gettext 'Generate upload commands...')"
+			tui-print -rS 2 "$(gettext 'Generate upload commands...')"
 		count=0 ; total=${#LOC_FILES[@]}
 		DEFAULT_DIR="${REM_PATHS[0]}"
 		[ -z "$DEFAULT_DIR" ] && DEFAULT_DIR="/"
@@ -460,7 +460,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		HOST_STRING="$HOST" || \
 		HOST_STRING="$USERNAME@$HOST"
 	[ -z "$HOST" ] && \
-		tui-printline -S 1 "$(gettext 'No host supplied.')" && \
+		tui-print -S 1 "$(gettext 'No host supplied.')" && \
 		exit 1
 	
 	if ! $GREP -q "$HOST" ~/.netrc

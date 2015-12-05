@@ -184,6 +184,6 @@ AUTHOR
 			( $GREP -q "$D" "$LOG" || tui-log -e "$LOG" "$daily_date_str" )
 	fi
 	while [ " " = "${PRE:0:1}" ] ;do PRE="${PRE:1}";done	# Remove leading spaces
-	$beVerbose && tui-printline -E "$MSG"
+	$beVerbose && tui-print -E  "$MSG"
 	printf -- "${PRE}${MSG}\n" >> "$LOG"
 	
