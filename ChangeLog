@@ -2,6 +2,7 @@
 * lists/web_gui: Renamed chromium -> chromium-browser
 * docs/texi/fdl.texi: Included now in tui.texi
 * configure.cfg: Removed docs/texi/fdl.texi from the INFO/HTML tasks.
+* configure.cfg: Now checks if make was run or not
 * tui-dd: Fixed and improved progress display
 * tui-dd: Updated po file
 * tui-wait: Fixed 'splitting' of hours and minutes
