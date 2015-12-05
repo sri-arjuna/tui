@@ -182,7 +182,7 @@ AUTHOR
 	if [ -z "$1" ] 
 	then	tui-header "$MSG_TR_TITLE_LEFT" "$MSG_TR_TITLE_RIGHT"
 		tui-title "$MSG_TR_TITLE_CENTER"
-		tui-printfile -d 0.04 "$MSG_TR_WANTLEARN"
+		tui-typewriter -d 0.04 "$MSG_TR_WANTLEARN"
 		if tui-yesno " "
 		then	tui-printline -E "${MSG_TR_FUTURE} tuirc"
 			tui-wait 3 "$MSG_TR_LEARNMORE"
