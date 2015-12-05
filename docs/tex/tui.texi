@@ -586,8 +586,10 @@ Showing the full countdown:
 
 
 @subsection tui-web
-Well, Firefox might be a good choice, but some people do not have it installed, this takes care of it,
-just like tui-edit, tui-filemgr, and tui-terminal.
+Not everyone might have Icecat or Midori installed, tui-web will search for installed web browser and open the passed URL in the first it finds.
+
+If none is found, it asks the user to either install one from the list, or to manualy type the name of the browser (s)he uses.
+Just like tui-edit, tui-filemgr, and tui-terminal.
 
 @example
 	tui-web "http://www.gnu.org"
@@ -1116,5 +1118,8 @@ where i went back to my origins, and created homepages and flyers for several ba
 
 Then finaly in 2011, i've had enough of Windows and 'joined the GNU/Linux Community'.
 Providing my part to it, by realizing/writing an idea i've had almost 20 years ago... TUI for scripts.
+
+@subsection Manual License
+@include fdl.texi
 
 @bye
