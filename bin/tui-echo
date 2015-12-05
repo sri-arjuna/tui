@@ -1,1 +1,140 @@
-tui-print
+#!/usr/bin/env bash
+#
+# Copyright (c) 2014-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	Variable defaults
+#
+	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
+	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
+	done
+	# Get the main config files
+	# 
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc )
+	then 	source tuirc
+	fi
+	
+	TERM="${TERM:-GNU\057Linux}"
+	break_on_injections "$@" && \
+		exit 1
+	script_version=0.9.1
+	ME="${0##*/}"
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+TUI ($ME, Version $script_version)
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+NAME
+  $ME - echo, TUI-style
+
+SYNOPSYS
+  $ME [-h|--help] [--version] [[-] | [str1] [str2] [str3]]
+  
+DESCRIPTION
+  Prints one string on the left
+  Prints two strings left and right
+  Prints three strings left, entered and right
+
+  Pass \"-\" to read input from pipe
+  One can pass empty strings to align the desired output.
+  
+OPTIONS
+  -h|--help	Shows help and exit with 99
+  --version	Shows version infoand exit with 0
+  
+  -		Read input from pipe
+ 
+EXAMPLE
+
+	$ME "Hello World" 
+	$ME "i am left"  "i am right"
+	$ME "" "i am centered" ""
+  
+HINTS
+  If your script should feel too slow, 
+  you might get a slightly better performance using "tui-printline -E"
+  
+SEE ALSO
+  bash(1), tui-printline(1)
+  
+BUGS
+  Report bugs to: <tui-support@nongnu.org>
+  
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
+#
+#	Variable handling
+#
+	showVersion() { 
+	cat <<-EOF
+		$TR_MSG_TEXT_VERSION
+	EOF
+	}
+	case "$1" in
+	"--version")	showVersion
+			exit 0
+			;;
+	"-h"|"--help")
+		echo "$TR_MSG_TEXT_HELP"
+		exit 99
+		;;
+	*)	[ "-" = "${1:0:1}" ] && \
+			leadingDASHdummy="--" || \
+			leadingDASHdummy=""
+		;;
+	esac
+#
+#	Display
+#
+	if [ "-" = "$1" ] || [ "--" = "$1" ]
+	then	# Do pipe handling
+		while read LEFT CENTER RIGHT
+		do	set "$LEFT" "$CENTER" "$RIGHT"
+			case $# in
+			0)	tui-printline -E 					;;
+			1)	tui-printline -E $leadingDASHdummy "$1"		;;
+			2)	tui-printline -E $leadingDASHdummy "$1" "$2" 	;;
+			3)	tui-printline -E $leadingDASHdummy "$1" "$2" "$3"	;;
+			esac
+		done
+	else	case $# in
+		0)	tui-printline -E 					;;
+		1)	tui-printline -E $leadingDASHdummy "$1"		;;
+		2)	tui-printline -E $leadingDASHdummy "$1" "$2" 	;;
+		3)	tui-printline -E $leadingDASHdummy "$1" "$2" "$3"	;;
+		esac
+        fi
