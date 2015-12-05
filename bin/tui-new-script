@@ -32,11 +32,13 @@
 	else	source tuirc
 	fi
 	break_on_injections "$@" && exit 1
+	[ -f ~/.tuirc ] && source ~/.tuirc || source tuirc
 #
 #	Variable defaults
 #
-	script_version=1.7.1
+	script_version=1.7.2
 	ME="${0##*/}"
+	DEBUG=true
 #
 #	Translate preps
 #
@@ -131,6 +133,7 @@ AUTHOR
 #
 #	Display
 #
+	$DEBUG && set -x
 	if [ -z "$1" ]
 	then	# No filename passed
 		MSG_TR_="$(gettext 'Enter the filename for the script:')"
@@ -142,6 +145,7 @@ AUTHOR
 			#tui-bol-dir -v "$(dirname "$DEST")"
 		fi
 	else	# There is a name passed
+		$DEBUG && tui-title "$LINENO -- There is a name passed"
 		if [ "$1" = "${1##*/}" ]
 		then	# Has no path - incl no leading ./
 			DEST="$TUI_DIR_USER_SCRIPTS/$1"
@@ -152,7 +156,7 @@ AUTHOR
 		fi
 	fi
 	
-	
+	$DEBUG && tui-title "$LINENO"
 	
 	if [ -f "$DEST" ]
 	then	tui-yesno "$(eval_gettext 'File $DEST exists... Overwrite?')" ||  ( 
@@ -161,6 +165,8 @@ AUTHOR
 			tui-status "$?" "$(eval_gettext 'Saved original $DEST to $BACKUP')"
 		)
 	fi
+	
+	$DEBUG && tui-title "$LINENO"
 	
 	# Check where provided template path is
 	if [ -f "$TUI_DIR_TEMPLATES/scripts/$SCRIPT" ]
@@ -173,6 +179,8 @@ AUTHOR
 		exit 1
 	fi
 	
+	$DEBUG && tui-title "$LINENO"
+	
 	# Did it get created
 	[ -f "$DEST" ]
 	if tui-status $? "$(gettext 'Saved script:') $DEST"
@@ -180,9 +188,12 @@ AUTHOR
 	else	exit $?
 	fi
 	
+	$DEBUG && tui-title "$LINENO"
+	
 	if ${default_new_script_manpage_ask:-true}
 	then	tui-yesno "$(gettext 'Create a manpage as well?')" && \
 			tui-new-manpage "$DEST"
 	fi
 	# Open the script AFTER the manpage... to encourage the writing of the man pages first ;)
 	tui-edit "$DEST"
+	$DEBUG && set +x
