@@ -1,6 +1,11 @@
-2015-12-03 - TUI 0.9.2 - sea
+2015-12-05 - TUI 0.9.2 GNU RC 24 - sea
+* lists/web_gui: Renamed chromium -> chromium-browser
+* docs/texi/fdl.texi: Included now in tui.texi
+* configure.cfg: Removed docs/texi/fdl.texi from the INFO/HTML tasks.
 * tui-dd: Fixed and improved progress display
 * tui-dd: Updated po file
+* tui-wait: Fixed 'splitting' of hours and minutes
+
 
 2015-12-03 - TUI 0.9.1 GNU RC23 - sea
 * tui-rnd: Added permutation and random picked number lists

@@ -23,7 +23,7 @@
 #	Help text
 #
 	script_name=tui-wait
-	script_version=0.9.1
+	script_version=0.9.2
 	beVerbose=false
 	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -105,7 +105,7 @@ BUGS
 #
 #	Variables
 #
-	TIME="${1//[a-zA-Z]//}"
+	TIME="${1/[a-zA-Z]}"
 	UNIT="$(printf ${1}|tr -d [:digit:])"
 	( [ -z "$TIME" ] || echo "${UNIT:-s}"|${GREP:-grep} -v ^[smh]$ ) && \
 		printf "$help_text" && exit 1
@@ -128,7 +128,7 @@ BUGS
 #
 #	Functions
 #
-	function seconds2TIME() { #
+	function seconds2TIME() { # ORIGINAL -- leave as fallback info, it was a randomly faster, but granted.
 	# Returns the TIME as string
 	# as much as applicable: hh:mm:ss
 		tmp_input="${seconds_total:-0}" 
@@ -177,6 +177,65 @@ BUGS
 		# output
 		echo "${hours}${minutes}$seconds"
 	}
+	function seconds2TIME() { # --> NEW ONE
+	# Returns the TIME as string
+	# as much as applicable: hh:mm:ss
+		tmp_input="${seconds_total:-0}" 
+		tmp_work="$tmp_input"
+		
+		M=60
+		H=3600
+		# display
+		hours=0
+		minutes=0
+		seconds=0
+		# subtraction
+		sub_hrs=0
+		sub_min=0
+		
+		
+		# Get hours
+		while [ $tmp_work -ge $H ]
+		do
+			((hours++))
+			tmp_work=$(( $tmp_work - $H ))
+		done
+		# Get minutes
+		while [ $tmp_work -ge $M ]
+		do
+			((minutes++))
+			tmp_work=$(( $tmp_work - $M ))
+		done
+		seconds=$tmp_work
+		
+		
+		# Format strings - hrs
+		[ $hours -eq 0 ] && \
+			hours="0" || hours+=":"
+		
+		# Format strings - mins
+		if [ ${hours/:} -eq 0 ] && [ ${minutes/:} -eq 0 ]
+		then	minutes="0"
+		elif [ ${hours/:} -gt 0 ]
+		then	[ ${#minutes} -lt 2 ] && \
+				minutes="0${minutes}:" || \
+				minutes+=":"
+		else	minutes+=":"
+		fi
+		
+		# Format strings - secs
+		if [ ${hours/:} -gt 0 ] || [ ${minutes/:} -gt 0 ]
+		then	[ ${#seconds} -lt 2 ] && \
+				seconds="0${seconds}"
+		fi
+		
+		# Remove the single '0', as they were only required to be 'math compatible'
+		[ "$hours" = "0" ] && hours=""
+		[ "$minutes" = "0" ] && minutes=""
+		
+		
+		echo "${hours}${minutes}$seconds"
+	}
 #
 #	Action - loop
 #
@@ -195,6 +254,6 @@ BUGS
 				tui-printline -E "$action_text" || \
 				printf "\n"
 		fi
-		sleep 1
+		sleep 0.999
 	done
 	exit 0
