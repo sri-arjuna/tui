@@ -38,7 +38,7 @@
 #
 	script_version=1.7.2
 	ME="${0##*/}"
-	DEBUG=true
+	DEBUG=false
 #
 #	Translate preps
 #
