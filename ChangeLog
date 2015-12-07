@@ -6,7 +6,7 @@
 * tui-dd: Fixed and improved progress display
 * tui-dd: Updated po file
 * tui-wait: Fixed 'splitting' of hours and minutes
-
+* tui-select: Updated return code
 
 2015-12-03 - TUI 0.9.1 GNU RC23 - sea
 * tui-rnd: Added permutation and random picked number lists
