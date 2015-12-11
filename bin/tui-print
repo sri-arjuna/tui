@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.6
+	script_version=2.7
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU\057Linux}"
 #
@@ -495,18 +495,18 @@ AUTHOR
 	else	str=""
 	fi
 	# Generate borders
-	START="${CL}${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}${str}"
+	START="${CL}${POS_CLS}${COLOR_LINE_START}${BORDER_LEFT}${COLOR_LINE_IDENT}"
 	END="${POS_CLC}${COLOR_LINE_CLOSE}${POS_CLE}${BORDER_RIGHT}${COLOR_LINE_END}"
 #
 #	Display & Action
 #
-	printf "${START}"
-	[ -z "$FIRST" ]  || printf "${POS_CLI}$FIRST"
+	printf "${START}%s" "${str}"
+	[ -z "$FIRST" ]  || printf "${POS_CLI}%s" "$FIRST"
 	if [ ! -z "$SECOND" ] 
 	then	num_tmp=$(( $pos_cli_num + ${#FIRST} ))
 		[ $num_tmp -gt $pos_center_num ] && \
 			POS_CENTER="\033[$(( $num_tmp + 1 ))G"
 		printf  "${POS_CENTER}$SECOND"
 	fi
-	[ -z "$THIRD" ]  || printf "${POS_THIRD}$THIRD"
+	[ -z "$THIRD" ]  || printf "${POS_THIRD}%s" "$THIRD"
 	printf "${END}"

@@ -32,7 +32,7 @@
 	TERM="${TERM:-GNU\057Linux}"
 	break_on_injections "$@" && \
 		exit 1
-	script_version=0.9.1
+	script_version=0.9.2
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -99,42 +99,82 @@ AUTHOR
 #
 #	Variable handling
 #
-	showVersion() { 
-	cat <<-EOF
+#
+#	Varbles
+#
+	doUnderstand=false
+	R=""
+#
+#	Functions
+#
+	show_version() { 
+		cat <<-EOF
 		$TR_MSG_TEXT_VERSION
-	EOF
+		EOF
+		exit 0
 	}
-	case "$1" in
-	"--version")	showVersion
-			exit 0
-			;;
-	"-h"|"--help")
+	show_help() { 
 		echo "$TR_MSG_TEXT_HELP"
-		exit 99
-		;;
-	*)	[ "-" = "${1:0:1}" ] && \
-			leadingDASHdummy="--" || \
-			leadingDASHdummy=""
-		;;
-	esac
+		exit 0
+	}
+#
+#	Get options
+#
+	while true
+	do 	case "$1" in
+		"--version")	show_version	;;
+		-h|--help)	show_help	;;
+		--)		shift ; break	;;
+		-e)		doUnderstand=true ; shift ;;
+		-E)		doUnderstand=false ; shift ;;
+		-n|-r)		R="r" ; shift ;;
+		*)		[ "-" = "${1:0:1}" ] && \
+					leadingDASHdummy="--" || \
+					leadingDASHdummy=""
+					;;
+		esac
+	done
 #
 #	Display
 #
-	if [ "-" = "$1" ] || [ "--" = "$1" ]
-	then	# Do pipe handling
-		while read LEFT CENTER RIGHT
-		do	set "$LEFT" "$CENTER" "$RIGHT"
+	if $doUnderstand
+	then	if [ "-" = "$1" ] || [ "--" = "$1" ]
+		then	# Do pipe handling, that is
+			while read LEFT CENTER RIGHT
+			do	set "$(echo -e $LEFT)" "$(echo -e $CENTER)" "$(echo -e $RIGHT)"
+				case $# in
+				0)	tui-print -${R}E  					;;
+				1)	tui-print -${R}E $leadingDASHdummy "$1"		;;
+				2)	tui-print -${R}E $leadingDASHdummy "$1" "$2" 	;;
+				3)	tui-print -${R}E $leadingDASHdummy "$1" "$2" "$3"	;;
+				esac
+			done
+		else	[ -n "$1" ] && one="$(echo -e $1)"
+			[ -n "$2" ] && two="$(echo -e $2)"
+			[ -n "$3" ] && three="$(echo -e $3)"
 			case $# in
-			0)	tui-print -E  					;;
-			1)	tui-print -E  $leadingDASHdummy "$1"		;;
-			2)	tui-print -E  $leadingDASHdummy "$1" "$2" 	;;
-			3)	tui-print -E  $leadingDASHdummy "$1" "$2" "$3"	;;
+			0)	tui-print -${R}E  					;;
+			1)	tui-print -${R}E $leadingDASHdummy "$one"		;;
+			2)	tui-print -${R}E $leadingDASHdummy "$one" "$two" 	;;
+			3)	tui-print -${R}E $leadingDASHdummy "$one" "$two" "$three"	;;
 			esac
-		done
-	else	case $# in
-		0)	tui-print -E  					;;
-		1)	tui-print -E  $leadingDASHdummy "$1"		;;
-		2)	tui-print -E  $leadingDASHdummy "$1" "$2" 	;;
-		3)	tui-print -E  $leadingDASHdummy "$1" "$2" "$3"	;;
-		esac
-        fi
+		fi
+	else	if [ "-" = "$1" ] || [ "--" = "$1" ]
+		then	# Do pipe handling
+			while read LEFT CENTER RIGHT
+			do	set "$LEFT" "$CENTER" "$RIGHT"
+				case $# in
+				0)	tui-print -${R}E  					;;
+				1)	tui-print -${R}E $leadingDASHdummy "$1"		;;
+				2)	tui-print -${R}E $leadingDASHdummy "$1" "$2" 	;;
+				3)	tui-print -${R}E $leadingDASHdummy "$1" "$2" "$3"	;;
+				esac
+			done
+		else	case $# in
+			0)	tui-print -${R}E  					;;
+			1)	tui-print -${R}E $leadingDASHdummy "$1"		;;
+			2)	tui-print -${R}E $leadingDASHdummy "$1" "$2" 	;;
+			3)	tui-print -${R}E $leadingDASHdummy "$1" "$2" "$3"	;;
+			esac
+		fi
+	fi
