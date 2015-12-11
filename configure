@@ -18,10 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 #
-#	Created:	2015.07.27
-#	Changed:	2015.11.27
+#	Created:	2015.02.27
+#	Transformed:	2015.12.07
+#	Changed:	2015.12.09
 	script_name=configure
-	script_version=1.2.3
+	script_version=1.99-BETA
 #
 #	Description:
 #		This script automaticly, according to passed options, 
@@ -29,7 +30,10 @@
 #		* make
 #		* make-install
 #		* make-uninstall
+#		* make-clean
 #		* make-distclean
+#		* make-doc-{info,html,dvi,pdf,ps}
+#		* Makefile
 #
 #		It can also create a REFERENCE file ($APP_dirs.conf) and if 'doRef=true',
 #		it will copy that file to $SYSCONFDIR automaticly, as well as remove it when uninstalling
@@ -47,931 +51,585 @@
 #
 # ------------------------------------------------------------------------
 #
-#	Configfile / Option defaults
+#	Clear data of previous / other runs
 #
-	APP="<APPNAME>"		# Non-space-name of the application
-	APP_VER=""		# Version of the APP
-	APP_TITLE=""		# Full name with spaces
-	APP_DIR="/usr/local"	# Default if no --prefix=DIR is passed
-	
-	# External requirements
-	APP_REQUIRES=""		# Commands required by APP
-	CFG_REQUIRES=""		# Commands required for MAKE
-	
-	# Author
-	APP_AUTHOR=""		# Author of the script project
-	APP_EMAIL=""		# Email of the author
-	APP_HOMEPAGE=""		# Homepage of the author
-	
-	# App/Code retrieving
-	APP_URL=""		# Homepage of $APP
-	APP_GIT=""		# Giturl to clone from
-	APP_URL=""		# Url to download the package
-	DOWNLOAD=""		# Url to download the package
-	
-	APP_LIC="GPLv3+"	# Default license for scripted projects
-	
-	BUGS=""			# Email adress to disply for bug repots
-	ISSUE=""		# Web adress to display for bug reports
-	
+	unset CHROOT DESTDIR
+	unset ${!APP_*} ${!AUTHOR_*} ${!MAINTAINER_*} ${!MAILLIST_*} BUGTRACKER
+	unset DOWNLOAD_IF_MISSING DOWNLOAD GIT SVN
+	unset REQS DEPS DOCS MAKE PRIOR POST UNINSTALL CLEAN DISTCLEAN IGNORE CHECK INSTALLDIRS
+	unset doMakefile doGNU doTUI doRef
+	unset ${!DIR_*} #${![AZ]]*_DIR}
+#
+#	Set Commands, bypass alias'
+#
+	AWK=\gawk
+	GREP=\grep
+	INSTALL=\install
+	LS=\ls
+	SED=\sed
+	WHICH=\which
+#
+#	Prepare cleared arrays and variables
+#
+	# Arrays
+	declare -A FHS DOCS REQS 
+	declare -a MAKE PRIOR POST UNINSTALL CLEAN IGNORE CHECK INSTALLDIRS
+	# Variables
+	declare APP_NAME="APPNAME" APP_VER APP_LIC \
+			APP_TITLE APP_PRJ APP_HOMEPAGE \
+			APP_DIR="${PREFIX:-/usr/local}"
+	declare AUTHOR_NAME AUTHOR_EMAIL AUTHOR_HOMEPAGE
+	declare MAINTAINER_NAME MAINTAINER_EMAIL MAINTAINER_HOMEPAGE
+	declare BUGTRACKER DOWNLOAD_IF_MISSING DOWNLOAD GIT SVN DEPS
+	declare CFG="${CFG:-./configure.yassi}" REF MANPAGE="/tmp/yassi.1"
 	# Bools
-	doRef=false		# Copy the REFERENCE file to SYSCONFDIR?
-	doMakefile=false	# Do not write a makefile by default
-	doTarball=false		# Create a redist tarball?
-	is_at_home=false	# Is it a system (false) or user (true) installation?
+	declare doMakefile=false doGNU=false doTUI=false doRef=false
+	declare VERBOSE=false DEBUG=false
+	# Basic 'compatiblity' with the 'prepass V=[1|2] toggle'
+	[ -n "$V" ] && VERBOSE=true
 #
-#	Internal Variables
+#	Message Strings
 #
-	unset FHS MAKE PRIOR POST REMOVE	# Basic/Core arrays
-	unset HTML DVI PDF PS			# Documention arrays
-	declare -A FHS		# This contains the directory strucutre by name
-	declare -a MAKE	# This will be ran during ./configure --prefix=/usr
-	declare -a PRIOR	# This will be ran first during ./make-install
-	declare -a POST		# This will be ran last during ./make-install
-	declare -a REMOVE	# This will be ran during ./make-uninstall
-	declare -a CLEAN	# This will be ran during ./make-distclean
-	declare -a IGNORE	# These files will be ignored when running './configure --tarball --prefix=/usr'
-	declare -a HTML DVI PDF PS # Use for creating make-* scripts
-	AWK=\awk		# Bypass aliases
-	GREP=\grep		# Bypass aliases
-	SED=\sed		# Bypass aliases
-	# Accept shell preset, but get overwritten by option --config CONFIG
-	CONFIG="${CONFIG:-./$script_name.cfg}"
-	which sudo 1>/dev/zero 2>/dev/zero && \
-		install_prefix="sudo " || \
-		install_prefix="su -c "
+	[ -f "$CFG" ] && source "$CFG"
+	case "${APP_LANG:-eng}" in
+	eng)	MSG_NO_CONFIG="Configuration file ($CFG) not found!"
+		MSG_NO_NAME="Missing APP_NAME..."
+		MSG_NO_INTERNET="No working internet connection found."
+		MSG_NO_REQS="Did not find the following required commands:"
+		MSG_CANNOT_EXE_DIR='Cannot execute a directory: $1!'
+		MSG_MISSING_CMDS="Please provide these commands before configuring $APP_NAME!"
+		MSG_NO_TEXI="The command 'texi2any' was not found, which is required to create this manual"
+		MSG_TARBALL_GOOD="Successfully created tarball"
+		MSG_TARBALL_BAD="There was an error building the tarball"
+		MSG_=""
+		;;
+	esac
+#
+#	Default path list
+#
 	mandirs="mandir $(echo man{1..9}dir)"
-	index_list="prefix bindir sbindir  sysconfdir datarootdir appdir icondir datadir docdir htmldir infodir $mandirs dvidir pdfdir psdir compldir sharedstatedir localstatedir"
-	variable_list="";for i in $index_list;do variable_list+=" ${i^^}";done
-	TMP="$PWD/tmp.$$"
-	CHROOT=""
-	source "$CONFIG"
+	list_index="prefix bindir sbindir  sysconfdir datarootdir appdir icondir datadir docdir htmldir infodir $mandirs dvidir pdfdir psdir compldir sharedstatedir localstatedir rootdir bootdir efidir grubdir"
+	list_variables="";for i in $list_index;do list_variables+=" ${i^^}";done
 #
-#	Functions
+#	Version & Help
 #
-	make_info() { # INFILE OUTDIR
-	#
-	#
-		INFILE="$1"
-		OUTDIR="${2:-./docs}"
-		OUTFILE="${1##*/}"
-		OUTFILE="${OUTFILE/\.*}.info"
-		
-		[ -f "$INFILE" ] || return 1
-		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
-		
-		echo "texi2any -o $OUTDIR/$OUTFILE --no-split $INFILE"
-		#echo "texi2any -o docs/info/$APP.info --no-split docs/info/$APP.texi"
-	}
-	make_doc() { # TYPE INFILE OUTDIR
-	#
-	#
-		EXT="$1"
-		INFILE="$2"
-		OUTDIR="${3:-./docs}"
-		OUTFILE="${INFILE##*/}"
-		OUTFILE="${OUTFILE/\.*}.$EXT"
-		
-		[ -f "$INFILE" ] || return 1
-		[ -d "$OUTDIR" ] || mkdir -p "$OUTDIR"
-		
-		echo "texi2any  --$EXT -o $OUTDIR/$OUTFILE --no-split $INFILE"
-	}
-	write_makefile() { 
-	# Checks for existing scripts and adds them to the makefile
-	#
-		# Clear / Init makefile
-		local M="./Makefile"
-		>$M
-		#printf '%s\n' \
-		#	"SHELL = /bin/sh" > "$M"
-		#echo "PHONY: options make $(echo make-*|sed s,make\-,,g|sed s,doc\-,,g)" > "$M"
-		
-		for task in ./make ./make-*
-		do 	case "$task" in
-			./make)	# Was PNONY ??
-				printf '%s\n' "options:"  \
-					"	./make"  >> "$M"
-				[ -f ./make-doc-info ] && \
-					printf '%s\n' \
-						"	./make-doc-info" >> "$M"
-				;;
-			# *-doc-*)
-			#	[ -f "$task" ] && \
-			#		printf '%s\n' \
-			#		"install: ${task/*-}"  \
-			#		"	${task}"  >> "$M" 
-			#	;;
-			make-install)
-				[ -f "$task" ] && \
-					printf '%s\n' \
-					"${task/*-}:"  \
-					"	DESTDIR=\$DESTDIR ${task}"  >> "$M" 
-				;;
-			*)	[ -f "$task" ] && \
-					printf '%s\n' \
-					"${task/*-}:"  \
-					"	${task}"  >> "$M" 
-				;;
-			esac
-		done
-		
-	}
-	show_sample() {
-	# Prints a sample configure.cfg
+	show_version() {
+	# Prints the version of the script
 	# and exits
-		cat <<-EOF
-		#!/usr/bin/env bash
-		#
-		#	Project Info
-		#
-		 	APP=prjname
-		 	APP_TITLE="<Project Name>"
-		 	APP_REQUIRES="gawk bash grep sed"
-		#
-		#	Targets
-		#
-		 	BINDIR=bin
-		 	DOCDIR=docs/[CRL]*
-		 	MAN1DIR=docs/man/\*.1
-		 	INFODIR=docs/info/\*.info
-		 	DATADIR="./templates ./extra"
-		#
-		#	Contact
-		#
-		 	BUGS="${USER_EMAIL:-your@email.com}"
-		EOF
-		exit 0
+		cat <<-EO_SCREEN
+		./configure, Version $script_version
+		Copyright (C) 2015 by Simon Arjuna Erat, erat.simon@gmail.com
+		License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+		
+		This is free software; you are free to change and redistribute it.
+		There is NO WARRANTY, to the extent permitted by law.
+
+		Report bugs of ./configure to: https://github.com/sri-arjuna/yassi/issues
+		EO_SCREEN
+		exit 111
 	}
-	show_sample_full() {
-	# Prints an advanced sample configure.cfg
-	# and exits
-		cat <<-EOF
-		#!/usr/bin/env bash
-		#
-		#	Project Info
-		#
-		 	# Used for /usr/share/\$APP & /usr/share/doc/\$APP
-		 	APP=prjname
-		 	# Used to show full name of the project
-		 	APP_TITLE=""
-		 	# This is required to run the script properly
-		 	APP_REQUIRES="gawk bash grep sed"
-		 	# This is required only until it is installed
-		 	CFG_REQUIRES="git texi2any txt2man"
-			
-		 	# Used for helpscreen & tarball
-		 	APP_VER=0.1
-			
-		 	# Contact
-		 	APP_AUTHOR="${USER_NAME:-$USER}"
-		 	APP_EMAIL="${USER_EMAIL:-your@email.com}"
-		 	# The authors homepage, not related to the project
-		 	APP_HOMEPAGE="${USER_HOMEPAGE:-http://your-homepage.com}"
-		 
-		 	# Visit & Download package locate
-		 	APP_URL="https://github.com/\$APP_AUTHOR/\$APP/"
-		 	APP_GIT="\$APP_URL.git"
-		 	DOWNLOAD="\$APP_URL/archive/v\${APP_VER}.tar.gz"
-			DOWNLOAD_DIR="\$APP-\$APP_VER"
-		 	
-		 	# If set, overwrites the default PREFIX (/usr/local) to assigned value.
-		 	#APP_DIR=~/.local
-		 	
-		 	# Set true to install the reference file to $PREFIX/$SYSCONFDIR/\$APP.conf
-		 	# This will automaticly be uninstalled if set to true, no extra work.
-		 	#doRef=false
-		#
-		#	Prepare, before making a tarball
-		#	So the CFG_REQUIRES are only needed on one machine, and the tarball then can be shared 
-		#
-		 	MAKE[0]="texi2any -o docs/info/\$APP.info --no-split docs/info/\$APP.texi"
-		 	MAKE[1]="texi2any --html -o docs/info/\$APP.html --no-split docs/info/\$APP.texi"
-		 	MAKE[2]="which tuirc 1>/dev/zero 2>/dev/zero || git clone https://github.com/sri-arjuna/tui tui"
-		 	MAKE[3]="bin/\$APP --help | txt2man -T \${APP^^} -r \$APP_VER > docs/man/\$APP.1"
-		#
-		#	Tasks prior to installation, but after tarball
-		#
-		 	# Only install if the current system does not provide TUI, simply remove this if you dont need it
-		 	PRIOR[0]="! which tuirc 1>/dev/zero 2>/dev/zero && cd tui && ./configure --prefix=\${prefix} && ./make-install && cd .. "
-		 	PRIOR[1]="echo 'Some variable examples:'"
-		 	PRIOR[2]="printf '* %s\n' \"CHROOT=\\\$CHROOT\" \"prefix=\\\$prefix\" \"SYSCONFDIR=\\\$SYSCONFDIR\" \"DATADIR=\\\$DATADIR\";read -p 'press enter to continue' buffer"
-		#
-		#	Targets, where is what installed
-		#
-		 	BINDIR=bin
-		 	# Do not use [A-Z], that might include a-z as well
-		 	DOCDIR=docs/[CIRU]*
-		 	MAN1DIR=docs/man/*.1
-		 	INFODIR=docs/info/\$APP.info
-		 	HTMLDIR=docs/info/\$APP.html
-		 	DATADIR="./menu ./includes"
-		#
-		#	Tasks post of installation
-		#
-		 	POST[0]=scripts/post_script1.sh
-		 	POST[1]="echo \"Thank you for installing '\$APP' to \\\${prefix}! :)\""
-		#
-		#	Clean up what has been prepared 
-		#
-		 	CLEAN[0]="docs/info/\$APP.html"
-		 	CLEAN[0]="docs/info/\$APP.info"
-		#
-		#	Additional tasks for the uninstallation process
-		#
-		 	# In this example, TUI was installed, therefor the command 'tui-yesno' is available
-		 	REMOVE[0]="tui-yesno 'Remove TUI as well?' && cd tui && ./make-uninstall && ./make-distclean && cd .."
-		#
-		#	Contact
-		#
-		 	BUGS="\$APP_EMAIL"
-		 	ISSUE="\$APP_SITE/\$APP_AUTHOR/\$APP/issues"
-		EOF
-		exit 0
+	show_paragraph() { # NODE "CONTENT"
+	# Prints a helptext block
+	# that is usable as manpage 
+		printf "\n%s\n" "${1^^}" ; shift
+		for a in "${@}";do printf "\t%s\n" "$a";done
 	}
 	show_help() {
 	# Prints the helpscreen
 	# and exits
-		FINAL_NOTE=$(printf '\n%s\n' "YASSI $script_version (Yet Another Simple Script Installer), Copyright (c) 2015 GPLv3+ by Simon Arjuna Erat (sea)")
-		CONTACT_INFO="$( [ ! -z "$BUGS" ] && echo -e "\nReport bugs of \"$APP\" to <$BUGS>")$( [ ! -z "$ISSUE" ] && printf "\nReport bugs of \"$APP\" on <$ISSUE>\n\n")$(printf '\n')"
+		[ -n "$APP_LIC" ] && \
+			scr_lic="$(show_paragraph license "${APP_NAME:-APPNAME}: ${APP_LIC}" " ")" || \
+			src_lic=""
+		app_ver=""
+		[ -n "$APP_VER" ] && \
+			 app_ver=" (${APP_VER})" || \
+			 app_ver=""
 		
-		if [ -n "$APP_AUTHOR$APP_EMAIL$APP_HOMEPAGE" ]
-		then 	COPYRIGHTLINE="
-$APP"
-			[ -n "$APP_VER" ] && COPYRIGHTLINE+=" $APP_VER"
-			[ -n "$APP_TITLE" ] && COPYRIGHTLINE+=" ($APP_TITLE)"
-			COPYRIGHTLINE+=", Copyright (c) - $APP_LIC"
-			[ -n "$APP_AUTHOR" ] && COPYRIGHTLINE+=" - by $APP_AUTHOR"
-			[ -n "$APP_EMAIL" ] && \
-				COPYRIGHTLINE+=", (<${APP_EMAIL}>" && \
-				[ -n "$APP_HOMEPAGE" ] && \
-				COPYRIGHTLINE+=", <" || \
-				COPYRIGHTLINE+=", <"
-			[ -n "$APP_HOMEPAGE" ] && COPYRIGHTLINE+="${APP_HOMEPAGE}>"
-			[ -n "$APP_EMAIL" ] && COPYRIGHTLINE+=")
-"
-		fi
+		cat <<-EO_SCREEN
+		SYNOPSIS
+		  	./$script_name [options]
+		
+		DESCRIPTION
+		 	Routine to configure the installation of "${APP_TITLE:-${APP_NAME:-APPNAME}}$app_ver"
+		$scr_lic
+		OPTIONS-BASIC
+		 	-h|--help		Shows this screen and exits
+		 	--version		Shows the version of YASSI (./configure) and exits
+		 	--verbose		Prints all the action on the screen
+		
+		 	--prefix DIR		Sets the prefix to DIR		(default: PREFIX=${APP_DIR})
 			
-		MSG_TR_HELP="SYNOPSIS
-  	./$script_name [options]
-
-DESCRIPTION
-	Routine to configure the installation of ${APP_TITLE:-${APP:-APPNAME}} ${APP_VER}
-
-OPTIONS
-	-h|--help		Shows this screen and exits
-	--version		Shows the version and exits
-	
-	--sample		Prints a sample '$CONFIG' required by projects and exits
-	--sample-full		Prints an advanced sample '$CONFIG' required by projects and exits
-	--tarball		Configures ${APP:-APPNAME}, runs PRIOR tasks and saves the folder as tarball, then exits
-	
-	--prefix DIR		Sets the prefix to DIR		(default: ${APP_DIR})
-	--chroot DIR		Sets the CHROOT to DIR		(for 'builddirs' or before chrooting into a partition)
-	
-	--bindir DIR		user executeables 		(\$prefix/bin)
-	--sbindir DIR		admin executeables		(\$prefix/sbin)
-	--sysconfdir DIR	read-only single-machine data 	(\$prefix/etc)
-	--datarootdir DIR	read-only arch.-independent data root 	(\$prefix/share)
-	
-	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/${APP:-APPNAME})
-	--docdir DIR		project documentation root	(\$DATAROOTDIR/doc/${APP:-APPNAME})
-	--htmldir DIR		project documentation root	(\$DOCDIR)
-	--infodir DIR		info documentation		(\$DATAROOTDIR/info)
-	dvidir|pdfdir|psdir
-	
-	--appdir DIR		.desktop files			(\$DATAROOTDIR/applications)
-	--icondir DIR		Icons for the desktop files	(\$DATAROOTDIR/icons)
-	--compldir DIR		bash completion			(\$DATAROOTDIR/bash-completion/completions)
-	--localedir		locale-dependent data		(\$DATAROOTDIR/locale)
-	--localstatedir		modifiable single-machine data	(\$prefix/var)
-	
-	--mandir DIR		Basedir for manpages		(\$DATAROOTDIR/man)
-	--man[1-9]dir DIR	Specific manpage dirs		(\$MANDIR/man/man[1-9])
-	
-	--sharedstatedir	modifiable architecture-independent	(\$prefix/com)
-
-NOTES
-  Common Prefix Locations
-  	Common places that are used as --prefix=DIR:
-  	* / or /usr
-	* /usr/local or /opt
-	* \$HOME
-	* \$HOME/local or \$HOME/.local
-  ${CONTACT_INFO}
-  ${COPYRIGHTLINE}${FINAL_NOTE}"
-		printf "%s\n" "$MSG_TR_HELP"
+		OPTIONS-DIRS	
+		 	--bindir DIR		user executeables 		(\$PREFIX/bin)
+		 	--sysconfdir DIR	read-only single-machine data 	(\$PREFIX/etc)
+		 	--datadir DIR		read-only architecture-independent data (\$DATAROOTDIR/${APP_NAME:-APPNAME})
+		 	--compldir DIR		Bash completion				(\$DATAROOTDIR/bash-completion/completions)
+		 	
+		 	--datarootdir DIR	read-only arch.-independent data root 	(\$PREFIX/share)
+		 	--localedir DIR		locale-dependent data			(\$DATAROOTDIR/locale)
+		 	--localstatedir	DIR	modifiable single-machine data		(\$PREFIX/var)
+		 	--sbindir DIR		admin executeables			(\$PREFIX/sbin)
+		 	--sharedstatedir DIR	modifiable architecture-independent	(\$PREFIX/com)
+			
+		OPTIONS-DOCS
+		 	--docdir DIR		Project documentation root	(\$DATAROOTDIR/doc/${APP_NAME:-APPNAME})
+		 	--infodir DIR		Info documentation		(\$DATAROOTDIR/info)
+		 	
+		 	--mandir DIR		Basedir for manpages		(\$DATAROOTDIR/man)
+		 	--man[1-9]dir DIR	Specific manpage dirs		(\$MANDIR/man/man[1-9])
+		 	
+		 	--htmldir DIR		Project documentation root	(\$DOCDIR)
+		 	--dvidir DIR		Project documentation root	(\$DOCDIR)
+		 	--pdfdir DIR		Project documentation root	(\$DOCDIR)
+		 	--psdir DIR		Project documentation root	(\$DOCDIR)
+		 	
+		OPTIONS-GUI
+		 	--appdir DIR		*.desktop files			(\$DATAROOTDIR/applications)
+		 	--icondir DIR		Icons for the desktop files	(\$DATAROOTDIR/icons)
+		 
+		OPTIONS-REDIST
+		 	--chroot DIR		Sets the CHROOT to DIR		(for 'builddirs' or before chrooting into a partition)
+		 	--tarball		Equivalent of: "./configure [opts] && (./make-tarball || make dist)"
+		 	--makefile		Writes a dynamic Makefile according to created scripts
+		 	--gnu			Writes a GNU compliant Makefile
+		
+		OPTIONS-DEVEL
+		 	--sample		Prints a mini example for a '$CFG'
+		 	--sample-full		Prints a template with all options of a '$CFG'
+		 	--sample-full-clean	Prints the same template without comments.
+		 	--manpage		Prints an advanced help screen for developers/packagers
+		 
+		NOTES
+		  Common Prefix Locations
+		  	Common places that are used as --prefix=DIR:
+		  	* / or /usr
+		 	* /usr/local or /opt
+		 	* \$HOME or \$HOME/usr
+		 	* \$HOME/local or \$HOME/.local
+		
+		EO_SCREEN
+		
+		# Print messages according to passed configuration file
+		[ -n "$AUTHOR_NAME" ] && echo "The project \"${APP_TITLE:-$APP_NAME}\" was written by \"$AUTHOR_NAME\" <$AUTHOR_EMAIL> ($AUTHOR_HOMEPAGE)"
+		[ -n "$MAINTAINER_NAME" ] && echo "This package of \"${APP_TITLE:-$APP_NAME}\" is maintained by \"$MAINTAINER_NAME\" <$MAINTAINER_EMAIL> ($MAINTAINER_HOMEPAGE)"
+		[ -n "$MAILLIST_NEWS" ] && echo "To stay informed about \"$APP_NAME\", subscribe to: <$MAILLIST_NEWS>"
+		[ -n "$MAILLIST_BUGS" ] && echo "To report bugs, please send a descriptive email to <$MAILLIST_BUGS>"
+		[ -n "$BUGTRACKER" ] && echo "If you experience any bugs or errors using \"$APP_NAME\", please rais an issue on <$BUGTRACKER>"
 		exit 99
 	}
-	show_version() {
-	# Prints the version of the script
-	# and exits
-		MSG_TR_VERSION="(sea) $script_name, Version $script_version
-Copyright (C) 2015 Simon Arjuna Erat
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-
-This is free software; you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
-"
-		echo "$MSG_TR_VERSION"
-		exit 111
-	}
-	write_files() { 
-	# Write the different types of make-{clean,install,uninstall} scripts
-	# An run pre-'make-install'-tasks
-		# Abort with failure if not all required apllication are present
-		APP_REQUIRES=""
-		source "$CONFIG";missing=""
-		for req in $CFG_REQUIRES;do
-			which $req 2>/dev/zero 1>&2 || missing+=" $req"
-		done
-		[ ! -z "$missing" ] && \
-			printf '%s\n' "Please provide these commands before configuring $APP!" "Sadly, you must figure out the package name yourself." && \
-			printf '::-->> %s\n' ${missing} && \
-			exit 1
-		write_install() { # INDEX CONTENT
-		# Prints the copy commands
-		#
-			fullPath="${2/$CHROOT}"
-			target="${CHROOT}${FHS[${1,,}]}"
-		#	tui-header " --> $1 -- $target" >&2 #; exit 100
-			case "$1" in
-			INFODIR|HTML*)
-				if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
-				then	# Its a directory, go recursive
-					tui-header "$2 DIR" >&2
-					echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
-				else	# It is a single entry but not a directory
-			#		tui-header "$1 $2 FILE" >&2
-					tmp_check="${2##*/}"
-					check_char="${tmp_check:0:1}"
-					isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
-				
-					case "$isAsterix" in
-					true|false)	isAsterix=$isAsterix	;;
-					*)		isAsterix=false		;;
-					esac
-			#	tui-header "$(dirname $2)/$tmp_check" >&2
-					if $isAsterix
-					then 	echo "[ -f \"$(dirname $2)/$tmp_check\" ] && cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
-					else	echo "[ -f \"$2\" ] && cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
-					fi
-				
-					case "${1,,}" in
-					compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:nobody \"$target/${2##*/}\""
-					esac
-				fi 
-				;;
-			*)
-				if [ -d "$2" ] && [ ! "./" = "${fullPath:0:2}" ]
-				then	# Its a directory, go recursive
-					echo "cp -ar \"${PWD:-$(pwd)}/$2/\"* \"$target\" || exit 1" | sed s,"//","/",g
-				else	tmp_check="${2##*/}"
-					check_char="${tmp_check:0:1}"
-					isAsterix=$(printf '%s' "$check_char" | grep -q '*' && echo true || echo false )
-				
-					case "$isAsterix" in
-					true|false)	isAsterix=$isAsterix	;;
-					*)		isAsterix=false		;;
-					esac
-				
-					if $isAsterix
-					then 	echo "cp -ar \"${PWD:-$(pwd)}/$(dirname ${2})/\"$tmp_check \"$target\" || exit 1" | sed s,"//","/",g
-					else	echo "cp -a \"${PWD:-$(pwd)}/$2\" \"$target\" || exit 1" | sed s,"//","/",g
-					fi
-				
-					case "${1,,}" in
-					compldir)	echo "[ \${UID:-0} -eq 0 ] && chown 0:nobody \"$target/${2##*/}\""
-					esac
-				fi
-				;;
-			esac
-		}
-		write_reference() { # INDEX
-		# Prints the index reference used
-		#
-			ref_val="${FHS[${1,,}]}"
-			echo "${1}=$ref_val"  | \sed s,"//","/",g
-		}
-		write_uninstall() { # INDEX CONTENT
-		# Prints the remove commands
-		#
-			INDEX="$1" ; shift
-			DEST="${CHROOT}${FHS[${INDEX,,}]}"
-			
-			for tr in ${@}
-			do	case "$INDEX" in
-				SBINDIR|BINDIR|MANDIR|MAN[1-9]DIR)
-					if [ -d "${tr}" ]
-					then	for e in "./$tr/"*
-						do 	[ -d "$e" ] && \
-								echo "rm -fr $DEST/${e##*/}" || \
-								echo "rm -f $DEST/${e##*/}"
-						done
-					else	echo "rm -f $DEST/${tr##*/}"
-					fi
-					;;
-				COMPLDIR)
-					# Check if it is a single file or a dir with possible multiple files
-					if [ -d "$tr" ]
-					then	for this_compl in "$tr/"*
-						do 	tmp_compl="${this_compl/\$\{APP\}/$APP}"
-							echo "rm -f $DEST/${tmp_compl##*/}"
-						done
-					else	tr="${tr/\$\{APP\}/$APP}"
-						echo "rm -f $DEST/${tr##*/}"
-					fi
-					;;
-				APPDIR|ICONDIR)
-					(
-						. ./$CONFIG
-						for F in $(cd ${!INDEX}/ ; find -type f )
-						do
-							[ ! -d "$F" ] && echo "rm -f $DEST/${F##/*}"
-						done
-					)
-					;;
-				*)	[ -d "$tr" ] && \
-						echo "rm -fr $DEST/${tr##*/}" || \
-						echo "rm -f $DEST/${tr##*/}"
-					;;
-				esac
-			done
-			return 0
-		}
-		write_remover() { # ENTRY
-		# Catches ENTRY and prints 'rm -f ENTRY' if it is a file/dir
-		# Print the line as-is otherwise
-			if [ -f "$1" ]
-			then 	echo "rm -f \"$1\""
-			elif [ -d "$1" ]
-			then 	echo "rm -fr \"$1\""
-			else	echo "$1"
-			fi
-		}
-		write_executer() { # ENTRY
-		# Catches ENTRY and prints 'sh ./ENTRY'
-		# Executes it, or fails if it is a dir.
-			if [ -d "$1" ]
-			then 	echo "DIR: $1, cannot execute!" >&2
-				exit 1
-			elif [ -f "$1" ]
-			then	[ "/" = "${1:0:1}" ] && \
-					echo "bash \"$1\"" || \
-					echo "bash \"./$1\""
-			else	echo "$1"
-			fi
-		}
-		write_clean() { 
-		# Remove the files that where created
-		# from 'make' or make 'html'
-			if [ -n "$(echo ${TEXI[@]})" ]
-			then	#tui-header "DEBUG:: TODO It has info files"
-				for T in "${TEXI[@]}";do
-					first="$(echo ${T}|$AWK '{print $1}')"
-					tt="${first/\.texi}.info"
-					echo $T | awk -vtt="$tt" '{print "rm -fr ",tt}'
-				done
-			fi
-			if [ -n "$(echo ${HTML[@]})" ]
-			then	#tui-header "DEBUG:: TODO It has html files"
-				for T in "${TEXI[@]}";do
-					first="$(echo ${T}|$AWK '{print $1}')"
-					tt="${first/\.texi}.html"
-					echo $T | awk -vtt="$tt" '{print "rm -fr ",tt}'
-				done
-			fi
-		}
-		write_distclean() { 
-		# Remove all the files that where created
-		#
-			echo "rm -f Makefile"
-			for task in make* make-* $REFERENCE
-			do	write_remover "$task"
-			done
-			
-		}
-		
-		# Prepare script headers
-		if [ -n "$(echo ${MAKE[@]})" ] 
-		then	echo "#!/usr/bin/env bash" > "./make"
-			echo "set -x" >> "./make"
-			chmod +x "./make"
-		fi
-		for m in install uninstall distclean clean
-		do	echo "#!/usr/bin/env bash" > "make-$m"
-			if [ ! "$m" = "distclean" ] &&  [ ! "$m" = "clean" ] && !  $is_at_home 
-			then	echo "$CHROOT/$prefix"| grep -q -ve /home -ve /Users && \
-					printf '%s\n' \
-					"[ -z \$UID ] && UID=0" \
-					"[ \$UID -ne 0 ] && \\" \
-					"	echo \"To $m '$APP', root access is required.\" && \\" \
-					"	exit 99" >> "make-$m"
-			fi
-			echo "set -x" >> "make-$m"
-			chmod +x "make-$m"
-		done
-		
-		$is_at_home && FHS[prefix]="$prefix_home"
-		echo "prefix=${FHS[prefix]}">"$REFERENCE"
-		echo "CHROOT=\${DESTDIR:-$CHROOT}" >> "make-install"
-		echo "CHROOT=\${DESTDIR:-$CHROOT}" >> "make-uninstall"
-		
-		# Create the basic ./make content
-		if [ -n "$(echo ${PREPARE[@]} ${MAKE[@]})" ]
-		then 	C=0
-			touch ./make
-			chmod +x ./make
-			#echo "#!/usr/bin/env bash" > "./make"
-			while 	item="${MAKE[$C]}"
-				[ -n "$item" ]
-			do 	write_executer "$item" >> "./make"
-				echo >> "./make"
-				((C++))
-			done
-		else 	echo "echo 'Nothing todo.'" > "./make"
-		fi
-		
-		# Write content of PRIOR tasks, if any
-		if [ -n "$(echo ${PRIOR[@]})" ]
-		then	source "./$REFERENCE"	# Just prefix yet
-			C=0
-			echo >> "make-install"
-			while 	item="${PRIOR[$C]}"
-			[ -n "$item" ]
-			do 	write_executer "$item" >> "make-install"
-				((C++))
-			done
-		fi
-		
-		# Actualy write the make-{un,}install scripts
-		for index in $variable_list
-		do	# Expand index
-			tmp="${!index}"
-			# Count words
-			num=$(echo "$tmp" | wc -w)
-			
-			# Only do something if index has content count higher than 0
-			if [ "$num" -gt 0 ]
-			then	# 'Group' different tasks 
-				echo >> "make-install"
-				echo >> "make-uninstall"
-				
-				# It has content
-				write_reference "$index" >> "$REFERENCE"
-				set $index
-				# This usualy is the most important fix, sadly
-				cat >> "make-install" <<-EOF
-				tmp_str="${FHS[${1,,}]}"
-				if [ ! -d "\${CHROOT}\${tmp_str%/*}" ]
-				then 	cd "\${CHROOT}/usr/.."
-				 	[ -d "\${CHROOT}/usr\${tmp_str%/*}" ] && [ -n "\${tmp_str%/*}" ] && \\
-				 		ln -sf "usr\${tmp_str%/*}" "./\${tmp_str%/*}"
-				 	cd "\$OLDPWD"
-				fi
-				[ -d "\${CHROOT}\$tmp_str" ] || mkdir -p "\${CHROOT}\$tmp_str"
-				EOF
-				case "$num" in
-				1)	write_install "$index" "$tmp" >> "make-install"
-					write_uninstall "$index" "$tmp" >> "make-uninstall"
-					;;
-				*)	for s in $(echo "$tmp"|sed s,\"," ",g)
-					do 	write_install "$index" "$s" >> "make-install"
-						write_uninstall "$index" "$s" >> "make-uninstall"
-					done
-					;;
-				esac
-			fi
-		done
-		source "$PWD/$REFERENCE"
+	show_manpage() { #
 	#
-	# 	Finalize
-	#
-		# Uninstall
-		if [ -n "$(echo ${REMOVE[@]})" ]
-		then 	C=0
-			echo >> "make-uninstall"
-			
-			while 	item="${REMOVE[$C]}"
-				[ -n "$item" ]
-			do 	[ -f "$item" ] && \
-					echo "rm -f $item" >> "make-uninstall" || \
-					echo "$item" >> "make-uninstall"
-				((C++))
-			done
-		fi
-		# Now remove hardcoded folders that were used
-		for D in data doc
-		do 	d="${FHS[${D}dir]}"
-			[ -n "$d" ] && \
-				echo "[ -d \"\${CHROOT}$d\" ] && rm -fr \${CHROOT}$d" >> "make-uninstall"
-		done
+	#	show_paragraph() { # NODE "CONTENT"
+		show_paragraph 
+		cat <<-EO_SCREEN
+			DESCRIPTION
+			 	This manpage shall explain how to write/modify a YASSI configuration file.
+				
+				This manual is still in progress and also describes functionality that is still in developement.
+				
+			FILES
+			 	Assuming you want to install only a single script, 
+			 	which resides in the same dir as the configuration:
+			 	
+			 		APP_NAME=my-app-name-without-spaces
+			 		BINDIR=my-app-script.sh
+			 	
+			 	Say you have two executable scripts, change the BINDIR to:
+			 	
+			 		BINDIR="my-app-script.sh my-other-script.sh"
 		
-		# Check for DISTCLEAN operations
-		if [ -n "$(echo ${CLEAN[@]})" ]
-		then 	C=0
-			echo >> "make-distclean"
-			
-			while 	item="${CLEAN[$C]}"
-				[ -n "$item" ]
-			do 	write_executer "$item" >> "make-distclean"
-				((C++))
-			done
-		fi
-		
-		if [ "true" = "${doRef:-false}" ]
-		then	echo >> "make-install"
-			echo "mkdir -p ${CHROOT}${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${CHROOT}${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
-			echo "rm -f ${CHROOT}${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
-		fi
-		
-		# Check for TEXI operations
-		if [ -n "$(echo ${TEXI[@]})" ]
-		then 	this_target=make-doc-info
-			C=0
-			touch "$this_target"
-			echo "#!/usr/bin/env bash" > "$this_target"
-			chmod +x "$this_target"
-			
-			while 	[ -n "${TEXI[$C]}" ]
-			do 	while read infile outdir
-				do 	make_info "$infile" "$outdir" >> "$this_target"
-					write_install "infodir" "$outdir/$(echo ${infile##*/}info|sed s,'texi','',)" >> "make-install"
-					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}info|sed s,'texi','',)" >> "make-uninstall"
-					break
-				done<<<"${TEXI[$C]}"
-				C=$(( $C + 1 ))
-			done
-		fi
-		# Check for HTML operations
-		if [ -n "$(echo ${HTML[@]})" ]
-		then 	this_target=make-doc-html
-			C=0
-			touch "$this_target"
-			echo "#!/usr/bin/env bash" > "$this_target"
-			chmod +x "$this_target"
-			
-			while 	[ -n "${HTML[$C]}" ]
-			do 	while read infile outdir
-				do 	make_doc html "$infile" "$outdir" >> "$this_target"
-					write_install "infodir" "$outdir/$(echo ${infile##*/}html|sed s,'texi','',)" >> "make-install"
-					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}html|sed s,'texi','',)" >> "make-uninstall"
-					break
-				done<<<"${HTML[$C]}"
-				C=$(( $C + 1 ))
-			done
-		fi
-		# Check for PDF operations
-		if [ -n "$(echo ${PDF[@]})" ]
-		then 	this_target=make-doc-pdf
-			C=0
-			touch "$this_target"
-			echo "#!/usr/bin/env bash" > "$this_target"
-			chmod +x "$this_target"
-			
-			while 	[ -n "${PDF[$C]}" ]
-			do 	while read infile outdir
-				do 	make_doc pdf "$infile" "$outdir" >> "$this_target"
-					write_install "infodir" "$outdir/$(echo ${infile##*/}pdf|sed s,'texi','',)" >> "make-install"
-					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}pdf|sed s,'texi','',)" >> "make-uninstall"
-					break
-				done<<<"${PDF[$C]}"
-				C=$(( $C + 1 ))
-			done
-		fi
-		# Check for DVI operations
-		if [ -n "$(echo ${DVI[@]})" ]
-		then 	this_target=make-doc-dvi
-			C=0
-			touch "$this_target"
-			echo "#!/usr/bin/env bash" > "$this_target"
-			chmod +x "$this_target"
-			
-			while 	[ -n "${DVI[$C]}" ]
-			do 	while read infile outdir
-				do 	make_doc dvi "$infile" "$outdir" >> "$this_target"
-					write_install "infodir" "$outdir/$(echo ${infile##*/}dvi|sed s,'texi','',)" >> "make-install"
-					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}dvi|sed s,'texi','',)" >> "make-uninstall"
-					break
-				done<<<"${DVI[$C]}"
-				C=$(( $C + 1 ))
-			done
-		fi
-		# Check for PS operations
-		if [ -n "$(echo ${PS[@]})" ]
-		then 	this_target=make-doc-ps
-			C=0
-			touch "$this_target"
-			echo "#!/usr/bin/env bash" > "$this_target"
-			chmod +x "$this_target"
-			
-			while 	[ -n "${PS[$C]}" ]
-			do 	while read infile outdir
-				do 	make_doc ps "$infile" "$outdir" >> "$this_target"
-					write_install "infodir" "$outdir/$(echo ${infile##*/}ps|sed s,'texi','',)" >> "make-install"
-					write_uninstall "infodir" "$outdir/$(echo ${infile##*/}ps|sed s,'texi','',)" >> "make-uninstall"
-					break
-				done<<<"${PS[$C]}"
-				C=$(( $C + 1 ))
-			done
-		fi
-		
-		
-		# Use the REFERENCE file?
-		if [ "true" = "${doRef:-false}" ]
-		then	echo >> "make-install"
-			echo "mkdir -p ${CHROOT}${FHS[sysconfdir]} ; cp \"$REFERENCE\" \"${CHROOT}${FHS[sysconfdir]}/$APP.conf\"" >> "make-install"
-			echo "rm -f ${CHROOT}${FHS[sysconfdir]}/$APP.conf" >> "make-uninstall"
-		fi
-		
-		# Check for post operations, letter better here, than with 'set -s'
-		if [ -n "$(echo ${POST[@]})" ]
-		then 	C=0
-			echo >> "make-install"
-			while 	item="${POST[$C]}"
-				[ ! -z "$item" ]
-			do 	[ -f "$item" ] && \
-					echo "bash ./$item" >> "make-install" || \
-					echo "$item" >> "make-install"
-				((C++))
-			done
-		fi
-		write_distclean >> "make-distclean"
-		write_clean >> "make-clean"
-		for m in install uninstall clean distclean doc-{info,html,dvi,ps,pdf}
-		do	if [ -f "./make-$m" ]
-			then 	echo >> "make-$m"
-				printf '%s\n' \
-					"RET=\$?" \
-					"set +x" >> "make-$m"
-			fi
-		done
-		printf '%s\n' "RET=\$?" "set +x" >> "./make"
-		
-		# Let the script exit with their proper exit code.
-		echo "echo;echo \"Finished installation of ${APP_TITLE:-$APP} with \$? (0=success)\";exit \$RET" >> "make-install"
-		[ -f "./make" ] && echo "exit \$RET" >> "make" && chmod +x "./make"
-		echo "exit \$RET" >> "make-uninstall"
-		echo "exit \$RET" >> "make-distclean"
-		
-		sed s,'set -x',"set -x\nSYSCONFDIR=$SYSCONFDIR",g -i make-{uni,i}nstall
-		sed s,'~',"$HOME",g -i make-{uni,i}nstall
-		
-		
+			DIRECTORIES
+			  	Or you might want to place the two scripts in a single directory, 
+			  	naming that to something like 'bin':
+			 	
+			 		BINDIR=bin
+			 		
+			 	Now in addition, let us assume your application requires additional data.
+			 	
+			 	Lets say we need to copy two folder and a file into the DATADIR
+			 	(eg: /usr/share/appname)
+			 	
+			 		DATADIR="./datadir ./templatedir docs/extra/dirinfo.txt"
+			 	
+			DIRECTORIES CUSTOM	
+			 	You may define and use custom paths, be aware that you probably have to handle them your own.
+			 	
+			 	To define a new TARGET DIR, use:
+			 	
+			 		DIR_DEMO='$DATADIR/demo'
+			 		
+			 	Then to assing the installer to install files there:
+			 	
+			 		DEMO_DIR=demo/my*files
+			 	
+			 	NOTE: This is a hardcore example of what could have been:
+			 	
+			 		DATADIR=./demo
+			 	
+			REGEX
+			 	If you want to copy only specific items, you can use REGEX to select them.
+			 	
+			 	In one of my projects i have this as a good example:
+			 	
+			 		DOCDIR="[CT]* docs/[ACGILNR]* docs/tex/*.html"
+			 		
+			 	Which would copy all files starting with a capital C or T, 
+			 	likewise for all files starting with A C G I L N or R from the docs dir.
+			 	
+			 	In addition, it also installs all html files from the subdir docs/tex/.
+			 	
+			 	No directories will be found within this DOCDIR (/usr/share/doc/appname)
+				
+			DOCS
+			 	Is a nice handler to create texi documents.
+			 	
+			 	Each of the following assignments will create a specific: make-doc-<TYPE> file.
+			 	
+			 	Supported TYPE's are: info, html, pdf, dvi and ps.
+			 	
+			 	DOCS[\$TYPE]=docs/texi/\$APP_NAME.texi	The created script will create the info document.
+			 	
+			 	DOCS[info]="docs/texi\$APP_NAME.texi docs/texi/other-node.texi" Also multiple entries are supported.
+			 	
+			 	There is no need to handly the 'texi2any' requirement, using DOCS[TYPE] will inform the user if it is missing.
+			 	Also, it will not allow the user to delete (./make-clean) these docs if 'texi2any' is not available.
+			 	
+			 	While this only takes care of creating these docs, you still need to place them for the installation:
+			 	
+			 		INFODIR=docs/tex/*.info
+			 		HTMLDIR=docs/tex/*.html
+			 	
+			 	Upon ./configure, ./make-doc-<TYPE> will be created.
+			 	
+			 	Upon ./make-doc-<TYPE>, it will check if 'texi2any' is avilable or not.
+			 	
+			 	Upon ./make-install-all, all available ./make-doc-* are executed.
+			 	
+			BOOLEANS
+			 	There are a few optional bool'ish helpers, by default they are set to false, they are:
+			 	
+			 	doMakefile=false	It is quite obvious what doMakefile does if it is set to true.
+			 	doGNU=false		If not provided by the author of the project, it adds some targets to the Makefile
+			 	doRef=false		installs the reference file of the used paths to /etc/appname.conf, 
+						 	if enabled, the file is also uninstalled automaticly.
+						 	If you need to apply the systems absolute paths into your scripts, use the \$REF for your TASK's in your $CFG.
+			 	doVer=false		Some projects require to have the version in their path name 'doVer' does that.
+			 	doTUI=false		As I wrote YASSI for myself, this doTUI toogle will install the Text User Interface,
+			 				framework for scripts before the the actual install.
+			 	
+			 	
+			TASKS
+			 	If you need to generate some files, for example a file containing the absolute paths of the system it is installed to,
+			 	you can do that by adding one or multiple MAKE array entries:
+			 	
+			 		MAKE[0]="cat scripts/template.sh > bin/myapp"
+			 	
+			 	You could also let ./make execute other scripts:
+			 	
+			 		MAKE[1]=scripts/prepare.sh
+			 		
+			 	Or print a message to the user:
+			 	
+			 		MAKE[2]='echo "Hello $USER"'
+			 	
+			 	Likewise for PRIOR[0] and POST[0], but those will be executed before and after the actual installation of the TARGETs.
+			 	
+			 	The obvious exceptions are: UNINSTALL[0], CLEAN[0], DISTCLEAN[0], and IGNORE[0].
+			 	IGNORE is used for --tarball (make dist), the others obvious for their make-<COMMAND>s.
+			 	
+			REQS
+			 	There are two ways to let YASSI check for your project its REQs.
+			 	
+			 	If the variable REQS is just filled by a single list, 
+			 	it will check for any entry of that list to be available in \$PATH using 'which',
+			 	and if some entries are missing, it will not create the make-install script.
+			 	
+			 	However, if you change REQS to become an asociative array, it accepts these modes:
+			 	
+			 	REQS[app]="bash gawk sed"	Your project requires these commands and cannot run without them
+			 	REQS[make]="txt2man"		This command is required to prepare the/your project files
+			 	REQS[opt]="shuffle"		This command can improve usablity for your project but is not essential
+			 	
+			 	Why this destinction?
+			 	
+			 	In regards of the 'app' it is quite obvious, likewise for the 'opt'.
+		 		The 'make' part is there to let redistributors and packages a chance to prepare your project without the need to install the REQS[make] items for all target systems.
+		 		
+			DEPS
+			 	If you have multiple projects prepared with YASSI, you can simple list the filename (.yassi extension optional).
+			 	And YASSI will install all of the listed YASSI configure files prior to the install but after PRIOR tasks.
+			 	
+			 		DEPS="deps/*.yassi"
+			 	
+			 	Is the equivalent of:
+			 	
+			 		PRIOR[0]="cd deps"
+			 		PRIOR[1]="../configure -c one.yassi"
+			 		PRIOR[2]="../configure --conf two.yassi"
+			 		PRIOR[3]="cd .."
+			 	
+			 	Or even just:
+			 	
+			 		PRIOR[0]="cd deps;../configure -conf one.yassi;../configure -conf two.yassi;cd .."
+			 	
+			 	However, this only works if that DEP provides a DOWNLOAD, GIT or SVN source..
+			 	When downloading a tarball, it expects it to contain a folder named '\$APP_NAME' ($APP_NAME) optional appended by either '-master' or '-\$APP_VER' ($APP_VER).
+			 	
+			 	Retrieving the project using GIT or SVN is recomended.
+			 	
+			VARIABLES PRESETS
+			 	These variables may be placed in front of ./configure and will influence the behavior of YASSI.
+			 	
+			 	CFG=file	This is the same as "--conf file"
+			 	DESTDIR=dir	This is the same as ./configure --chroot=dir,
+			 			but it can also overwrite the previous set CHROOT by
+			 			passing "DESTDIR=dir make install"
+			 	TARBALL=file	By default the created tarball will reside in the top dir, use this to change the location
+			 	
+			AUTHOR
+			 	YASSI was started in early Feb 2015 by Simon Arjuna Erat from Switzerland.
+			 	
+			 	
+		EO_SCREEN
+		#root boot efi grub systemd"
 	}
-#
-#	Get options
-#
-	GETOPT=$(getopt \
-		--options	"h" \
-		--longoptions	"help,version,config,write-makefile,sample,sample-full,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,mandir,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:" \
-		--name 		"${0##*/}" -- "${@}"
-	)
-	eval set -- "$GETOPT"
-	while true
-	do 	case "$1" in
-		-h|--help)	show_help	;;
-		--version)	show_version	;;
-		--sample)	show_sample	;;
-		--sample-full)	show_sample_full;;
-		--prefix|--bindir|--sbindir|--datarootdir|--datadir|\
-		--infodir|--sysconfdir|--mandir,--man[1-9]dir|--docdir|--htmldir|--dvidir|--pdfdir|--psdir|\
-		--compldir|--sharedstatedir|--localstatedir|--localedir)
-				FHS["${1/--}"]="$2"
-				shift 2		;;
-		--tarball)	doTarball=true
-				shift 		;;
-		--config)	CONFIG="$2"
-				shift 2		;;
-		--chroot)	CHROOT="$2"
-				shift 2		;;
-		--write-makefile)
-				doMakefile=true
-				shift		;;
-		--)		shift ; break	;;
+	show_sample() { #
+	#
+	#
+		cat <<-EO_SCREEN
+		#!/usr/bin/env bash
+		#
+		#	Project Info
+		#
+		 	APP_NAME=		# Install name of the application, \$PREFIX/share/\$APP_NAME
+		 #	APP_VER=		# Optional, Show Versionnumber
+		 #	APP_LIC=GPLv3+		# Optional, Show License
+		 #	AUTHOR_NAME=""		# Optional, Name of author
+		 #	AUTHOR_EMAIL=""		# Optional, Email of author
+		#
+		#	Default target dirs
+		#
+		 	# Basic
+		 	BINDIR=			# Executables
+		 	SYSCONFDIR=		# Recomended, see --help for its default path
+		 	DATADIR=		# Recomended, see --help for its default path
+		 
+		 
+		EO_SCREEN
+		exit 0
+	}	
+	show_sample_full() { #
+	#
+	#
+		cat <<-EO_SCREEN
+		#!/usr/bin/env bash
+		# Copyright (c) $(date +'%F') by ${USER_NAME:-USER}  <${USER_EMAIL:-$USER@$HOSTNAME}>
+		# All rights reserved.
+		#
+		# This program is free software: you can redistribute it and/or modify it
+		# under the terms of the GNU General Public License as published
+		# by the Free Software Foundation, either version 3 of the License, or
+		# (at your option) any later version.
+		#
+		# This program is distributed in the hope that it will be useful,
+		# but WITHOUT ANY WARRANTY; without even the implied warranty of
+		# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		# GNU General Public License for more details.
+		#
+		# You should have received a copy of the GNU General Public License
+		# along with this program.  If not, see <http://www.gnu.org/licenses/>
+		#
+		#
+		#	Project Info
+		#
+		 	APP_NAME=		# Install name of the application, \$PREFIX/share/\$APP_NAME
+		 #	APP_VER=		# Optional, Show Versionnumber
+		 #	APP_LIC=GPLv3+		# Optional, Show License
+		 #	APP_TITLE=""		# Optional, Show long title
+		 #	APP_PRJ=""		# Optional, Name the parent project
+		 #	APP_HOMEPAGE=""		# Optional, This Project its website
+		 #	APP_DIR=/usr/local	# Optional, Used as default PREFIX if none is passed
+		#
+		#	Author & Package Maintainer Info
+		#
+		 #	AUTHOR_NAME=""		# Optional, Name of author
+		 #	AUTHOR_EMAIL=""		# Optional, Email of author
+		 #	AUTHOR_HOMEPAGE=""	# Optional, Website of author
+		 #	MAINTAINER_NAME=""	# Optional, Name of author
+		 #	MAINTAINER_EMAIL=""	# Optional, Email of author
+		 #	MAINTAINER_HOMEPAGE=""	# Optional, Website of author
+		 #	MAILLIST_NEWS=""	# Optional, address of maillist to get news
+		 #	MAILLIST_BUGS=""	# Optional, address of maillist to send bugs to...
+		 #	BUGTRACKER=""		# Optional, adress to visit if no maillist is available
+		#
+		#	Mini Installer
+		#
+		 #	DOWNLOAD_IF_MISSING=""	# Optional, If this file is not found, use one of the 3 below methods
+		 #	DOWNLOAD=""		# Optional, Url to download package
+		 #	GIT=""			# Optional, Retrieve code from git to ./\$APP_NAME.src
+		 #	SVN=""			# Optional, Retrieve code from svn to ./\$APP_NAME.src
+		#
+		#	YASSI Booleans
+		#
+		 #	doMakefile=false	# Optional, Write a Makefile according to created scripts
+		 #	doGNU=false		# Optional, like doMakefile, but write additional TARGETs to the Makefile
+		 #	doTUI=false		# Optional, Install TUI
+		 #	doRef=false		# Optional, Install \${APP_NAME}_dirs.conf to \$SYSCONFDIR/\$APP_NAME.conf
+		 #	doVer=false		# Optional, Use \$APP_VER for the DATADIR (\$DATAROOTDIR/\$APP_NAME-\$APP_VER)
+		#
+		#	Requirements
+		#
+		 #
+		#	Requirements
+		#
+		 #	REQS=""			# What commands must be installed
+		 #	REQS[app]="bash which"	# Detailed checks, MODE ('app') may be: app, make or opt.
+		 #	REQS_ONE[0]="curl wget"	# For each entry at least one of the commands must be found
+		 #	DEPS=""			# Install these *.yassi configure files before anything else
+		#
+		#	Create documentions
+		#
+		 #	DOCS[info]=		# Optional, Add *.texi files to the list and texi2any will convert them with ./make-doc-info
+		 #	DOCS[html]=		# Optional, Add *.texi files to the list and texi2any will convert them with  ./make-doc-html
+		 #	DOCS[pdf]=		# Optional, Add *.texi files to the list and texi2any will convert them with  ./make-doc-pdf
+		 #	DOCS[dvi]=		# Optional, Add *.texi files to the list and texi2any will convert them with  ./make-doc-dvi
+		 #	DOCS[ps]=		# Optional, Add *.texi files to the list and texi2any will convert them with  ./make-doc-ps
+		#
+		#	Default target dirs
+		#
+		 	# Basic
+		 	BINDIR=			# Recomended, see --help for its default path
+		 #	SBINDIR=		# Optional, see --help for its default path
+		 	SYSCONFDIR=		# Recomended, see --help for its default path
+		 #	DATAROOTDIR=		# Optional, see --help for its default path
+		 	DATADIR=		# Recomended, see --help for its default path
+		 	COMPLDIR=		# Recomended, see --help for its default path
+		 #	LOCALEDIR=		# Optional, see --help for its default path
+		 #	LOCALSTATEDIR=		# Optional, see --help for its default path
+		 #	SHAREDSTATEDIR=		# Optional, see --help for its default path
+		 
+		 	# GUI			# --> See "./configure --help" for their default paths
+		 #	APPDIR=			# Optional, Install *.desktop files
+		 #	ICONDIR=		# Optional, Install according icons
+		 
+		 #	# Docs
+		 #	DOCDIR=			# Recomended, see --help for its default path
+		 #	INFODIR=		# Recomended, see --help for its default path
+		 #	HTMLDIR=		# Optional, see --help for its default path
+		 #	PDFDIR=			# Optional, see --help for its default path
+		 #	DVIDIR=			# Optional, see --help for its default path
+		 #	PSDIR=			# Optional, see --help for its default path
+		 #	MANDIR=			# Optional, see --help for its default path
+		 	MAN1DIR=		# Recomended, see --help for its default path
+		 #	MAN8DIR=		# Optional, see --help for its default path
+		#
+		#	Advanced Tweakings
+		#
+		 #	MAKE_CREATES=		# Optional, If this file is missing, make install wont start
+		 #	TARBALL="\${HOME}/\${APP_NAME}.tar.gz"		# Optional, default tarball is: ../\$APP_NAME.tar.gz or ../\${APP_NAME}-${APP_VER}.tar.gz
+		 #	MAKE[0]="python ./scripts/script.py"	# Optional, Tasks to be done by ./make
+		 #	PRIOR[0]=""		# Optional, Tasks prior to installation (./make-install)
+		 #	POST[0]=""		# Optional, Tasks post to installation (./make-install)
+		 #	UNINSTALL[0]=""		# Optional, additional tasks to be done by ./make-uninstall, required to undo possible PRIOR or POST operations
+		 #	CLEAN[0]="to-delete.file"		# Optional, Tasks to be done by ./make-clean
+		 #	DISTCLEAN[0]=""		# Optional, Tasks to be done by ./make-distclean
+		 #	IGNORE[0]=".git"	# Optional, Files or Folders that are not used for tarball
+		#
+		#	Custom Target Paths
+		#
+		 	# Example
+		 # 	DIR_DEMO='$DATAROOTDIR/demos/$APP_NAME'
+		 # 	DEMO_DIR=mydata/*
+		 	
+		EO_SCREEN
+		exit 0
+	}
+	show_sample_full_clean() { #
+	#
+	#
+		show_sample_full | sed s,"	#..*","",g
+	}
+#	Functions
+#	
+	task_reference() { # INDEX
+	# Prints the index reference used
+	#
+		ref_val="${FHS[${1,,}]}"
+		echo "${1}=$ref_val"  | $SED s,"//","/",g
+	}
+	task_docs() { # INFILE [TYPE=info]
+	# Prints the texi2any command to create an info file
+	# or another specified TYPE (dvi,html,pdf,ps)
+		INFILE="$1"
+		DOCTYPE="${2:-info}"
+		OUTFILE=${INFILE/\.*/\.$DOCTYPE}
+		
+		case "${DOCTYPE,,}" in
+		info)	echo "texi2any -o \"$OUTFILE\" --no-split \"$INFILE\""
+			;;
+		*)	echo "texi2any  --$DOCTYPE -o \"$OUTFILE\" --no-split \"$INFILE\""
+			;;
 		esac
-	done
-	[ -z "$APP" ] && echo "Missing APP name..." && exit 1
-	REFERENCE="${APP}_dirs.conf"
-#
-#	Prepare paths
-#
-	for index in $index_list
-	do
-		tmp="${FHS[$index]}"
-		etc_done=false
-		if [ -z "$tmp" ]
-		then	case "$index" in
-			prefix)		tmp="${APP_DIR}"	;;
-			"bindir")	tmp="${FHS[prefix]}/bin"	;;
-			"sbindir")	tmp="${FHS[prefix]}/sbin"	;;
-			sysconfdir)	tmp_prefix="${FHS[prefix]}"
-					case "$tmp_prefix" in
-					"/"|"/usr")
-						tmp="/etc"		;;
-					*)	if $is_at_home
-						then	tmp="$HOME/.local/etc"
-						else	tmp="${FHS[prefix]}/etc"
-						fi
-						;;
-					esac ; etc_done=true				;;
-			datarootdir)	tmp="${FHS[prefix]}/share"	;;
-			appdir)		tmp="${FHS[datarootdir]}/applications"	;;
-			icondir)	tmp="${FHS[datarootdir]}/icons"	;;
-			datadir)	tmp="${FHS[datarootdir]}/$APP"	;;
-			infodir)	tmp="${FHS[datarootdir]}/info"	;;
-			mandir)		tmp="${FHS[datarootdir]}/man" ;;
-			man[0-9]dir)	tmp="${FHS[mandir]}/${index:0:4}" ;;
-			localedir)	tmp="${FHS[datarootdir]}/locale" ;;
-			docdir)		tmp="${FHS[datarootdir]}/doc/$APP" ;;
-			htmldir|dvidir|pdfdir|psdir)	tmp="${FHS[docdir]}" ;;
-			compldir)	# Some systems have bash completion within the SYSCONFDIR
-					if [ -d "${FHS[datarootdir]}/bash_completion/completions" ]
-					then 	tmp="${FHS[datarootdir]}/bash_completion/completions"
-					elif [ -d "${FHS[sysconfdir]}/bash_completion.d" ]
-					then	tmp="${FHS[sysconfdir]}/bash_completion.d"
-					else # Use default as fallback
-						tmp="${FHS[datarootdir]}/bash-completion/completions"
-					fi ;;
-			sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
-			localstatedir)	tmp="${FHS[prefix]}/var"	;;
+	}
+	task_remover() { # ENTRY
+	# Catches ENTRY and prints 'rm -f ENTRY' if it is a file/dir
+	# Print the line as-is otherwise
+		if [ -f "$1" ]
+		then 	echo "rm -f \"$1\""
+		elif [ -d "$1" ]
+		then 	echo "rm -fr \"$1\""
+		elif [ "rm" = "${1:0:2}" ]
+		then	case "$1" in
+			"rm "*|"rmdir "*)
+				echo "$1"	;;
+			*)	echo "rm -f $1"	;;
 			esac
-			if [ "$index" = "prefix" ] && ! $etc_done
-			then	# Do special handling
-				[ "~" = "${tmp:0:1}" ] && tmp="${tmp/~/$HOME}"
-				if [ "${tmp:0:${#HOME}}" = "$HOME" ]
-				then	is_at_home=true
-					install_prefix=""
-					prefix_home="${{tmp/~/$HOME}/$HOME}"
-					tmp="$prefix_home"
-				fi
-			fi
-			FHS["$index"]="$tmp"
+		else	echo "rm -f $1"
 		fi
-	done
-	export FHS
-	prefix="${FHS[prefix]}"
-	# Updated again - For the Arrays
-	source "$CONFIG"
-#
-#	Before we start, are there any other files beside configure?
-#
-	tmp=$(\ls -l|\grep -v configure)
-	if [ -z "$tmp" ]
-	then	# It is empty, so no other files available, get them now
-
-		if [ -n "$DOWNLOAD" ]
-		then 	# Tarball is available
-			curl -o "$APP.tar.gz" "$DOWNLOAD"
-			tar axf "$APP.tar.gz"
-			cd "$DOWNLOAD_DIR"
-			mv * ..
-			cd ..
-		elif [ -n "$APP_GIT" ]
-		then	# Git url is passed, lets check if it is required
-			# There are 'code' or '.git' urls
-			last_word="${APP_GIT##*/}"
-			check_word="${last_word/\.git}"
-			if [ "$last_word" = "$check_word" ]
-			then	# it is 'code'
-				git clone "$APP_GIT" "$APP"
-			else	# its *.git
-				git clone "$APP_GIT"
-			fi
-			mv "$APP" "$APP.$$"
-			cd "$APP.$$"
-			mv * ..
-			cd ..
-		else	printf '%s\n' \
-				"Fatal error, could not retrieve source code" \
-				"Please check if either DOWNLOAD ($DOWNLOAD + $DOWNLOAD_DIR) are set," \
-				"or if $APP_GIT provides a valid URL."
+	}
+	task_executer() { # ENTRY
+	# Catches ENTRY and prints 'sh ./ENTRY'
+	# Executes it, or fails if it is a dir.
+		if [ -d "$1" ]
+		then 	echo "$(eval $MSG_CANNOT_EXE_DIR)" >&2
 			exit 1
+		elif [ -f "$1" ]
+		then	if [ -x "$1" ] 
+			then	[ "/" = "${1:0:1}" ] && \
+					echo "\"$1\"" || echo "\"./$1\""
+			else	[ "/" = "${1:0:1}" ] && \
+					echo "bash \"$1\"" || echo "bash \"./$1\""
+			fi
+		else	echo "$1"
 		fi
-	fi
-#
-#	Prepare installation script
-#
-	write_files
-	APP_REQUIRES=""
-	source "$CONFIG";missing=""
-	for req in $CFG_REQUIRES $APP_REQUIRES;do
-		which $req 2>/dev/zero 1>&2 || missing+=" $req"
-	done
-	[ ! -z "$missing" ] && \
-		printf '%s\n' "Please provide these commands before installing $APP!"  && \
-		printf '::-->> %s\n' ${missing} && \
-		exit 1
-#
-#	Output
-#
-	if $doTarball
-	then	exclude_list="make-distclean"
+	}
+	task_clean() { 
+	# Remove the files that where created
+	# from 'make' or make 'html'
+		[ -f make-clean ] || return 
+		texi_convert() { # INFILE TYPE
+			echo "${1%\.texi}.$2"
+		}
+		echo "which texi2any 2>/dev/zero 1>/dev/zero || exit 0" >> make-clean
+		for T in info html pdf dvi ps;do tData="${DOCS[$T]}" 
+			for item in $tData;do echo "rm -f $(texi_convert "$item" "$T")" >> make-clean ;done
+		done
+	}
+	task_distclean() { 
+	# Remove all the files that where created by configure
+	#
+		( $doMakefile || $doGNU ) && echo "rm -f Makefile"
+		for task in make* $REF
+		do	task_remover "$task"
+		done
+	}
+	task_dist() { #
+	# 
+	#
+		exclude_list=$(echo [mM]ake* *_dirs.conf)
 		for ex in "${IGNORE[@]}";do exclude_list+=" $ex";done
 		# Since we prepare the make-<files>, configure is no longer required
-		opt_exclude="--exclude-ignore=configure"
+		opt_exclude="" #"--exclude-ignore=configure"
 		for item in $exclude_list;do opt_exclude+=" --exclude-ignore=$item";done
 		
 		tmp_p="${PWD:-$(pwd)}"
@@ -979,38 +637,490 @@ Report bugs of $script_name to: https://github.com/sri-arjuna/yassi/issues
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="_${APP_VER}"
-		for t in "${PRIOR[@]}"
-		do 	(set -x ; $t )
-		done
-		tarball="../${APP}$VERSION.tar.gz"
-		set -x
+		tarball="${TARBALL:-../${APP_NAME}$VERSION.tar.gz}"
 		tar 	-acf "$tarball" \
 			--hard-dereference \
 			$opt_exclude * && \
-			echo "Successfully created tarball ${tarball}!"
-		set +x
-	else	[ "$HOME" = "${prefix:0:${#HOME}}" ] && install_prefix=""
-		${doMakefile} && write_makefile
-		echo
-		echo "The installation script has been configured to ${CHROOT}${FHS[prefix]} (${FHS[prefix]})."
-		if [ -n "$(echo ./make-doc-*)" ] 
-		then
-			if [ -f Makefile ]
-			then 	for mm in ./make-doc-*
-				do
-					[ ! -f make-doc-info ] && \
-						echo "You might want to run:" && \
-						grep ":" Makefile | awk '{print $1}' | \
-							grep -ve tall -ve opt -ve clea -ve PH|\
-							while read var;do echo "* make ${var/\:}";done
+			echo "$MSG_TARBALL_GOOD ${tarball}!"
+	}
+	task_reqs() { # LIST
+	# Parse command list of REQS
+	# Prints list of missing items and returns 1, 0 if all available
+		missing=""
+		for req in ${@};do
+			$DEBUG && printf '.'
+			which $req 2>/dev/zero 1>&2 || missing+=" $req"
+		done
+		if [ -z "$missing" ]
+		then	return 0
+		else	printf '%s\n' \
+				"$MSG_MISSING_CMDS" #"Sadly, you must figure out the package name yourself."
+			printf '::-->> %s\n' \
+				${missing}
+			exit 1
+		fi
+	}
+	task_download() { #
+	#
+	#
+		tmp=$(\ls -l|\grep -v configure)
+		if [ -z "$tmp" ]
+		then	# It is empty, so no other files available, get them now
+
+			if [ -n "$DOWNLOAD" ]
+			then 	# Tarball is available
+				curl -o "$APP_NAME.tar.gz" "$DOWNLOAD"
+				tar axf "$APP_NAME.tar.gz"
+				cd "$DOWNLOAD_DIR"
+				mv * ..
+				cd ..
+			elif [ -n "$APP_GIT" ]
+			then	# Git url is passed, lets check if it is required
+				# There are 'code' or '.git' urls
+				last_word="${APP_GIT##*/}"
+				check_word="${last_word/\.git}"
+				if [ "$last_word" = "$check_word" ]
+				then	# it is 'code'
+					git clone "$GIT" "$APP_NAME"
+				else	# its *.git
+					git clone "$APP_GIT"
+				fi
+				mv "$APP_NAME" "$APP_NAME.$$"
+				cd "$APP_NAME.$$"
+				mv * ..
+				cd ..
+			else	printf '%s\n' \
+					"Fatal error, could not retrieve source code" \
+					"Please check if either DOWNLOAD ($DOWNLOAD + $DOWNLOAD_DIR) are set," \
+					"or if $APP_GIT provides a valid URL."
+				exit 1
+			fi
+		fi
+	}
+	load_fhs() { #
+	# Assign default paths according to: http://www.pathname.com/fhs/
+	# The 'appdir', 'icondir' and the 'man[1-9]dir's are 'homebrew' and non-standard, so are root, bootdir, efidir, grubdir and systemddir
+		for index in $list_index
+		do
+			$DEBUG && printf '.'
+			tmp="${FHS[$index]}"
+			etc_done=false
+			if [ -z "$tmp" ]
+			then	case "$index" in
+				prefix)		tmp="${APP_DIR}"	;;
+				sysconfdir)	tmp_prefix="${FHS[prefix]}"
+						case "$tmp_prefix" in
+						"/"|"/usr")
+							tmp="/etc";;
+						*)	if $is_at_home
+							then	tmp="$HOME/.local/etc"
+							else	tmp="${FHS[prefix]}/etc"
+							fi	;;
+						esac ; etc_done=true	;;
+				# --- ---  --- ---  --- ---  --- ---  --- #
+				rootdir)	tmp="/"	;;
+				bootdir)	tmp="${FHS[rootdir]}/boot"	;;
+				efidir)		tmp="${FHS[bootdir]}/efi"	;;
+				grubdir)	tmp="${FHS[bootdir]}/grub"	;;
+				systemddir)	tmp="${FHS[sysconfdir]}/systemd";;
+				# --- ---  --- ---  --- ---  --- ---  --- #
+				"bindir")	tmp="${FHS[prefix]}/bin"	;;
+				"sbindir")	tmp="${FHS[prefix]}/sbin"	;;
+				datarootdir)	tmp="${FHS[prefix]}/share"	;;
+				appdir)		tmp="${FHS[datarootdir]}/applications"	;;
+				icondir)	tmp="${FHS[datarootdir]}/icons"	;;
+				datadir)	tmp="${FHS[datarootdir]}/$APP_NAME"	;;
+				infodir)	tmp="${FHS[datarootdir]}/info"	;;
+				mandir)		tmp="${FHS[datarootdir]}/man" ;;
+				man[0-9]dir)	tmp="${FHS[mandir]}/${index:0:4}" ;;
+				localedir)	tmp="${FHS[datarootdir]}/locale" ;;
+				docdir)		tmp="${FHS[datarootdir]}/doc/$APP_NAME" ;;
+				htmldir|dvidir|pdfdir|psdir)	tmp="${FHS[docdir]}" ;;
+				compldir)	# Some systems have bash completion within the SYSCONFDIR
+						if [ -d "${FHS[datarootdir]}/bash_completion/completions" ]
+						then 	tmp="${FHS[datarootdir]}/bash_completion/completions"
+						elif [ -d "${FHS[sysconfdir]}/bash_completion.d" ]
+						then	tmp="${FHS[sysconfdir]}/bash_completion.d"
+						else # Use default as fallback
+							tmp="${FHS[datarootdir]}/bash-completion/completions"
+						fi ;;
+				sharedstatedir)	tmp="${FHS[prefix]}/com"	;;
+				localstatedir)	tmp="${FHS[prefix]}/var"	;;
+				esac
+				if [ "$index" = "prefix" ] && ! $etc_done
+				then	# Do special handling
+					[ "~" = "${tmp:0:1}" ] && tmp="${tmp/~/$HOME}"
+					if [ "${tmp:0:${#HOME}}" = "$HOME" ]
+					then	is_at_home=true
+						install_prefix=""
+						tmp="${tmp/~\/$HOME/$HOME}"
+					else	is_at_home=false
+					fi
+				fi
+				FHS["$index"]="$tmp"
+			fi
+		done
+		export FHS is_at_home
+	}
+	write_file_ref() { #
+	# Write the basic reference file
+	#
+		# Exit with error with $REF is not set
+		[ -z "$REF" ] && exit 1 ; >"$REF"
+		# Internal defaults
+		$is_at_home && FHS[prefix]="$prefix_home"
+		echo "PREFIX=${FHS[prefix]}">>"$REF"
+		for i in $list_variables;do [ -n "${!i}" ] && task_reference "${i^^}" >> "$REF";done
+		
+		# Custom added dirs
+		for D in ${!DIR_*};do
+			$DEBUG && printf '.'
+			echo "$D=\"${!D}\" " >> "$REF"
+		done
+	}
+	write_file_docs() { #
+	# Checks if texi2any is installed and exit if not
+	# Converts the texi files to given type
+		for type in info html dvi pdf ps;do
+			$DEBUG && printf '.'
+			#set -x
+			if [ -n "${DOCS[$type]}" ]
+			then 	printf '%s\n' \
+					'! which texi2any 2>/dev/zero 1>/dev/zero && \' \
+					"	echo \"$MSG_NO_TEXI\" && \\" \
+					'	exit 1' \
+					>> make-doc-$type
+				for entry in ${DOCS[$type]};do
+					task_docs "$entry" "$type" >> make-doc-$type
 				done
 			fi
-		#	 && \
-		#		echo "You might to run $(echo ./make-doc-*)."
+			#set +x
+		done
+	}
+	write_file_headers() { #
+	# Creates the ./make* files 
+	# and writes the according script headers
+		# Basic files
+		touch make make-{install,uninstall,distclean}
+		$doGNU && touch make-clean make-dist
+		[ -n "$(echo ${DOCS[*]})" ] && touch make-install-all
+		[ -n "$(echo ${CLEAN[*]})" ] && touch make-clean
+		[ -n "$(echo ${DISTCLEAN[*]})" ] && touch make-distclean
+		# Docs
+		for t in info html dvi pdf ps;do
+			[ -n "$(echo ${DOCS[$t]})" ] && touch make-doc-$t
+		done
+		# Write shebang and make the scripts executable
+		for m in ./make*;do
+			$DEBUG && printf '.'
+			printf '%s\n' "#!/usr/bin/env bash" > "$m" ; chmod +x $m
+			# Write special content
+			case "$m" in
+			make)		printf '%s\n' "source $REF" "$tmp_var" >> "$m"	;;
+			*install*)	tmp_var="CHROOT=\${DESTDIR:-$CHROOT}"
+					printf '%s\n' "source $REF" "$tmp_var" >> "$m"
+					if [ "$m" = "make-install" ] && ! echo "$CHROOT/$PREFIX"| $GREP -q -e /home -e /Users -e /users
+					then 	printf '%s\n' "[ \${UID:-0} -ne 0 ] && \\"  \
+						printf '\t%s\n' "echo \"To ${m/*-} '${APP_TITLE:-APP_NAME}', root access is required.\" && \\" "exit 99" >> "$m"
+					fi ; unset tmp_var 	;;
+			esac ; $VERBOSE && printf '%s\n' "set -x" >>  "$m"
+		done
+		# Write $REF handlers
+		if ${doRef:-false}
+		then	printf '%s\n' "mkdir -p ${CHROOT}${FHS[sysconfdir]}" \
+				"cp $REF ${CHROOT}${FHS[sysconfdir]}/$APP_NAME.conf" >> "make-install"
+			printf '%s\n' "rm -f ${CHROOT}${FHS[sysconfdir]}/$APP_NAME.conf" >> "make-uninstall"
 		fi
-		[ -f Makefile ] && \
-			echo "To install \"${APP_TITLE:-$APP} ($APP_VER)\" now, please execute: make && ${install_prefix}'make install'" || \
-			echo "To install \"${APP_TITLE:-$APP} ($APP_VER)\" now, please execute: ./make && ${install_prefix}'./make-install'"
-		echo
-	fi
-	exit
+	}
+	
+	write_files_content() { #
+	# Write the actual content of the scripts
+	#
+		write_array() { # FILE ARRAY
+		# Expand passed ARRAY and write 
+		# its content to passed FILE
+			C=0;F="$1" ; shift
+			while 	item="$(eval echo \${${1}[$C]})"
+				[ -n "$item" ]
+			do 	case "$F" in
+				*clean*|*uninst*)
+					task_remover "$item" >> "$F" 	;;
+				*)	task_executer "$item" >> "$F" 	;;
+				esac
+				((C++))
+			done
+		}
+		write_file_install() { #
+		# Parse all variables and expand them
+		# TODO :: DIR_* and *_DIR are handled here
+			# Actualy write the make-{un,}install scripts
+			for index in $list_variables ${!DIR_*}
+			do	# Expand index
+				case "$index" in
+				DIR_*)	tmp1="${index/*_}_DIR"
+					tmp="${!tmp1}"	;;
+				*)	tmp="${!index}" ;;
+				esac
+				task_install "$index" "$tmp"
+			done
+		}
+		# Actually write the content
+		for m in make*;do
+			$DEBUG && printf '.'
+			case "$m" in
+			"make")		write_array $m MAKE 		;;
+			"make-install")	[ -n "$MAKE_CREATES" ] && \
+						echo "[ ! -f \"$MAKE_CREATES\" ] && echo 'Please run either \"./make\" or \"make\" first!' && exit 1" >> "$m"
+					write_array "$m" PRIOR
+					write_file_install
+					write_array "$m" POST		;;
+			"make-check")	write_array "$m" CHECK	 	;;
+			"make-uninstall")
+					write_array "$m" UNINSTALL 	;;
+			"make-clean")
+					write_array "$m" CLEAN
+					task_clean >> "make-clean"	;;
+			"make-dist")	echo "source $CFG" >> make-dist
+					LC_ALL=C type task_dist | ${GREP:-\grep} -v "is a" >> make-dist
+					echo task_dist >> make-dist	;;
+			"make-distclean")
+					write_array "$m" DISTCLEAN 
+					>> "make-distclean"
+					task_distclean >> "make-distclean";;
+			esac
+		done
+	}
+	write_file_closer() { #
+	# Saves the return code of the last command 
+	#
+		for m in ./make*
+		do	$VERBOSE && verbose="set +x" || verbose=""
+			printf '%s\n' "RET=\$?" "$( [ -n "$verbose" ] && echo $verbose)" "exit \$RET" >> "$m"
+		done
+	}
+	task_mkdir() { # INDEX
+	# Print the code required to create a directory
+	# Checking for '/usr-move' and creates symlink if required
+		grep -q "create_dir=\"${FHS[${1,,}]}\"" make-install && return
+		cat >> "make-install" <<-EO_SCREEN
+		
+		create_dir="${FHS[${1,,}]}"
+		if [ ! -d "\${CHROOT}\${create_dir%/*}" ]
+		then 	cd "\${CHROOT}/usr/.."
+		 	[ -d "\${CHROOT}/usr\${create_dir%/*}" ] && [ -n "\${create_dir%/*}" ] && \\
+		 		ln -sf "usr\${create_dir%/*}" "./\${create_dir%/*}"
+		 	cd "\$OLDPWD"
+		fi
+		#[ -d "\${CHROOT}\$create_dir" ] || \\
+			mkdir -p "\${CHROOT}\$create_dir" || echo >/dev/zero
+		EO_SCREEN
+	}
+	task_install() { # INDEX CONTENT
+	#
+	#
+		# Vars 
+		INDEX="$1" ; shift
+		DEST="${CHROOT}${FHS[${INDEX,,}]}"
+		# func
+		get_dir() { # Entry
+			. "$REF" ; tmp="${1/DIR_}"
+			#[ ! "$1" = "$tmp" ] && tmp="${1/DIR_}_DIR" || \
+				tmp="$1"
+			echo "${!tmp}";unset tmp
+		}
+		skip_this() { # Entry
+			A=$(get_dir DATADIR)
+			B=$(get_dir DOCDIR)
+			for E in $A $B;do
+				len=${#E}
+				[ ! "$APP_NAME" = "${E##*/}" ] && continue
+				[ "${1:0:$len}" = "$E" ] && return 0
+			done
+			return 1
+		}
+		
+		# Parse each 'variable'
+		for item in ${@}
+		do 	ID=${INDEX^^}
+			tPath="$(get_dir ${INDEX})"
+			tItem="${!ID}"
+			# This expansion must not have quotes!
+			
+			DEST="${DEST:-$tPath}"
+			
+			# Something to do?
+			[ -n "$tItem" ] && \
+				task_mkdir "$INDEX" >> make-install || \
+				continue
+			skip_this && continue
+			
+			# Parse each item of the tList
+			for lItem in $tItem;do
+				$DEBUG && printf '.'
+				tList=$(eval echo $lItem)
+				unset ${!str_*}
+				# Install - very new
+				if [ -d "$lItem" ]
+				then	# Install
+					[ "./" = "${lItem:0:2}" ] && \
+						str_inst="cp -pr \"$lItem\" \"$tPath\""  || \
+						str_inst="cp -pr \"$lItem\"/* \"$tPath\"" 
+					# Uninstall
+					for e in "./$lItem/"*
+					do 	[ -d "$e" ] && \
+							str_rem="rm -fr $DEST/${e##*/}" || \
+							str_rem="rm -f $DEST/${e##*/}"
+					done
+				elif [ -f "$lItem" ]
+				then	# Install
+					str_inst="cp -p \"$lItem\" \"$tPath\""
+					# Uninstall
+					str_rem="rm -f \"$tPath/$lItem\""
+				else	## Pobably not yet available....
+					# Install
+					str_inst="cp -p \"$lItem\" \"$tPath\""
+					# Uninstall
+					str_rem="rm -f \"$tPath/$lItem\""
+				fi
+				# only print to file if command is neither empty nor present yet
+				[ -n "$str_inst" ] && ! $GREP -q "$str_inst" make-install && echo "$str_inst"| sed s,"//","/",g >> "make-install"
+				[ -n "$str_rem" ] && ! $GREP -q "$str_rem" make-uninstall && echo "$str_rem"| sed s,"//","/",g >> "make-uninstall"
+			done
+		done
+	}
+	write_file_make() { #
+	# Checks for existing scripts and adds them to the makefile
+	# Create it either dynamic or add additional make targets
+	#
+	#	Variables
+	#
+		# Clear / Init makefile
+		$doMakeFile || return
+		local M="./Makefile"
+		echo "# This Makefile was generated on $(date +'%F') using YASSI ($script_version)" >$M
+	#
+	#	Function
+	#
+		regular_handling() { #
+		# Write the basic Makefile
+		#
+			for task in ./make*
+			do 	[ "task" = "all" ] && task=install-all
+				case "$task" in
+				./make)		printf '%s\n' "options:" "	./make"  >> "$M"				;;
+				./make-install-all)
+					 	if [ -f "$task" ];then
+					 		printf '%s\n' "./make" ./make-doc-* "DESTDIR=\$DESTDIR ./make-install" >> "$task"
+						fi 
+						[ -f "$task" ] && printf '%s\n' "${task/\.\/make-}:" "	DESTDIR=\$DESTDIR $task"  >> "$M"
+						 ;;
+				./make-install)	[ -f "$task" ] && printf '%s\n' "${task/*-}:" "	DESTDIR=\$DESTDIR ${task}"  >> "$M" ;;
+				*-doc-*)	[ -f "$task" ] && printf '%s\n' "${task/*-}:" "	${task}"  >> "$M" 	;;
+				*)		[ -f "$task" ] && printf '%s\n' "${task/*-}:" "	${task}"  >> "$M" 		;;
+				esac
+			done
+			echo "PHONY: $(echo make-*|sed s,make\-,,g|sed s,doc\-,install\-,g)" >> "$M"
+			
+		}
+		add_gnu_mods() { #
+		#
+		#
+			echo $FUNCNAME todo
+			return 
+			
+			mostlyclean
+			maintainer-clean
+			installdirs
+
+		}
+	#
+	#	Action & Display
+	#
+		if $doGNU
+		then	# Make the Makefile GNU compliant
+			regular_handling
+			add_gnu_mods
+		else	# Regular default handling
+			regular_handling
+		fi
+	}
+#
+#	Get options
+#
+	[ -f "$CFG" ] && source "$CFG"		# Overwrite YASSI defaults and load APP-defaults
+	GETOPT=$(getopt \
+		--options	"hc:t" \
+		--longoptions	"help,version,verbose,conf:,manpage,makefile,sample,sample-full,sample-full-clean,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,mandir,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:,rootdir:,bootdir:,efidir:,grubdir:,systemddir:" \
+		--name 		"${0##*/}" -- "${@}"
+	)
+	eval set -- "$GETOPT"
+	while true
+	do 	case "$1" in
+		-h|--help)	show_help		;;
+		--version)	show_version		;;
+		--sample)	show_sample		;;
+		--sample-full)	show_sample_full	;;
+		--sample-full-clean)	show_sample_full_clean ; exit 0	;;
+		
+		--prefix|--bindir|--sbindir|--datarootdir|--datadir|\
+		--infodir|--sysconfdir|--mandir,--man[1-9]dir|\
+		--docdir|--htmldir|--dvidir|--pdfdir|--psdir|\
+		--compldir|--sharedstatedir|--localstatedir|--localedir|\
+		--rootdir|--bootdir|--efidir|--grubdir)
+				FHS["${1/--}"]="$2"
+				shift 2		;;
+		-t|--tarball)	task_dist
+				exit $? 		;;
+		-c|--conf)	CFG="$2"
+				shift 2		;;
+		--chroot)	CHROOT="$2"
+				shift 2		;;
+		--makefile)	doMakefile=true
+				shift		;;
+		--manpage)	if txt2man --help > /dev/zero
+				then 	show_manpage | \
+						txt2man \
+							-t "configure 1" \
+							-r "YASSI $script_version" \
+							-I "/usr/share/doc/appname" \
+							-I "/etc/appname.conf" \
+							-I "./make-" \
+							-I "./configure" \
+							-B "doMakefile" \
+							-B "doTUI" \
+							-B "doGNU" \
+							-B "doRef" \
+							> "$MANPAGE"
+					man "$MANPAGE" ; rm "$MANPAGE"
+				else 	show_manpage
+				fi
+				exit 0		;;
+		--verbose)	VERBOSE=true	;;
+		--)		shift ; break	;;
+		esac
+	done
+	[ ! -f "$CFG" ] && echo "$MSG_NO_CONFIG" && exit 1 || source "$CFG"
+	[ -z "${APP_NAME/APP*NAME}" ] && echo "$MSG_NO_NAME" && exit 1
+	REF="./${APP_NAME}_dirs.conf"
+#
+#	Prepare Environment
+#
+	$DEBUG && printf '.'
+	load_fhs
+	unset ${list_variables}
+	source "$CFG"
+	write_file_ref
+#
+#	Prepare installation script
+#
+	write_file_headers
+	write_files_content
+	write_file_docs
+	write_file_make
+	write_file_closer
+#
+#	Quit
+#
+	RET=$?
+	$DEBUG && set +x
+	

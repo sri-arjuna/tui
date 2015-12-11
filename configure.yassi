@@ -80,5 +80,8 @@
 	MAKE[1]="source ./tuirc ; for f in conf.tui/*conf;do source \$f;done"
 	POST[0]="[ ! -d \${CHROOT}\$SYSCONFDIR/tui ] && mkdir -p \${CHROOT}\$SYSCONFDIR/tui"
 	POST[1]="mv \${CHROOT}\$SYSCONFDIR/conf.tui/* \${CHROOT}\$SYSCONFDIR/tui && rmdir \${CHROOT}\$SYSCONFDIR/conf.tui"
+	DISTCLEAN[0]="tuirc"
+	REMOVE[0]="[ -d \${CHROOT}\$SYSCONFDIR/tui ] && rm -fr \${CHROOT}\$SYSCONFDIR/tui"
+	REMOVE[0]="[ -f \${CHROOT}\$SYSCONFDIR/tuirc ] && rm -f \${CHROOT}\$SYSCONFDIR/tuirc"
 	TARBALL="$HOME/$APP_NAME-$APP_VER.tar.gz"
 	
