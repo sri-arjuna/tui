@@ -74,6 +74,7 @@
 	#MAKE[1]="source ./tuirc ; for f in conf.tui/*conf;do source \$f;done"
 	POST[0]="[ ! -d \${CHROOT}\$SYSCONFDIR/tui ] && mkdir -p \${CHROOT}\$SYSCONFDIR/tui"
 	POST[1]="mv \${CHROOT}\$SYSCONFDIR/conf.tui/* \${CHROOT}\$SYSCONFDIR/tui && rmdir \${CHROOT}\$SYSCONFDIR/conf.tui"
+	POST[2]="sed s,\$SYSCONFDIR/conf.tui,\$SYSCONFDIR/tui,g -i make-{install,uninstall}"
 	DISTCLEAN[0]="tuirc"
 	REMOVE[0]="[ -d \${CHROOT}\$SYSCONFDIR/tui ] && rm -fr \${CHROOT}\$SYSCONFDIR/tui"
 	REMOVE[0]="[ -f \${CHROOT}\$SYSCONFDIR/tuirc ] && rm -f \${CHROOT}\$SYSCONFDIR/tuirc"

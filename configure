@@ -20,7 +20,7 @@
 #
 #	Created:	2015.02.27
 #	Transformed:	2015.12.07
-#	Changed:	2015.12.13
+#	Changed:	2015.12.14
 	script_name=configure
 	script_version=1.8.4
 #
@@ -95,13 +95,14 @@
 	# Parse for any found language, or fallback to 'en_GB'
 	for lng in $YASSI_LANGS en_GB
 	do 	# If lng is not default, check if LANG and lng are the same lang, even if not country.
-		[ ! $lng = en_GB ] && L="${LANG##\.*}" && [ "${L/_*}" = "${lng/_*}" ] || continue
+		[ ! $lng = en_GB ] && L="${LANG##\.*}" && { [ "${L/_*}" = "${lng/_*}" ] || continue ; }
 		case "${lng:-en_GB}" in
 		en_*)	MSG_NO_CODE="Fatal error, could not retrieve project (${APP_NAME^^}) code!"
 			MSG_NO_CONFIG="Configuration file ($CFG) not found!"
 			MSG_NO_NAME="Missing APP_NAME..."
 			MSG_NO_INTERNET="No working internet connection found."
 			MSG_NO_REQS="Did not find the following required commands:"
+			MSG_NO_DL_APP="Could not find: curl/wget!"
 			MSG_CANNOT_EXE_DIR='Cannot execute a directory: $1!'
 			MSG_MISSING_CMDS="Please provide these commands before configuring $APP_NAME!"
 			MSG_NO_TEXI="The command 'texi2any' was not found, which is required to create this manual"
@@ -135,7 +136,8 @@
 		This is free software; you are free to change and redistribute it.
 		There is NO WARRANTY, to the extent permitted by law.
 
-		Report bugs of ./configure to: https://github.com/sri-arjuna/yassi/issues
+		Report bugs of ./configure to: <https://github.com/sri-arjuna/yassi/issues>
+		Or send an email to: <erat.simon@gmail.com>
 		EO_SCREEN
 		exit 0
 	}
@@ -701,7 +703,7 @@
 		done
 	}
 	task_dist() { #
-	# 
+	# Packages the project dir without the items of IGNORE[@]
 	#
 		exclude_list=$(echo [mM]ake* *_dirs.conf)
 		for ex in "${IGNORE[@]}";do exclude_list+=" $ex";done
@@ -711,17 +713,22 @@
 		
 		tmp_p="${PWD:-$(pwd)}"
 		tmp_dir="$(dirname $tmp_p)"
+		this=${tmp_p/$tmp_dir}
+		
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
-			VERSION="_${APP_VER}"
+			VERSION="-${APP_VER}"
 		tarball="${TARBALL:-../${APP_NAME}$VERSION.tar.gz}"
+		cd ..
 		tar 	-acf "$tarball" \
 			--hard-dereference \
-			$opt_exclude *
+			$opt_exclude "${this/\/}"
 		RET=$?
-		[ o -eq $RET ] && \
+		[ 0 -eq $RET ] && \
 			echo "$MSG_TARBALL_GOOD ${tarball}!" || \
 			echo "$MSG_TARBALL_BAD ${tarball}!"
+		cd "$tmp_p"
+		unset ${!tmp_*} this
 		return $RET
 	}
 	task_reqs() { # MODE
@@ -773,24 +780,28 @@
 		[ -f "$DOWNLOAD_IF_MISSING" ] && doDL=false || doDL=true
 		$doDL || return # its there
 		# Prefer git over svn over download
-		if [ -n "$GIT" ]
+		if [ -n "$GIT" ] && $WHICH git 2>/dev/zero 1>/dev/zero
 		then	outdir="$APP_NAME.src"
 			git clone "$GIT" "$outdir"
-		elif [ -n "$SVN" ]
+		elif [ -n "$SVN" ] && $WHICH git 2>/dev/zero 1>/dev/zero
 		then	outdir="$APP_NAME.src"
 			svn checkout "$SVN" "$outdir"
 		elif [ -n "$DOWNLOAD" ]
-		then	if which curl 2>/dev/zero 1>/dev/zero
+		then	app=""
+			if which curl 2>/dev/zero 1>/dev/zero
 			then	app=curl ; opt="-o"
 			else	app=wget ; opt="-O"	# Hopefully
 			fi
+			[ -z "$app" ] && printf '%s\n' "$MSG_NO_DL_APP" && exit 1
 			$app $opt "${DOWNLOAD##*/}" "$DOWNLOAD"
 			tar -axf "${DOWNLOAD##*/}"
-			if [ -d "${APP_NAME}-master" ]
+			if [ -d "${APP_NAME}" ]
+			then	outdir="${APP_NAME}"
+			elif [ -d "${APP_NAME}-master" ]
 			then	outdir="${APP_NAME}-master"
 			elif [ -d "${APP_NAME}-$APP_VER" ]
 			then	outdir="${APP_NAME}-$VER"
-			else	[ -f "$DOWNLOAD_DIR" && \
+			else	[ -z "$DOWNLOAD_DIR" && \
 					outdir=$($LS -dd $APP_NAME |$AWK '/^d/ {print $9}'|head -n1) \\
 					outdir="$DOWNLOAD_DIR"
 			fi
@@ -802,8 +813,7 @@
 	task_mkdir() { # INDEX
 	# Print the code required to create a directory
 	# Checking for '/usr-move' and creates symlink if required
-		#
-		grep -q "create_dir=\"${FHS[${1,,}]}\"" make-install && return
+		$GREP -q "create_dir=\"${FHS[${1,,}]}\"" make-install && return
 		cat >> "make-install" <<-EO_SCREEN
 		
 		create_dir="${FHS[${1,,}]}"
@@ -1079,7 +1089,7 @@
 				task_install "$index" "$tmp"
 				task_uninstall "$index" "$tmp" >> make-uninstall
 			done
-			[ -n "$CHROOT" ] && echo "cp -a $REF make-install \"\${CHROOT}\$DATADIR\"" >> "make-install"
+			[ -n "$CHROOT" ] && echo "cp -a $REF make-uninstall \"\${CHROOT}\$DATADIR\"" >> "make-install"
 		}
 		# Actually write the content
 		for m in make*;do
@@ -1092,12 +1102,16 @@
 					write_array "$m" POST		;;
 			"make-check")	write_array "$m" CHECK	 	;;
 			"make-uninstall")
+					# These two are app specific and can be deleted as is
+					[ -n "$(get_dir datadir)" ] && echo "rm -fr \"\${CHROOT}$(get_dir datadir)\"" >> make-uninstall
+					[ -n "$(get_dir docdir)" ] && echo "rm -fr \"\${CHROOT}$(get_dir docdir)\"" >> make-uninstall
+					# Do manual removals too
 					write_array "$m" UNINSTALL 	;;
 			"make-clean")
 					write_array "$m" CLEAN
 					task_clean >> "make-clean"	;;
 			"make-dist")	echo "source $CFG" >> make-dist
-					LC_ALL=C type task_dist | ${GREP:-\grep} -v "is a" >> make-dist
+					LC_ALL=C type task_dist | ${GREP} -v "is a" >> make-dist
 					echo task_dist >> make-dist	;;
 			"make-distclean")
 					write_array "$m" DISTCLEAN 
@@ -1115,10 +1129,12 @@
 	write_file_closer() { #
 	# Saves the return code of the last command 
 	#
+		# Now close the files
 		for m in ./make*
 		do	$VERBOSE && verbose="set +x" || verbose=""
 			printf '%s\n' "RET=\$?" "$( [ -n "$verbose" ] && echo $verbose)" "exit \$RET" >> "$m"
 		done
+		
 	}
 	write_file_make() { #
 	# Checks for existing scripts and adds them to the makefile
