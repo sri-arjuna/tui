@@ -22,7 +22,7 @@
 #	Transformed:	2015.12.07
 #	Changed:	2015.12.14
 	script_name=configure
-	script_version=1.8.4
+	script_version=1.8.6
 #
 #	Description:
 #		This script automaticly generates,
@@ -84,7 +84,7 @@
 	# Bools
 	declare doMakefile=false doGNU=false doTUI=false doRef=false
 	declare VERBOSE=false DEBUG=false	## V=1 // V=2
-	# Basic 'compatiblity' with the 'prepass V=[1|2] toggle'
+	# Basic 'compatiblity' with the 'prepass V=[1|2] toggle' (covers --verbose (V=1) and --debug (V=2))
 	[ -n "$V" ] && VERBOSE=true && [ $V -eq 2 ] && DEBUG=true 
 #
 #	Message Strings
@@ -168,7 +168,8 @@
 		BASIC
 		 	-h|--help		Shows this screen and exits
 		 	--version		Shows the version of YASSI (./configure) and exits
-		 	--verbose		Prints all the action on the screen
+		 	--verbose		Prints all the action of the make* commands on the screen (V=1 ./configure [opts])
+		 	--debug			Like --verbose but also internal action how those files are created (V=2 ./configure [opts])
 		
 		 	--prefix DIR		Sets the prefix to DIR		(default: PREFIX=${APP_DIR})
 			
@@ -446,7 +447,6 @@
 			 	
 			 	
 		EO_SCREEN
-		#root boot efi grub systemd"
 	}
 	show_sample() { #
 	# Prints a minimal example config
@@ -625,19 +625,44 @@
 	#
 		local GIT="git://git.sv.gnu.org/tui.git"
 		local DOWNLOAD="http://git.savannah.gnu.org/cgit/tui.git/snapshot/tui-master.tar.gz"
+		local GIT="http://github.com/sri-arjuna/tui.git"
 		get_it(){
-			which git 2>/dev/zero 1>/dev/zero && git clone "$GIT" tui.src; cd tui.src
-			which curl 2>/dev/zero 1>/dev/zero && curl -o "${DOWNLOAD##*/}" "$DOWNLOAD"
-			which wget 2>/dev/zero 1>/dev/zero && wget -O "${DOWNLOAD##*/}" "$DOWNLOAD"
-			[ ! -f "${DOWNLOAD##*/}" ] && return 1
-			tar -axf "${DOWNLOAD##*/}" ; cd tui-master
+			ping -c1 8.8.8.8 2>/dev/null >&2 || \
+				{ echo "$MSG_NO_INTERNET" ; exit 1 ; }
+			if which git 2>/dev/zero 1>/dev/zero 
+			then	if [ -d tui-master ]
+				then	cd tui-master
+					git pull
+					RET=$?
+				else	git clone "$GIT" tui-master
+					RET=$?
+					cd tui-master
+				fi
+				return $RET
+			elif which curl 2>/dev/zero 1>/dev/zero 
+			then	curl -o "${DOWNLOAD##*/}" "$DOWNLOAD"
+			elif which wget 2>/dev/zero 1>/dev/zero 
+			then	wget -O "${DOWNLOAD##*/}" "$DOWNLOAD"
+			else	echo "$MSG_NO_DL_APP"
+				exit 1
+			fi
+			[ -f "${DOWNLOAD##*/}" ] && \
+				tar -axf "${DOWNLOAD##*/}" && \
+				cd tui-master && \
+				return 0
+			exit 1
 		}
-		! get_it && echo "$MSG_NO_INTERNET" && exit 1
-		./configure --prefix=$PREFIX --chroot=$CHROOT
-		T=${PWD##*/}
+		# TUI is found, no download/install required.
+		$WHICH tui 2>/dev/null >&2  && return 0
+		# TUI is not found, download it or exit with failure
+		get_it || { echo "$MSG_NO_INTERNET" ; exit 1 ; }
+		# Call proper installation depending on chroot/builddir
+		[ -z "${DESTDIR:-${FHS[chroot]}}" ] && \
+			$PWD/configure --prefix=${FHS[prefix]} || \
+			./configure -c $PWD/configure.yassi --prefix=${FHS[prefix]} --chroot=${FHS[chroot]} 
 		cd ..
-		echo "$T/make" >> make
-		echo "$T/make-install-all" >> make-install
+		echo "(set -x;cd tui-master ; ./make)" >> ./make
+		echo "(set -x;cd tui-master ; ./make-install-all)" >> ./make-install
 	}
 	task_docs() { # INFILE [TYPE=info]
 	# Prints the texi2any command to create an info file
@@ -678,9 +703,9 @@
 		elif [ -f "$1" ]
 		then	if [ -x "$1" ] 
 			then	[ "/" = "${1:0:1}" ] && \
-					echo "\"$1\"" || echo "\"./$1\""
+					echo "\"$1\"" || echo "\"$PWD/$1\""
 			else	[ "/" = "${1:0:1}" ] && \
-					echo "bash \"$1\"" || echo "bash \"./$1\""
+					echo "bash \"$1\"" || echo "bash \"$PWD/$1\""
 			fi
 		else	echo "$1"
 		fi
@@ -814,9 +839,10 @@
 	# Print the code required to create a directory
 	# Checking for '/usr-move' and creates symlink if required
 		$GREP -q "create_dir=\"${FHS[${1,,}]}\"" make-install && return
+		create_dir="${FHS[${1,,}]}"
 		cat >> "make-install" <<-EO_SCREEN
 		
-		create_dir="${FHS[${1,,}]}"
+		create_dir="$create_dir"
 		if [ ! -d "\${CHROOT}\${create_dir%/*}" ]
 		then 	mkdir -p "\${CHROOT}/usr"
 			cd "\${CHROOT}/usr/.."
@@ -877,33 +903,21 @@
 	get_dir() { source "$REF" ; tmp="${1^^}";echo "${!tmp}";unset tmp;}
 	get_content() { source "$CFG" ; tmp="${1^^}";echo "${!tmp}";unset tmp;}
 	task_install() { # INDEX CONTENT
-	#
-	#
-		# Vars 
+	# Write the 'install' command for this INDEX and CONTENT
+	# Copy all CONTENT of INDEX, preserve same output dir!
 		INDEX="$1" ; shift ; ID=${INDEX^^}
-		DEST="${CHROOT}${FHS[${INDEX,,}]}"
-		# func
-		# Get content is former get_dir
-		skip_this() { # Entry
-			A=$(get_dir DATADIR)
-			B=$(get_dir DOCDIR)
-			for E in $A $B;do
-				len=${#E}
-				[ ! "$APP_NAME" = "${E##*/}" ] && continue
-				[ "${1:0:$len}" = "$E" ] && return 0
-			done
-			return 1
-		}
-		# Copy all CONTENT of INDEX, preserve same output dir!
+		DEST="\${CHROOT}${FHS[${INDEX,,}]}"
+		
+		# This covers custom created target paths
 		tPath="$(get_dir ${INDEX})"
 		DEST="${DEST:-$tPath}"
-		#tFile="$(get_content ${INDEX})"
+		[ "${1,,}" = root* ] && [ -z "$DEST" ] && DEST="/"
 		
 		# Parse each 'variable'
 		for item in "${@}"
 		do 	# Something to do?
-			#tui-title "$item :: $@"
 			tItem="$(eval echo $item)"
+			#tui-title "$INDEX :: $item :: $tItem :: $@ "
 			[ -n "$tItem" ] && \
 				task_mkdir "$INDEX" >> make-install || \
 				continue
@@ -917,7 +931,6 @@
 			# Install this the simple way
 			echo "cp -ar ${str} \"$DEST\"" >> "make-install"
 		done
-		# Copy it to chroot, but let end user remove it
 	}
 	load_fhs() { #
 	# Assign default paths according to: http://www.pathname.com/fhs/
@@ -989,7 +1002,7 @@
 		# Find user homebase
 		for that in / /Usr /Os /Sys /System /Var
 		do 	for this in Home User Users
-			do 	HOMEBASE="$that$this"
+			do 	HOMEBASE="$that/$this"
 				[ -d "${HOMEBASE}" ] && break 2
 				[ -d "${HOMEBASE,,}" ] && HOMEBASE="${HOMEBASE,,}" && break 2
 				[ -d "${HOMEBASE^^}" ] && HOMEBASE="${HOMEBASE^^}" && break 2
@@ -1033,22 +1046,27 @@
 		for t in info html dvi pdf ps;do
 			[ -n "$(echo ${DOCS[$t]})" ] && touch make-doc-$t
 		done
-		# Write shebang and make the scripts executable
-		tmp_var="CHROOT=\${DESTDIR:-$CHROOT}"
+		# Write shebang and make the scripts executable		
 		for m in ./make*;do
-			printf '%s\n' "#!/usr/bin/env bash" > "$m" ; chmod +x $m
+			printf '%s\n' "#!/usr/bin/env bash" \
+				"$($VERBOSE && printf '%s\n' 'set -x')" \
+				"source $CFG" \
+				"source $REF" \
+				"CHROOT=\${DESTDIR:-$CHROOT}" \
+				> "$m"
+			chmod +x "$m"
+			
 			# Write special content
 			case "$m" in
-			make)		printf '%s\n' "source $REF" "$tmp_var" >> "$m"	;;
-			*install*)	tmp_var="CHROOT=\${DESTDIR:-$CHROOT}"
-					printf '%s\n' "source $REF || { echo \"$MSG_RERUN_CFG\" ; exit 1; }" "$tmp_var" >> "$m"
+			*install*)	printf '%s\n' "source $REF || { echo \"$MSG_RERUN_CFG\" ; exit 1; }" "$tmp_var" >> "$m"
 					if [ "$m" = "make-install" ] && ! echo "$CHROOT/$PREFIX"| $GREP -q -e /home -e /Users -e /users
 					then 	printf '%s\n' "[ \${UID:-0} -ne 0 ] && \\"  \
 						printf '\t%s\n' "echo \"To ${m/*-} '${APP_TITLE:-APP_NAME}', root access is required.\" && \\" "exit 1" >> "$m"
-					fi ; unset tmp_var
-					[ "./make-install" = "$m" ] &&   printf '%s\n' "[ -d \"\$CHROOT\" ] || mkdir -p \"\$CHROOT\"" >> "$m"
-					[ "./make-uninstall" = "$m" ] && printf '%s\n' "[ -d \"\$CHROOT\" ] || CHROOT=\"\""  >>  "$m"	;;
-			esac ; $VERBOSE && printf '%s\n' "set -x" >>  "$m"
+					fi
+					[ "./make-install" = "$m" ] &&   printf '%s\n' "$tmp_var" "[ -z \"\$CHROOT\" ] || mkdir -p \"\$CHROOT\"" >> "$m"
+					[ "./make-uninstall" = "$m" ] && printf '%s\n' "[ -n \"\$CHROOT\" ] || CHROOT=\"\""  >>  "$m"
+					;;
+			esac
 		done
 		# Write $REF handlers
 		if ${doRef:-false}
@@ -1056,7 +1074,6 @@
 				"cp $REF ${CHROOT}${FHS[sysconfdir]}/$APP_NAME.conf" >> "make-install"
 			printf '%s\n' "rm -f ${CHROOT}${FHS[sysconfdir]}/$APP_NAME.conf" >> "make-uninstall"
 		fi
-		#[ -n "$CHROOT" ] && echo "mkdir -p $CHROOT{/bin,/etc,/share/$APP_NAME,/share/doc/$APP_NAME}" >> make-install
 	}
 	write_files_content() { #
 	# Write the actual content of the scripts
@@ -1145,7 +1162,7 @@
 		# Clear / Init makefile
 		($doMakeFile||$doGNU) || return
 		local M="./Makefile"
-		echo "# This Makefile was generated on $(date +'%F') using YASSI ($script_version)" >$M
+		echo "# This Makefile was generated for ${APP_TITLE:-$APP_NAME} on $(date +'%F') using YASSI ($script_version)" >$M
 	#
 	#	Function
 	#
@@ -1190,7 +1207,7 @@
 	[ -f "$CFG" ] && source "$CFG"		# Overwrite YASSI defaults and load APP-defaults
 	GETOPT=$(getopt \
 		--options	"hc:t" \
-		--longoptions	"help,version,verbose,conf:,manpage,makefile,sample,sample-full,sample-full-clean,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,mandir,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:,root:,boot:,efi:,grub:,systemd:" \
+		--longoptions	"help,version,verbose,debug,conf:,manpage,makefile,sample,sample-full,sample-full-clean,chroot:,tarball,bindir:,sbindir:,prefix:,datarootdir:,datadir:,infodir:,mandir,man[1-9]dir:,localedir:,docdir:,compldir:,sharedstatedir:,localstatedir:,localedir:,root:,boot:,efi:,grub:,systemd:" \
 		--name 		"${0##*/}" -- "${@}"
 	)
 	eval set -- "$GETOPT"
@@ -1217,7 +1234,8 @@
 				exit $? 		;;
 		-c|--conf)	CFG="$2"
 				shift 2		;;
-		--chroot)	[ "~" = "${2:0:1}" ] && \
+		--chroot)	[ -z "$2" ] && continue
+				[ "~" = "${2:0:1}" ] && \
 					CHROOT="${2/\~/$HOME}" || \
 					CHROOT="${2}"
 				shift 2		;;
@@ -1240,6 +1258,8 @@
 				fi
 				exit 0		;;
 		--verbose)	VERBOSE=true	;;
+		--debug)	VERBOSE=true
+				DEBUG=true	;;
 		--)		shift ; break	;;
 		esac
 	done

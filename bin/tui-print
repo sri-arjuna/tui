@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.7
+	script_version=2.7.1
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU\057Linux}"
 #
@@ -484,6 +484,7 @@ AUTHOR
 		echo "$THIRD" | $GREP -q '%' && \
 			pos_third_num=$(( $pos_third_num + 1 ))
 		POS_THIRD="\033[${pos_third_num}G"
+		#POS_THIRD="$(eval echo $POS_THIRD)"
 	fi
 #
 #	Generate output strings
@@ -508,5 +509,8 @@ AUTHOR
 			POS_CENTER="\033[$(( $num_tmp + 1 ))G"
 		printf  "${POS_CENTER}$SECOND"
 	fi
-	[ -z "$THIRD" ]  || printf "${POS_THIRD}%s" "$THIRD"
+	$doStatus && \
+		( [ -z "$THIRD" ]  || printf  "$POS_THIRD$THIRD" ) || \
+		[ -z "$THIRD" ]  || printf "${POS_THIRD}%s" "$THIRD"
+	
 	printf "${END}"

@@ -1,10 +1,13 @@
+2015-12-20 - TUI 0.9.4-inprogress - sea
+* Updated: tui-progress, there was an issue with displaying '|' and reseting values
+* Updated: tui-print, hotfixes for tui-echo and tui-progress
+
 2015-12-14 - TUI 0.9.3 GNU RC 24 - sea
 * Renamed: tui-print -> tui-echo (Back to original)
 * Renamed: tui-printline -> tui-print (With symlink from tui-tui-printf)
 * Updated: tui-echo, now accepts same arguments as 'echo'.
 * Updated: conf.tui/status.conf, optimized for local checks
 * Created: Initial check script
-
 
 2015-12-07 - TUI 0.9.2 - sea
 * lists/web_gui: Renamed chromium -> chromium-browser
