@@ -41,8 +41,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.05.07
-#	Changed:	2015.11.07
-	script_version=0.9.1
+#	Changed:	2015.12.25
+	script_version=0.9.2
 #	Description:	Returns true if user is in GUI mode.
 #
 #	Variable defaults (options)
@@ -141,8 +141,8 @@ AUTHOR
 #	Display & Action
 #
 	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
-	if [ ! -z "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other [ep]term/in/ator's
-	then	$beVerbose && echo "$DE"
+	if [ -n "${DE:-$XAUTHORITY}" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other [ep]term/in/ator's
+	then	$beVerbose && echo "${DE:-$TERM}"
 		exit 0
 	else	exit 1
 	fi

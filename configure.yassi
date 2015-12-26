@@ -70,6 +70,7 @@
 #	Advanced Tweakings
 #
 	MAKE[0]="scripts/prepare.sh"
+	MAKE[1]="scripts/gen-tuirc.sh > ./tuirc"
 	MAKE_CREATES=./tuirc
 	#MAKE[1]="source ./tuirc ; for f in conf.tui/*conf;do source \$f;done"
 	POST[0]="[ ! -d \${CHROOT}\$SYSCONFDIR/tui ] && mkdir -p \${CHROOT}\$SYSCONFDIR/tui"

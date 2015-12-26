@@ -226,7 +226,7 @@ AUTHOR
 	then	TMPFILE="$TUI_DIR_TEMP/tui-progress_ids.tmp"
 	else	TMPFILE="$TUI_DIR_TEMP/tui-progress_default.tmp"
 	fi
-	trap "rm $TMPFILE" INT ABRT QUIT KILL TERM
+	trap "rm $TMPFILE ; traps_restore" INT ABRT 2>/dev/null
 #
 #	Something quick?
 #
