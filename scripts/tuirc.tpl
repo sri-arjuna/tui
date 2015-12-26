@@ -1,0 +1,887 @@
+#!/usr/bin/env bash
+shopt -s expand_aliases
+#set -x
+#
+# Copyright (c) 2013-2015 Simon Arjuna Erat (sea)  <erat.simon@gmail.com>
+# All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANT ABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
+# ------------------------------------------------------------------------
+#
+#	Internals
+#
+	oME="${ME:-$script_name}"	# Backup of variable 'ME' if sourced
+	oVER="$script_version"
+	ME=tuirc
+	script_version=2.9.5
+	unset ${!TUI_[ABCEG..Z]*}
+	TUI_VERSION=0.9.3
+#
+#	Translate preps
+#
+	source gettext.sh
+	TEXTDOMAIN="tuirc"	# Will be changed over time, but easier to copy paste
+	TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+	export TEXTDOMAIN TEXTDOMAINDIR
+#
+#	Translate strings
+#
+	TR_MSG_TEXT_VERSION="$(eval_gettext '
+TUI $TUI_VERSION ($ME, Version $script_version)
+Copyright (C) 2011-2015 Simon Arjuna Erat
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+')"
+	TR_MSG_TEXT_HELP="$(eval_gettext '
+Usage: 	tuirc [config|reset[-yes]|theme]  // source tui
+Where options are:
+	-h|--help	This screen
+	config		Enters directly into config mode
+	provides	List all variables provided by TUI
+	reset		Resets configuration to defaults, root will reset system wide defaults
+	reset-yes	Resets configuration without asking for verification
+	samples		View samples files, first code then executed
+	theme [THEME]	If no THEME is passed, returns which is currently active, otherwise sets theme of the current user to THEME.
+
+Report bugs to: <tui-support@nongnu.org>
+TUI home page: <http://www.gnu.org/software/tui/>
+General help using GNU software: <http://www.gnu.org/gethelp/>
+')"
+	case "${0##*/}$1" in
+	tuirc-h|tuirc--help|tuirchelp)	
+		echo "$TR_MSG_TEXT_HELP"
+		exit 99
+		;;
+	esac
+	TR_MSG_TEXT_HELP_LONG="$(eval_gettext '
+NAME
+       TUI - Text User Interface, framework for scripts
+
+SYNOPSIS
+       tui-<tab>
+       source tuirc
+       tuirc config
+       tuirc theme default
+       tuirc theme floating
+
+DESCRIPTION
+       An  easy  way  to give your scripts some bling bling is to use TUI, which is an abrevihation for
+       "Text User Interface".  Technicly, it is a framework of commands to help you creating a (due  to
+       the limits of scripts) line based text interface.
+       All the commands start with the prefix tui- followed by either the subsection, like bol-, conf-,
+       str- or just the command its name/acronym/synonym.  Their names are chosen to  represent  either
+       their counterparts or to describe what it does. tui-print beeing the exception, as its original
+       functionaly is now metaphoricly adapted for TUI.
+
+       It also helps to start the proper application like editor, file manager or web  broswer,  so  it
+       chooses  a GUI application if there is a GUI, and a console application if there is none ($DESK‐
+       TOP_SESSION).
+
+OPTIONS
+       Please see their respective help or manpage information for their options and syntax.
+
+USAGE
+       It is thought for the use via ssh or telnet connections, to provide the  enduser  an  interface.
+       Or to style up scripts and make them more pleasent to the eye.
+       While for the basic "display" task, one only needs one of these four commands:
+             * tui-header, to make the full line with a blue background and white font (theme:default)
+             * tui-title, to make inner area with a blue background and white font (theme:default)
+             * tui-print, to make the full line with the terminal default colors.
+             * tui-printline, to make next tui-<command> "overwrite" the current output.
+       The biggest part of the TUI package however, are its additional commands.
+       If  your  shell supports tab-completion, type: tui- and press tab one or two times to get a list
+       of TUI its commands.  Otherwise you can see a list of the command by typing: ls /usr/bin/tui-\*
+       Simply said, they should perform their task while producing output with the same output-style as
+       tui-print.
+       Please see their according helpscreen (tui-<cmd> -h) or its manpage.
+
+USAGE as TOOLS
+       The tools can also be used to make your terminal usage safer...
+            cmd=tui-print
+            for f in * ; do \044cmd "\044f" "\044{f:5:\044{#f}-15}" ; done
+
+       then, when i like what i see, i simply type:
+            cmd=mv
+
+       press arrow key up twice, and rerun:
+            for f in * ; do \044cmd "\044f" "\044{f:5:\044{#f}-15}" ; done
+
+       and have the files renamed as i needed to, with a simple and safe compare of the two values.
+
+FILES
+       These files are used as settings and user customization.
+       Generaly  speaking, these are ment so the user configures the "endpoints" (theme, applications),
+       and the developer can focus on writing functions, and simply use  tui-edit  instead  of  looking
+       which text editor is installed, and wether or not the user is in graphical interface.
+
+       /etc/tui/
+              System wide defaults
+
+              apps.conf
+                     (tui-edit, tui-web, tui-terminal)
+                     This stores the default applications tui might want/need to interact with
+                     Provides:
+
+                         BROSER_CLI
+                                The internetbrowser for the CLI, default: w3m
+
+                         BROWSER_GUI
+                                The internetbrowser for the Graphical Interface, default: firefox
+
+                         EDITOR_CLI
+                                Your favorite console editor, default: nano
+
+                         EDITOR_GUI
+                                Your favorite graphical editor, default: leafpad
+
+                         FILEMGR
+                                Name of your favorite filebrowser, default: pcmanfm
+
+                         TERMINAL
+                                Name of your favorite terminal window, default: xterm
+
+                         TAR_EXT
+                                Default extension used by tui-tar , defaults: tar.gz
+
+                         DD_BS  Bytesize used by tui-dd to read and write per cycle, default: 4M
+
+              commands.conf
+                     (tui*)
+                     This  stores  the  variables  of AWK, GREP, LS and SED for cross-system use. It is
+                     known that Solaris-Users must change the AWK variables.
+                     Provides:
+
+                         AWK    Name or full path to the awk to be used.
+
+                         GREP   Name or full path to the grep to be used.
+
+                         LS     Name or full path to the ls to be used, this is just to bypass any pos‐
+                                sible aliases.
+
+                         SED    Name or full path to the sed to be used.
+
+              colors.conf
+                     (tui-header, tui-title)
+                     Contains a list of colors.
+                     You could change them, but it is highly recomended not to do so!
+                     Provides:
+
+                         TUI_COLOR_RESET
+                                Resets any color settings upon echo.
+
+                         TUI_RESET
+                                Resets any color settings upon echo. (lazy)
+
+                         TUI_FONT_BOLD
+                                Makes the font bold
+
+                         TUI_FONT_STRIKE
+                                Makes the font stroke-through
+
+                         TUI_FONT_INVERT
+                                Inverts the color settings
+
+                         TUI_FONT_UNDERSCORE
+                                Underlines the text
+
+                         TUI_COLOR_{BG,FG}_{COLORNAME}
+                                Where the color names are: BLACK BLUE CYAN GREEN GREY RED WHITE YELLOW
+                                As in:
+                                TUI_COLOR_BG_WHITE
+                                TUI_COLOR_FG_BLACK
+
+              status.conf
+                     (tui-status)
+                     Defines how tui-status will report the different statuses
+                     Note  that (for example): TUI_DONE contains the string, where RET_DONE contains an
+                     integer value.
+                     They are ment to simplify custom command calls:
+                          source /etc/tui/status.conf
+                          tui-status $RET_ON "Enabled some hw setting"
+                          echo "$TUI_CANC Canceled something"
+                     Provides:
+
+                         {RET,TUI}_DONE
+                                0
+                                [ DONE ]
+
+                         {RET,TUI}_FAIL
+                                1
+                                [ FAIL ]
+
+                         {RET,TUI}_WORK
+                                2
+                                [ WORK ]
+
+                         {RET,TUI}_TODO
+                                3
+                                [ TODO ]
+
+                         {RET,TUI}_SKIP
+                                4
+                                [ SKIP ]
+
+                         {RET,TUI}_NEXT
+                                5
+                                [ NEXT ]
+
+                         {RET,TUI}_BACK
+                                6
+                                [ BACK ]
+
+                         {RET,TUI}_CANC
+                                7
+                                [ DONE ]
+
+                         {RET,TUI}_ON
+                                10
+                                [  ON  ]
+
+                         {RET,TUI}_OFF
+                                11
+                                [ OFF  ]
+                         {RET,TUI}_HELP
+                                99
+                                [ HELP ]
+
+                         {RET,TUI}_INFO
+                                111
+                                [ INFO ]
+
+             tui.conf
+                     (tui-new-browser, tui-new-script)
+                     Some basic configurations, like TUI_TEMP_{DIR,FILE}
+                     Provides:
+
+                         THE_THEME
+                                Name of the default theme for the users, default (blue): default
+
+                         TUI_THEME_ROOT
+                                Name of the theme for the root user, default (red): default-red
+
+                         TUI_CONF
+                                Full path to itself
+
+                         TUI_USER_CONF
+                                Full path to the user configuration file: ~/.config/tui/user.conf
+
+                         TUI_USER_TEMPLATE
+                                Path to the templates for a new user: /usr/share/tui/user.conf/
+
+                         TUI_TEMP_DIR
+                                Full path to first temp path existing
+
+                         TUI_TEMP_FILE
+                                Full path to a file in $TUI_TEMP_DIR
+
+                         DEFAULT_LICENSE
+                                Default licensing for  tui-new-script,  default:  "GNU  General  Public
+                                License (GPL)"
+
+                         DEFAULT_LICENSE_URL
+                                URL to the license, default: "http://www.gnu.org/licenses/gpl.html"
+				
+              ~/.config/tui/
+                     Personal user configuration
+
+                     apps.conf
+                            (tui-edit, tui-web, tui-terminal)
+                            Personal favorite applications, will overwrite the system wide defaults
+                            Provides: The same as /etc/tui/apps.conf
+
+                     user.conf
+                            (tui-new-browser, tui-new-script)
+                            Some  basic  reusable info about you, so you can easly reuse these informa‐
+                            tion inside your own scripts.
+                            Provides:
+
+                                USER_NAME
+                                       Default username shown, default: $USER
+
+                                USER_EMAIL
+                                       Default email used, default: $USER AT \044(hostname)
+
+                                USER_HOMEPAGE
+                                       Default URL shown when $USER_HOMEPAGE is used
+
+                                DEFAULT_LICENSE
+                                       Default licensing for tui-new-script, default: "GNU General Pub‐
+                                       lic License (GPL)"
+
+                                DEFAULT_LICENSE_URL
+                                       URL          to          the          license,          default:
+                                       "http://www.gnu.org/licenses/gpl.html"
+
+                                TUI_THEME
+                                       The actual theme name the user uses, default: $TUI_THEME
+
+THEME
+       The themes define the borders and the color used.
+       Allthough this is a per-user setting, if no configuration was found it uses the  system  default
+       theme from /etc/tui/tui.conf
+
+       default
+              The default theme.
+              Border:        "# |"
+              Background:    red Font:          white
+
+       default-red
+              The default "root" theme.
+              Border:        "# |"
+              Background:    red Font:          white
+
+       dot-blue
+              A dotted border with blue-white color
+              Border:        "::"
+              Background:    blue Font:          white
+
+       dot-red
+              A dotted border with red-white color
+              Border:        ""
+              Background:    red Font:          white
+
+       floating
+               "Empty" theme, no border, no colors
+              Border:        ""
+              Background:    - Font:          -
+
+       mono   A lined theme with black and white color
+              Border:        "||"
+              Background:    black Font:          white
+
+       witch-purple
+              A colorfulf and disturbing theme
+              Border:        "/"
+              Background:    purple Font:          cyan
+
+       witch-yellow
+              A colorfulf and disturbing theme
+              Border:        "./"
+              Background:    yellow Font:          black
+  
+SEE ALSO
+  bash(1), console_codes(4), gawk(1), grep(1), sed(1), 
+  
+BUGS
+  Report bugs to: <tui-support@nongnu.org>
+  
+  TUI - Homepage: <https://savannah.nongnu.org/projects/tui>
+  
+  General help using GNU software: <http://www.gnu.org/gethelp/>
+
+AUTHOR
+  Simon Arjuna Erat, <http://linux-scripter.blogspot.ch>
+')"
+#
+#	Author: 	Simon Arjuna Erat (sea)
+#	Contact:	erat.simon@gmail.com
+#	License:	GNU General Public License v3 or later (GPLv3+)
+#	Created:        2013.05.03 (rev:3)
+#	Changed:	2015.11.07
+#	Description:	The loader and configuration of TUI
+#
+#	Variables	:	Default
+#
+	# Check for '$HOME'
+	if [ -z "$HOME" ]
+	then	# HOME is empty, if UID is empty too, assume machine is still booting
+		if [ 0 -eq "${UID:-0}" ]
+		then	# Its root, check both even though /root is not standard
+			known="/root /"
+			for k in $(awk  -v FS=":" '/^root/ {print $6}' /etc/passwd 2>/dev/zero) $known
+			do 	[ -d "$k" ] && HOME="$k" && export HOME && break
+			done
+		else	# Its normal user
+			known="/Users /home"
+			for k in $known	# Dont quote, or it would not expand to words / paths
+			do 	[ -d "$k" ] && HOME="$k" && export HOME && break
+			done
+		fi
+	fi
+	# If its still empty, use 'cd' default behaviour to return to the users homedir if invoked without args
+	[ -z "$HOME" ] && HOME="${k:-$(cd;pwd)}"
+	
+	# Regular definitions
+	TRC="${HOME:-/root}/.tuirc"	# User default	-- If no HOME is set, assume the computer is booting
+	TRC_SYS="$SYSCONFDIR/tuirc"
+	
+	# Get paths of where it was installed
+	SYSCONFDIR=""
+	while [ -z "$SYSCONFDIR" ]
+	do 	for install_kind in "/" "/usr" "$HOME/.local" "$HOME" "." "../conf.tui" 
+		do 	tmp_cfg="$install_kind/etc/tui.conf"
+			[ -f "$tmp_cfg" ] && source "$tmp_cfg" #&& break
+		done
+#		[ -f "./conf.tui/" ] && source ./conf.tui/$tmp_cfg && break
+		
+	done
+	
+	# Get system wide default configuration paths
+	[ -z "$SYSCONFDIR" ] && \
+		printf '%s\n' "$(gettext 'Please attempt a fresh installation of TUI.')" && \
+		( return 1 || exit 1 )
+	source "$SYSCONFDIR/tuirc"
+#
+#	Functions
+#
+	doLog() { # "MESSAGE STRING"
+	# Prints: Time & "Message STRING"
+	# See 'tui-log -h' for more info
+		tui-log -t "$TUI_LOG" "$1"
+	}
+	function help_screen () { #
+	# Prints some basic usage
+	#
+		echo "$TR_MSG_TEXT_HELP
+"
+	}
+	function first_time() { #
+	# Prepare all variables and write conf files
+	#
+		function writeconf_trc() { # PATH
+		# Write initial default paths
+		# But first prepare some variables
+			# Check for existing and writable (expected) default dirs
+			for tryout in "$HOME/.local/cache" "$HOME/local/cache" "$HOME/.cache"
+			do	[ -d "$tryout" ] && TUI_DIR_TEMP="$tryout" && break
+			done
+			
+			for tryout in "$HOME/.local/bin" "$HOME/bin" "$HOME/local/bin"
+			do	[ -d "$tryout" ] && TUI_DIR_USER_SCRIPTS="$tryout" && break
+			done
+			
+			for tryout in "$HOME/.local/man/man1"
+			do	[ -d "$tryout" ] && TUI_DIR_USER_MANPAGES="$tryout" && break || tryout=""
+			done
+			[ "$UID" -eq 0 ] && TUI_DIR_USER_MANPAGES="${TUI_DIR_USER_MANPAGES:-/usr/share/man/man1}"
+			
+			# Since this is used as a fallback dir, its own fallback needs to be set now
+			TUI_DIR_USER_SCRIPTS="${TUI_DIR_USER_SCRIPTS:-\$HOME/bin}"
+			TUI_DIR_TEMP="${TUI_DIR_TEMP:-$TCACHE}"
+			
+			[ -z "$TUI_DIR_USER_MANPAGES" ] && \
+				[  "$HOME/.local/bin" = "$TUI_DIR_USER_SCRIPTS" ] && \
+				TUI_DIR_USER_MANPAGES="$HOME/.local/man/man1"
+			
+			# Set initial default values per user / root
+			if [ "$UID" -eq 0 ]
+			then	THM=default-red
+				TCACHE=/tmp
+			else	THM=default
+				TCACHE="${HOME:-~}/.cache"
+			fi
+			
+			
+			cat > "$TRC" <<-TUI_RC
+			#$TRC
+			# This file is not meant to be changed manually!
+			# Any change of this file may result in an unusable TUI.
+			# Do changes at your own risk!
+			#
+			# If you need to change something, change the top DIR variables first,
+			# so all later variable definitions apply that change automatically.
+			#
+			#	Theme
+			#	Options are: 	default, default-red, dot-blue, dot-red, \\
+			#			floating, mono, witch-purple, witch-yellow
+			#	See $TUI_DIR_SYSTEM/themes
+			#
+			 	TUI_THEME=$THM
+			#
+			#	Paths	:	System wide but user specific
+			#
+			 	TUI_DIR_TEMP="${TUI_DIR_TEMP}"
+			#
+			#	Paths	:	That are about the User
+			#
+			 	TUI_DIR_USER="${XDG_CONFIG_DIR:-\$HOME/.config}/tui"
+			 	TUI_DIR_USER_LOGS="\$TUI_DIR_USER/logs"
+			 	TUI_DIR_USER_SCRIPTS="$TUI_DIR_USER_SCRIPTS"
+			 	TUI_DIR_USER_MANPAGES="$TUI_DIR_USER_MANPAGES"
+			 	TUI_DIR_USER_TEMPLATES="\$TUI_DIR_USER/templates"
+			 	TUI_DIR_USER_THEMES="\$TUI_DIR_USER/themes"
+			#
+			#	Files	:	User specific configuration files
+			#
+			 	TUI_FILE_USER="\$TUI_DIR_USER/user.conf"
+			 	TUI_FILE_USER_APPS="\$TUI_DIR_USER/apps.conf"
+			 	TUI_FILE_USER_SETTINGS="\$TUI_DIR_USER/settings.conf"
+			 	TUI_FILE_USER_LOADLIST="\$TUI_DIR_USER/loadlist.conf"
+			 	TUI_FILE_TEMP="${TUI_DIR_TEMP:-\$HOME/.cache}/tui.tmp~"
+			
+			TUI_RC
+		}
+		function writeconf_loadlist() { #
+		# tui will load the config files according to the order of the loadlist.
+		# So the user can define which of his config files is loaded first, if required.
+			cat > "$TUI_FILE_USER_LOADLIST" <<-LOADLIST
+			# This list defines the loading order do NOT change
+			user.conf
+			apps.conf
+			settings.conf
+			
+			LOADLIST
+		}
+		writeconf_trc
+		source "$TRC" 2>/dev/zero
+		writeconf_loadlist
+		
+		# Verify all dirs are created, could be so easy...
+		DIRS_RAW="${!TUI_DIR_*}"
+		for r in $DIRS_RAW
+		do 	DIRS_N1+=" ${!r}"
+		done
+		for item in "$TUI_PREFIX" $DIRS_N1
+		do	[ -d "$item" ] ||  ( mkdir -p "$item" ; echo "$(eval_gettext '* Created: $item')" >&2 )
+		done
+		
+		if [ ${UID:-0} -eq 0 ]
+		then 	# The default uses the $USER variable,
+			# which often expands doesnt expand the the proper $UID related name
+			sed s,"USER_NAME=.*","USER_NAME=\".: ROOT :.\"", -i "$TUI_FILE_USER"
+			sed s,"USER_EMAIL=.*","USER_EMAIL=\"root@localhost\"", -i "$TUI_FILE_USER"
+			sed s,"USER_HOMEPAGE=.*","USER_HOMEPAGE=\"http://localhost\"", -i "$TUI_FILE_USER"
+		fi
+	}
+	ConfigTUI() { #
+	#
+	#
+		MSG_MENU_title=""
+		MSG_MENU_out=""
+		MSG_MENU_next=""
+		
+		# Get the proper path
+		if [ 0 -eq "$UID" ] 
+		then 	# thisconf="${TUI_DIR_CONF/\/\//\/}"
+			thisconf="$TUI_DIR_CONF"
+			MSG_MENU_title="$(gettext 'TUI config - System Wide')"
+		else	thisconf="$TUI_DIR_USER"
+			MSG_MENU_title="$(eval_gettext 'TUI config - Personal for $USER_NAME')"
+		fi
+		
+		# Show & Edit files
+		cd "$thisconf"
+		tui-conf-editor -T "$(gettext 'Text User Interface')" *conf
+	}
+	ResetTUI() { #
+	# Removes the current configuration according to user level
+	# and replaces them with default configuration.
+		YES="${YES:-false}"
+		case "$UID" in
+		0)	# ROOT, system wide
+			RANGE="$(gettext 'System defaults')"
+			CFG_DIR="$TUI_DIR_CONF"
+			SRC_DIR="$TUI_DIR_SYSTEM/conf.etc"
+			;;
+		*)	# USER, personal only
+			RANGE="$(gettext 'Personal settings')"
+			CFG_DIR="$TUI_DIR_USER"
+			SRC_DIR="$TUI_DIR_SYSTEM"
+			;;
+		esac
+		
+		[ -d "$CFG_DIR" ] || mkdir -p "$CFG_DIR"
+		cd "$CFG_DIR"
+		if [ "$?" -eq 0 ]  && "$YES"
+		then	rm -fr *
+		else	tui-yesno "$(eval_gettext 'Are you sure to remove $RANGE in \"$CFG_DIR\"?')" || return 1
+			rm -fr *
+		fi
+		
+		cd "$SRC_DIR"
+		cp *conf "$CFG_DIR"
+		return "$?"
+	}
+#
+#	Premiere?
+#
+	# Check if user configuration files are present
+	if [ ! -f "$HOME/.config/tui/apps.conf" ]
+	then 	HD="$HOME/.config/tui"
+		[ -d "$HD" ] || mkdir -p "$HD"
+		cp "$DATADIR/conf.home/"* "$HD" 
+	fi
+	if [ ! -f "$TRC" ]
+	then	# Some default values required for first time setup
+		[ -z "$DEFAULT" ] && \
+		DEFAULT="$HOME/.config"
+		[ -z "$XDG_CONFIG_DIR" ] && \
+			[ -d "$DEFAULT/user-dirs.dirs" ] && \
+			source "$DEFAULT/user-dirs.dirs"
+		XDG_CONFIG_DIR="${XDG_CONFIG_DIR:-$DEFAULT}"
+		# This is just required for the manual install process
+		[ -z "$TUI_CHROOT" ] && \
+			TUI_CHROOT="${CHROOT:-/}"
+		[ -z "$TUI_PREFIX" ] && \
+			TUI_PREFIX="${TUI_PREFIX:-${TUI_CHROOT%/}/usr}"
+		# Prepare!
+		first_time
+	fi
+#
+#	Load Environment	:	System wide / defaults
+#
+	list="" ; for F in ${!TUI_FILE_CONF_*} $TUI_FILE_CONF_{APPS,COMMANDS,COLORS,SETTINGS,STATUS,SYSTEM,SHORTS,ALIAS} ${!TUI_FILE_USER_*};do list+=" ${!F}";done
+	for f in ${list}
+	do	[ loadlist.conf = "${f##*/}" ] && continue	# Skip this one - here
+		[ -f "$f" ] && source "$f"
+	done
+#
+#	Load Environment	:	User settings
+#
+	# Lets continue with a general security check
+	if source "$TRC"
+	then 	break_on_injections "$@" && exit 1
+	else	tui-status 1 "${TR_MSG_TEXT_MISSING_FILE} $TRC_SYS"
+		exit 
+	fi
+	
+	# Write default loadlist if file is missing
+	[ -f "$TUI_FILE_USER_LOADLIST" ] || printf '%s\n' {user,apps,settings}.conf > "$TUI_FILE_USER_LOADLIST"
+	# Read loadlist and start parsing only if variable is not empty
+	while read f
+	do	# Filter out comments and verify file exists before sourcing it.
+		#[ ! -z "$f" ] && \
+			[ ! "#" = "${f:0:1}" ] && \
+			[ -f "$TUI_DIR_USER/$f" ] && \
+			source "$TUI_DIR_USER/$f"
+	done<"$TUI_FILE_USER_LOADLIST"
+	
+	# Make apps not require *_CLI or *_GUI
+	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
+	if [ ! -z "$DE" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other [ep]term/in/ator's
+	then	# Its GUI
+		BROWSER="$BROWSER_GUI"
+		EDITOR="$EDITOR_GUI"
+		FILEMGR="$FILEMGR_GUI"
+	else	# Its CLI
+		BROWSER="$BROWSER_CLI"
+		EDITOR="$EDITOR_CLI"
+		FILEMGR="$FILEMGR_CLI"
+	fi
+#
+#	Is there anything to display ?
+#
+	if [ "${0##*/}" = "tuirc" ]
+	then	# It is not sourced
+		# So we load gettext env
+		source gettext.sh
+		TEXTDOMAIN="${0##*/}"	# Will be changed over time, but easier to copy paste
+		TEXTDOMAINDIR="${TUI_DIR_SYSTEM/tui/locale}"	# Will be changed over time, but easier to copy paste
+		export TEXTDOMAIN TEXTDOMAINDIR
+		
+		hello_date="$(date +%F)"
+		hello_time="$(date +%T)"
+		# Lets see if this solves the $USER_NAME issue when being root
+		#source "$TUI_FILE_CONF_SYSTEM"
+		#source "$TUI_FILE_USER"
+		MSG_TR_HELLO_USER="$(eval_gettext '$USER_NAME, ${hello_time} ${hello_date}')"
+			
+		
+		case "$1" in
+		"-h"|"--help"|"help")
+			help_screen
+			exit $RET_HELP
+			;;
+		esac
+		MODE="$1"
+		YES="false"
+		case "$MODE" in
+		--version|version)
+			echo "$TR_MSG_TEXT_VERSION"
+			exit
+			;;
+		config)
+			ConfigTUI
+			exit "$?"
+			;;
+		info)	info "${TUI_DIR_SYSTEM/tui/info}/tui.info" ; exit ;;
+		html)	"$BROWSER" "${TUI_DIR_SYSTEM/tui/doc}/tui/tui.html" ; exit ;;
+		manpage) echo "$TR_MSG_TEXT_HELP_LONG";exit 0;;
+		samples)
+			MENU=show
+			list_sample=""
+			cd "${TUI_DIR_SYSTEM}/samples"
+			for f in *;do
+				[ -f "$f" ] && [ -x "$f" ] && list_sample+=" $f"
+			done
+			while 	tui-title "$(gettext 'TUI - Samples')"
+				MSG_TR_QUIT="$(gettext 'Quit')"
+				item=$(tui-select "$MSG_TR_QUIT" $list_sample)
+				[ ! "$MSG_TR_QUIT" = "$item" ]
+			do
+				clear
+				tui-title "$(eval_gettext 'File: $item')"
+				tui-printfile "$item"
+				tui-header "" "$(eval_gettext 'Executing $item')" ""
+				tui-press
+				bash "$item"
+			done
+			exit 0
+			;;
+		reset-yes)
+			MODE=reset
+			YES=true
+			;;
+		theme)	if [ -z "$2" ]
+			then	tui-print -E  "$(gettext 'TUI_THEME is set to:')" \
+					"${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
+				exit $?
+			else	tui-conf-set -v "$TRC" "TUI_THEME" "$2"
+				exit $?
+			fi
+			;;
+		info)	tui-status 111 "$(eval_gettext 'Please use: ${TUI_FONT_BOLD}tuirc provides${TUI_RESET}')"
+			exit $?
+			;;
+		provides)
+			tui-print -H 	"$(eval_gettext 'TUI ($TUI_VERSION) by sea')" \
+					"$MSG_TR_HELLO_USER"
+			tui-print -T "$(gettext 'Text User Interface - Framework for Scripts')"
+			
+			tui-print -T "$(gettext 'Variables provided by sourcing TUI') ($TRC)"
+			for foundVar in ${!TUI_THEME*} ${!TUI_PREFIX*} ${!TUI_DIR_*} ${!TUI_FILE_*} 
+			do	tui-print -E  "$foundVar" "${!foundVar}"
+			done
+			
+			tui-print;tui-press
+			tui-print -T "$(gettext 'Variables provided by apps.conf') (\$TUI_FILE_CONF_APPS)"
+			for foundVar in ${!EDITOR_*} ${!FILEMGR_*} ${!BROWSER_*} ${!TERMINAL*} ${!CURLWGET*}
+			do	tui-print -E  "$foundVar" "${!foundVar}"
+			done
+			
+			tui-print -T "$(gettext 'Variables provided by settings.conf') (\$TUI_FILE_CONF_SETTINGS)"
+			for txt in $(tui-conf-get -l $TUI_FILE_CONF_SETTINGS);do
+				val="\$${txt}"
+				tui-print -E  "$txt" "${!txt}"
+			done
+			
+			tui-print -T "$(gettext 'Variables provided by commands.conf') (\$TUI_FILE_CONF_COMMANDS)"
+			for txt in $(tui-conf-get -l $TUI_FILE_CONF_COMMANDS);do
+				tui-print -E  "$txt" "${!txt}"
+			done
+			
+			tui-print;tui-press
+			tui-print -T "$(gettext 'Variables provided by colors.conf') (\$TUI_FILE_CONF_COLORS)"
+			tui-print -E  "$(gettext 'Be aware that using TUI_COLOR_* currently causes alignment issues.')" "$TUI_INFO"
+			tui-print -E  "$(gettext 'Any escape sequence for that matter.')" "$TUI_INFO"
+			for foundVar in ${!TUI_FONT_*} ${!TUI_COLOR_*}
+			do	#tui-print -E  \
+				#	"$foundVar" \
+				#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp)TEXT${TUI_RESET})"
+				tui-print -E  "$foundVar" "${!foundVar}TEXTS${TUI_RESET}"
+			done
+			tui-print -E  "TUI_RESET" "${TUI_RESET}TEXT"
+			
+			tui-print;tui-press
+			tui-print -T "$(gettext 'Variables provided by status.conf') (\$TUI_FILE_CONF_STATUS)"
+			for txt in ${STATUS_TEXT[@]};do
+				val="TUI_${txt}"
+				tui-print -E  "TUI_$txt" "${!val}"
+			done
+			for foundVar in ${!RET_*}
+			do	#tui-print -E  \
+				#	"$foundVar" \
+				#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
+				tui-print -E  "$foundVar" "${!foundVar}"
+			done
+			
+			tui-print;tui-press
+			tui-print -H "$(gettext 'Variables provided by sourcing TUI (User specific)')"
+			for task in user apps sets
+			do	list=""
+				case $task in
+				user)	tui-title "User (\$TUI_FILE_USER)"
+					list=" $(tui-conf-get -l $TUI_FILE_USER)"	;;
+				apps)	tui-title "Apps (\$TUI_FILE_USER_APPS"
+					list=" $(tui-conf-get -l $TUI_FILE_USER_APPS)"	;;
+				sets)	tui-title "Settings (\$TUI_FILE_USER_SETTINGS"
+					list=" $(tui-conf-get -l $TUI_FILE_USER_SETTINGS)" ;;
+				esac
+				
+				for foundVar in $list # Quoting breaks the parsing
+				do	#tui-print -E  \
+					#	"$foundVar" \
+					#	"$(tmp=\$$foundVar ; printf '%s' $(eval echo $tmp))"
+					tui-print -E  "$foundVar" "${!foundVar}"
+				done
+				[ $task = apps ] && for t in EDITOR BROWSER FILEMGR;do tui-print -E  "${t^}" "\$${t}_$(tui-bol-gui && printf GUI || printf CLI)";done
+			done
+			
+			tui-print;tui-press
+			tui-print -T "$(gettext 'Variables provided by shorts.conf') (\$TUI_DIR_CONF/shorts.conf)"
+			for entry in $($GREP "=" "$TUI_DIR_CONF/shorts.conf"|$GREP -v ^"#")
+			do	tui-print -E  "${entry/=*}"	"${entry/*=}" 	#""
+			done
+			
+			tui-print;tui-press
+			tui-print -T "$(eval_gettext 'Aliases provided by shorts-alias.conf (\$TUI_DIR_CONF/shorts-alias.conf)')"
+			tui-print -S 111 "$(eval_gettext 'Source tuirc, or define ${fnt_bold}shopt -s expand_aliases${c_reset} when sourcing this conf file.')"
+			while 	IFS='=	'
+				read al var val
+			do	echo "$al $var $val" | $GREP -q "#" || \
+					tui-print -E  "$var" "$val" #"" #"($al)"
+			done<"$TUI_DIR_CONF/shorts-alias.conf"
+			
+			tui-print
+			tui-status 0 "$(gettext 'Showed what TUI provides')"
+			exit $?
+			;;
+		esac
+	
+		if [ "$MODE" = "reset" ]
+		then	ResetTUI
+			# $RANGE should be set within the function 'ResetTUI'
+			tui-status $? "$(eval_gettext 'Reset $RANGE')"
+			exit $?
+		fi
+#
+#	Display & Action
+#
+		# Freaky this workaround is required because of injection_protection...
+		HIT_TAB="$(gettext 'hit-tab')"
+		COLUMNS="${COLUMNS:-$(tput cols)}"
+		. $TUI_DIR_THEMES/$TUI_THEME
+		n=$(( $COLUMNS - ${#BORDER_LEFT} - 14 ))
+		POS="\033[${n}G"
+		# Actual display
+		tui-print -H 	"$(eval_gettext 'TUI ($TUI_VERSION), Copyright (c) 2015 by sea')" \
+				"$MSG_TR_HELLO_USER"
+		tui-print -T "$(gettext 'Text User Interface, framework for Scripts')"
+		tui-print -E  "$(gettext 'Calling tuirc like this gives you an impression on how your future scripts could look like.')"
+		tui-print -E 
+		tui-print -E  	"$(gettext 'If you are looking for the commands of TUI, try this:')" \
+				"${POS}tui-\074${HIT_TAB}\076"
+		tui-print -E  	"$(gettext 'If you are a developer, i highly recommend to read:')" \
+				"$(eval_gettext 'man tui[rc] // ${TUI_FONT_BOLD}info tui${TUI_RESET}')"
+		tui-print -E  	"$(gettext 'And to check the provided variables, see:')" \
+				"${TUI_FONT_BOLD}tuirc provides${TUI_RESET}"
+		tui-print -E 
+		tui-print -E  	"$(gettext 'There are some sample scripts to get you started:')" \
+				"$DATADIR/samples"
+		tui-print -E  	"$(gettext 'To create a new script in $TUI_DIR_USER_SCRIPTS, type:')" \
+				"tui-new-script [-befrs] [./]$(gettext 'SCRIPTNAME')"
+		tui-print -E 
+		tui-print -E  	"$(gettext 'Arguments to this command are:')" \
+				"config html info provides reset reset-yes samples theme"
+		tui-print -E  
+		tui-yesno "$(gettext 'Configure it now?')" || exit 0
+		ConfigTUI
+	else	# Set back possible original variables ME and script_version
+		ME="${oME:-${0##*/}}"
+		script_version="$oVER"
+	fi
+set +x

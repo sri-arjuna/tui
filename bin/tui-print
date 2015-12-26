@@ -457,12 +457,26 @@ AUTHOR
 	esac
 	if $doStatus
 	then	# That is a difference of 22 (val-1 ; val+21) thats the escape chars for colour and reset
-		case $NUM_ID in
-		0|1|2|3|7|10|11|127|130)	# These are colored, was 21
-			pos_three_adder=3	;;
-		4|5|6|99|111)		# These are not
-			pos_three_adder=0	;;
-		esac
+		if tui-bol-gui
+		then	# GUI fonts - works
+			case $NUM_ID in
+			0|1|2|3|7|10|11|127|130)	# These are colored, was 21
+				pos_three_adder=5	;;
+			5|6|99)		# These are not
+				pos_three_adder=0	;;
+			4)	pos_three_adder=1	;;
+			111)	pos_three_adder=4	;;
+			esac
+		else	# Console / Textmode only - works 
+			case $NUM_ID in
+			0|1|2|3|7|10|11|127|130)	# These are colored, was 21
+				pos_three_adder=3	;;
+			4|5|6|99|111)		# These are not
+				pos_three_adder=0	;;
+			4)	pos_three_adder=1	;;
+			111)	pos_three_adder=4	;;
+			esac
+		fi
 		long=${#THIRD}
 		chkval=$(printf "${THIRD}")
 		short=${#chkval}

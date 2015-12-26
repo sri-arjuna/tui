@@ -143,6 +143,9 @@ AUTHOR
 	DE="${XDG_CURRENT_DESKTOP:-$DESKTOP_SESSION}"
 	if [ -n "${DE:-$XAUTHORITY}" ] || echo "$TERM" | $GREP -q -i term 	# This should cover xterm and other [ep]term/in/ator's
 	then	$beVerbose && echo "${DE:-$TERM}"
+		$beVerbose && \
+			[ -n "$SUDO_USER" ] && [ -z "$DE" ] && \
+			echo "$(gettext 'This sudo environment does not provide any DESKTOP_SESSION or XDG_CURRENT_DESKTOP variables.')" >&2
 		exit 0
 	else	exit 1
 	fi

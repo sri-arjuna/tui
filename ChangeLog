@@ -1,9 +1,12 @@
 2015-12-20 - TUI 0.9.4-inprogress - sea
 * Updated: tui-progress, there was an issue with displaying '|' and reseting values
 * Updated: tui-print, hotfixes for tui-echo, tui-progress and tui-status
-* Updated: tui-bol-gui, now also checks Xauthority
+* Updated: tui-bol-gui, now also checks XAUTHORITY and SUDO_USER
+* Updated: po file of tui-bol-gui
+* Updated: tui-status, better alignment for all items
+* Updated: conf.tui/status.conf, changed some symbols that kept font width
 * Updated: YASSI
-* Working on: scripts/gen-tuirc.sh
+* Updated: scripts/gen-tuirc.sh
 
 2015-12-14 - TUI 0.9.3 GNU RC 24 - sea
 * Renamed: tui-print -> tui-echo (Back to original)
