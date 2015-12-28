@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------
 #
-# Copyright (c) 2015 by sea, sea@toshiba.ocean
+# Copyright (c) 2015 by Simon Arjuna Erat (sea), erat.simon@gmail.com
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -145,38 +145,25 @@ AUTHOR
 #	Traps are cool!
 #
 	# TRAP FUNCTION/"COMMAND" MODE's ...
-	trap cleanup INT ERR QUIT KILL ABRT
+	trap cleanup INT ERR QUIT ABRT
 #
 #	Get options
 #
-	# -a|--alternative ; to allow longoptions with a single leading '-'
-	GETOPT=$(getopt \
-		--options	"habcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-		--longoptions	"help,version" \
-		--name 		"${0##*/}" -- "${@}" \
-	)
-	eval set -- "${GETOPT}";
-	while true
-	do 	case "$1" in
-		-h|--help)	show_help	;;
-		--version)	show_version	;;
-		--|*)		shift ; break	;;
-		# --------------------------------
-		# -*)		opt_str="$2"
-		#		shift 2
-		#		;;
-		esac
-	done
+	# Catch help and version, functions exit themself
+	case "$1" in
+	-h|--help)	show_help	;;
+	--version)	show_version	;;
+	esac
 #
 #	Action
 #
 	MSG_TR_WANTLEARN="$(gettext 'Do you want to learn about TUI?')"
 	MSG_TR_FUTURE="$(gettext 'In the future you may want to call:')"
 	MSG_TR_LEARNMORE="$(gettext 'Learn more in a few seconds...')"
-	MSG_TR_TITLE_LEFT="$(eval_gettext 'The TUI Experience')"
-	MSG_TR_TITLE_RIGHT="$(eval_gettext 'Idea (1995) & Code (2011-today) by Simon Arjuna Erat, Switzerland')"
-	MSG_TR_TITLE_CENTER="$(eval_gettext 'Asks you an important question')"
-	MSG_TR_MSG_LATER="$(eval_gettext 'See you later')"
+	MSG_TR_TITLE_LEFT="$(gettext 'The TUI Experience')"
+	MSG_TR_TITLE_RIGHT="$(gettext 'Idea (1995) & Code (2011-today) by Simon Arjuna Erat, Switzerland')"
+	MSG_TR_TITLE_CENTER="$(gettext 'Asks you an important question')"
+	MSG_TR_MSG_LATER="$(gettext 'See you later')"
 #
 #	Display
 #
@@ -203,10 +190,9 @@ AUTHOR
 				$cmd "${@}"
 			exit $?
 			;;
-		*)	#[ -z "$2" ] && show_help
-			which tui-$1 >/dev/zero 2>&1 && \
+		*)	which tui-$1 >/dev/zero 2>&1 && \
 				cmd=tui-$1 && \
-				shift 2 && \
+				shift 1 && \
 				$cmd "${@}"
 			exit $?
 			;;

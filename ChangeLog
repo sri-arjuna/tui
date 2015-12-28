@@ -1,6 +1,9 @@
 25-12-28 - TUI 0.9.4 - sea
 * Updated: YASSI configuration
 * Updated: tui, now takes arguments to pass to its commands (alpha-preview)
+* Updated: tui-progress, reset was too low
+* Updated: docs/samples/tui_progress
+* Updated: docs/samples/* (but not template) are executable to be listed
 
 2015-12-27 - TUI 0.9.4-alpha - sea
 * Changed: Within all bins /dev/zero to /dev/null
