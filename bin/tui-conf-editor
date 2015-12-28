@@ -52,7 +52,7 @@
 	if [ -z "$SYSCONFDIR" ]
 	then 	# Load required variables
 		source "${SYSCONFDIR}/tuirc" ||  [ -f ./tuirc ] && source ./tuirc || exit 1 
-		source "${HOME:-/root}/.tuirc" 2>/dev/zero
+		source "${HOME:-/root}/.tuirc" 2>/dev/null
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
 		done

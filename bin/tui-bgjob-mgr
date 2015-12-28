@@ -265,7 +265,7 @@ AUTHOR
 			2)	# IS PID still available?
 				pid="${script_pid[$C]}"
 				if [ ! -z "$(echo $pid)" ]
-				then	if ! ps "$pid" > /dev/zero
+				then	if ! ps "$pid" > /dev/null
 					then	# Its finished
 						read RET < "$RET_FILE"
 						[ -z "$RET" ] && RET=1
@@ -294,7 +294,7 @@ AUTHOR
 					"$beVerbose" && \
 						echo "$cmd" > "$TMP" && \
 						tui-terminal "$TMP" || \
-						( eval "$cmd" 1>/dev/zero ) &
+						( eval "$cmd" 1>/dev/null ) &
 					script_pid["$C"]="$!"
 					PID="${script_pid[$C]}"
 					doLog "$TR_MSG_WORD_STARTING $PID"

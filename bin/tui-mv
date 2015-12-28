@@ -164,7 +164,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 					shift
 				fi
 				;;
-		--verbose)	echo "irrelevant, as using TUI" > /dev/zero
+		--verbose)	echo "irrelevant, as using TUI" > /dev/null
 				;;
 		# --- original args ---
 		--dash)	showBar=false

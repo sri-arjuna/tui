@@ -25,7 +25,7 @@
 	done
 	# Get the main config files
 	# 
-	if ! source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if ! source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/null
 	then 	source tuirc
 	fi
 	

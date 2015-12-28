@@ -100,12 +100,12 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		tui-print -S 1 "$(eval_gettext '$ME: Requires to be in GUI mode')" && \
 		exit 1
 	
-	if ! which "$TERMINAL" 2>/dev/zero 1>/dev/zero
+	if ! which "$TERMINAL" 2>/dev/null 1>/dev/null
 	then	# List of known but possible unhandled terminals
 		list="$(<$TUI_DIR_LIST/terminals)"
 		found=false
 		for TERMINAL in $list;do
-			which "$TERMINAL" 1>/dev/zero 2>/dev/zero && found=true && break
+			which "$TERMINAL" 1>/dev/null 2>/dev/null && found=true && break
 		done
 		$found && tui-conf-set -v "${TUI_USER_CONF/user/apps/}" TERMINAL "$TERMINAL"
 		! $found && \

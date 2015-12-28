@@ -190,7 +190,7 @@ AUTHOR
 		[ -z "$NUM" ] && invalid=true && continue
 		echo "$NUM" | $GREP '^\?' && invalid=true && continue
 		echo "${NUM,,}" | tr -d [:digit:] | "$GREP" -q "[0-9]" && invalid=true && continue
-		[ 0 -eq "${NUM/^\[\[[ABCD]/0}" ] 2>/dev/zero && exit 1
+		[ 0 -eq "${NUM/^\[\[[ABCD]/0}" ] 2>/dev/null && exit 1
 		if ! echo "$NUM" | "$GREP" -q ^[0-9] 
 		then	NUM="" 
 			invalid=true 

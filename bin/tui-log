@@ -170,8 +170,8 @@ AUTHOR
 	if [ ! -f "$LOG" ]
 	then 	# Create log file, exit with message on error
 		# Prints basic log header
-		tui-bol-dir "$(dirname $LOG)" 1>/dev/zero 2>/dev/zero || tui-status 1 "$(eval_gettext 'Failed to create $LOG')"
-		if ! touch "$LOG" 2>/dev/zero
+		tui-bol-dir "$(dirname $LOG)" 1>/dev/null 2>/dev/null || tui-status 1 "$(eval_gettext 'Failed to create $LOG')"
+		if ! touch "$LOG" 2>/dev/null
 		then	tui-status 1 "$(eval_gettext 'Failed to create $LOG')" 
 			exit 1
 		fi

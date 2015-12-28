@@ -121,7 +121,7 @@ AUTHOR
 		#[ -z "$1" ] && echo "GetAvailableEditor requires: gui or cli" && return 1
 		LIST="$(<$TUI_DIR_LIST/web_${MODE})"
 		for L in $LIST;do
-			which $L 2>/dev/zero && \
+			which $L 2>/dev/null && \
 				return 0
 		done
 		return 1
@@ -131,17 +131,17 @@ AUTHOR
 #
 	if [ -z "$BROWSER" ]
 	then	case "$MODE" in
-		cli)	BROWSER=$(which "$BROWSER_CLI" 2>/dev/zero)
+		cli)	BROWSER=$(which "$BROWSER_CLI" 2>/dev/null)
 			wasFound=$?
 			;;
-		gui)	BROWSER=$(which "$BROWSER_GUI" 2>/dev/zero)
+		gui)	BROWSER=$(which "$BROWSER_GUI" 2>/dev/null)
 			wasFound=$?
 			;;
 		esac
 		#export BROWSER
 	fi
 	# Failsafe check, use first available editor found if set EDITOR was not found
-	if ! which $BROWSER 2>/dev/zero 1>/dev/zero
+	if ! which $BROWSER 2>/dev/null 1>/dev/null
 	then 	# The EDITOR is not available, search for default
 		BROWSER=$(GetAvailableApp)
 		[ $MODE = cli ] && \

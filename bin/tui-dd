@@ -237,7 +237,7 @@ AUTHOR
 		# cannot be granted, prefer gdisk, as UEFI seems to be upcoming
 			BLOCK="$1"
 			tui-print -rS 2 "$(eval_gettext 'Calculating size of ${BLOCK}...')" >&2
-			if which gdisk 2>/dev/zero 1>/dev/zero
+			if which gdisk 2>/dev/null 1>/dev/null
 			then	cmd="gdisk -p"
 			else	cmd="fdisk -l"
 			fi
@@ -284,12 +284,12 @@ AUTHOR
 #
 #	Display
 #
-	while 	ps $PID >/dev/zero
+	while 	ps $PID >/dev/null
 		#[ ! "" = "$(ps|$GREP -v tui|$GREP dd|$AWK '{print $1}')" ]
 		sleep 0.7
 	do 	# Debug
 		DEBUG=false
-		if ! kill -USR1 $PID 2>/dev/zero
+		if ! kill -USR1 $PID 2>/dev/null
 		then	# All has been written, and sync'd
 			tui-print -S $(<$TMP) "$(eval_gettext 'Successfully written $SRC to $TARGET.')"
 			exit $?

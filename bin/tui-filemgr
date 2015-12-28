@@ -110,7 +110,7 @@ AUTHOR
 	# Returns the first found editor for either GUI or CLI
 	#
 		for L in $(<$TUI_DIR_LIST/filemgr_${MODE});do
-			which $L 2>/dev/zero && \
+			which $L 2>/dev/null && \
 				return 0
 		done
 		return 1
@@ -129,7 +129,7 @@ AUTHOR
 	fi
 	
 	# Fail safe check, use first available editor found if set EDITOR was not found
-	if ! which $FILEMGR 2>/dev/zero 1>/dev/zero
+	if ! which $FILEMGR 2>/dev/null 1>/dev/null
 	then 	# The EDITOR is not available, search for default
 		FILEMGR=$(GetAvailableApp $MODE)
 		[ -z "$FILEMGR" ] && \

@@ -136,13 +136,13 @@ AUTHOR
 			continue
 		fi
 		# Is it a file but not a link?
-		if [ -f "$dir_name" ] && [ ! -L "$dir_name" ] #2>/dev/zero
+		if [ -f "$dir_name" ] && [ ! -L "$dir_name" ] #2>/dev/null
 		then	$beVerbose && tui-status 1 "$(eval_gettext 'Found file: $dir_name')"
 			RET=1
 			continue
 		fi
 		# A link that is a directory?
-		if [ -L "$dir_name" ] && [ -d "$dir_name" ] 2>/dev/zero
+		if [ -L "$dir_name" ] && [ -d "$dir_name" ] 2>/dev/null
 		then	$beVerbose && tui-status 0 "$(eval_gettext 'Found link: $dir_name')"
 			RET=0
 			continue
@@ -154,7 +154,7 @@ AUTHOR
 			continue
 		fi
 		# It does not exit yet, attempt to create it
-		mkdir -p "$dir_name" 2>/dev/zero
+		mkdir -p "$dir_name" 2>/dev/null
 		RET=$?
 		if $beVerbose
 		then	[ $RET -eq 0 ] && \

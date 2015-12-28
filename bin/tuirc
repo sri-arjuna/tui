@@ -27,7 +27,7 @@ shopt -s expand_aliases
 	ME=tuirc
 	script_version=2.9.5
 	unset ${!TUI_[ABCEG..Z]*}
-	TUI_VERSION=0.9.3
+	TUI_VERSION=0.9.4
 #
 #	Translate preps
 #
@@ -402,7 +402,7 @@ AUTHOR
 		if [ 0 -eq "${UID:-0}" ]
 		then	# Its root, check both even though /root is not standard
 			known="/root /"
-			for k in $(awk  -v FS=":" '/^root/ {print $6}' /etc/passwd 2>/dev/zero) $known
+			for k in $(awk  -v FS=":" '/^root/ {print $6}' /etc/passwd 2>/dev/null) $known
 			do 	[ -d "$k" ] && HOME="$k" && export HOME && break
 			done
 		else	# Its normal user
@@ -537,7 +537,7 @@ AUTHOR
 			LOADLIST
 		}
 		writeconf_trc
-		source "$TRC" 2>/dev/zero
+		source "$TRC" 2>/dev/null
 		writeconf_loadlist
 		
 		# Verify all dirs are created, could be so easy...

@@ -198,7 +198,7 @@ AUTHOR
 			RET=$?
 		else	DEST=$(tui-str-genfilename "$(pwd)/$THIS.$TAR_EXT")
 			tui-print -rS 2 "$READING..."
-			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/zero > $TMP" > "$FILE_CMD"
+			echo -e "tar -ac --one-file-system -f \"$DEST\" \"$THIS\" 2>&1 > /dev/null > $TMP" > "$FILE_CMD"
 			cd "$(dirname $FOLDER)"
 			chmod +x "$FILE_CMD"
 

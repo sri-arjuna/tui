@@ -84,9 +84,9 @@ AUTHOR
 	FILE_TEMP="$TUI_DIR_TEMP/tui-download.status"
 	FILE_CMD="$TUI_FILE_TEMP.cmd"
 	DEST="" 
-	tui-bol-dir "$TUI_DIR_TEMP"  2>/dev/zero 
+	tui-bol-dir "$TUI_DIR_TEMP"  2>/dev/null 
 	LIST_APPS="wget curl"
-	[ -z "$(which $CURLWGET 2>/dev/zero)" ] && \
+	[ -z "$(which $CURLWGET 2>/dev/null)" ] && \
 		CURLWGET="$(echo ${LIST_APP/$CURLWGET})"
 	TERM="${TERM:-GNU\057Linux}"
 	tui-bol-dir "$TUI_DIR_TEMP"
@@ -121,7 +121,7 @@ AUTHOR
 	if [ -z "$CURLWGET" ]
 	then	# Not set yet.
 		for app in $LIST_APPS;do
-			which "$app" 1>/dev/zero 2>/dev/zero && \
+			which "$app" 1>/dev/null 2>/dev/null && \
 				CURLWGET="$app" && \
 				break
 		done
@@ -137,7 +137,7 @@ AUTHOR
 	"")	tui-status 1 "$MSG_NOTFOUND"
 		tui-print -E  "$MSG_SELECT"
 		CURLWGET="$(tui-select curl wget)"
-		which "$CURLWGET" 1>/dev/zero && \
+		which "$CURLWGET" 1>/dev/null && \
 			tui-conf-set "$TUI_FILE_USER_APPS" CURLWGET $CURLWGET || \
 			exit 1
 		tui-asroot "tui-install $CURLWGET"
@@ -165,7 +165,7 @@ AUTHOR
 		
 		tui-print -rS 2 "$MSG_INIT_ACT" #"$WORK"
 		>$TUI_FILE_TEMP
-		echo "LC_ALL=C $CURLWGET $OPT_C $OPT_O \"$out_string\" \"$URL\" 1>/dev/zero 2>$TUI_FILE_TEMP" > "$FILE_CMD"
+		echo "LC_ALL=C $CURLWGET $OPT_C $OPT_O \"$out_string\" \"$URL\" 1>/dev/null 2>$TUI_FILE_TEMP" > "$FILE_CMD"
 		
 		chmod +x "$FILE_CMD"
 		"$FILE_CMD" &

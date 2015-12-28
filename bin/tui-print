@@ -44,7 +44,7 @@
 	# 
 	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc ) ## || exit 1
 	then 	# Load required variables
-		source "${HOME:-/root}/.tuirc" 2>/dev/zero
+		source "${HOME:-/root}/.tuirc" 2>/dev/null
 		for f in $TUI_FILE_CONF_{COMMANDS,COLORS,SYSTEM}
 		do	[ -f "$f" ] && source "$f"
 		done
@@ -229,7 +229,7 @@ AUTHOR
 		esac
 		# For tui-status always use '3' strings
 		ARGS_COUNT=3
-		THIRD="${retvalue[${NUM_ID:-1}]}"	2>/dev/zero
+		THIRD="${retvalue[${NUM_ID:-1}]}"	2>/dev/null
 		len_strings=$[ ${#FIRST} + ${#SECOND} + 8 ]
 	else
 		[ ! -z "$1" ] && FIRST="$1"

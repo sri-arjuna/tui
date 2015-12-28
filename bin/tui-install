@@ -165,14 +165,14 @@ AUTHOR
 		else	out=unknown
 			# Do further checking
 			# Changes according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
-			which cave   1>/dev/zero 2>/dev/zero && out=exherbo
-			which emerge 1>/dev/zero 2>/dev/zero && out=gentoo
-			which port   1>/dev/zero 2>/dev/zero && out=mac
-			which brew   1>/dev/zero 2>/dev/zero && out=mac
-			which zypper 1>/dev/zero 2>/dev/zero && out=opensuse
+			which cave   1>/dev/null 2>/dev/null && out=exherbo
+			which emerge 1>/dev/null 2>/dev/null && out=gentoo
+			which port   1>/dev/null 2>/dev/null && out=mac
+			which brew   1>/dev/null 2>/dev/null && out=mac
+			which zypper 1>/dev/null 2>/dev/null && out=opensuse
 			# Not sure if i handle these 2 properly
-			which pkg 1>/dev/zero 2>/dev/zero && out=openbsd
-			which pkgng 1>/dev/zero 2>/dev/zero && out=freebsd
+			which pkg 1>/dev/null 2>/dev/null && out=openbsd
+			which pkgng 1>/dev/null 2>/dev/null && out=freebsd
 		fi
 		echo $out
 	}
@@ -225,7 +225,7 @@ AUTHOR
 	case "$(based)" in
 	arch)		APP=pacman	;;
 	debian)		APP=apt-get	;;
-	redhat)		which dnf 1>/dev/zero 2>/dev/zero && \
+	redhat)		which dnf 1>/dev/null 2>/dev/null && \
 				APP=dnf || \
 				APP=yum		;;
 	# Additions according to: https://github.com/icy/pacapt/blob/ng/pacapt (153-180)
@@ -233,7 +233,7 @@ AUTHOR
 	exherbo)	APP=cave	;;
 	gentoo)		APP=emerge	;;
 	mac)		for APP in port brew
-			do 	which "$APP" 2>/dev/zero 1>/dev/zero && break
+			do 	which "$APP" 2>/dev/null 1>/dev/null && break
 			done
 			;;
 	*bsd)		APP=pkg	;;
@@ -283,11 +283,11 @@ AUTHOR
 			app_name="$(basename $app)"
 			$doLog && tui-log "$LOG" "$(gettext 'Execute:') $cmd_all"
 			
-			tui-progress -m $# "$MSG_TR_WORD_INSTALLING: $app_name" #> /dev/zero
+			tui-progress -m $# "$MSG_TR_WORD_INSTALLING: $app_name" #> /dev/null
 			tui-print -rS 2 "$MSG_TR_WORD_INSTALLING $app_name"
 			
 			if $doYes
-			then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+			then	$cmd_all > /dev/null 1>/dev/null 2>/dev/null && RET=0 || RET=1
 			else	$cmd_all && RET=0 || RET=1
 			fi
 			
@@ -310,7 +310,7 @@ AUTHOR
 		$doLog && tui-log "$LOG" "$(gettext 'Trying to execute'): $cmd_all"
 		
 		if "$doYes"
-		then	$cmd_all > /dev/zero 1>/dev/zero 2>/dev/zero && RET=0 || RET=1
+		then	$cmd_all > /dev/null 1>/dev/null 2>/dev/null && RET=0 || RET=1
 		else	$cmd_all
 		fi
 		[ -z "$RET" ] && RET=1

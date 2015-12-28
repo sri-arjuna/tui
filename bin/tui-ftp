@@ -26,7 +26,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc ).tuirc" 2>/dev/zero ) || source ./tuirc source "${HOME:-/root}/.tuirc" 2>/dev/zero ) || source ./tuirc
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc ).tuirc" 2>/dev/null ) || source ./tuirc source "${HOME:-/root}/.tuirc" 2>/dev/null ) || source ./tuirc
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
@@ -307,7 +307,7 @@ General help using GNU software: <http://www.gnu.org/gethelp/>
 		found=""
 		for f in ftp lftp sftp
 		do
-			which $f > /dev/zero && \
+			which $f > /dev/null && \
 				count=$(( $count + 1 )) && \
 				found+=" $f"
 		done

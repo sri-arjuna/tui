@@ -319,7 +319,7 @@ AUTHOR
 		doBlacklist=false || \
 		doBlacklist=true
 	
-	if ! which $browser_shell 1>/dev/zero 2>/dev/zero
+	if ! which $browser_shell 1>/dev/null 2>/dev/null
 	then	tui-status 1 "Invalid shell supplied or not installed: \"$browser_shell\""
 		exit $?
 	fi
@@ -618,7 +618,7 @@ AUTHOR
 			elif [ -f "$action" ]
 			then	$browser_shell "$action"
 				action_done=true
-			elif which $str 1>/dev/zero 2>/dev/zero
+			elif which $str 1>/dev/null 2>/dev/null
 			then	# This IS be a BASH command
 				# Check for blacklisted words$action
 				if $doBlacklist

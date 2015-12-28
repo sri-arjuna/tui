@@ -119,7 +119,7 @@ AUTHOR
 		b)	SCRIPT="basic"		;;
 		e)	SCRIPT="empty"		;;
 		s)	oPWD="$PWD"
-			rmdir "$TUI_DIR_USER_TEMPLATES" 2>/dev/zero
+			rmdir "$TUI_DIR_USER_TEMPLATES" 2>/dev/null
 			[ -d "$TUI_DIR_USER_TEMPLATES" ] && \
 					cd "$TUI_DIR_USER_TEMPLATES" || \
 					cd "${TUI_DIR_TEMPLATES}/scripts"

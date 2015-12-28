@@ -125,7 +125,7 @@ AUTHOR
 	# Returns the first found editor for either GUI or CLI
 	#
 		for L in $(<"$TUI_DIR_LIST"/editor_${MODE});do
-			which "$L" 2>/dev/zero && \
+			which "$L" 2>/dev/null && \
 				return 0
 		done
 		return 1
@@ -135,8 +135,8 @@ AUTHOR
 #
 	if [ -z "$EDITOR" ]
 	then	case "$MODE" in
-		cli)	EDITOR=$(which "$EDITOR_CLI" 2>/dev/zero )	;;
-		gui)	EDITOR=$(which "$EDITOR_GUI" 2>/dev/zero )	;;
+		cli)	EDITOR=$(which "$EDITOR_CLI" 2>/dev/null )	;;
+		gui)	EDITOR=$(which "$EDITOR_GUI" 2>/dev/null )	;;
 		esac
 		export EDITOR
 	fi

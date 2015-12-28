@@ -1,4 +1,9 @@
-2015-12-20 - TUI 0.9.4-inprogress - sea
+2015-12-27 - TUI 0.9.4-alpha - sea
+* Changed: Within all bins /dev/zero to /dev/null
+* Added: ./description for nongnu git repo description
+* Removed: Symlinks of backwards compatibility: tui-cat and tui-printf
+
+2015-12-26 - TUI 0.9.4-inprogress - sea
 * Updated: tui-progress, there was an issue with displaying '|' and reseting values
 * Updated: tui-print, hotfixes for tui-echo, tui-progress and tui-status
 * Updated: tui-bol-gui, now also checks XAUTHORITY and SUDO_USER

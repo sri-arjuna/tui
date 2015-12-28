@@ -146,7 +146,7 @@ AUTHOR
 	# Loop while waiting for --item-list-without-the-ignored-ones--
 	while [ -z "$list" ] ; do
 		tui-progress "$msg" >&2
-		list="$(getlist)" 2>/dev/zero
+		list="$(getlist)" 2>/dev/null
 		list="${list/$usbIgnore}"
 		sleep $sleeper
 		[ "$sleeper" = "0.0001" ] && sleeper=1.2

@@ -48,7 +48,7 @@
 	do 	[ -f "$tmp_task/tui.conf" ] && source "$tmp_task/tui.conf" && [ ! -z "${SYSCONFDIR}!" ] && break
 	done
 	# Get the main config files
-	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/zero
+	if source "${SYSCONFDIR}/tuirc" && source "${HOME:-/root}/.tuirc" 2>/dev/null
 	then 	# Load required variables
 		source "$TUI_FILE_CONF_COMMANDS"
 	else	source tuirc
