@@ -27,14 +27,82 @@
 #
 #	Functions
 #
-	
+	[ ! -f ./tuirc ] && \
+		./configure --prefix=/usr && \
+		cat scripts/gen-tuirc.sh > ./tuirc && \
+		./make-distclean
 #
 #	Action
 #
-	
+	# Shortcuts
+	P="bin/tui-print"
+	E="$P -E"
+	H="$P -H"
+	T="$P -T"
+	TT="bin/tui-typewriter"
+	S="bin/tui-status"
+	Y="bin/tui-yesno"
+	L="bin/tui-list"
+	F="${P}file"
 #
 #	Display
 #
+	$H 	"$USER @ ${HOSTNAME:-$(hostname)}" "Bash: $(bash --version|head -n1)"	"Kernel: $(uname -r)"
+	$T 	"Fuzztest : Start"
+	
+	rep() { tui-progress -m 4 -c $1 'Please be patient, random readings may take a while...';}
+	sleep 0.5
+	rep 0 ; len=32 ; read -n$len tempstring < /dev/random
+	rep 1 ; len=12 ; read -n$len str1 < /dev/random
+	rep 2 ; len=21 ; read -n$len str2 < /dev/random
+	rep 3 ; len=5 ; read -n$len str3 < /dev/random
+	
+	list="$tempstring $str1 $str2 $str3"
+	
+	$H	"$tempstring" "$str1"
+	$T 	"$tempstring"
+	$E 	$str1
+	$E 	"$str1" "$str3"
+	$P 	"$str2"
+	$P 	"$str3"
+	
+	$L	$list
+	$L -2r	$list
+	$L -1n	$list
+	
+	$Y 	"$str3"
+	$S 	$? 		"$tempstring"
+	
+	cat > "$TUI_FILE_TEMP" <<-EOF
+	$str1
+	$tempstring
+	$str2
+	$str3
+	EOF
+	$F -t	"$TUI_FILE_TEMP"
+	
+	$H 
+	$T	"Fuzztest : part 2 : Piped stuff"
+	
+	echo "$str" | $E -
+	echo "$str" | $E --
+	
+	echo "$str" | $P -
+	echo "$str" | $P --
+	
+	echo "$list" | $L -
+	echo "$str" | $L --
+	
+	echo "$list" | $TT -
+	echo "$list" | $TT --
+	
+	
+	exit $?
+	
+	
+	
+	
+			 
 	bin/tui-print -H "1: Initial testing / checks" \
 			"$something" \
 			"$USER @ $HOSTNAME"
