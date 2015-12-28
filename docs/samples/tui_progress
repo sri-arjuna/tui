@@ -2,26 +2,25 @@
 # This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
 tui-header "TUIRC - Samples"	"tui-progress"
 tui-title "Basic invocation"
-MAX=21
-COUNT=1
-while [ $COUNT -le $MAX ];do
-	tui-progress -lbm $MAX -c $COUNT "Message to user"
-	sleep 0.1
-	((COUNT++))
-done
+	for f in *;do	tui-progress "Message to user"	;	sleep 0.1	;done
+	printf "\n"
 
-tui-title "Example 2"
-tui-progress -r
-for i in $(seq 1 1 5);do 
-	tui-progress -m 5 "Number: $i"
-	sleep 1
-done
+tui-title "Example 2 : Auto Increasing Number"
+	filecount=$(ls | wc -l)
+	tui-progress -r
+	for this_file in *;do
+		tui-progress -m $filecount 	"Working on file: $this_file"
+		sleep 0.3
+	done
+	printf "\n"
 
-tui-title "Example 3"
-MAX=5
-COUNT=0
-while [ $COUNT -le $MAX ];do
-	tui-progress -lbm $MAX -c $COUNT "Message to user"
-	sleep 1
-	((COUNT++))
-done
+tui-title "Example 3 : Progressbar"
+	MAX=21
+	COUNT=0
+	while [ $COUNT -le $MAX ];do
+		tui-progress -lbm $MAX -c $COUNT "Message to user"
+		sleep 0.8
+		((COUNT++))
+	done
+	printf "\n"
+
