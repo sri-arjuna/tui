@@ -45,7 +45,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.6.1
+	script_version=1.6.2
 	# higher number, and more and more in another script..lol
 	ME="${0##*/}"
 #
@@ -137,16 +137,15 @@ AUTHOR
 	R=""
 	while getopts r opt
 	do	case $opt in	
-		r)	R="r"
+		r)	R="$opt"
 			shift	;;
 		esac
 	done
-	arg="$1"
-	check=$(echo "$arg" | tr -d '[:digit:]')
+	check=$(echo "$1" | tr -d '[:digit:]')
 	if [ ! -z "$check" ]
-	then	echo "$(eval_gettext 'First argument $arg ($check) is not numeric!')" >&2
+	then	echo "$(eval_gettext 'First argument $1 ($check) is not numeric!')" >&2
 		exit 1
 	fi
 
 	tui-print -${R}S "${@}"
-	exit ${1:-1}
+	exit ${1:1}

@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.7.2
+	script_version=2.8
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU\057Linux}"
 #
@@ -461,11 +461,11 @@ AUTHOR
 		then	# GUI fonts - works
 			case $NUM_ID in
 			0|1|2|3|7|10|11|127|130)	# These are colored, was 21
-				pos_three_adder=5	;;
+				pos_three_adder=4	;;
 			5|6|99)		# These are not
-				pos_three_adder=0	;;
+				pos_three_adder=1	;;
 			4)	pos_three_adder=1	;;
-			111)	pos_three_adder=4	;;
+			111)	pos_three_adder=1	;;
 			esac
 		else	# Console / Textmode only - works 
 			case $NUM_ID in

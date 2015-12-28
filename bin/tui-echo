@@ -32,7 +32,7 @@
 	TERM="${TERM:-GNU\057Linux}"
 	break_on_injections "$@" && \
 		exit 1
-	script_version=0.9.3
+	script_version=0.9.4
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -102,7 +102,7 @@ AUTHOR
 #
 #	Varbles
 #
-	doUnderstand=false
+	doUnderstand=true
 	R=""
 #
 #	Functions
@@ -124,10 +124,10 @@ AUTHOR
 	do 	case "$1" in
 		"--version")	show_version	;;
 		-h|--help)	show_help	;;
-		--)		shift ; break	;;
 		-e)		doUnderstand=true ; shift ;;
 		-E)		doUnderstand=false ; shift ;;
 		-n|-r)		R="r" ; shift ;;
+		--)		shift ; break	;;
 		*)		[ "-" = "${1:0:1}" ] && \
 					leadingDASHdummy="--" || \
 					leadingDASHdummy=""
@@ -155,7 +155,7 @@ AUTHOR
 			[ -n "$1" ] && one="$(echo -e $1)"
 			[ -n "$2" ] && two="$(echo -e $2)"
 			[ -n "$3" ] && three="$(echo -e $3)"
-			set one two three
+			set $one $two $three
 		fi
 		case $# in
 		0)	tui-print -${R}E  					;;

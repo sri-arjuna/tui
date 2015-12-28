@@ -2,6 +2,9 @@
 * Changed: Within all bins /dev/zero to /dev/null
 * Added: ./description for nongnu git repo description
 * Removed: Symlinks of backwards compatibility: tui-cat and tui-printf
+* Updated: tui-print, hopefully fixed wrong placed error 'option not found'
+* Updated: tui-status, better aligned status output, were over-corrected
+* Updated: tui-echo, set '-e' as default (doUnderstand=true)
 
 2015-12-26 - TUI 0.9.4-inprogress - sea
 * Updated: tui-progress, there was an issue with displaying '|' and reseting values
