@@ -19,7 +19,7 @@ tui-title "Example 3 : Progressbar"
 	COUNT=0
 	while [ $COUNT -le $MAX ];do
 		tui-progress -lbm $MAX -c $COUNT "Message to user"
-		sleep 0.8
+		sleep 0.1
 		((COUNT++))
 	done
 	printf "\n"

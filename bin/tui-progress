@@ -280,7 +280,7 @@ AUTHOR
 		esac
 		;;
 	NUM)	# Show increments number
-		[ "$VAL" -gt "$MAX" ] && \
+		[ $VAL -gt $MAX ] && \
 			echo "$(eval_gettext '$ME: Should have called \"${TUI_FONT_BOLD}$ME -r\" first!${TUI_FONT_RESET}')" >&2
 		STATUS="[ $VAL / $MAX ]"
 		;;
