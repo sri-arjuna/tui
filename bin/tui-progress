@@ -21,7 +21,7 @@
 #	Init TUI environment
 #
 	ME="${0##*/}"	# Name
-	script_version=1.3
+	script_version=1.3.1
 	# Check the two default places for the core configuration
 	# First system wide, second user only install
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -86,7 +86,7 @@ OPTIONS
   -m VAL	If provided, changes progress-string output to \"calculated-num / VAL \"
   -l		Prints more info when in bar mode.
   -i VAL	VAL is used as part of tempfile name tui-progress use, if used in multiple instances
-  		Should be provided if used with -m
+  		Should be provided if used with -m invocations
   -r		Resets the temp file, required for automatic increasing counts
   		If the counting exceeds the set max value, it prints a warning but continues.
 
@@ -118,7 +118,7 @@ AUTHOR
 #
 	# internals
 	TYPE=""		# Start with no display mode
-	INDI=( '\' '-' '/' '|' )	# Dont use tui-indi, for asynchronus display
+	INDI=(  '/' '-' '\' '|' )	# Dont use tui-indi, for asynchronus display
 	TOTAL=$[ ${#INDI[@]} -1 ]
 	WIDTH=${COLUMNS:-$(tput cols)}
 	# id file?
@@ -156,10 +156,10 @@ AUTHOR
 	}
 	reset_tmp() { # ID
 	# Resets the counter according to passed ID
-	#
+	# Needs to be one, otherwise last item is too low
 		if "$hasID"
-		then	tui-conf-set "$TMPFILE" "$ID" 0
-		else	echo 0 > "$TMPFILE"
+		then	tui-conf-set "$TMPFILE" "$ID" 1
+		else	echo 1 > "$TMPFILE"
 		fi
 		#echo was here
 	}
@@ -263,15 +263,17 @@ AUTHOR
 #
 #	Generate output string, and save values
 #
+	POS=""
 	case "${TYPE}" in
 	DASH)	# Regular animated dash
 		[ "$VAL" -gt 3 ] && VAL=0
+		n=$(( $WIDTH - ${#BORDER_LEFT} - 8 ))
+		POS="\033[${n}G"
+			
 		case $VAL in
-		0|1|2)	STATUS="[  ${INDI[$VAL]}   ]"	;;
+		0|1|2)	STATUS="${POS}[  ${INDI[$VAL]}   ]"	;;
 		# Below is a failback setting (injection protection)
 		3)	source "$TUI_DIR_THEMES/${TUI_THEME:-default}"
-			n=$(( $WIDTH - ${#BORDER_LEFT} - 9 ))
-			POS="\033[${n}G"
 			#STATUS="${POS}${STATUS}"
 			STATUS=$(printf "${POS}[  \174   ]")
 				;;
