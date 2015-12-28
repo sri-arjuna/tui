@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) $DATE $USER $EMAIL
+# Copyright (c) 2015 Simon Arjuna Erat (sea) <erat.simon@gmail.com>
 # All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify it
@@ -24,7 +24,7 @@
 	APP_TITLE="Text User Interface, framework for scripts"
 	APP_PRJ="TUI"
 	APP_HOMEPAGE="https://savannah.nongnu.org/projects/tui/"
-	APP_DIR="/usr"
+	#APP_DIR="/usr"
 	#CHROOT="$HOME/tmp/sysroot"
 #
 #	Author & Package Maintainer Info
@@ -40,7 +40,7 @@
 #
 	doMakefile=false
 	doGNU=true
-	doRef=true
+	#doRef=true
 #
 #	Requirements
 #
@@ -61,7 +61,7 @@
 	SYSCONFDIR="./conf.tui ./tuirc"
 	DATADIR="./conf.home ./lists ./docs/samples ./templates ./themes"
 	COMPLDIR=compl
-	#LOCALEDIR=	# No translations yet
+	#LOCALEDIR=locale/mo		# No translations yet
 	DOCDIR="[CT]* docs/[ACGILNR]*"
 	INFODIR=docs/tex/*.info
 	HTMLDIR=docs/tex/*.html
@@ -72,7 +72,6 @@
 	MAKE[0]="scripts/prepare.sh"
 	MAKE[1]="scripts/gen-tuirc.sh > ./tuirc"
 	MAKE_CREATES=./tuirc
-	#MAKE[1]="source ./tuirc ; for f in conf.tui/*conf;do source \$f;done"
 	POST[0]="[ ! -d \${CHROOT}\$SYSCONFDIR/tui ] && mkdir -p \${CHROOT}\$SYSCONFDIR/tui"
 	POST[1]="mv \${CHROOT}\$SYSCONFDIR/conf.tui/* \${CHROOT}\$SYSCONFDIR/tui && rmdir \${CHROOT}\$SYSCONFDIR/conf.tui"
 	POST[2]="sed s,\$SYSCONFDIR/conf.tui,\$SYSCONFDIR/tui,g -i make-{install,uninstall}"
@@ -83,7 +82,7 @@
 #
 #	Mini Installer
 #
-	DOWNLOAD_IF_MISSING="bin/tui-print"	# In plan
+	DOWNLOAD_IF_MISSING="bin/tui-print"
 	DOWNLOAD="http://git.savannah.gnu.org/cgit/$APP_NAME.git/snapshot/$APP_NAME-master.tar.gz"
 	GIT="git://git.sv.gnu.org/$APP_NAME.git"
 	

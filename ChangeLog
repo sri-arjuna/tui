@@ -1,6 +1,9 @@
+25-12-28 - TUI 0.9.4 - sea
+* Updated: YASSI configuration
+* Updated: tui, now takes arguments to pass to its commands (alpha-preview)
+
 2015-12-27 - TUI 0.9.4-alpha - sea
 * Changed: Within all bins /dev/zero to /dev/null
-* Added: ./description for nongnu git repo description
 * Removed: Symlinks of backwards compatibility: tui-cat and tui-printf
 * Updated: tui-print, hopefully fixed wrong placed error 'option not found'
 * Updated: tui-status, better aligned status output, were over-corrected

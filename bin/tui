@@ -151,8 +151,8 @@ AUTHOR
 #
 	# -a|--alternative ; to allow longoptions with a single leading '-'
 	GETOPT=$(getopt \
-		--options	"h" \
-		--longoptions	"help,version,YOUROPT:" \
+		--options	"habcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+		--longoptions	"help,version" \
 		--name 		"${0##*/}" -- "${@}" \
 	)
 	eval set -- "${GETOPT}";
@@ -160,11 +160,11 @@ AUTHOR
 	do 	case "$1" in
 		-h|--help)	show_help	;;
 		--version)	show_version	;;
-		--)		shift ; break	;;
+		--|*)		shift ; break	;;
 		# --------------------------------
-		--YOUROPT)	opt_str="$2"
-				shift 2
-				;;
+		# -*)		opt_str="$2"
+		#		shift 2
+		#		;;
 		esac
 	done
 #
@@ -192,7 +192,25 @@ AUTHOR
 		else	show_help
 			exit 99
 		fi
-	else	echo "todo ;)"
+	else	# This is the first apporach
+		# Since preparing all scripts as functions and on-need sourcing requires some time
+		case "$1" in
+		bol|conf|str)
+			[ -z "$2" ] && exit 1
+			which tui-$1-$2 >/dev/zero 2>&1 && \
+				cmd=tui-$1-$2 && \
+				shift 2 && \
+				$cmd "${@}"
+			exit $?
+			;;
+		*)	#[ -z "$2" ] && show_help
+			which tui-$1 >/dev/zero 2>&1 && \
+				cmd=tui-$1 && \
+				shift 2 && \
+				$cmd "${@}"
+			exit $?
+			;;
+		esac
 	fi
 #	
 # 	Clean up & exit
