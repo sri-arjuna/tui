@@ -111,8 +111,6 @@ cat << EOS
 	break_on_injections() { # ARGS
 	# Searches for injection subjects
 	# Returns true if it finds some
-		#trap - HUP INT QUIT ABRT ALRM TERM EXIT
-		
 		typeset arg ac=0
 		for arg do
 		ac="$((ac+=1))"
@@ -123,14 +121,14 @@ cat << EOS
 		;;
 		esac
 		done
-		#trap - HUP INT QUIT ABRT ALRM TERM EXIT
 		return 1
 	}
 	msg_error() { # CALLER SCRIPT FUNCNAME LINENO [CONTENT]
 	# Prints an error message and exits
 	#
-		caller="\$1" script="\$2" fname="\$3" lineno="\$4" 
-		shift 4
+		caller="\$1" script="\$2" #fname="\$3" lineno="\$4" 
+		shift 2 #4
+		
 		content=($(echo "\${@}"))
 		printf "\n"
 		printf '\t%s:\t%s\n' \\
@@ -151,7 +149,8 @@ cat << EOS
 	traps_restore() { eval \$saved_traps;}
 	export -f msg_error traps_save traps_restore
 	# Set and save basic error message traping, 
-	trap "msg_error \${CALLER:-\$0} \$0 \${FUNCNAME:-NON-FUNCTION} \$LINENO '\$(echo -E \${@})'" ABRT ALRM HUP QUIT TERM # INT  #2>/dev/null
+	#trap "msg_error \${CALLER:-\$0} \$0 \${FUNCNAME:-NON-FUNCTION} \$LINENO '\$(echo -E \${@})'" ABRT ALRM HUP QUIT TERM # INT  #2>/dev/null
+	trap "msg_error \${CALLER:-\$0} \$0 '\$(echo -E \${@})'" ABRT ALRM HUP QUIT TERM
 	## HUP INT QUIT ABRT KILL ALRM TERM ## 1 2 3 6 9 14 15
 	[ $(trap | wc -l) -ge 4 ] &&  traps_save	# Save initial traps
 EOS
