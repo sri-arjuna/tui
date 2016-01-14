@@ -44,7 +44,7 @@
 #
 #	Variable defaults
 #
-	script_version=1.5.4
+	script_version=1.5.5
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -154,8 +154,12 @@ AUTHOR
 	fi
 	# Open each file 'separately',
 	# as not all editors support to open multiple files at once
-	for A in "${ARGS[@]}";do
+	if tui-bol-gui
+	then	tui-print -E  "$(gettext 'Opening:')" "${ARGS[@]}"
+		$EDITOR "${ARGS[@]}"
+	else	for A in "${ARGS[@]}";do
 		[ ! -z "$A" ] && \
 			tui-print -E  "$(gettext 'Opening:')" "$A" && \
 			"$EDITOR" "$A"
-	done
+		done
+	fi
