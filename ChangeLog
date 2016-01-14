@@ -1,4 +1,22 @@
-25-12-28 - TUI 0.9.4 - sea
+2016-01-14 - TUI 0.9.4-3 - sea
+* Added:   steampunk & steampunk-border themes
+* Updated: tuirc, removed set +x
+* Updated: tui-asroot
+* Updated: tui-edit, attempts to open all files at once in GUI
+* Updated: tui-print, better handling of default values
+* Updated: tuirc better (custom) theme handling
+* Updated: README, Changelog, configure
+* Removed: unrequired PKBUILD files
+
+2015-12-30 - TUI 0.9.4-2 - sea
+* Updated: tui-edit, attempts to open all passed files at once in gui,
+*                   but opens each file by itself in tty mode.
+* Updated: tui-print, fixed some empty numeric variables
+* Added:   Themes "steampunk"  & "steampunk-border"
+* Updated: bin/tuirc, theme handling
+* Updated: README.md
+
+2015-12-28 - TUI 0.9.4-1 - sea
 * Updated: YASSI configuration
 * Updated: tui, now takes arguments to pass to its commands (alpha-preview)
 * Updated: tui-progress, reset was too low

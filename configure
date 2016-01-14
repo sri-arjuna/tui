@@ -20,7 +20,7 @@
 #
 #	Created:	2015.02.27
 #	Transformed:	2015.12.07
-#	Changed:	2015.12.14
+#	Changed:	2015.12.20
 	script_name=configure
 	script_version=1.8.6
 #
@@ -377,6 +377,7 @@
 			  A tarball is usally not required, unless you create them manual for upstream, now this can be partialy automated!
 			  
 			 	TARBALL 	Set alternate output file (default: ../\$APP_NAME[-\APP_VER].tar.gz)
+			 	TARBALL_DIR	Set custom output path, but let YASSI decide the filename
 			 	IGNORE  	Ignore these entries when creating the tarball
 			
 			 	A tarball can be created by either:
@@ -587,6 +588,7 @@
 		#	Advanced: Tarball (--tarball ; make dist)
 		#
 		 #	TARBALL="\${HOME}/\${APP_NAME}.tar.gz" # Where to save the tarball? Default: ../\$APP_NAME.tar.gz -- ../\${APP_NAME}-\${APP_VER}.tar.gz
+		 #	TARBALL_DIR="\$HOME"	# Let YASSI create the filename, but save it here
 		 #	IGNORE[0]=".git"	# Besides Makefile + make*, which files should be ignored for tarball?
 		 
 		#
@@ -743,8 +745,13 @@
 		[ -z "$APP_VER" ] && \
 			VERSION="" || \
 			VERSION="-${APP_VER}"
-		tarball="${TARBALL:-../${APP_NAME}$VERSION.tar.gz}"
-		cd ..
+		# This is just as a failsafe and fallback
+		[ ! -z "$TARBALL_DIR" ] && TARBALL="" && \
+			( [ -d "$TARBALL_DIR" ] || mkdir -p "$TARBALL_DIR" ) 
+		cd "${TARBALL_DIR:-..}"
+		#if TARBALL has another path than TARBALL_DIR, that is okay this way
+		tarball="${TARBALL:-${APP_NAME}$VERSION.tar.gz}"
+		# Actually save this, 
 		tar 	-acf "$tarball" \
 			--hard-dereference \
 			$opt_exclude "${this/\/}"
