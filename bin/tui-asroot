@@ -41,8 +41,8 @@
 #	Contact:	erat.simon@gmail.com
 #	License:	GNU General Public License (GPL)
 #	Created:	2015.04.05
-#	Changed:	2015.11.07
-	script_version=0.9.2-alpha
+#	Changed:	2016.01.14
+	script_version=0.9.4
 #	Description:	Executes passed command as root
 #
 #
@@ -129,17 +129,18 @@ AUTHOR
 #
 #	Display & Action
 #
+	# TUI output is redirected to stderr, if user wants to catch 'his' stdout
 	if tui-bol-root
-	then	# When passing eg: bash /path/to/script, quotes causes a failure!
-		#eval "${@}"
+	then	# envsubst, doesnt work here
 		eval "${@}" #>&2
 		exit "$?"
-	elif "${useSudo:-false}" && which "$SUDO" 2>/dev/null 1>/dev/null
-	then	tui-print -E  "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2
-		"${SUDO:-sudo}" ${@} 	>&2
-		exit "$?"
-	else	tui-print -E  "${MSG:-$TR_MSG_TEXT_ROOT}"
-		su -c "$(echo $@)" 		>&2
-		exit "$?"
+	elif ${useSudo:-false} && which "$SUDO" 2>/dev/null 1>/dev/null
+	then	tui-print -E "${MSG:-$TR_MSG_TEXT_PASSWORD}" >&2
+		${SUDO:-sudo} ${@}  || exit 1
+		${beVerbose:-false} && tui-status $? "Executed $@" >&2
+		exit $?
+	else	tui-print -E "${MSG:-$TR_MSG_TEXT_ROOT}" >&2
+		su -p -c "$(echo $@)"
+		exit $?
 	fi
 	exit 1
