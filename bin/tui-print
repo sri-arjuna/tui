@@ -21,7 +21,7 @@
 #	Script Environment
 #
 	ME="${0##*/}"
-	script_version=2.8
+	script_version=2.8.1
 	BORDER_RIGHT=""
 	TERM="${TERM:-GNU\057Linux}"
 #
@@ -52,9 +52,9 @@
 	fi
 	break_on_injections "$@" && exit 1
 	# If there is a user theme directory, use that one instead
-	if [ -f "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}" ]
+	if [ -f "$TUI_DIR_USER_THEMES/${TUI_THEME}" ]
 	then	# User has a custom theme
-		source "$TUI_DIR_USER_THEMES/${TUI_THEME:-default}"
+		source "$TUI_DIR_USER_THEMES/${TUI_THEME}"
 	else	# This should always work, absolute default anyway
 		source "$TUI_DIR_THEMES/${TUI_THEME:-default}"
 	fi
@@ -381,8 +381,8 @@ AUTHOR
 	POS_CLC="\033[${pos_clc_num}G"
 	POS_CLE="\033[${pos_cle_num}G"
 	# Center for last task
-	pos_center_num=""
-	pos_third_num=""
+	pos_center_num=0
+	pos_third_num=0
 	POS_CENTER=""
 	POS_THIRD=""
 #
