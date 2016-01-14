@@ -25,7 +25,7 @@ shopt -s expand_aliases
 	oME="${ME:-$script_name}"	# Backup of variable 'ME' if sourced
 	oVER="$script_version"
 	ME=tuirc
-	script_version=2.9.5
+	script_version=2.9.6
 	unset ${!TUI_[ABCEG..Z]*}
 	TUI_VERSION=0.9.4
 #
@@ -740,7 +740,9 @@ AUTHOR
 			then	tui-print -E  "$(gettext 'TUI_THEME is set to:')" \
 					"${TUI_THEME:-$(tui-conf-get $TRC TUI_THEME)}"
 				exit $?
-			else	tui-conf-set -v "$TRC" "TUI_THEME" "$2"
+			else	( [ -f "$TUI_DIR_THEMES/$2" ] || [ -f "$TUI_DIR_USER_THEMES/$2" ] ) && \
+					tui-conf-set -v "$TRC" "TUI_THEME" "$2" || \
+					tui-status 1 "$(eval_gettext "$2 is not a valid themename! ")"
 				exit $?
 			fi
 			;;
@@ -854,7 +856,9 @@ AUTHOR
 		# Freaky this workaround is required because of injection_protection...
 		HIT_TAB="$(gettext 'hit-tab')"
 		COLUMNS="${COLUMNS:-$(tput cols)}"
-		. $TUI_DIR_THEMES/$TUI_THEME
+		[ -f "$TUI_DIR_THEMES/$TUI_THEME" ] && \
+			source "$TUI_DIR_THEMES/$TUI_THEME" || \
+			source "$TUI_DIR_USER_THEMES/$TUI_THEME"
 		n=$(( $COLUMNS - ${#BORDER_LEFT} - 14 ))
 		POS="\033[${n}G"
 		# Actual display
@@ -884,4 +888,4 @@ AUTHOR
 		ME="${oME:-${0##*/}}"
 		script_version="$oVER"
 	fi
-set +x
+
