@@ -19,7 +19,7 @@
 #	Project Info
 #
 	APP_NAME=tui
-	APP_VER=0.9.4-2
+	APP_VER=0.9.4-3
 	APP_LIC=GPLv3+
 	APP_TITLE="Text User Interface, framework for scripts"
 	APP_PRJ="TUI"
