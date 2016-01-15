@@ -15,8 +15,8 @@ tui-title "$IAM_SAMPLE samples"
 	tui-echo
 	tui-echo "Sample: #2"
 	if tui-yesno "Try something more complex?"
-	then	tui-yesno "Show FSTAB?" && tui-cat /etc/fstab
-		tui-yesno "Show crypttab?" && tui-asroot tui-cat /etc/crypttab
+	then	tui-yesno "Show FSTAB?" && tui-printfile /etc/fstab
+		tui-yesno "Show crypttab?" && tui-asroot tui-printfile /etc/crypttab
 	else	tui-status 4 "You skipped the fs/crypt-tab display."
 	fi
 #

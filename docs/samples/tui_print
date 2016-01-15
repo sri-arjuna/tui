@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # This file belongs to the package GNU TUI (0.9.0 or later), which is copyrighted by the GPLv3 (or later).
-tui-header "TUIRC - Samples"	"tui-printf"
+tui-header "TUIRC - Samples"	"tui-print"
 
 tui-title "Basic invocation"
 MSG="Print a line that replaced by the next, loop count:"
 C=0
 while [ $C -lt 25 ]
-do 	tui-printf "$MSG $C"
+do 	tui-print "$MSG $C"
 	((C++))
 	sleep 0.05
 done
@@ -17,7 +17,7 @@ tui-title "Example 2"
 MSG="Can be used to illustrate the exit codes of tui-status, without the actual exit codes"
 C=0
 while [ $C -lt 131 ]
-do 	tui-printf -rS $C "$MSG $C"
+do 	tui-print -rS $C "$MSG $C"
 	case $C in
 	0|1|2|3|4|5|6|7|10|11|99|111|127|130)
 		sleep 0.7
@@ -28,14 +28,14 @@ do 	tui-printf -rS $C "$MSG $C"
 done
 
 tui-title "Example 3"
-tui-printf -E "It is tui-echo as well"
+tui-print -E "It is tui-echo as well"
 
 tui-title "Example 4"
-tui-printf -T "Or tui-title"
+tui-print -T "Or tui-title"
 
 tui-title "Example 5"
-tui-printf -E "" "Apply some" "custom alignment" 
+tui-print -E "" "Apply some" "custom alignment" 
 
 tui-title "Example 6"
-tui-printf -rS 111 "Or even tui-status..."
-tui-printf -S 99 Hope, "this helps"
+tui-print -rS 111 "Or even tui-status..."
+tui-print -S 99 Hope, "this helps"

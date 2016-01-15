@@ -48,6 +48,6 @@
 	# Complex usages: 2
 	# -----------------
 	grep TIME /etc/default/grub && \
-		tui-printf -S $? "Found a grub theme!" && \
+		tui-print -S $? "Found a grub theme!" && \
 		tui-echo "It is: $(tui-conf-get /etc/default/grub GRUB_TIMEOUT)" || \
 		tui-status $? "Could not find THEME in /etc/default/grub"
