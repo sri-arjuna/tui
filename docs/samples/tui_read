@@ -9,7 +9,7 @@
 #	List entries of a list
 #
 	tui-title "Sample: #1"
-	tui-read "Enter some text"
+	str=$(tui-read "Enter some text")
 #
 #	Print the list with 2 columns with roman counting
 #
