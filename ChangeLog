@@ -1,3 +1,6 @@
+2016-01-15 - TUI 0.9.4-4 - sea
+* Changed: tuirc samples, applied name changes
+
 2016-01-14 - TUI 0.9.4-3 - sea
 * Added:   steampunk & steampunk-border themes
 * Updated: tuirc, removed set +x
