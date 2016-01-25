@@ -23,7 +23,7 @@
 #	Help text
 #
 	script_name=tui-wait
-	script_version=0.9.2
+	script_version=0.9.2.1
 	beVerbose=false
 	ME="${0##*/}"
 	for tmp_task in "/etc" "${HOME:-/root}/.local" "$HOME"
@@ -161,7 +161,9 @@ BUGS
 		then	[ ${#minutes} -lt 2 ] && \
 				minutes="0${minutes}:" || \
 				minutes+=":"
-		else	minutes+=":"
+		else	minutes=$(( $minutes - $(( $hours * 60 )) ))
+			minutes+=":"
+			
 		fi
 		
 		# Format strings - secs
