@@ -20,12 +20,12 @@ INSTALL
 
 You may then call either
 
-        make && sudo make install
+        make && sudo make install-all
 
 or
 
         ./make
-        sudo ./make-install
+        sudo ./make-install-all
 
 
 

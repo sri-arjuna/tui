@@ -15,18 +15,13 @@ Missing feedback for these types:
 
 Known Bugs:
 -----------
-* Bash-completion not working
 * tui-yesno dont work properly with BORDER_COLOR yet
-* tui-dd, progress bar doesnt display properly - data is written though
+* tui-dd, progress bar doesnt display text properly - data is written though
+* samples - read ?? -- that is the only place where i 'know' read to be buggy
 
 
 Security:
 ---------
-No issues known. :)
-
-
-Fix:
-----
 No issues known. :)
 
 

@@ -312,7 +312,7 @@ AUTHOR
 			#Prepare displayed string to user
 			if $DEBUG
 			then 	[ -z "$(echo $CUR)" ] && \
-					echo " -- **** EMPTY \$CUR **** -- " && \
+					echo " -- **** EMPTY \$CUR --- DEBUGGING, please send this data to the author! **** -- " && \
 					hexdump -CL "$TMP"
 				TXT="DBG:: MB:$MB CUR:$CUR MAX_MB:$MAX_MB SRC:$SRC TARGET:$TARGET"
 				(set -x ; tui-progress -lbm ${MAX:-10} -c ${CUR:-1} "$TXT" )
