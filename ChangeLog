@@ -1,3 +1,10 @@
+2016-01-25 - TUI 0.9.4-5 - sea
+* Updated: INSTALL.md
+* Updated: TODO
+* Updated: tui-conf-editor, cancel (ctrl+c) should no longer mess up screen
+* Updated: tui-conf-editor, --options now also take --labels to describe what the values do
+* Updated: tui-wait, there was a display/calculation error
+
 2016-01-15 - TUI 0.9.4-4 - sea
 * Changed: tuirc samples, applied name changes
 
