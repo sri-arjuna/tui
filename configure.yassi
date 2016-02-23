@@ -89,4 +89,5 @@
 	DOWNLOAD_IF_MISSING="bin/tui-print"
 	DOWNLOAD="http://git.savannah.gnu.org/cgit/$APP_NAME.git/snapshot/$APP_NAME-master.tar.gz"
 	GIT="git://git.sv.gnu.org/$APP_NAME.git"
+	APP_GIT="git://git.sv.gnu.org/$APP_NAME.git"
 	
