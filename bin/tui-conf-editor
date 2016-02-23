@@ -29,7 +29,7 @@
 	script_name="${script_name/.sh/}"
 	script_title="tui-conf-editor"
 	script_package="TUI"
-	script_url="http://www.gnu.org/software/tui"
+	script_url="script_url="https://savannah.nongnu.org/projects/tui/""
 	
 	script_author="Simon Arjuna Erat (sea)"
 	script_contact="erat.simon æ gmail,com"
