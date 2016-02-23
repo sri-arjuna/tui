@@ -18,11 +18,16 @@ Known Bugs:
 * tui-yesno dont work properly with BORDER_COLOR yet
 * tui-dd, progress bar doesnt display text properly - data is written though
 * samples - read ?? -- that is the only place where i 'know' read to be buggy
-
+http://www.unix.com/shell-programming-and-scripting/263820-bash-displays-every-command.html
 
 Security:
 ---------
 No issues known. :)
+
+
+Feedback urls:
+Post in Shell scripting: 	https://plus.google.com/u/0/communities/118065954434691544613/stream/227acc6c-6780-4c78-aa42-53fae7a5054c
+Google plus community:   	https://plus.google.com/communities/100234551346652779244
 
 
 Finalize:

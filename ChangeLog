@@ -1,3 +1,9 @@
+2016-02-23 - TUI 0.9.4-5 - sea
+* Updated: tui-ftp, there were typos in the script header.
+* Updated: tui-typewriter, now prints the borders correctly again.
+* Updated: tui & tui-conf-editor, now refers to the proper url (savannah.nongnu.org)
+* Updated: YASSI
+
 2016-01-25 - TUI 0.9.4-5 - sea
 * Updated: INSTALL.md
 * Updated: TODO
