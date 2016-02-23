@@ -26,7 +26,7 @@
 	done
 	# Get the main config files
 	# 
-	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc ).tuirc" 2>/dev/null ) || source ./tuirc source "${HOME:-/root}/.tuirc" 2>/dev/null ) || source ./tuirc
+	if source "${SYSCONFDIR}/tuirc" || ( [ -f ./tuirc ] && source ./tuirc  2>/dev/null ) || ( source "${HOME:-/root}/.tuirc" 2>/dev/null ) || source ./tuirc
 	then 	# Load required variables
 		for f in $TUI_FILE_{CONF,USER}_{APPS,COMMANDS,SETTINGS}
 		do	[ -f "$f" ] && source "$f"
