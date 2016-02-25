@@ -1,3 +1,7 @@
+2016-02-23 - TUI 0.9.4-7 - sea
+* Updated: tui-download, prints again the name and filesize
+* Updated: YASSI, applied '2.0-alpha-rc1' now
+
 2016-02-23 - TUI 0.9.4-6 - sea
 * Updated: tui-ftp, there were typos in the script header.
 * Updated: tui-typewriter, now prints the borders correctly again.

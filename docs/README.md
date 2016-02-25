@@ -1,6 +1,8 @@
 Text User Interface - 0.9.x
 ===========================
 
+Project home: 	https://savannah.nongnu.org/projects/tui/
+
 This is the general purpose / all in one README.
 For detailed information, see the DOCUMENTION heading and/or the files in ./docs
 

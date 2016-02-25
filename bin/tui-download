@@ -30,7 +30,7 @@
 #	Variable defaults
 #
 	TUI_DIR_TEMP="${TUI_DIR_TEMP:-${TMPDIR:-${HOME:-/root}/.cache}}"
-	script_version=0.9.1
+	script_version=0.9.2
 	ME="${0##*/}"
 #
 #	Translate preps
@@ -177,15 +177,16 @@ AUTHOR
 		MAXVAL=$(curl_get_filesize)
 		# While its found, assume its till downloading...
 		while [ ! "" = "$(ps|$GREP $CURLWGET)" ]
-		do	tmp_size="$($LS -hl |$GREP $THIS |$AWK '{print $5}')"
+		do	[ -f "$THIS" ] && \
+				tmp_size="($($LS -hl |$GREP $THIS |$AWK '{print $5}'))"
 			COLUMNS="$(tput cols)"
-			str_middle="$THIS ($tmp_size)"
+			str_middle="$THIS $tmp_size"
 			[ 0 -ne "${MAXVAL:-0}" ] && \
 				size_bar="$($LS -l |$GREP $THIS |$AWK '{print $5}')" \
 				opt_bar="-lbm $MAXVAL -c $size_bar" || \
 				opt_bar=""
 			
-			tui-progress $opt_bar "$str_left" "${str_middle_corrected}"
+			tui-progress $opt_bar "$str_left ${str_middle}"
 			sleep 1
 			case ${CURLWGET,,} in
 			curl*)	MAXVAL=$(curl_get_filesize)

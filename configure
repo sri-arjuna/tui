@@ -20,9 +20,9 @@
 #	Idea & Author:	Simon Arjuna Erat (sea), Switzerland
 #	Created:	2015.02.27
 #	Transformed:	2016.01.15
-#	Changed:	2016.02.13
+#	Changed:	2016.02.25
 	script_name="configure"
-	script_version="2.0.0-alpha-rc0"
+	script_version="2.0.0-alpha-rc1"
 	script_bugtracker="https://github.com/sri-arjuna/yassi/issues"
 #
 #	Yet Another Simple Script Installer
@@ -505,6 +505,7 @@
 #
 	# Arrays
 	declare -A FHS 	# Use the varname to get its associated path
+	unset DOCS
 	declare -A DOCS # Use info,html,pdf,ps,dvi to create the assigned list of texi files
 	# REQS is unset about 20 lines above, on line 442, next line is 464.
 	unset REQS
@@ -739,7 +740,7 @@
 			 	
 			 	DOCS[info]="docs/texi\$APP_NAME.texi docs/texi/other-node.texi" Also multiple entries are supported.
 			 	
-			 	There is no need to handly the 'texi2any' requirement, using DOCS[TYPE] will inform the user if it is missing.
+			 	There is no need to handle the 'texi2any' requirement, using DOCS[TYPE] will inform the user if it is missing.
 			 	Also, it will not allow the user to delete (./make-clean) these docs if 'texi2any' is not available.
 			 	
 			 	While this only takes care of creating these docs, you still need to place them for the installation:
@@ -1320,6 +1321,7 @@
 		yassi.usr.check() { # 
 		# Check wether passed dir is in /usr but refers to /
 		# 
+			local oPWD="$PWD"
 			# Parent dir target does not exist
 			if [ ! -d "${CHROOT}${1%/*}" ]
 			then	for task in usr # What is Mac, Solaris, others?
@@ -1334,6 +1336,7 @@
 		 				$LN -sf "usr${1%/*}" "${1%/*}"
 				done
 			fi
+			cd "$oPWD"
 		}
 		# For some reason, it fails with grep only, about output beeing same as input
 		if $CAT "make-install" | $GREP -q "yassi.usr.check"
